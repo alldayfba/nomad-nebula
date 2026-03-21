@@ -1,16 +1,15 @@
 {
   "builds": [
     {
-      "src": "landing/package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "dist" }
-    },
-    {
       "src": "app.py",
       "use": "@vercel/python"
     },
     {
       "src": "static/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "landing/dist/**",
       "use": "@vercel/static"
     }
   ],
@@ -24,8 +23,7 @@
     { "src": "/ceo(.*)", "dest": "/app.py" },
     { "src": "/projects(.*)", "dest": "/app.py" },
     { "src": "/api/(.*)", "dest": "/app.py" },
-    { "src": "/assets/(.*)", "dest": "/assets/$1" },
-    { "src": "/(.*\\.(js|css|ico|png|jpg|svg|woff2?))", "dest": "/$1" },
-    { "src": "/", "dest": "/index.html" }
+    { "src": "/assets/(.*)", "dest": "/landing/dist/assets/$1" },
+    { "src": "/", "dest": "/landing/dist/index.html" }
   ]
 }
