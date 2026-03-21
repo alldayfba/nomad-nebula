@@ -11,7 +11,7 @@ import time
 import uuid
 from datetime import datetime
 from pathlib import Path
-from flask import Flask, render_template, request, jsonify, Response, stream_with_context, send_from_directory
+from flask import Flask, render_template, request, jsonify, Response, stream_with_context
 from flask_cors import CORS
 
 # Lazy imports for modules with heavy deps (playwright, etc.)
@@ -55,32 +55,7 @@ _sourcing_lock = threading.Lock()
 
 @app.route("/")
 def landing():
-    # Try multiple paths — Vercel serverless may resolve __file__ differently
-    candidates = [
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "landing", "dist", "index.html"),
-        os.path.join(os.getcwd(), "landing", "dist", "index.html"),
-        "/var/task/landing/dist/index.html",
-    ]
-    for path in candidates:
-        if os.path.isfile(path):
-            with open(path, "r") as f:
-                return Response(f.read(), content_type="text/html")
-    # Fallback to old lead scraper UI
-    return render_template("index.html")
-
-
-@app.route("/assets/<path:filename>")
-def landing_assets(filename):
-    candidates = [
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "landing", "dist", "assets"),
-        os.path.join(os.getcwd(), "landing", "dist", "assets"),
-        "/var/task/landing/dist/assets",
-    ]
-    for d in candidates:
-        full = os.path.join(d, filename)
-        if os.path.isfile(full):
-            return send_from_directory(d, filename)
-    return "Not found", 404
+    return render_template("landing.html")
 
 
 @app.route("/leads")
