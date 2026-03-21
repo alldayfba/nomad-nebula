@@ -1,15 +1,5 @@
 flask
-playwright
 beautifulsoup4
 requests
 anthropic
 python-dotenv
-yt-dlp
-youtube-transcript-api
-imagehash
-Pillow
-sounddevice
-numpy
-faster-whisper
-rumps
-pynput

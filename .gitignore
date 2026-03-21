@@ -43,3 +43,4 @@ autoresearch/
 clients/
 execution/remotion/
 service_account.json
+.vercel
