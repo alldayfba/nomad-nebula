@@ -3,216 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>247profits — Storefront Stalker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-    <style>
-        .severity-high { background: var(--error); color: white; }
-        .severity-medium { background: var(--warning); color: white; }
-        .severity-low { background: var(--success); color: white; }
-        
-        .status-active { color: var(--success); font-weight: 700; }
-        .status-quiet { color: var(--warning); font-weight: 700; }
-        .status-retired { color: var(--text-secondary); font-weight: 700; }
-        
-        .alert-card {
-            border-left: 4px solid var(--glass-border);
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            transition: var(--transition);
+    <title>247profits | Storefront Stalker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#FAF8F5',
+                        surface: '#FFFFFF',
+                        primary: '#0D0D12',
+                        accent: '#0071E3',
+                        text: '#111111',
+                        muted: '#666666',
+                        success: '#34d399',
+                        warning: '#fbbf24',
+                        error: '#ef4444'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Inter', 'sans-serif'],
+                        drama: ['Playfair Display', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
         }
-        .alert-card:hover { transform: translateX(4px); }
-        .alert-card.grade-a { border-left-color: var(--success); }
-        .alert-card.grade-b { border-left-color: var(--warning); }
-        .alert-card.grade-c { border-left-color: var(--text-secondary); opacity: 0.7; }
-        .alert-card.hot-deal { 
-            border-left-color: #ff9500; 
-            background: rgba(255, 149, 0, 0.05);
-            box-shadow: 0 0 20px rgba(255, 149, 0, 0.1);
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass {
+                background: rgba(255, 255, 255, 0.4);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
         }
-
-        .accuracy-track { height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden; width: 100px; }
-        .accuracy-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
-        .accuracy-high { background: var(--success); }
-        .accuracy-med { background: var(--warning); }
-        .accuracy-low { background: var(--error); }
-
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.5rem; letter-spacing: 0.05em; }
-        
-        .grid-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 2.5rem; }
-        .grid-main { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem; }
-        
-        .webhook-badge { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; margin-top: 1rem; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; }
-        .dot-online { background: var(--success); box-shadow: 0 0 8px var(--success); }
-        .dot-offline { background: var(--error); }
-
-        .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; margin-bottom: 2rem; display: inline-block; transition: var(--transition); }
-        .nav-link:hover { color: var(--accent); }
+        body { font-family: 'Inter', sans-serif; }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
-<body>
-    <div class="bg-layer">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
+<body class="bg-background text-text antialiased selection:bg-accent selection:text-white min-h-screen flex flex-col items-center">
+    
+    <!-- Global Noise Overlay -->
+    <svg style="position: absolute; width: 0; height: 0;">
+        <filter id="noiseFilter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+        </filter>
+    </svg>
+    <div class="pointer-events-none fixed inset-0 z-50 opacity-[0.03]" style="filter: url(#noiseFilter);"></div>
+
+    <!-- Animated background orbs -->
+    <div class="fixed inset-0 pointer-events-none -z-10 bg-background overflow-hidden flex justify-center items-center">
+        <div class="absolute w-[800px] h-[800px] rounded-full blur-[100px] opacity-[0.1] bg-gradient-radial from-warning/20 to-transparent bottom-[10%] left-[-20%] animate-[pulse_15s_ease-in-out_infinite]"></div>
     </div>
 
-    <main class="container" style="padding: 4rem 0;">
-        <a href="/sourcing" class="nav-link">&larr; Back to Sourcing Matrix</a>
+    <!-- Top Navigation (Floating) -->
+    <nav class="fixed top-6 z-[100] glass px-8 py-4 rounded-full flex items-center gap-12 shadow-xl border border-white/40 nav-anim">
+        <a href="/" class="font-display font-bold text-xl tracking-tight text-primary flex items-center gap-2">
+            <div class="w-4 h-4 rounded-full bg-accent animate-pulse shadow-[0_0_15px_rgba(0,113,227,0.5)]"></div>
+            247<span class="font-light">Profits</span>
+        </a>
+        <div class="hidden md:flex gap-6 text-sm font-semibold text-muted">
+            <a href="/dashboard" class="hover:text-primary transition-colors">Overview</a>
+            <a href="/sourcing" class="hover:text-primary transition-colors">Sourcing Matrix</a>
+            <a href="/audit" class="hover:text-primary transition-colors">Audit Engine</a>
+            <a href="/stalker" class="text-accent hover:text-accent transition-colors">Entity Monitor</a>
+        </div>
+    </nav>
+
+    <main class="w-full max-w-7xl mt-40 px-8 pb-32">
+        <a href="/sourcing" class="nav-anim inline-block mb-12 text-sm font-bold text-muted hover:text-accent transition-colors">&larr; Back to Sourcing Matrix</a>
         
-        <header style="margin-bottom: 4rem; display: flex; justify-content: space-between; align-items: flex-end;">
+        <header id="header" class="flex justify-between items-end mb-12">
             <div>
-                <div class="logo" style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-                        <circle cx="16" cy="16" r="14" stroke="url(#logo-grad)" stroke-width="2.5" />
-                        <circle cx="16" cy="16" r="6" fill="url(#logo-grad)" />
-                        <defs>
-                            <linearGradient id="logo-grad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
-                                <stop offset="0%" stop-color="#0071e3" />
-                                <stop offset="100%" stop-color="#5e5ce6" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <span class="text-gradient">247profits</span>
-                </div>
-                <h1 style="font-size: 3rem; margin-bottom: 0.5rem;">Storefront Stalker</h1>
-                <p style="color: var(--text-secondary); font-size: 1.1rem;">Autonomous Amazon seller monitoring with AI grading.</p>
+                <h1 class="text-5xl font-display font-bold tracking-tight mb-3">Storefront Stalker</h1>
+                <p class="text-lg text-muted">Autonomous Amazon seller monitoring with AI grading.</p>
             </div>
-            <button onclick="triggerScan()" id="btn-trigger" class="btn btn-primary" style="padding: 0.75rem 2rem;">Scan All Nodes</button>
+            <button onclick="triggerScan()" id="btn-trigger" class="px-8 py-4 bg-primary text-white rounded-full font-bold shadow-2xl hover:bg-black hover:scale-[1.03] transition-all flex items-center gap-2 group">
+                <svg class="group-hover:rotate-180 transition-transform duration-500" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                Scan All Nodes
+            </button>
         </header>
 
         <!-- Stats Matrix -->
-        <section class="grid-stats">
-            <div class="glass card" style="padding: 1.5rem;">
-                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Tracked Sellers</p>
-                <h3 id="stat-sellers" style="font-size: 2rem; margin-top: 0.5rem;">0</h3>
+        <section class="grid grid-cols-5 gap-6 mb-12">
+            <div class="glass p-6 rounded-[2rem] hover:-translate-y-1 hover:shadow-xl transition-all block-stagger">
+                <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-2">Tracked Sellers</p>
+                <h3 id="stat-sellers" class="text-4xl font-display font-bold text-primary mt-4">0</h3>
             </div>
-            <div class="glass card" style="padding: 1.5rem;">
-                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Alerts Today</p>
-                <h3 id="stat-alerts-today" style="font-size: 2rem; margin-top: 0.5rem; color: var(--accent);">0</h3>
+            <div class="glass p-6 rounded-[2rem] hover:-translate-y-1 hover:shadow-xl transition-all block-stagger">
+                <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-2">Alerts Today</p>
+                <h3 id="stat-alerts-today" class="text-4xl font-display font-bold text-accent mt-4">0</h3>
             </div>
-            <div class="glass card" style="padding: 1.5rem;">
-                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Grade A Discoveries</p>
-                <h3 id="stat-grade-a" style="font-size: 2rem; margin-top: 0.5rem; color: var(--success);">0</h3>
+            <div class="glass p-6 rounded-[2rem] hover:-translate-y-1 hover:shadow-xl transition-all block-stagger">
+                <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-2">Grade A Discoveries</p>
+                <h3 id="stat-grade-a" class="text-4xl font-display font-bold text-green-500 mt-4">0</h3>
             </div>
-            <div class="glass card" style="padding: 1.5rem;">
-                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Avg Precision</p>
-                <h3 id="stat-accuracy" style="font-size: 2rem; margin-top: 0.5rem;">0%</h3>
+            <div class="glass p-6 rounded-[2rem] hover:-translate-y-1 hover:shadow-xl transition-all block-stagger">
+                <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-2">Avg Precision</p>
+                <h3 id="stat-accuracy" class="text-4xl font-display font-bold text-primary mt-4">0%</h3>
             </div>
-            <div class="glass card" style="padding: 1.5rem;">
-                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Hot Deals (24h)</p>
-                <h3 id="stat-convergence" style="font-size: 2rem; margin-top: 0.5rem; color: #ff9500;">0</h3>
+            <div class="glass p-6 rounded-[2rem] hover:-translate-y-1 hover:shadow-xl transition-all block-stagger relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-tr from-orange-500/10 to-transparent"></div>
+                <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-2 relative z-10">Hot Deals (24h)</p>
+                <h3 id="stat-convergence" class="text-4xl font-display font-bold text-orange-500 mt-4 relative z-10">0</h3>
             </div>
         </section>
 
-        <section class="grid-main">
+        <section class="grid grid-cols-2 gap-8 mb-12">
             <!-- Add Node -->
-            <div class="glass card" style="padding: 2.5rem;">
-                <h3 style="margin-bottom: 2rem;">+ Deploy New Watcher</h3>
-                <div class="form-group">
-                    <label>Amazon Seller ID</label>
-                    <input type="text" id="input-seller-id" placeholder="e.g., A2VIDQ35RC54UG" maxlength="16" style="width: 100%;" />
-                    <p style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.5rem;">The 10-16 character code found after <code>seller=</code> in the URL.</p>
+            <div class="glass p-10 rounded-[2rem] shadow-xl block-stagger">
+                <h3 class="text-2xl font-display font-bold mb-8 text-primary">+ Deploy New Watcher</h3>
+                <div class="flex flex-col gap-6">
+                    <div>
+                        <label class="text-[0.65rem] font-bold text-muted uppercase tracking-wider block mb-2">Amazon Seller ID</label>
+                        <input type="text" id="input-seller-id" placeholder="e.g., A2VIDQ35RC54UG" maxlength="16" class="w-full px-5 py-4 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent text-sm font-mono tracking-wider font-bold" />
+                        <p class="text-xs text-muted mt-2">The 10-16 character code found after <code>seller=</code> in the URL.</p>
+                    </div>
+                    <div>
+                        <label class="text-[0.65rem] font-bold text-muted uppercase tracking-wider block mb-2">Operations Nickname</label>
+                        <input type="text" id="input-seller-name" placeholder="e.g., EliteSupply" class="w-full px-5 py-4 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent text-sm font-medium" />
+                    </div>
+                    <div>
+                        <label class="text-[0.65rem] font-bold text-muted uppercase tracking-wider block mb-2">Intelligence Notes</label>
+                        <textarea id="input-notes" rows="3" placeholder="Category specialization, sourcing patterns, etc..." class="w-full px-5 py-4 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent text-sm font-medium"></textarea>
+                    </div>
+                    <button onclick="addStorefront()" id="btn-add" class="w-full px-6 py-4 bg-accent text-white rounded-xl font-bold shadow-[0_10px_20px_rgba(0,113,227,0.2)] hover:scale-[1.02] transition-transform">Authorize Monitoring</button>
+                    <p id="add-error" class="hidden text-sm text-error font-bold mt-2 text-center"></p>
                 </div>
-                <div class="form-group">
-                    <label>Operations Nickname</label>
-                    <input type="text" id="input-seller-name" placeholder="e.g., EliteSupply" style="width: 100%;" />
-                </div>
-                <div class="form-group">
-                    <label>Intelligence Notes</label>
-                    <textarea id="input-notes" rows="3" placeholder="Category specialization, sourcing patterns, etc..." style="width: 100%;"></textarea>
-                </div>
-                <button onclick="addStorefront()" id="btn-add" class="btn btn-primary" style="width: 100%;">Authorize Monitoring</button>
-                <p id="add-error" style="color: var(--error); font-size: 0.8rem; margin-top: 1rem; display: none;"></p>
             </div>
 
             <!-- Configuration -->
-            <div class="glass card" style="padding: 2.5rem;">
-                <h3 style="margin-bottom: 2rem;">Neural Notifications</h3>
-                <div class="form-group">
-                    <label>Discord Webhook Endpoint</label>
-                    <input type="text" id="input-webhook" placeholder="https://discord.com/api/webhooks/..." style="width: 100%;" />
-                </div>
-                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-                    <button onclick="saveWebhook()" class="btn btn-primary" style="flex: 1;">Save Configuration</button>
-                    <button onclick="testWebhook()" class="btn" style="background: rgba(0,0,0,0.05); color: var(--text-primary); flex: 1;">Test Signal</button>
-                </div>
-                <div id="webhook-status" class="webhook-badge">
-                    <span class="dot dot-offline"></span>
-                    <span style="color: var(--text-secondary);">Endpoint disconnected</span>
-                </div>
+            <div class="glass p-10 rounded-[2rem] shadow-xl block-stagger">
+                <h3 class="text-2xl font-display font-bold mb-8 text-primary">Neural Notifications</h3>
+                <div class="flex flex-col gap-6">
+                    <div>
+                        <label class="text-[0.65rem] font-bold text-muted uppercase tracking-wider block mb-2">Discord Webhook Endpoint</label>
+                        <input type="text" id="input-webhook" placeholder="https://discord.com/api/webhooks/..." class="w-full px-5 py-4 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent text-xs font-mono text-primary" />
+                    </div>
+                    <div class="flex gap-4">
+                        <button onclick="saveWebhook()" class="flex-1 px-6 py-4 bg-primary text-white rounded-xl font-bold hover:scale-[1.02] transition-transform">Save Configuration</button>
+                        <button onclick="testWebhook()" class="flex-1 px-6 py-4 bg-black/5 text-primary rounded-xl font-bold hover:bg-black/10 transition-colors">Test Signal</button>
+                    </div>
+                    <div id="webhook-status" class="flex items-center gap-3 mt-2">
+                        <div class="w-2.5 h-2.5 rounded-full bg-error" id="webhook-dot"></div>
+                        <span class="text-sm font-bold text-muted" id="webhook-text">Endpoint disconnected</span>
+                    </div>
 
-                <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
-                    <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 1rem;">Operating Protocol</h4>
-                    <ul style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; padding-left: 1.25rem;">
-                        <li>Monitor profitable sellers while sourcing.</li>
-                        <li>Automated checks occur every 15 minutes.</li>
-                        <li>Grade A/B/C alerts sent to Discord instantly.</li>
-                        <li>Real-time deal analysis via neural processing.</li>
-                    </ul>
+                    <div class="mt-8 pt-8 border-t border-black/5">
+                        <h4 class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-4">Operating Protocol</h4>
+                        <ul class="space-y-3 text-sm text-muted font-medium">
+                            <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-accent/50"></div> Monitor profitable sellers while sourcing.</li>
+                            <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-accent/50"></div> Automated checks occur every 15 minutes.</li>
+                            <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-accent/50"></div> Grade A/B/C alerts sent to Discord instantly.</li>
+                            <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-accent/50"></div> Real-time deal analysis via neural processing.</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Tracked Entities -->
-        <section class="glass card" style="padding: 2.5rem; margin-bottom: 2.5rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h3>Monitored Storefront Entities</h3>
-                <span id="seller-count-label" style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 700;">0 NODES ACTIVE</span>
+        <section class="glass p-10 rounded-[2rem] mb-12 shadow-2xl block-stagger">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-2xl font-display font-bold">Monitored Storefront Entities</h3>
+                <span id="seller-count-label" class="px-4 py-1.5 rounded-md bg-black/5 text-[0.65rem] font-bold text-muted uppercase tracking-widest">0 NODES ACTIVE</span>
             </div>
-            <div class="table-wrapper">
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse text-sm">
                     <thead>
-                        <tr style="text-align: left; border-bottom: 1px solid var(--glass-border);">
-                            <th style="padding: 1rem;">Entity Name</th>
-                            <th style="padding: 1rem;">Seller Signature</th>
-                            <th style="padding: 1rem;">Status</th>
-                            <th style="padding: 1rem;">Precision</th>
-                            <th style="padding: 1rem;">Alert Count</th>
-                            <th style="padding: 1rem; text-align: right;">Actions</th>
+                        <tr class="border-b border-black/5">
+                            <th class="py-4 text-left font-bold text-muted uppercase tracking-wider text-xs">Entity Name</th>
+                            <th class="py-4 text-left font-bold text-muted uppercase tracking-wider text-xs">Seller Signature</th>
+                            <th class="py-4 text-left font-bold text-muted uppercase tracking-wider text-xs">Status</th>
+                            <th class="py-4 text-left font-bold text-muted uppercase tracking-wider text-xs">Precision</th>
+                            <th class="py-4 text-left font-bold text-muted uppercase tracking-wider text-xs">Alert Count</th>
+                            <th class="py-4 text-right font-bold text-muted uppercase tracking-wider text-xs">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="sellers-tbody"></tbody>
                 </table>
-                <div id="sellers-empty" style="padding: 4rem; text-align: center; color: var(--text-secondary);">
-                    <p style="font-size: 2rem; margin-bottom: 1rem;">🔍</p>
-                    <p>No storefront entities currently under surveillance.</p>
+                <div id="sellers-empty" class="py-16 text-center text-muted">
+                    <p class="text-4xl mb-4 opacity-50">🔍</p>
+                    <p class="font-medium">No storefront entities currently under surveillance.</p>
                 </div>
             </div>
         </section>
 
         <!-- Alert Intelligence Feed -->
-        <section>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h2>Intelligence Feed</h2>
-                <div style="display: flex; gap: 0.5rem;">
-                    <button class="btn filter-btn active" data-grade="" onclick="filterAlerts('')" style="font-size:0.75rem; padding: 0.4rem 1rem;">All Signal</button>
-                    <button class="btn filter-btn" data-grade="A" onclick="filterAlerts('A')" style="font-size:0.75rem; padding: 0.4rem 1rem;">Grade A Only</button>
-                    <button class="btn filter-btn" data-grade="B" onclick="filterAlerts('B')" style="font-size:0.75rem; padding: 0.4rem 1rem;">Grade B Only</button>
-                    <button class="btn filter-btn" data-grade="C" onclick="filterAlerts('C')" style="font-size:0.75rem; padding: 0.4rem 1rem;">Grade C Only</button>
+        <section class="block-stagger">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-display font-bold">Intelligence Feed</h2>
+                <div class="flex gap-2">
+                    <button class="filter-btn active px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-primary text-white shadow-md transition-all scale-105" data-grade="" onclick="filterAlerts('')">All Signal</button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-surface border border-black/5 text-muted hover:bg-black/5 transition-all" data-grade="A" onclick="filterAlerts('A')">Grade A Only</button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-surface border border-black/5 text-muted hover:bg-black/5 transition-all" data-grade="B" onclick="filterAlerts('B')">Grade B Only</button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-surface border border-black/5 text-muted hover:bg-black/5 transition-all" data-grade="C" onclick="filterAlerts('C')">Grade C Only</button>
                 </div>
             </div>
-            <div id="alert-feed" class="alert-feed">
-                <div id="alerts-empty" class="glass card" style="padding: 4rem; text-align: center; color: var(--text-secondary);">
-                    <p style="font-size: 2rem; margin-bottom: 1rem;">🔔</p>
-                    <p>Alert feed clear. Monitoring in progress...</p>
+            <div id="alert-feed" class="flex flex-col gap-4">
+                <div id="alerts-empty" class="glass p-16 rounded-[2rem] text-center text-muted">
+                    <p class="text-4xl mb-4 opacity-50">🔔</p>
+                    <p class="font-medium">Alert feed clear. Monitoring in progress...</p>
                 </div>
             </div>
         </section>
     </main>
 
-    <div id="toast" style="position: fixed; bottom: 2rem; right: 2rem; padding: 1rem 2rem; border-radius: var(--radius-md); background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); color: var(--text-primary); font-weight: 600; font-size: 0.9rem; transform: translateY(150%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; box-shadow: var(--glass-shadow);"></div>
+    <!-- Global Toast -->
+    <div id="toast" class="fixed bottom-8 right-8 px-6 py-4 rounded-xl bg-surface/90 backdrop-blur-xl border-l-4 border-success shadow-2xl text-sm font-bold text-primary translate-y-[150%] transition-transform duration-500 z-[1000]"></div>
 
     <script>
+        // GSAP Initialization
+        document.addEventListener("DOMContentLoaded", () => {
+            gsap.from(".nav-anim", { y: -50, opacity: 0, duration: 1, ease: "power3.out" });
+            gsap.from("#header", { y: 20, opacity: 0, duration: 0.8, delay: 0.1, ease: "power2.out" });
+            gsap.from(".block-stagger", { y: 30, opacity: 0, duration: 0.8, stagger: 0.1, ease: "back.out(1.2)", delay: 0.2 });
+        });
+
         let lastAlertId = 0;
         let currentGradeFilter = '';
-        let refreshInterval = null;
 
         function showToast(msg, type = 'success') {
             const t = document.getElementById('toast');
             t.textContent = msg;
-            t.style.borderLeft = type === 'success' ? '4px solid var(--success)' : '4px solid var(--error)';
-            t.style.transform = 'translateY(0)';
+            t.className = `fixed bottom-8 right-8 px-8 py-4 rounded-xl bg-surface/90 backdrop-blur-xl border-l-[6px] ${type === 'success' ? 'border-green-500' : 'border-error'} shadow-2xl text-sm font-bold text-primary translate-y-0 transition-transform duration-500 z-[1000]`;
             setTimeout(() => { t.style.transform = 'translateY(150%)'; }, 3000);
         }
 
@@ -221,10 +240,13 @@
             const sellerName = document.getElementById('input-seller-name').value.trim();
             const notes = document.getElementById('input-notes').value.trim();
             const errEl = document.getElementById('add-error');
-            errEl.style.display = 'none';
-            if (!sellerId) { errEl.textContent = 'Seller ID required'; errEl.style.display = 'block'; return; }
+            errEl.classList.add('hidden');
+            
+            if (!sellerId) { errEl.textContent = 'Seller ID required'; errEl.classList.remove('hidden'); return; }
+            
             const btn = document.getElementById('btn-add');
             btn.disabled = true; btn.textContent = 'Deploying...';
+            
             try {
                 const resp = await fetch('/stalker/api/storefronts', {
                     method: 'POST',
@@ -238,8 +260,9 @@
                     document.getElementById('input-seller-name').value = '';
                     document.getElementById('input-notes').value = '';
                     loadStorefronts();
-                } else { errEl.textContent = data.error || 'Authorization failed'; errEl.style.display = 'block'; }
-            } catch (e) { errEl.textContent = 'Neural link error'; errEl.style.display = 'block'; }
+                } else { errEl.textContent = data.error || 'Authorization failed'; errEl.classList.remove('hidden'); }
+            } catch (e) { errEl.textContent = 'Neural link error'; errEl.classList.remove('hidden'); }
+            
             btn.disabled = false; btn.textContent = 'Authorize Monitoring';
         }
 
@@ -259,28 +282,38 @@
                 const tbody = document.getElementById('sellers-tbody');
                 const empty = document.getElementById('sellers-empty');
                 const label = document.getElementById('seller-count-label');
+                
                 if (!data.ok || !data.storefronts || data.storefronts.length === 0) {
-                    tbody.innerHTML = ''; empty.style.display = 'block'; label.textContent = '0 NODES ACTIVE'; return;
+                    tbody.innerHTML = ''; empty.classList.remove('hidden'); label.textContent = '0 NODES ACTIVE'; return;
                 }
-                empty.style.display = 'none';
+                
+                empty.classList.add('hidden');
                 label.textContent = data.storefronts.length + ' NODE' + (data.storefronts.length !== 1 ? 'S' : '') + ' ACTIVE';
+                
                 tbody.innerHTML = data.storefronts.map(sf => {
                     const accPct = sf.accuracy_total > 0 ? Math.round(sf.accuracy_score * 100) : 0;
-                    const accClass = accPct >= 60 ? 'accuracy-high' : (accPct >= 30 ? 'accuracy-med' : 'accuracy-low');
+                    const accClass = accPct >= 60 ? 'bg-green-500' : (accPct >= 30 ? 'bg-warning' : 'bg-error');
+                    
+                    let statusClass = "text-muted font-bold";
+                    if (sf.status === "active") statusClass = "text-green-500 font-bold";
+                    if (sf.status === "quiet") statusClass = "text-warning font-bold";
+                    
                     return `
-                    <tr style="border-bottom: 1px solid var(--glass-border);">
-                        <td style="padding: 1.25rem 1rem;"><strong>${sf.seller_name}</strong></td>
-                        <td style="padding: 1.25rem 1rem; font-family: monospace; color: var(--text-secondary);">${sf.seller_id}</td>
-                        <td style="padding: 1.25rem 1rem;"><span class="status-${sf.status}">${sf.status.toUpperCase()}</span></td>
-                        <td style="padding: 1.25rem 1rem;">
-                            <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                <div class="accuracy-track"><div class="accuracy-fill ${accClass}" style="width: ${accPct}%"></div></div>
-                                <span style="font-weight: 700; font-size: 0.75rem;">${accPct}%</span>
+                    <tr class="border-b border-black/5 hover:bg-black/5 transition-colors">
+                        <td class="py-5 pr-4 font-bold text-primary">${sf.seller_name}</td>
+                        <td class="py-5 pr-4 font-mono text-xs text-muted tracking-widest">${sf.seller_id}</td>
+                        <td class="py-5 pr-4"><span class="${statusClass} text-xs uppercase tracking-widest">${sf.status}</span></td>
+                        <td class="py-5 pr-4">
+                            <div class="flex items-center gap-3">
+                                <div class="flex-1 h-1.5 rounded-full bg-black/5 overflow-hidden w-24">
+                                    <div class="h-full rounded-full ${accClass}" style="width: ${accPct}%"></div>
+                                </div>
+                                <span class="text-xs font-bold font-mono">${accPct}%</span>
                             </div>
                         </td>
-                        <td style="padding: 1.25rem 1rem; font-weight: 700; color: var(--accent);">${sf.total_alerts}</td>
-                        <td style="padding: 1.25rem 1rem; text-align: right;">
-                            <button onclick="removeStorefront('${sf.seller_id}', '${sf.seller_name}')" class="btn" style="color: var(--error); padding: 0.4rem 0.8rem; font-size: 0.7rem;">DECOMMISSION</button>
+                        <td class="py-5 pr-4 text-accent font-bold font-mono text-lg">${sf.total_alerts}</td>
+                        <td class="py-5 pl-4 text-right">
+                            <button onclick="removeStorefront('${sf.seller_id}', '${sf.seller_name}')" class="text-[0.65rem] font-bold text-error uppercase tracking-widest hover:scale-105 transition-transform">Decommission</button>
                         </td>
                     </tr>`;
                 }).join("");
@@ -301,11 +334,22 @@
                 const data = await resp.json();
                 const feed = document.getElementById('alert-feed');
                 const empty = document.getElementById('alerts-empty');
+                
                 if (!data.ok || !data.alerts || data.alerts.length === 0) {
-                    feed.innerHTML = ''; feed.appendChild(empty); empty.style.display = 'block'; return;
+                    Array.from(feed.children).forEach(c => { if(c.id !== 'alerts-empty') feed.removeChild(c); });
+                    empty.classList.remove('hidden');
+                    return;
                 }
-                empty.style.display = 'none';
-                feed.innerHTML = data.alerts.map(a => renderAlertCard(a)).join("");
+                
+                empty.classList.add('hidden');
+                
+                let html = '';
+                data.alerts.forEach(a => { html += renderAlertCard(a); });
+                
+                // Clear and inject
+                Array.from(feed.children).forEach(c => { if(c.id !== 'alerts-empty') feed.removeChild(c); });
+                feed.insertAdjacentHTML('beforeend', html);
+                
                 if (data.alerts.length > 0) {
                     const today = new Date().toISOString().split('T')[0];
                     const todayAlerts = data.alerts.filter(al => al.created_at.startsWith(today));
@@ -317,38 +361,55 @@
         }
 
         function renderAlertCard(a) {
-            const isHot = a.is_hot ? 'hot-deal' : '';
-            const gradeClass = "grade-" + a.grade.toLowerCase();
+            let configClasses = "border-l-[6px] border-black/10 bg-surface shadow-sm";
+            let badgeClasses = "bg-black/5 text-muted";
+            
+            if (a.is_hot) {
+                configClasses = "border-l-[6px] border-orange-500 bg-orange-500/5 shadow-[0_4px_20px_rgba(249,115,22,0.1)]";
+            } else if (a.grade === 'A') {
+                configClasses = "border-l-[6px] border-green-500 bg-surface shadow-md";
+                badgeClasses = "bg-green-500/10 text-green-600 border border-green-500/20";
+            } else if (a.grade === 'B') {
+                configClasses = "border-l-[6px] border-warning bg-surface shadow-md";
+                badgeClasses = "bg-warning/10 text-warning border border-warning/20";
+            } else if (a.grade === 'C') {
+                configClasses = "border-l-[6px] border-black/10 bg-surface/50 opacity-80";
+                badgeClasses = "bg-black/5 text-muted border border-black/10";
+            }
+
             const profit = a.analysis && a.analysis.profit ? a.analysis.profit : 0;
             const roi = a.analysis && a.analysis.roi ? a.analysis.roi : 0;
+            
             return `
-            <div class="glass card alert-card ${gradeClass} ${isHot}">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+            <div class="p-6 rounded-2xl transition-transform hover:-translate-y-1 ${configClasses} alert-stagger">
+                <div class="flex justify-between items-start mb-6">
                     <div>
-                        <div style="font-size: 0.7rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">${a.seller_name} — ${timeAgo(a.created_at)}</div>
-                        <h4 style="font-size: 1.1rem; margin-bottom: 0.25rem;">${a.product_name}</h4>
-                        <code style="font-size: 0.75rem; color: var(--accent);">${a.asin}</code>
+                        <div class="text-[0.65rem] font-bold text-muted uppercase tracking-widest mb-1.5 font-mono">${a.seller_name} — ${timeAgo(a.created_at)}</div>
+                        <h4 class="text-xl font-bold font-display text-primary mb-1">${a.product_name}</h4>
+                        <code class="text-xs font-bold text-accent px-1.5 py-0.5 bg-accent/5 rounded">${a.asin}</code>
                     </div>
-                    <div class="badge ${a.grade === 'A' ? 'severity-low' : a.grade === 'B' ? 'severity-medium' : 'severity-none'}" style="padding: 0.4rem 1.25rem;">GRADE ${a.grade}</div>
+                    <div class="px-4 py-1.5 rounded-full font-bold uppercase tracking-widest text-xs ${badgeClasses}">GRADE ${a.grade}</div>
                 </div>
-                <div style="display: flex; gap: 2rem; margin-bottom: 1.5rem;">
+                
+                <div class="flex gap-10 mb-6">
                     <div>
-                        <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Est. Profit</p>
-                        <p style="font-weight: 800; color: var(--success);">$${profit}</p>
+                        <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-1">Est. Profit</p>
+                        <p class="text-lg font-bold font-mono text-green-600">$${profit}</p>
                     </div>
                     <div>
-                        <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">ROI</p>
-                        <p style="font-weight: 800; color: var(--accent);">${roi}%</p>
+                        <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-1">ROI</p>
+                        <p class="text-lg font-bold font-mono text-accent">${roi}%</p>
                     </div>
                     <div>
-                        <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Rank</p>
-                        <p style="font-weight: 800;">#${a.analysis?.rank || 'N/A'}</p>
+                        <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-1">Rank</p>
+                        <p class="text-lg font-bold font-mono text-primary">#${a.analysis?.rank || 'N/A'}</p>
                     </div>
                 </div>
-                <div style="display: flex; gap: 1rem;">
-                    <a href="https://www.amazon.com/dp/${a.asin}" target="_blank" class="btn" style="background: rgba(255,153,0,0.1); color: #ff9900; font-size: 0.8rem; flex: 1; text-align: center;">View Amazon</a>
-                    <button onclick="submitFeedback(${a.id}, 'bought')" class="btn" style="background: rgba(52,211,153,0.1); color: var(--success); font-size: 0.8rem; flex: 1;">Logged Purchase</button>
-                    <button onclick="submitFeedback(${a.id}, 'skipped')" class="btn" style="background: rgba(239,68,68,0.1); color: var(--error); font-size: 0.8rem; flex: 1;">Irrelevant Signal</button>
+                
+                <div class="grid grid-cols-3 gap-4">
+                    <a href="https://www.amazon.com/dp/${a.asin}" target="_blank" class="px-4 py-2.5 rounded-xl bg-orange-500/10 text-orange-600 text-xs font-bold uppercase tracking-wider text-center hover:bg-orange-500 hover:text-white transition-colors">View Amazon</a>
+                    <button onclick="submitFeedback(${a.id}, 'bought')" class="px-4 py-2.5 rounded-xl bg-green-500/10 text-green-600 text-xs font-bold uppercase tracking-wider hover:bg-green-500 hover:text-white transition-colors">Logged Purchase</button>
+                    <button onclick="submitFeedback(${a.id}, 'skipped')" class="px-4 py-2.5 rounded-xl bg-red-500/10 text-red-500 text-xs font-bold uppercase tracking-wider hover:bg-red-500 hover:text-white transition-colors">Irrelevant Signal</button>
                 </div>
             </div>`;
         }
@@ -367,13 +428,21 @@
 
         async function triggerScan() {
             const btn = document.getElementById('btn-trigger');
-            btn.disabled = true; btn.textContent = 'Scanning Nodes...';
+            btn.disabled = true; 
+            btn.innerHTML = '<span class="animate-pulse">Scanning Nodes...</span>';
             try {
                 const resp = await fetch('/stalker/api/scan', { method: 'POST' });
                 const data = await resp.json();
                 showToast(data.message || 'Node scan initiated');
-                setTimeout(() => { loadAlerts(); btn.disabled = false; btn.textContent = 'Scan All Nodes'; }, 2000);
-            } catch (e) { btn.disabled = false; btn.textContent = 'Scan All Nodes'; }
+                setTimeout(() => { 
+                    loadAlerts(); 
+                    btn.disabled = false; 
+                    btn.innerHTML = '<svg class="group-hover:rotate-180 transition-transform duration-500" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg> Scan All Nodes'; 
+                }, 2000);
+            } catch (e) { 
+                btn.disabled = false; 
+                btn.innerHTML = '<svg class="group-hover:rotate-180 transition-transform duration-500" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg> Scan All Nodes'; 
+            }
         }
 
         async function saveWebhook() {
@@ -401,22 +470,36 @@
             try {
                 const resp = await fetch('/stalker/api/webhook');
                 const data = await resp.json();
-                const dot = document.querySelector('.dot');
-                const text = document.querySelector('#webhook-status span:last-child');
+                const dot = document.getElementById('webhook-dot');
+                const text = document.getElementById('webhook-text');
                 if (data.url) {
-                    dot.className = 'dot dot-online';
+                    dot.className = 'w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_10px_rgba(52,211,153,0.5)]';
                     text.textContent = 'Neural link established';
+                    text.className = 'text-sm font-bold text-green-500';
                     document.getElementById('input-webhook').value = data.url;
-                } else { dot.className = 'dot dot-offline'; text.textContent = 'Endpoint disconnected'; }
+                } else { 
+                    dot.className = 'w-2.5 h-2.5 rounded-full bg-error'; 
+                    text.textContent = 'Endpoint disconnected'; 
+                    text.className = 'text-sm font-bold text-muted';
+                }
             } catch (e) {}
         }
 
         function filterAlerts(grade) {
             currentGradeFilter = grade;
             document.querySelectorAll('.filter-btn').forEach(b => {
-                b.classList.toggle('active', b.getAttribute('data-grade') === grade);
+                if(b.getAttribute('data-grade') === grade) {
+                    b.className = 'filter-btn active px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-primary text-white shadow-md transition-all scale-105';
+                } else {
+                    b.className = 'filter-btn px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-surface border border-black/5 text-muted hover:bg-black/5 transition-all';
+                }
             });
             loadAlerts();
+            
+            // Re-animate new alerts
+            setTimeout(() => {
+                gsap.from(".alert-stagger", { y: 20, opacity: 0, duration: 0.5, stagger: 0.05, ease: "power2.out" });
+            }, 100);
         }
 
         function timeAgo(date) {
@@ -434,8 +517,11 @@
             return "just now";
         }
 
-        refreshAll();
         function refreshAll() { loadStorefronts(); loadAlerts(); checkWebhook(); }
+        
+        // Initial load
+        refreshAll();
+        // Periodic sync
         setInterval(refreshAll, 60000);
     </script>
 </body>

@@ -3,257 +3,184 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>247profits — AI Business Audit</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-  <style>
-    .nav-tabs {
-      display: flex;
-      gap: 2rem;
-      margin-bottom: 3rem;
-      border-bottom: 1px solid var(--glass-border);
-    }
-    .nav-tab {
-      padding: 1rem 0;
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-      text-decoration: none;
-      border-bottom: 2px solid transparent;
-      transition: var(--transition);
-    }
-    .nav-tab.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
-
-    .mode-tabs {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 2rem;
-      background: rgba(0,0,0,0.03);
-      padding: 0.25rem;
-      border-radius: var(--radius-sm);
-      width: fit-content;
-    }
-    .mode-tab {
-      padding: 0.6rem 1.25rem;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      background: transparent;
-      color: var(--text-secondary);
-      transition: var(--transition);
-    }
-    .mode-tab.active {
-      background: white;
-      color: var(--text-primary);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .mode-panel { display: none; }
-    .mode-panel.active { display: block; }
-
-    .btn-audit {
-      padding: 0.5rem 1rem;
-      border-radius: var(--radius-sm);
-      font-size: 0.8rem;
-      font-weight: 600;
-      background: rgba(0, 113, 227, 0.05);
-      color: var(--accent);
-      border: 1px solid rgba(0, 113, 227, 0.1);
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    .btn-audit:hover { background: var(--accent); color: white; }
-    .btn-audit.selected { background: var(--success); color: white; border-color: var(--success); }
-
-    .progress-step {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 0.75rem;
-      border-radius: var(--radius-sm);
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-    }
-    .progress-step.active { color: var(--text-primary); font-weight: 600; background: rgba(0, 113, 227, 0.03); }
-    .progress-step.done { color: var(--success); }
-    
-    .step-icon {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      border: 2px solid currentColor;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.7rem;
-      font-weight: 800;
-    }
-
-    .output-section {
-      margin-bottom: 2rem;
-      overflow: hidden;
-    }
-    .output-header {
-      padding: 1.25rem 1.5rem;
-      border-bottom: 1px solid var(--glass-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .audit-body { padding: 2.5rem; line-height: 1.8; color: var(--text-secondary); }
-    .audit-body h1, .audit-body h2 { color: var(--text-primary); margin-top: 2rem; }
-    .audit-body h1:first-child { margin-top: 0; }
-
-    .ad-angle-card {
-      background: white;
-      border: 1px solid var(--glass-border);
-      padding: 1.5rem;
-      border-radius: var(--radius-sm);
-    }
-    .angle-badge {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      border-radius: var(--radius-full);
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      margin-bottom: 1rem;
-    }
-    .angle-pain { background: rgba(255, 59, 48, 0.1); color: var(--error); }
-    .angle-opportunity { background: rgba(40, 205, 65, 0.1); color: var(--success); }
-    .angle-credibility { background: rgba(0, 113, 227, 0.1); color: var(--accent); }
-
-    .hidden { display: none !important; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .spin-mini { width: 12px; height: 12px; border: 2px solid rgba(0,0,0,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  <title>247profits | AI Business Audit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+      tailwind.config = {
+          theme: {
+              extend: {
+                  colors: {
+                      background: '#FAF8F5',
+                      surface: '#FFFFFF',
+                      primary: '#0D0D12',
+                      accent: '#0071E3',
+                      text: '#111111',
+                      muted: '#666666',
+                      success: '#34d399',
+                      warning: '#fbbf24',
+                      error: '#ef4444'
+                  },
+                  fontFamily: {
+                      sans: ['Inter', 'sans-serif'],
+                      display: ['Inter', 'sans-serif'],
+                      drama: ['Playfair Display', 'serif'],
+                      mono: ['JetBrains Mono', 'monospace'],
+                  }
+              }
+          }
+      }
+  </script>
+  <style type="text/tailwindcss">
+      @layer utilities {
+          .glass {
+              background: rgba(255, 255, 255, 0.4);
+              backdrop-filter: blur(20px);
+              -webkit-backdrop-filter: blur(20px);
+              border: 1px solid rgba(255, 255, 255, 0.2);
+          }
+      }
+      body { font-family: 'Inter', sans-serif; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .spin-mini { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
-<body>
-  <div class="bg-layer">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
+<body class="bg-background text-text antialiased selection:bg-accent selection:text-white min-h-screen flex flex-col items-center">
+
+  <!-- Global Noise Overlay -->
+  <svg style="position: absolute; width: 0; height: 0;">
+      <filter id="noiseFilter">
+          <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+      </filter>
+  </svg>
+  <div class="pointer-events-none fixed inset-0 z-50 opacity-[0.03]" style="filter: url(#noiseFilter);"></div>
+
+  <!-- Animated background orbs -->
+  <div class="fixed inset-0 pointer-events-none -z-10 bg-background overflow-hidden flex justify-center items-center">
+      <div class="absolute w-[800px] h-[800px] rounded-full blur-[100px] opacity-[0.1] bg-gradient-radial from-success/20 to-transparent top-[10%] left-[-10%] animate-[pulse_12s_ease-in-out_infinite]"></div>
   </div>
 
-  <main class="container" style="padding: 4rem 0;">
-    <header style="margin-bottom: 4rem;">
-      <a href="/" class="logo" style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-        <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-          <circle cx="16" cy="16" r="14" stroke="url(#logo-grad)" stroke-width="2.5" />
-          <circle cx="16" cy="16" r="6" fill="url(#logo-grad)" />
-          <defs>
-            <linearGradient id="logo-grad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#0071e3" />
-              <stop offset="100%" stop-color="#5e5ce6" />
-            </linearGradient>
-          </defs>
-        </svg>
-        <span class="text-gradient">247profits</span>
+  <!-- Top Navigation (Floating) -->
+  <nav class="fixed top-6 z-[100] glass px-8 py-4 rounded-full flex items-center gap-12 shadow-xl border border-white/40 nav-anim">
+      <a href="/" class="font-display font-bold text-xl tracking-tight text-primary flex items-center gap-2">
+          <div class="w-4 h-4 rounded-full bg-accent animate-pulse shadow-[0_0_15px_rgba(0,113,227,0.5)]"></div>
+          247<span class="font-light">Profits</span>
       </a>
-      <h1 style="font-size: 3.5rem; margin-bottom: 1rem;">AI Business Audit</h1>
-      <p style="font-size: 1.25rem; color: var(--text-secondary); max-width: 700px;">
-        Generate comprehensive marketing audits, ad angles, and outreach strategy for any business in seconds.
-      </p>
+      <div class="hidden md:flex gap-6 text-sm font-semibold text-muted">
+          <a href="/dashboard" class="hover:text-primary transition-colors">Overview</a>
+          <a href="/sourcing" class="hover:text-primary transition-colors">Sourcing Matrix</a>
+          <a href="/audit" class="text-accent hover:text-accent transition-colors">Audit Engine</a>
+          <a href="/ceo" class="hover:text-primary transition-colors">CEO Command Center</a>
+      </div>
+  </nav>
+
+  <main class="w-full max-w-7xl mt-40 px-8 pb-32">
+    <header id="header" class="mb-12">
+      <h1 class="text-5xl font-display font-bold tracking-tight mb-3">AI Business Audit</h1>
+      <p class="text-lg text-muted max-w-2xl">Generate comprehensive marketing audits, ad angles, and outreach strategy for any business in seconds.</p>
     </header>
 
-    <nav class="nav-tabs">
-      <a href="/" class="nav-tab">Lead Finder</a>
-      <a href="/audit" class="nav-tab active">Audit Generator</a>
-      <a href="/dashboard" class="nav-tab">Dashboard</a>
-    </nav>
-
-    <section class="glass card" style="padding: 2.5rem; margin-bottom: 3rem;">
-      <div class="mode-tabs">
-        <button class="mode-tab active" onclick="switchMode('search')">🔍 Search Market</button>
-        <button class="mode-tab" onclick="switchMode('direct')">🔗 Direct URL</button>
+    <section class="glass p-10 rounded-[2rem] shadow-xl mb-12 block-stagger">
+      <!-- Mode Tabs -->
+      <div class="flex gap-2 p-1 bg-black/5 rounded-xl w-fit mb-8 relative z-10">
+        <button id="tab-search" class="px-6 py-2.5 rounded-lg text-sm font-bold transition-all bg-white text-primary shadow-sm active-tab" onclick="switchMode('search')">🔍 Search Market</button>
+        <button id="tab-direct" class="px-6 py-2.5 rounded-lg text-sm font-bold transition-all text-muted hover:text-primary" onclick="switchMode('direct')">🔗 Direct URL</button>
       </div>
 
-      <div id="mode-search" class="mode-panel active">
-        <div style="display: grid; grid-template-columns: 2fr 1fr 100px; gap: 1rem; margin-bottom: 1.5rem;">
-          <div class="field">
-            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 0.5rem;">Industry</label>
-            <input id="a-query" type="text" placeholder="e.g. dentists, gyms, law firms" />
+      <!-- Search Mode -->
+      <div id="mode-search" class="block">
+        <div class="grid grid-cols-12 gap-6 mb-6">
+          <div class="col-span-6">
+            <label class="text-[0.65rem] font-bold text-muted uppercase tracking-wider block mb-2 px-1">Industry</label>
+            <input id="a-query" type="text" placeholder="e.g. dentists, gyms, law firms" class="w-full px-5 py-4 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent text-sm font-medium" />
           </div>
-          <div class="field">
-            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 0.5rem;">Location</label>
-            <input id="a-location" type="text" placeholder="e.g. Dallas, TX" />
+          <div class="col-span-4">
+            <label class="text-[0.65rem] font-bold text-muted uppercase tracking-wider block mb-2 px-1">Location</label>
+            <input id="a-location" type="text" placeholder="e.g. Dallas, TX" class="w-full px-5 py-4 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent text-sm font-medium" />
           </div>
-          <div class="field">
-            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 0.5rem;">Limit</label>
-            <select id="a-max">
-              <option value="10" selected>10</option>
-              <option value="20">20</option>
-              <option value="50">50</option>
-            </select>
+          <div class="col-span-2">
+            <label class="text-[0.65rem] font-bold text-muted uppercase tracking-wider block mb-2 px-1">Limit</label>
+            <div class="relative">
+                <select id="a-max" class="w-full px-5 py-4 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent text-sm font-medium appearance-none cursor-pointer">
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+                <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+            </div>
           </div>
         </div>
-        <div style="display: flex; justify-content: flex-end;">
-          <button class="btn btn-primary" onclick="searchLeads()">Find Businesses</button>
+        <div class="flex justify-end">
+          <button onclick="searchLeads()" class="px-8 py-4 bg-primary text-white rounded-xl font-bold shadow-[0_10px_20px_rgba(13,13,18,0.2)] hover:scale-[1.02] transition-transform">Find Businesses</button>
         </div>
       </div>
 
-      <div id="mode-direct" class="mode-panel">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
-          <div class="field">
-            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 0.5rem;">Business Name *</label>
-            <input id="d-name" type="text" placeholder="e.g. Skyline Dental" />
+      <!-- Direct Mode -->
+      <div id="mode-direct" class="hidden">
+        <div class="grid grid-cols-2 gap-6 mb-6">
+          <div>
+            <label class="text-[0.65rem] font-bold text-muted uppercase tracking-wider block mb-2 px-1">Business Name *</label>
+            <input id="d-name" type="text" placeholder="e.g. Skyline Dental" class="w-full px-5 py-4 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent text-sm font-medium" />
           </div>
-          <div class="field">
-            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 0.5rem;">Website URL</label>
-            <input id="d-website" type="text" placeholder="https://example.com" />
-          </div>
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
-          <div class="field">
-            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 0.5rem;">Category</label>
-            <input id="d-category" type="text" placeholder="e.g. Medical" />
-          </div>
-          <div class="field">
-            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 0.5rem;">Phone</label>
-            <input id="d-phone" type="text" placeholder="(555) 000-0000" />
-          </div>
-          <div class="field">
-            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 0.5rem;">Owner Name</label>
-            <input id="d-owner" type="text" placeholder="Optional" />
+          <div>
+            <label class="text-[0.65rem] font-bold text-muted uppercase tracking-wider block mb-2 px-1">Website URL</label>
+            <input id="d-website" type="text" placeholder="https://example.com" class="w-full px-5 py-4 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent text-sm font-medium" />
           </div>
         </div>
-        <div style="display: flex; justify-content: flex-end;">
-          <button id="direct-generate-btn" class="btn btn-primary" onclick="startAuditDirect()">Generate AI Audit</button>
+        <div class="grid grid-cols-3 gap-6 mb-6">
+          <div>
+            <label class="text-[0.65rem] font-bold text-muted uppercase tracking-wider block mb-2 px-1">Category</label>
+            <input id="d-category" type="text" placeholder="e.g. Medical" class="w-full px-5 py-4 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent text-sm font-medium" />
+          </div>
+          <div>
+            <label class="text-[0.65rem] font-bold text-muted uppercase tracking-wider block mb-2 px-1">Phone</label>
+            <input id="d-phone" type="text" placeholder="(555) 000-0000" class="w-full px-5 py-4 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent text-sm font-medium" />
+          </div>
+          <div>
+            <label class="text-[0.65rem] font-bold text-muted uppercase tracking-wider block mb-2 px-1">Owner Name</label>
+            <input id="d-owner" type="text" placeholder="Optional" class="w-full px-5 py-4 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent text-sm font-medium" />
+          </div>
+        </div>
+        <div class="flex justify-end">
+          <button id="direct-generate-btn" class="px-8 py-4 bg-accent text-white rounded-xl font-bold shadow-[0_10px_20px_rgba(0,113,227,0.2)] hover:scale-[1.02] transition-transform" onclick="startAuditDirect()">Generate AI Audit</button>
         </div>
       </div>
     </section>
 
     <!-- Search Status -->
-    <div id="search-status" class="hidden" style="text-align: center; margin-bottom: 2rem;">
-      <div class="spin-mini" style="display: inline-block; width: 24px; height: 24px; vertical-align: middle; margin-right: 0.75rem;"></div>
-      <span id="search-status-text" style="font-weight: 600; color: var(--accent);">Scanning market data...</span>
+    <div id="search-status" class="hidden text-center mb-8">
+      <div class="spin-mini inline-block border-t-accent mr-3"></div>
+      <span id="search-status-text" class="font-bold text-accent">Scanning market data...</span>
     </div>
 
     <!-- Error Box -->
-    <div id="audit-error" class="hidden" style="padding: 1.5rem; background: rgba(255, 59, 48, 0.1); border: 1px solid var(--error); border-radius: var(--radius-sm); color: var(--error); margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem;">
+    <div id="audit-error" class="hidden p-6 bg-error/10 border-l-[6px] border-error rounded-xl text-error font-medium mb-8 flex items-center gap-4">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
       <span id="audit-error-text"></span>
     </div>
 
     <!-- Search Results -->
-    <section id="search-results" class="hidden glass card" style="padding: 1.5rem; margin-bottom: 3rem;">
-      <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+    <section id="search-results" class="hidden glass p-10 rounded-[2rem] shadow-xl mb-12">
+      <div class="flex justify-between items-center mb-8">
         <div>
-          <h3 id="search-results-count" style="margin-bottom: 0.25rem;">0 found</h3>
-          <p id="search-results-query" style="color: var(--text-secondary); font-size: 0.85rem;"></p>
+          <h3 id="search-results-count" class="text-2xl font-display font-bold">0 found</h3>
+          <p id="search-results-query" class="text-sm font-mono text-muted tracking-tight"></p>
         </div>
-        <p style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">SELECT A BUSINESS TO AUDIT</p>
+        <p class="text-[0.65rem] font-bold text-muted uppercase tracking-widest bg-black/5 px-4 py-1.5 rounded-lg">Select a Node</p>
       </div>
-      <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse text-sm">
           <thead>
-            <tr style="text-align: left; border-bottom: 1px solid var(--glass-border);">
-              <th style="padding: 1rem;">Business</th>
-              <th style="padding: 1rem;">Category</th>
-              <th style="padding: 1rem;">Rating</th>
-              <th style="padding: 1rem; text-align: right;">Action</th>
+            <tr class="border-b border-black/5">
+              <th class="py-4 text-left font-bold text-muted uppercase tracking-wider text-xs">Business</th>
+              <th class="py-4 text-left font-bold text-muted uppercase tracking-wider text-xs">Category</th>
+              <th class="py-4 text-left font-bold text-muted uppercase tracking-wider text-xs">Rating</th>
+              <th class="py-4 text-right font-bold text-muted uppercase tracking-wider text-xs">Action</th>
             </tr>
           </thead>
           <tbody id="search-results-body"></tbody>
@@ -262,80 +189,101 @@
     </section>
 
     <!-- Selected Biz Card -->
-    <section id="selected-card" class="hidden glass card" style="padding: 2rem; background: rgba(0, 113, 227, 0.03); border: 1px solid var(--accent); margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: center;">
+    <section id="selected-card" class="hidden glass p-10 rounded-[2rem] bg-accent/5 border-l-[6px] border-accent shadow-xl mb-12 flex justify-between items-center">
       <div>
-        <h2 id="selected-name" style="margin-bottom: 0.5rem;">Business Name</h2>
-        <div id="selected-meta" style="display: flex; gap: 1.5rem; color: var(--text-secondary); font-size: 0.85rem; font-weight: 500;">
-          <span id="selected-category"></span>
-          <span id="selected-location"></span>
-          <span id="selected-rating"></span>
-          <span id="selected-website"></span>
+        <h2 id="selected-name" class="text-3xl font-display font-bold text-primary mb-2">Business Name</h2>
+        <div id="selected-meta" class="flex flex-wrap gap-4 text-xs font-bold text-muted uppercase tracking-wider font-mono">
+          <span id="selected-category" class="px-2 py-1 bg-black/5 rounded"></span>
+          <span id="selected-location" class="px-2 py-1 bg-black/5 rounded"></span>
+          <span id="selected-rating" class="text-warning"></span>
+          <span id="selected-website" class="text-accent hover:underline"></span>
         </div>
       </div>
-      <button id="generate-btn" class="btn btn-primary" onclick="startAudit()" style="padding: 1rem 2rem; font-size: 1rem;">
-        🚀 Run Full Audit
+      <button id="generate-btn" class="px-8 py-4 bg-primary text-white rounded-xl font-bold shadow-[0_10px_20px_rgba(13,13,18,0.2)] hover:scale-[1.02] transition-transform flex items-center gap-2" onclick="startAudit()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="animate-pulse" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        Run Full Audit
       </button>
     </section>
 
     <!-- Progress -->
-    <section id="progress-container" class="hidden glass card" style="padding: 2rem; margin-bottom: 3rem;">
-      <h3 style="margin-bottom: 1.5rem; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.1em; color: var(--text-secondary);">Neural Pipeline Active</h3>
-      <div id="progress-steps" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+    <section id="progress-container" class="hidden glass p-10 rounded-[2rem] shadow-xl mb-12">
+      <h3 class="text-[0.7rem] font-bold text-muted border-b border-black/5 pb-4 uppercase tracking-widest mb-6 border-black/5">Neural Pipeline Active</h3>
+      <div id="progress-steps" class="flex flex-col gap-2"></div>
     </section>
 
     <!-- Final Output -->
     <div id="output-panel" class="hidden">
       <!-- Drive CTA -->
-      <div id="drive-cta-card" class="glass card" style="padding: 2rem; border: 1px solid var(--success); background: rgba(40, 205, 65, 0.05); margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: center;">
+      <div id="drive-cta-card" class="glass p-8 rounded-[2rem] border-l-[6px] border-success bg-success/5 shadow-xl mb-12 flex justify-between items-center">
         <div>
-          <div style="font-size: 0.7rem; font-weight: 800; color: var(--success); text-transform: uppercase; margin-bottom: 0.5rem;">Asset Package Ready</div>
-          <h2 id="drive-folder-name" style="margin-bottom: 0.25rem;">Drive Folder Name</h2>
-          <p id="drive-file-list" style="color: var(--text-secondary); font-size: 0.85rem;"></p>
+          <div class="text-[0.65rem] font-bold text-success uppercase tracking-widest mb-2 font-mono">Asset Package Ready</div>
+          <h2 id="drive-folder-name" class="text-2xl font-display font-bold text-primary mb-1">Drive Folder Name</h2>
+          <p id="drive-file-list" class="text-sm font-bold text-muted"></p>
         </div>
-        <a id="drive-folder-link" href="#" target="_blank" class="btn btn-primary" style="background: var(--success);">
+        <a id="drive-folder-link" href="#" target="_blank" class="px-8 py-4 bg-success text-white rounded-xl font-bold shadow-[0_10px_20px_rgba(52,211,153,0.3)] hover:scale-[1.02] transition-transform">
           Open in Google Drive
         </a>
       </div>
 
-      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
-        <div style="display: flex; flex-direction: column; gap: 2rem;">
+      <div class="grid grid-cols-3 gap-8">
+        <div class="col-span-2 flex flex-col gap-8">
           <!-- Audit Doc -->
-          <div class="glass card output-section">
-            <div class="output-header">
-              <h3 style="font-size: 1rem;">1-Page Market Audit</h3>
-              <button class="btn-audit" onclick="copySection('audit-doc-content', this)">Copy Markdown</button>
+          <div class="glass rounded-[2rem] shadow-xl overflow-hidden relative group">
+            <div class="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+            <div class="px-8 py-6 border-b border-black/5 flex justify-between items-center bg-surface/50">
+              <h3 class="text-lg font-display font-bold text-primary">1-Page Market Audit</h3>
+              <button class="px-4 py-2 bg-black/5 text-primary rounded-lg text-xs font-bold hover:bg-black/10 transition-colors" onclick="copySection('audit-doc-content', this)">Copy Markdown</button>
             </div>
-            <div id="audit-doc-rendered" class="audit-body"></div>
+            <div id="audit-doc-rendered" class="p-8 pb-12 text-sm text-muted leading-relaxed font-medium markdown-render"></div>
             <textarea id="audit-doc-content" class="hidden"></textarea>
           </div>
 
           <!-- Outreach -->
-          <div class="glass card output-section">
-            <div class="output-header">
-              <h3 style="font-size: 1rem;">Strategic Outreach</h3>
-              <button class="btn-audit" onclick="copySection('outreach-content', this)">Copy Message</button>
+          <div class="glass rounded-[2rem] shadow-xl overflow-hidden relative group">
+            <div class="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+            <div class="px-8 py-6 border-b border-black/5 flex justify-between items-center bg-surface/50">
+              <h3 class="text-lg font-display font-bold text-primary">Strategic Outreach</h3>
+              <button class="px-4 py-2 bg-black/5 text-primary rounded-lg text-xs font-bold hover:bg-black/10 transition-colors" onclick="copySection('outreach-content', this)">Copy Message</button>
             </div>
-            <div id="outreach-display" style="padding: 2.5rem; font-family: monospace; font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap;"></div>
+            <div id="outreach-display" class="p-8 pb-12 font-mono text-sm text-primary leading-relaxed whitespace-pre-wrap"></div>
             <textarea id="outreach-content" class="hidden"></textarea>
           </div>
         </div>
 
         <!-- Ad Angles Sidebar -->
-        <div class="glass card output-section">
-          <div class="output-header">
-            <h3 style="font-size: 1rem;">Meta Ad Angles</h3>
+        <div class="glass rounded-[2rem] shadow-xl overflow-hidden self-start sticky top-32">
+          <div class="px-8 py-6 border-b border-black/5 bg-surface/50">
+            <h3 class="text-lg font-display font-bold text-primary">Meta Ad Angles</h3>
           </div>
-          <div id="ad-angles-grid" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;"></div>
+          <div id="ad-angles-grid" class="p-8 flex flex-col gap-6"></div>
         </div>
       </div>
 
-      <div style="text-align: right; margin-top: 2rem; color: var(--text-secondary); font-size: 0.8rem;">
-        <span id="cost-badge" class="glass" style="padding: 0.5rem 1rem; border-radius: var(--radius-full);"></span>
+      <div class="text-right mt-8">
+        <span id="cost-badge" class="inline-block px-4 py-2 rounded-full glass text-xs font-bold font-mono text-muted"></span>
       </div>
     </div>
   </main>
 
+  <style>
+      /* Markdown basic styling for audit doc */
+      .markdown-render h1 { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-top: 1rem; margin-bottom: 1rem; line-height: 1.2; }
+      .markdown-render h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-top: 2rem; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 0.5rem; }
+      .markdown-render h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-top: 1.5rem; margin-bottom: 0.5rem; }
+      .markdown-render p { margin-bottom: 1rem; }
+      .markdown-render ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; }
+      .markdown-render li { margin-bottom: 0.25rem; }
+      .markdown-render strong { color: var(--primary); }
+  </style>
+
   <script>
+    // GSAP Initialization
+    document.addEventListener("DOMContentLoaded", () => {
+        gsap.from(".nav-anim", { y: -50, opacity: 0, duration: 1, ease: "power3.out" });
+        gsap.from("#header", { y: 20, opacity: 0, duration: 0.8, delay: 0.1, ease: "power2.out" });
+        gsap.from(".block-stagger", { y: 30, opacity: 0, duration: 0.8, stagger: 0.1, ease: "back.out(1.2)", delay: 0.2 });
+    });
+
     let currentMode = "search";
     let selectedBusiness = null;
     let searchResults = [];
@@ -352,9 +300,22 @@
 
     function switchMode(mode) {
       currentMode = mode;
-      document.querySelectorAll(".mode-tab").forEach(t => t.classList.toggle("active", t.innerText.toLowerCase().includes(mode)));
-      document.getElementById("mode-search").classList.toggle("active", mode === "search");
-      document.getElementById("mode-direct").classList.toggle("active", mode === "direct");
+      
+      const tabSearch = document.getElementById("tab-search");
+      const tabDirect = document.getElementById("tab-direct");
+      
+      if (mode === "search") {
+          tabSearch.className = "px-6 py-2.5 rounded-lg text-sm font-bold transition-all bg-white text-primary shadow-sm active-tab";
+          tabDirect.className = "px-6 py-2.5 rounded-lg text-sm font-bold transition-all text-muted hover:text-primary";
+          document.getElementById("mode-search").classList.remove("hidden");
+          document.getElementById("mode-direct").classList.add("hidden");
+      } else {
+          tabDirect.className = "px-6 py-2.5 rounded-lg text-sm font-bold transition-all bg-white text-primary shadow-sm active-tab";
+          tabSearch.className = "px-6 py-2.5 rounded-lg text-sm font-bold transition-all text-muted hover:text-primary";
+          document.getElementById("mode-direct").classList.remove("hidden");
+          document.getElementById("mode-search").classList.add("hidden");
+      }
+
       document.getElementById("selected-card").classList.add("hidden");
       document.getElementById("search-results").classList.add("hidden");
       clearError();
@@ -391,16 +352,22 @@
       document.getElementById("search-results-count").textContent = `${results.length} found`;
       document.getElementById("search-results-query").textContent = `"${query}" in ${location}`;
       body.innerHTML = results.map((r, i) => `
-        <tr style="border-bottom: 1px solid var(--glass-border); transition: var(--transition);">
-          <td style="padding: 1.25rem 1rem;"><strong>${escHtml(r.business_name)}</strong><br><small style="color:var(--text-secondary)">${escHtml(r.address || '')}</small></td>
-          <td style="padding: 1.25rem 1rem; color: var(--text-secondary);">${escHtml(r.category || '—')}</td>
-          <td style="padding: 1.25rem 1rem;">${r.rating ? '⭐ ' + r.rating : '—'}</td>
-          <td style="padding: 1.25rem 1rem; text-align: right;">
-            <button class="btn-audit" onclick="selectBusiness(${i})">Audit This</button>
+        <tr class="border-b border-black/5 hover:bg-black/5 transition-colors">
+          <td class="py-5 pr-4">
+              <strong class="text-primary font-bold block">${escHtml(r.business_name)}</strong>
+              <small class="text-[0.65rem] font-bold text-muted uppercase tracking-wider">${escHtml(r.address || '')}</small>
+          </td>
+          <td class="py-5 pr-4 text-xs font-bold text-muted uppercase tracking-wider">${escHtml(r.category || '—')}</td>
+          <td class="py-5 pr-4 font-mono font-bold text-warning">${r.rating ? '⭐ ' + r.rating : '—'}</td>
+          <td class="py-5 pl-4 text-right">
+            <button class="px-4 py-2 rounded-lg bg-black/5 text-primary text-xs font-bold hover:bg-accent hover:text-white transition-colors" onclick="selectBusiness(${i})">View Details</button>
           </td>
         </tr>
       `).join("");
       document.getElementById("search-results").classList.remove("hidden");
+      
+      // Animate entry
+      gsap.from("#search-results-body tr", { y: 20, opacity: 0, duration: 0.5, stagger: 0.05, ease: "power2.out" });
     }
 
     function selectBusiness(idx) {
@@ -411,6 +378,8 @@
       document.getElementById("selected-rating").textContent = selectedBusiness.rating ? "⭐ " + selectedBusiness.rating : "";
       document.getElementById("selected-website").textContent = selectedBusiness.website && selectedBusiness.website !== "N/A" ? "🌐 " + truncateUrl(selectedBusiness.website) : "";
       document.getElementById("selected-card").classList.remove("hidden");
+      
+      gsap.from("#selected-card", { scale: 0.95, opacity: 0, duration: 0.5, ease: "back.out(1.2)" });
       hideOutput();
     }
 
@@ -431,7 +400,9 @@
     async function runAudit(business) {
       clearError(); hideOutput(); showProgress();
       const btn = document.getElementById("generate-btn");
+      const dbtn = document.getElementById("direct-generate-btn");
       if (btn) btn.disabled = true;
+      if (dbtn) dbtn.disabled = true;
 
       try {
         const resp = await fetch("/audit/generate", {
@@ -439,7 +410,7 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ business }),
         });
-        if (!resp.ok) { showError("Failed to start pipeline."); if (btn) btn.disabled = false; return; }
+        if (!resp.ok) { showError("Failed to start pipeline."); if (btn) btn.disabled = false; if(dbtn) dbtn.disabled = false; return; }
 
         const reader = resp.body.getReader();
         const decoder = new TextDecoder();
@@ -459,7 +430,10 @@
           }
         }
       } catch (e) { showError(e.message); }
-      finally { if (btn) btn.disabled = false; }
+      finally { 
+          if (btn) btn.disabled = false; 
+          if (dbtn) dbtn.disabled = false;
+      }
     }
 
     function handleEvent(event) {
@@ -472,58 +446,95 @@
       const container = document.getElementById("progress-container");
       container.classList.remove("hidden");
       document.getElementById("progress-steps").innerHTML = STEPS.map((label, i) => `
-        <div class="progress-step" id="step-${i + 1}">
-          <div class="step-icon">${i + 1}</div>
-          <span>${label}</span>
+        <div class="flex items-center gap-4 py-3 px-4 rounded-xl text-sm font-medium transition-colors" id="step-${i + 1}">
+          <div class="step-icon w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold text-[0.65rem] shrink-0 border-black/20 text-muted">${i + 1}</div>
+          <span class="text-muted tracking-tight">${label}</span>
         </div>
       `).join("");
+      gsap.from("#progress-container", { y: 20, opacity: 0, duration: 0.5, ease: "power2.out" });
     }
 
     function updateProgress(step, total, message) {
       for (let i = 1; i < step; i++) {
         const el = document.getElementById(`step-${i}`);
-        if (el) { el.classList.remove("active"); el.classList.add("done"); el.querySelector(".step-icon").innerHTML = "✓"; }
+        if (el) { 
+            el.className = "flex items-center gap-4 py-3 px-4 rounded-xl text-sm font-medium transition-colors bg-white shadow-sm border border-black/5"; 
+            el.querySelector(".step-icon").className = "step-icon w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold text-[0.65rem] shrink-0 border-success bg-success/10 text-success";
+            el.querySelector(".step-icon").innerHTML = "✓"; 
+            el.querySelector("span").className = "text-primary font-bold";
+        }
       }
       const cur = document.getElementById(`step-${step}`);
-      if (cur) { cur.classList.add("active"); cur.querySelector(".step-icon").innerHTML = `<div class="spin-mini"></div>`; cur.querySelector("span").textContent = message; }
+      if (cur) { 
+          cur.className = "flex items-center gap-4 py-3 px-4 rounded-xl text-sm font-medium transition-colors bg-accent/5 border border-accent/20"; 
+          cur.querySelector(".step-icon").className = "step-icon shrink-0";
+          cur.querySelector(".step-icon").innerHTML = `<div class="w-4 h-4 border-2 border-accent/20 border-t-accent rounded-full animate-spin"></div>`; 
+          cur.querySelector("span").className = "text-accent font-bold animate-pulse";
+          cur.querySelector("span").textContent = message; 
+      }
     }
 
     function renderOutput(result) {
       for (let i = 1; i <= STEPS.length; i++) {
         const el = document.getElementById(`step-${i}`);
-        if (el) { el.classList.remove("active"); el.classList.add("done"); el.querySelector(".step-icon").innerHTML = "✓"; }
+        if (el) { 
+            el.className = "flex items-center gap-4 py-3 px-4 rounded-xl text-sm font-medium transition-colors"); 
+            el.querySelector(".step-icon").className = "step-icon w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold text-[0.65rem] shrink-0 border-success bg-success/10 text-success";
+            el.querySelector(".step-icon").innerHTML = "✓"; 
+            el.querySelector("span").className = "text-muted font-bold";
+        }
       }
+      
       if (result.folder_url) {
         document.getElementById("drive-folder-link").href = result.folder_url;
-        document.getElementById("drive-folder-name").textContent = result.business_name;
-        document.getElementById("drive-file-list").textContent = `${(result.files || []).length} assets synced`;
+        document.getElementById("drive-folder-name").textContent = result.business_name || "Client Assets";
+        document.getElementById("drive-file-list").textContent = `${(result.files || []).length} assets synced securely via service account`;
         document.getElementById("drive-cta-card").classList.remove("hidden");
       }
+      
       document.getElementById("audit-doc-content").value = result.audit_md || "";
       document.getElementById("audit-doc-rendered").innerHTML = renderMarkdown(result.audit_md || "");
       renderAdAngles(result.ad_angles || []);
       document.getElementById("outreach-content").value = result.outreach || "";
       document.getElementById("outreach-display").textContent = result.outreach || "";
-      if (result.total_cost_usd) document.getElementById("cost-badge").textContent = `Pipeline Cost: $${result.total_cost_usd.toFixed(4)}`;
+      
+      if (result.total_cost_usd) document.getElementById("cost-badge").textContent = `Compute Cost: $${result.total_cost_usd.toFixed(4)}`;
       document.getElementById("output-panel").classList.remove("hidden");
+      
+      gsap.from("#output-panel > div", { y: 30, opacity: 0, duration: 0.8, stagger: 0.1, ease: "back.out(1.2)" });
     }
 
     function renderAdAngles(angles) {
       const grid = document.getElementById("ad-angles-grid");
-      grid.innerHTML = angles.map(a => `
-        <div class="ad-angle-card">
-          <div class="angle-badge angle-${a.angle ? a.angle.toLowerCase() : 'pain'}">${a.angle}</div>
-          <p style="font-size: 0.9rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">"${escHtml(a.hook)}"</p>
-          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">${escHtml(a.body)}</p>
+      grid.innerHTML = angles.map(a => {
+        const angleType = a.angle ? a.angle.toLowerCase() : 'pain';
+        let badgeClass = "bg-red-500/10 text-error";
+        if (angleType === 'opportunity') badgeClass = "bg-green-500/10 text-success";
+        if (angleType === 'credibility') badgeClass = "bg-accent/10 text-accent";
+        
+        return `
+        <div class="p-6 rounded-xl bg-surface border border-black/5 shadow-sm hover:shadow-md transition-shadow">
+          <div class="inline-block px-3 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-widest mb-4 ${badgeClass}">${a.angle}</div>
+          <p class="text-sm font-bold text-primary mb-3 leading-snug">"${escHtml(a.hook)}"</p>
+          <p class="text-xs text-muted leading-relaxed font-medium">${escHtml(a.body)}</p>
         </div>
-      `).join("");
+      `}).join("");
     }
 
     function renderMarkdown(md) {
-      return md.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      let html = md.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
         .replace(/^# (.+)$/gm, "<h1>$1</h1>").replace(/^## (.+)$/gm, "<h2>$1</h2>")
-        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\n{2,}/g, "</p><p>")
-        .replace(/^(?!<h)/gm, "<p>").trim();
+        .replace(/^### (.+)$/gm, "<h3>$1</h3>")
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\*(.+?)\*/g, "<em>$1</em>");
+        
+      // Handle simple lists
+      html = html.replace(/^- (.+)$/gm, "<li>$1</li>");
+      html = html.replace(/(<li>.+<\/li>\n?)+/g, "<ul>$&</ul>");
+      
+      // Paragraphs
+      html = html.replace(/\n{2,}/g, "</p><p>");
+      return `<p>${html}</p>`;
     }
 
     function setSearchLoading(loading) {
@@ -536,11 +547,17 @@
     }
 
     function clearError() { document.getElementById("audit-error").classList.add("hidden"); }
-    function hideOutput() { document.getElementById("output-panel").classList.add("hidden"); document.getElementById("progress-container").classList.add("hidden"); }
+    function hideOutput() { document.getElementById("output-panel").classList.add("hidden"); document.getElementById("progress-container").classList.add("hidden"); document.getElementById("drive-cta-card").classList.add("hidden"); }
 
     function copySection(id, btn) {
       navigator.clipboard.writeText(document.getElementById(id).value).then(() => {
-        const old = btn.innerText; btn.innerText = "✓ Copied"; setTimeout(() => btn.innerText = old, 2000);
+        const old = btn.innerText; 
+        btn.innerText = "✓ Copied"; 
+        btn.classList.add("bg-success/10", "text-success");
+        setTimeout(() => {
+            btn.innerText = old;
+            btn.classList.remove("bg-success/10", "text-success");
+        }, 2000);
       });
     }
 

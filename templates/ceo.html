@@ -3,213 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>247profits — CEO Command Center</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-    <style>
-        .severity-high { background: var(--error); color: white; }
-        .severity-medium { background: var(--warning); color: white; }
-        .severity-low { background: var(--success); color: white; }
-        .severity-none { background: rgba(0,0,0,0.05); color: var(--text-secondary); }
-        
-        .status-ok { color: var(--success); }
-        .status-warn { color: var(--warning); }
-        .status-crit { color: var(--error); }
-        
-        .funnel-bar { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        .funnel-bar-low { background: var(--error); }
-        
-        .badge { font-size: 0.65rem; padding: 0.15rem 0.6rem; border-radius: var(--radius-full); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
-        
-        .grid-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 2rem; }
-        .grid-main { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
-        .grid-triple { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-bottom: 2rem; }
-        
-        .dispatch-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
-        .btn-dispatch { 
-            padding: 0.75rem; 
-            border-radius: var(--radius-sm); 
-            font-size: 0.8rem; 
-            font-weight: 600; 
-            border: 1px solid var(--glass-border); 
-            background: rgba(0, 113, 227, 0.05);
-            color: var(--accent);
-            text-align: left;
-            transition: var(--transition);
+    <title>247profits | CEO Command Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#FAF8F5',
+                        surface: '#FFFFFF',
+                        primary: '#0D0D12',
+                        accent: '#0071E3',
+                        text: '#111111',
+                        muted: '#666666',
+                        success: '#34d399',
+                        warning: '#fbbf24',
+                        error: '#ef4444'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Inter', 'sans-serif'],
+                        drama: ['Playfair Display', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
         }
-        .btn-dispatch:hover { background: var(--accent); color: white; transform: translateY(-2px); }
-
-        .list-item { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 0.75rem; 
-            border-bottom: 1px solid var(--glass-border);
-            transition: var(--transition);
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass {
+                background: rgba(255, 255, 255, 0.4);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
         }
-        .list-item:last-child { border-bottom: none; }
-        .list-item:hover { background: rgba(0, 113, 227, 0.02); }
-
-        .constraint-banner {
-            padding: 2rem;
-            border-left: 6px solid var(--warning);
-            margin-bottom: 2.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
-<body>
-    <div class="bg-layer">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
+<body class="bg-background text-text antialiased selection:bg-accent selection:text-white min-h-screen flex flex-col items-center">
+    
+    <!-- Global Noise Overlay -->
+    <svg style="position: absolute; width: 0; height: 0;">
+        <filter id="noiseFilter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+        </filter>
+    </svg>
+    <div class="pointer-events-none fixed inset-0 z-50 opacity-[0.03]" style="filter: url(#noiseFilter);"></div>
+
+    <!-- Animated background orbs -->
+    <div class="fixed inset-0 pointer-events-none -z-10 bg-background overflow-hidden flex justify-center items-center">
+        <div class="absolute w-[800px] h-[800px] rounded-full blur-[100px] opacity-[0.1] bg-gradient-radial from-error/20 to-transparent top-[-20%] right-[-10%] animate-[pulse_10s_ease-in-out_infinite]"></div>
     </div>
 
-    <main class="container" style="padding: 4rem 0;">
-        <header style="margin-bottom: 4rem; display: flex; justify-content: space-between; align-items: flex-end;">
+    <!-- Top Navigation (Floating) -->
+    <nav class="fixed top-6 z-[100] glass px-8 py-4 rounded-full flex items-center gap-12 shadow-xl border border-white/40 nav-anim">
+        <a href="/" class="font-display font-bold text-xl tracking-tight text-primary flex items-center gap-2">
+            <div class="w-4 h-4 rounded-full bg-accent animate-pulse shadow-[0_0_15px_rgba(0,113,227,0.5)]"></div>
+            247<span class="font-light">Profits</span>
+        </a>
+        <div class="hidden md:flex gap-6 text-sm font-semibold text-muted">
+            <a href="/dashboard" class="hover:text-primary transition-colors">Overview</a>
+            <a href="/sourcing" class="hover:text-primary transition-colors">Sourcing Matrix</a>
+            <a href="/audit" class="hover:text-primary transition-colors">Audit Engine</a>
+            <a href="/ceo" class="text-accent hover:text-accent transition-colors">CEO Command Center</a>
+        </div>
+    </nav>
+
+    <main class="w-full max-w-7xl mt-40 px-8 pb-32">
+        <header id="header" class="flex justify-between items-end mb-12">
             <div>
-                <div class="logo" style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-                        <circle cx="16" cy="16" r="14" stroke="url(#logo-grad)" stroke-width="2.5" />
-                        <circle cx="16" cy="16" r="6" fill="url(#logo-grad)" />
-                        <defs>
-                            <linearGradient id="logo-grad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
-                                <stop offset="0%" stop-color="#0071e3" />
-                                <stop offset="100%" stop-color="#5e5ce6" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <span class="text-gradient">247profits</span>
-                </div>
-                <h1 style="font-size: 3rem; margin-bottom: 0.5rem;">CEO Command Center</h1>
-                <p style="color: var(--text-secondary); font-size: 1.1rem;">Constraint detection, delegation, and ecosystem health.</p>
+                <h1 class="text-5xl font-display font-bold tracking-tight mb-3">CEO Command Center</h1>
+                <p class="text-lg text-muted">Constraint detection, delegation, and ecosystem health.</p>
             </div>
-            <div style="display: flex; gap: 1rem;">
-                <a href="/dashboard" class="btn" style="background: rgba(0,0,0,0.05); color: var(--text-primary);">Dashboard</a>
-                <button onclick="refreshAll()" class="btn btn-primary" style="padding: 0.75rem 2rem;">Refresh System</button>
-            </div>
+            <button onclick="refreshAll()" class="px-8 py-4 bg-primary text-white rounded-full font-bold shadow-2xl hover:bg-black hover:scale-[1.03] transition-all flex items-center gap-2 group">
+                <svg class="group-hover:rotate-180 transition-transform duration-500" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                Refresh System
+            </button>
         </header>
 
         <!-- Constraint Banner -->
-        <section id="constraint-banner" class="glass card constraint-banner">
+        <section id="constraint-banner" class="glass card p-8 border-l-8 border-warning rounded-r-2xl mb-12 flex justify-between items-center shadow-lg transition-colors duration-500 block-stagger">
             <div>
-                <p style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.1em; margin-bottom: 0.5rem;">Critical Priority</p>
-                <h2 id="constraint-text" style="font-size: 1.75rem; margin-bottom: 0.25rem;">Detecting constraints...</h2>
-                <p id="constraint-detail" style="color: var(--text-secondary); font-size: 0.95rem;"></p>
+                <p class="text-[0.65rem] font-black uppercase tracking-widest text-muted mb-2 font-mono">Critical Priority</p>
+                <h2 id="constraint-text" class="text-4xl font-display font-bold mb-1 text-primary">Detecting constraints...</h2>
+                <p id="constraint-detail" class="text-muted font-medium font-mono text-sm"></p>
             </div>
-            <div id="constraint-badge" class="badge" style="padding: 0.5rem 1.5rem; font-size: 0.8rem;">—</div>
+            <div id="constraint-badge" class="px-6 py-2 rounded-full font-bold uppercase tracking-widest text-sm bg-black/5 text-muted">—</div>
         </section>
 
         <!-- High Level Stats -->
-        <section class="grid-stats">
-            <div class="glass card" style="padding: 1.5rem;">
-                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.5rem;">Bottleneck</p>
-                <h3 id="stat-bottleneck" style="font-size: 1.5rem; color: var(--warning);">—</h3>
+        <section class="grid grid-cols-5 gap-6 mb-12">
+            <div class="glass p-6 rounded-[2xl] hover:-translate-y-1 hover:shadow-xl transition-all block-stagger">
+                <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-2">Bottleneck</p>
+                <h3 id="stat-bottleneck" class="text-2xl font-bold font-display text-warning">—</h3>
             </div>
-            <div class="glass card" style="padding: 1.5rem;">
-                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.5rem;">Clients At Risk</p>
-                <h3 id="stat-clients-risk" style="font-size: 1.5rem; color: var(--error);">—</h3>
+            <div class="glass p-6 rounded-[2xl] hover:-translate-y-1 hover:shadow-xl transition-all block-stagger">
+                <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-2">Clients At Risk</p>
+                <h3 id="stat-clients-risk" class="text-3xl font-bold font-display text-error">—</h3>
             </div>
-            <div class="glass card" style="padding: 1.5rem;">
-                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.5rem;">Students At Risk</p>
-                <h3 id="stat-students-risk" style="font-size: 1.5rem; color: var(--error);">—</h3>
+            <div class="glass p-6 rounded-[2xl] hover:-translate-y-1 hover:shadow-xl transition-all block-stagger">
+                <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-2">Students At Risk</p>
+                <h3 id="stat-students-risk" class="text-3xl font-bold font-display text-error">—</h3>
             </div>
-            <div class="glass card" style="padding: 1.5rem;">
-                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.5rem;">Pending Proposals</p>
-                <h3 id="stat-proposals" style="font-size: 1.5rem; color: var(--accent);">—</h3>
+            <div class="glass p-6 rounded-[2xl] hover:-translate-y-1 hover:shadow-xl transition-all block-stagger">
+                <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-2">Pending Proposals</p>
+                <h3 id="stat-proposals" class="text-3xl font-bold font-display text-accent">—</h3>
             </div>
-            <div class="glass card" style="padding: 1.5rem;">
-                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.5rem;">Memory Brain</p>
-                <h3 id="stat-brain" style="font-size: 1.25rem; color: var(--success);">—</h3>
+            <div class="glass p-6 rounded-[2xl] hover:-translate-y-1 hover:shadow-xl transition-all block-stagger">
+                <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-2">Memory Brain</p>
+                <h3 id="stat-brain" class="text-xl font-bold font-mono text-success mt-2">—</h3>
             </div>
         </section>
 
-        <section class="grid-main">
+        <section class="grid grid-cols-2 gap-8 mb-8">
             <!-- Pipeline Funnel -->
-            <div class="glass card" style="padding: 2rem;">
-                <h3 style="margin-bottom: 1.5rem;">Weekly Pipeline Performance</h3>
-                <div id="funnel-agency" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Initializing agency analytics...</p>
+            <div class="glass p-8 rounded-[2rem] shadow-xl block-stagger">
+                <h3 class="text-2xl font-display font-bold mb-8 text-primary">Weekly Pipeline Performance</h3>
+                <div id="funnel-agency" class="flex flex-col gap-4">
+                    <p class="text-sm text-muted">Initializing agency analytics...</p>
                 </div>
-                <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
-                    <p style="font-size: 0.7rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 1rem;">Coaching Division</p>
-                    <div id="funnel-coaching" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Initializing coaching analytics...</p>
+                <div class="mt-8 pt-8 border-t border-black/5">
+                    <p class="text-[0.65rem] font-bold text-muted uppercase tracking-widest mb-6">Coaching Division</p>
+                    <div id="funnel-coaching" class="flex flex-col gap-4">
+                        <p class="text-sm text-muted">Initializing coaching analytics...</p>
                     </div>
                 </div>
             </div>
 
             <!-- Client Health List -->
-            <div class="glass card" style="padding: 2rem;">
-                <h3 style="margin-bottom: 1.5rem;">Portfolio Health Monitor</h3>
-                <div id="client-health-list" style="max-height: 500px; overflow-y: auto;">
-                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Scanning client status...</p>
+            <div class="glass p-8 rounded-[2rem] shadow-xl block-stagger">
+                <h3 class="text-2xl font-display font-bold mb-8 text-primary">Portfolio Health Monitor</h3>
+                <div id="client-health-list" class="max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                    <p class="text-sm text-muted">Scanning client status...</p>
                 </div>
             </div>
         </section>
 
-        <section class="grid-main">
+        <section class="grid grid-cols-2 gap-8 mb-8">
             <!-- Student Progress -->
-            <div class="glass card" style="padding: 2rem;">
-                <h3 style="margin-bottom: 1.5rem;">Student Success Pipeline</h3>
-                <div id="student-list" style="max-height: 400px; overflow-y: auto;">
-                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Tracking student progress...</p>
+            <div class="glass p-8 rounded-[2rem] shadow-xl block-stagger">
+                <h3 class="text-2xl font-display font-bold mb-8 text-primary">Student Success Pipeline</h3>
+                <div id="student-list" class="max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    <p class="text-sm text-muted">Tracking student progress...</p>
                 </div>
             </div>
 
             <!-- Outreach -->
-            <div class="glass card" style="padding: 2rem;">
-                <h3 style="margin-bottom: 1.5rem;">Outreach Campaign Performance</h3>
+            <div class="glass p-8 rounded-[2rem] shadow-xl block-stagger">
+                <h3 class="text-2xl font-display font-bold mb-8 text-primary">Outreach Campaign Performance</h3>
                 <div id="outreach-stats">
-                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Aggregating sequence data...</p>
+                    <p class="text-sm text-muted">Aggregating sequence data...</p>
                 </div>
             </div>
         </section>
 
-        <section class="grid-triple">
+        <section class="grid grid-cols-3 gap-8 mb-8">
             <!-- Agents -->
-            <div class="glass card" style="padding: 1.5rem;">
-                <h4 style="margin-bottom: 1rem; font-size: 0.9rem;">Specialized Agents</h4>
-                <div id="agent-status-list" style="max-height: 300px; overflow-y: auto;"></div>
+            <div class="glass p-8 rounded-[2rem] block-stagger">
+                <h4 class="text-lg font-bold font-display mb-6">Specialized Agents</h4>
+                <div id="agent-status-list" class="max-h-[300px] overflow-y-auto pr-2 custom-scrollbar space-y-2"></div>
             </div>
 
             <!-- Proposals -->
-            <div class="glass card" style="padding: 1.5rem;">
-                <h4 style="margin-bottom: 1rem; font-size: 0.9rem;">Decision Queue</h4>
-                <div id="proposals-list" style="max-height: 300px; overflow-y: auto;"></div>
+            <div class="glass p-8 rounded-[2rem] block-stagger">
+                <h4 class="text-lg font-bold font-display mb-6">Decision Queue</h4>
+                <div id="proposals-list" class="max-h-[300px] overflow-y-auto pr-2 custom-scrollbar space-y-2"></div>
             </div>
 
             <!-- Delegations -->
-            <div class="glass card" style="padding: 1.5rem;">
-                <h4 style="margin-bottom: 1rem; font-size: 0.9rem;">Execution Log</h4>
-                <div id="delegations-list" style="max-height: 300px; overflow-y: auto;"></div>
+            <div class="glass p-8 rounded-[2rem] block-stagger">
+                <h4 class="text-lg font-bold font-display mb-6">Execution Log</h4>
+                <div id="delegations-list" class="max-h-[300px] overflow-y-auto pr-2 custom-scrollbar space-y-2"></div>
             </div>
         </section>
 
-        <section class="grid-main" style="align-items: start;">
+        <section class="grid grid-cols-5 gap-8 items-start">
             <!-- Dispatcher -->
-            <div class="glass card" style="padding: 2rem;">
-                <h3 style="margin-bottom: 1.5rem;">Neural Dispatch</h3>
-                <div class="dispatch-grid">
-                    <button onclick="dispatch('ads-copy', 'CPL optimization')" class="btn-dispatch">Ads Specialist</button>
-                    <button onclick="dispatch('outreach', 'Dream 100 flow')" class="btn-dispatch">Outreach Bot</button>
-                    <button onclick="dispatch('content', 'VSL generation')" class="btn-dispatch">Content Pro</button>
-                    <button onclick="dispatch('sourcing', 'Product research')" class="btn-dispatch">Sourcing Bot</button>
-                    <button onclick="dispatch('amazon', 'Student coaching')" class="btn-dispatch">Amazon Agent</button>
-                    <button onclick="dispatch('training-officer', 'Knowledge sync')" class="btn-dispatch">System Tech</button>
+            <div class="col-span-3 glass p-8 rounded-[2rem] block-stagger">
+                <h3 class="text-2xl font-display font-bold mb-8 text-primary">Neural Dispatch</h3>
+                <div class="grid grid-cols-3 gap-4">
+                    <button onclick="dispatch('ads-copy', 'CPL optimization')" class="p-4 rounded-xl text-left bg-surface/50 border border-black/5 hover:bg-accent hover:text-white hover:-translate-y-1 transition-all text-sm font-bold shadow-sm text-primary group">Ads Specialist <span class="block text-[0.65rem] font-mono font-medium text-muted group-hover:text-white/80 mt-1">CPL optimization</span></button>
+                    <button onclick="dispatch('outreach', 'Dream 100 flow')" class="p-4 rounded-xl text-left bg-surface/50 border border-black/5 hover:bg-accent hover:text-white hover:-translate-y-1 transition-all text-sm font-bold shadow-sm text-primary group">Outreach Bot <span class="block text-[0.65rem] font-mono font-medium text-muted group-hover:text-white/80 mt-1">Dream 100 flow</span></button>
+                    <button onclick="dispatch('content', 'VSL generation')" class="p-4 rounded-xl text-left bg-surface/50 border border-black/5 hover:bg-accent hover:text-white hover:-translate-y-1 transition-all text-sm font-bold shadow-sm text-primary group">Content Pro <span class="block text-[0.65rem] font-mono font-medium text-muted group-hover:text-white/80 mt-1">VSL generation</span></button>
+                    <button onclick="dispatch('sourcing', 'Product research')" class="p-4 rounded-xl text-left bg-surface/50 border border-black/5 hover:bg-accent hover:text-white hover:-translate-y-1 transition-all text-sm font-bold shadow-sm text-primary group">Sourcing Bot <span class="block text-[0.65rem] font-mono font-medium text-muted group-hover:text-white/80 mt-1">Product research</span></button>
+                    <button onclick="dispatch('amazon', 'Student coaching')" class="p-4 rounded-xl text-left bg-surface/50 border border-black/5 hover:bg-accent hover:text-white hover:-translate-y-1 transition-all text-sm font-bold shadow-sm text-primary group">Amazon Agent <span class="block text-[0.65rem] font-mono font-medium text-muted group-hover:text-white/80 mt-1">Student coaching</span></button>
+                    <button onclick="dispatch('training-officer', 'Knowledge sync')" class="p-4 rounded-xl text-left bg-surface/50 border border-black/5 hover:bg-accent hover:text-white hover:-translate-y-1 transition-all text-sm font-bold shadow-sm text-primary group">System Tech <span class="block text-[0.65rem] font-mono font-medium text-muted group-hover:text-white/80 mt-1">Knowledge sync</span></button>
                 </div>
             </div>
 
             <!-- Changelog -->
-            <div class="glass card" style="padding: 2rem;">
-                <h3 style="margin-bottom: 1.5rem;">System Mutation Log</h3>
-                <div id="changelog-list" style="font-family: monospace; font-size: 0.75rem; color: var(--text-secondary); max-height: 200px; overflow-y: auto; line-height: 1.6;">
+            <div class="col-span-2 glass p-8 rounded-[2rem] block-stagger">
+                <h3 class="text-2xl font-display font-bold mb-8 text-primary">System Mutation Log</h3>
+                <div id="changelog-list" class="font-mono text-[0.65rem] text-muted max-h-[250px] overflow-y-auto space-y-2 pr-2 custom-scrollbar">
                 </div>
             </div>
         </section>
     </main>
 
     <script>
+        // GSAP Initialization
+        document.addEventListener("DOMContentLoaded", () => {
+            gsap.from(".nav-anim", { y: -50, opacity: 0, duration: 1, ease: "power3.out" });
+            gsap.from("#header", { y: 20, opacity: 0, duration: 0.8, delay: 0.1, ease: "power2.out" });
+            gsap.from(".block-stagger", { y: 30, opacity: 0, duration: 0.8, stagger: 0.08, ease: "back.out(1.2)", delay: 0.2 });
+        });
+
         async function fetchJSON(url) {
             try {
                 const resp = await fetch(url);
@@ -236,7 +243,7 @@
         function renderFunnel(containerId, data, biz) {
             const el = document.getElementById(containerId);
             if (!data || !data.funnel || Object.keys(data.funnel).length === 0) {
-                el.innerHTML = '<p style="color: var(--text-secondary); font-size: 0.85rem;">No active signal detected.</p>';
+                el.innerHTML = '<p class="text-sm text-muted">No active signal detected.</p>';
                 return;
             }
             const funnel = data.funnel;
@@ -247,24 +254,26 @@
                 const count = funnel[step]?.count || 0;
                 const width = Math.max((count / maxCount) * 100, 2);
                 let convText = '';
+                let isLow = false;
                 if (i > 0) {
                     const prev = funnel[STEPS[i-1]]?.count || 0;
                     if (prev > 0) {
                         const rate = ((count / prev) * 100).toFixed(1);
                         const key = `${STEPS[i-1]}->${step}`;
                         const bench = (BENCHMARKS[biz] || {})[key] || 0;
-                        const isLow = parseFloat(rate) < bench;
-                        convText = `<span style="color: ${isLow ? 'var(--error)' : 'var(--text-secondary)'}">${rate}%${bench ? ` <small>/ ${bench}%</small>` : ''}</span>`;
+                        isLow = parseFloat(rate) < bench;
+                        convText = `<span class="${isLow ? 'text-error' : 'text-muted'}">${rate}%${bench ? ` <small class="opacity-50">/ ${bench}%</small>` : ''}</span>`;
                     }
                 }
+                
                 html += `
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <span style="font-size: 0.75rem; font-weight: 600; text-transform: capitalize; width: 100px;">${step.replace('_', ' ')}</span>
-                    <div style="flex: 1; height: 12px; background: rgba(0,0,0,0.05); border-radius: var(--radius-full); overflow: hidden;">
-                        <div class="funnel-bar ${convText.includes('var(--error)') ? 'funnel-bar-low' : ''}" style="width: ${width}%"></div>
+                <div class="flex items-center gap-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-primary w-28">${step.replace('_', ' ')}</span>
+                    <div class="flex-1 h-2 rounded-full bg-black/5 overflow-hidden">
+                        <div class="h-full rounded-full transition-all duration-1000 ease-out ${isLow ? 'bg-error' : 'bg-accent'}" style="width: ${width}%"></div>
                     </div>
-                    <span style="font-size: 0.8rem; font-weight: 700; width: 40px; text-align: right;">${count}</span>
-                    <span style="font-size: 0.75rem; width: 80px; text-align: right;">${convText}</span>
+                    <span class="text-sm font-bold font-mono w-10 text-right">${count}</span>
+                    <span class="text-[0.65rem] font-bold font-mono w-20 text-right opacity-80">${convText}</span>
                 </div>`;
             }
             el.innerHTML = html;
@@ -281,15 +290,15 @@
                     ct.textContent = constraint.step;
                     cd.textContent = `Conversion: ${constraint.current_rate}% (Target: ${constraint.benchmark_rate}%) | Delta: -${constraint.gap}%`;
                     cb.textContent = constraint.business?.toUpperCase() || 'AGENCY';
-                    cb.className = 'badge severity-medium';
-                    banner.style.borderLeftColor = 'var(--warning)';
+                    cb.className = 'px-6 py-2 rounded-full font-bold uppercase tracking-widest text-sm bg-warning/10 text-warning border border-warning/20';
+                    banner.className = 'glass card p-8 border-l-8 border-warning rounded-r-2xl mb-12 flex justify-between items-center shadow-[0_10px_40px_rgba(251,191,36,0.1)] transition-colors duration-500 block-stagger';
                     document.getElementById('stat-bottleneck').textContent = constraint.step.split('->')[1] || constraint.step;
                 } else {
                     ct.textContent = 'System Optimal';
                     cd.textContent = 'No bottlenecks detected in current active pipeline.';
                     cb.textContent = 'STABLE';
-                    cb.className = 'badge severity-low';
-                    banner.style.borderLeftColor = 'var(--success)';
+                    cb.className = 'px-6 py-2 rounded-full font-bold uppercase tracking-widest text-sm bg-green-500/10 text-green-600 border border-green-500/20';
+                    banner.className = 'glass card p-8 border-l-8 border-green-500 rounded-r-2xl mb-12 flex justify-between items-center shadow-lg transition-colors duration-500 block-stagger';
                     document.getElementById('stat-bottleneck').textContent = 'None';
                 }
             }
@@ -303,15 +312,19 @@
             const clients = await fetchJSON('/ceo/api/client-health');
             if (clients && clients.clients) {
                 const el = document.getElementById('client-health-list');
-                el.innerHTML = clients.clients.length === 0 ? '<p style="color: var(--text-secondary); font-size: 0.85rem;">No active clients.</p>' : 
+                el.innerHTML = clients.clients.length === 0 ? '<p class="text-sm text-muted">No active clients.</p>' : 
                     clients.clients.map(c => {
-                        const color = c.health_score >= 60 ? 'status-ok' : c.health_score >= 30 ? 'status-warn' : 'status-crit';
+                        const score = c.health_score;
+                        const isOk = score >= 60;
+                        const isWarn = score >= 30 && score < 60;
+                        const colorClass = isOk ? 'text-green-500' : (isWarn ? 'text-warning' : 'text-error');
+                        
                         return `
-                        <div class="list-item">
-                            <span style="font-size: 0.9rem; font-weight: 600;">${c.name}</span>
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <span style="font-size: 0.8rem; color: var(--text-secondary);">$${(c.mrr || 0).toLocaleString()}</span>
-                                <span class="${color}" style="font-weight: 800; font-size: 1rem;">${c.health_score}</span>
+                        <div class="flex justify-between items-center px-4 py-3 border-b border-black/5 hover:bg-black/5 transition-colors rounded-lg">
+                            <span class="text-sm font-bold text-primary">${c.name}</span>
+                            <div class="flex items-center gap-4">
+                                <span class="text-xs font-mono text-muted">$${(c.mrr || 0).toLocaleString()}</span>
+                                <span class="font-bold font-mono text-lg ${colorClass}">${score}</span>
                             </div>
                         </div>`;
                     }).join("");
@@ -321,18 +334,22 @@
             const students = await fetchJSON('/ceo/api/student-health');
             if (students && students.students) {
                 const el = document.getElementById('student-list');
-                el.innerHTML = students.students.length === 0 ? '<p style="color: var(--text-secondary); font-size: 0.85rem;">No students tracked.</p>' :
-                    students.students.map(s => `
-                    <div class="list-item">
-                        <div>
-                            <span style="font-size: 0.9rem; font-weight: 600;">${s.name}</span>
-                            <span style="font-size: 0.7rem; color: var(--text-secondary); margin-left: 0.5rem;">Tier ${s.tier}</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <span style="font-size: 0.75rem; color: var(--text-secondary);">${(s.current_milestone || '').replace('_', ' ')}</span>
-                            <span class="badge ${s.status === 'at_risk' ? 'severity-high' : 'severity-none'}">${s.status}</span>
-                        </div>
-                    </div>`).join("");
+                el.innerHTML = students.students.length === 0 ? '<p class="text-sm text-muted">No students tracked.</p>' :
+                    students.students.map(s => {
+                        const isRisk = s.status === 'at_risk';
+                        const badgeClass = isRisk ? 'bg-error/10 text-error border border-error/20' : 'bg-black/5 text-muted border border-black/5';
+                        
+                        return `
+                        <div class="flex justify-between items-center px-4 py-3 border-b border-black/5 hover:bg-black/5 transition-colors rounded-lg">
+                            <div>
+                                <span class="text-sm font-bold text-primary">${s.name}</span>
+                                <span class="text-[0.65rem] font-bold uppercase tracking-wider text-muted ml-2">Tier ${s.tier}</span>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="text-[0.65rem] uppercase tracking-wider font-bold text-muted">${(s.current_milestone || '').replace('_', ' ')}</span>
+                                <span class="px-2 py-0.5 rounded text-[0.6rem] font-bold uppercase tracking-widest ${badgeClass}">${s.status}</span>
+                            </div>
+                        </div>`}).join("");
                 document.getElementById('stat-students-risk').textContent = students.at_risk_count || 0;
             }
 
@@ -340,57 +357,58 @@
             if (outreach && outreach.stats) {
                 const s = outreach.stats;
                 document.getElementById('outreach-stats').innerHTML = `
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div style="padding: 1rem; background: rgba(0,0,0,0.02); border-radius: var(--radius-sm);">
-                            <p style="font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Total Active</p>
-                            <p style="font-size: 1.25rem; font-weight: 800;">${s.total_prospects}</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-5 bg-surface rounded-xl border border-black/5 shadow-sm">
+                            <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-1">Total Active</p>
+                            <p class="text-3xl font-bold font-mono text-primary">${s.total_prospects}</p>
                         </div>
-                        <div style="padding: 1rem; background: rgba(0,0,0,0.02); border-radius: var(--radius-sm);">
-                            <p style="font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Reply Rate</p>
-                            <p style="font-size: 1.25rem; font-weight: 800; color: var(--success);">${s.response_rate}%</p>
+                        <div class="p-5 bg-surface rounded-xl border border-black/5 shadow-sm">
+                            <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-1">Reply Rate</p>
+                            <p class="text-3xl font-bold font-mono text-green-500">${s.response_rate}%</p>
                         </div>
-                        <div style="padding: 1rem; background: rgba(0,0,0,0.02); border-radius: var(--radius-sm);">
-                            <p style="font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Book Rate</p>
-                            <p style="font-size: 1.25rem; font-weight: 800; color: var(--accent);">${s.book_rate}%</p>
+                        <div class="p-5 bg-surface rounded-xl border border-black/5 shadow-sm">
+                            <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-1">Book Rate</p>
+                            <p class="text-3xl font-bold font-mono text-accent">${s.book_rate}%</p>
                         </div>
-                        <div style="padding: 1rem; background: rgba(0,0,0,0.02); border-radius: var(--radius-sm);">
-                            <p style="font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Pending</p>
-                            <p style="font-size: 1.25rem; font-weight: 800; color: var(--warning);">${s.touches_pending}</p>
+                        <div class="p-5 bg-surface rounded-xl border border-black/5 shadow-sm">
+                            <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-1">Touches Pending</p>
+                            <p class="text-3xl font-bold font-mono text-warning">${s.touches_pending}</p>
                         </div>
                     </div>`;
             }
 
             const agents = await fetchJSON('/ceo/api/agent-status');
             if (agents) {
-                document.getElementById('agent-status-list').innerHTML = Object.entries(agents).map(([n, h]) => `
-                    <div class="list-item">
-                        <span style="font-size: 0.85rem; font-weight: 600;">${n}</span>
-                        <span class="badge ${h.status === 'current' ? 'severity-low' : 'severity-high'}">${h.status}</span>
-                    </div>`).join("");
+                document.getElementById('agent-status-list').innerHTML = Object.entries(agents).map(([n, h]) => {
+                    const ok = h.status === 'current';
+                    return `
+                    <div class="flex justify-between items-center p-3 rounded-lg border border-black/5 bg-surface/50">
+                        <span class="text-xs font-bold uppercase tracking-wider text-primary">${n}</span>
+                        <span class="px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-widest rounded ${ok ? 'bg-green-500/10 text-green-600' : 'bg-error/10 text-error'}">${h.status}</span>
+                    </div>`}).join("");
             }
 
             const proposals = await fetchJSON('/ceo/api/pending-proposals');
             if (proposals) {
-                document.getElementById('proposals-list').innerHTML = proposals.length === 0 ? '<p style="color: var(--text-secondary); font-size: 0.8rem;">Queue clear.</p>' :
+                document.getElementById('proposals-list').innerHTML = proposals.length === 0 ? '<p class="text-sm text-muted">Queue clear.</p>' :
                     proposals.map(p => `
-                    <div style="padding: 0.75rem; border-bottom: 1px solid var(--glass-border);">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-                            <span style="font-size: 0.6rem; font-family: monospace; color: var(--accent);">${p.id}</span>
-                            <span style="font-size: 0.6rem; font-weight: 800; text-transform: uppercase;">${p.agent}</span>
+                    <div class="p-4 rounded-xl border border-black/5 bg-surface shadow-sm hover:border-accent transition-colors">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-[0.65rem] font-mono text-accent bg-accent/10 px-1.5 py-0.5 rounded">${p.id}</span>
+                            <span class="text-[0.6rem] font-bold uppercase tracking-widest text-muted">${p.agent}</span>
                         </div>
-                        <p style="font-size: 0.8rem; font-weight: 600;">${p.title}</p>
+                        <p class="text-sm font-bold text-primary leading-tight">${p.title}</p>
                     </div>`).join("");
-                document.getElementById('stat-proposals').textContent = proposals.length;
             }
 
             const delegations = await fetchJSON('/ceo/api/delegations');
             if (delegations) {
-                document.getElementById('delegations-list').innerHTML = delegations.length === 0 ? '<p style="color: var(--text-secondary); font-size: 0.8rem;">No recent actions.</p>' :
+                document.getElementById('delegations-list').innerHTML = delegations.length === 0 ? '<p class="text-sm text-muted">No recent actions.</p>' :
                     delegations.slice(-8).reverse().map(d => `
-                    <div style="padding: 0.75rem; border-bottom: 1px solid var(--glass-border);">
-                        <p style="font-size: 0.75rem; font-weight: 600; margin-bottom: 0.15rem;">${d.task}</p>
-                        <div style="display: flex; justify-content: space-between; font-size: 0.6rem; color: var(--text-secondary);">
-                            <span>${d.agent}</span>
+                    <div class="p-3 border-l-2 border-primary/20 bg-surface/50 mb-2 hover:border-accent transition-colors">
+                        <p class="text-xs font-bold text-primary mb-1">${d.task}</p>
+                        <div class="flex justify-between text-[0.65rem] font-mono text-muted">
+                            <span class="uppercase tracking-widest">${d.agent}</span>
                             <span>${d.date}</span>
                         </div>
                     </div>`).join("");
@@ -400,14 +418,14 @@
             if (brain) {
                 const el = document.getElementById('stat-brain');
                 el.textContent = brain.exists ? `${brain.lines}L / ${brain.sections}S` : 'OFFLINE';
-                el.style.color = brain.exists ? (brain.lines > 3000 ? 'var(--warning)' : 'var(--success)') : 'var(--error)';
+                el.className = `text-lg font-bold font-mono mt-2 ${brain.exists ? (brain.lines > 3000 ? 'text-warning' : 'text-green-500') : 'text-error'}`;
             }
 
             const changelog = await fetchJSON('/ceo/api/changelog');
             if (changelog) {
                 document.getElementById('changelog-list').innerHTML = changelog.reverse().slice(0, 50).map(e => `
-                    <div style="margin-bottom: 0.25rem;">
-                        <span style="color: var(--accent);">${e.date}</span> ${e.file}: ${e.change.substring(0, 100)}...
+                    <div class="mb-2 p-2 hover:bg-black/5 rounded">
+                        <span class="text-accent font-bold mr-2">${e.date}</span> <span class="opacity-75">${e.file}:</span> ${e.change.substring(0, 100)}...
                     </div>`).join("");
             }
         }

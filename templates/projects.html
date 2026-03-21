@@ -3,181 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>247profits — Project Manager</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-    <style>
-        .health-ok { color: var(--success); font-weight: 800; }
-        .health-warn { color: var(--warning); font-weight: 800; }
-        .health-crit { color: var(--error); font-weight: 800; }
-        
-        .sev-critical { color: var(--error); font-weight: 700; }
-        .sev-high { color: var(--warning); font-weight: 600; }
-        .sev-medium { color: var(--accent); }
-        .sev-low { color: var(--text-secondary); }
-        
-        .status-active { color: var(--success); }
-        .status-paused { color: var(--warning); }
-        .status-blocked { color: var(--error); }
-        .status-completed { color: var(--text-secondary); }
-        .status-planning { color: var(--accent); }
-        
-        .congruence-banner { border-left: 6px solid var(--warning); background: rgba(255, 159, 10, 0.05); }
-        .congruence-banner.critical { border-left-color: var(--error); background: rgba(255, 59, 48, 0.05); }
-        
-        .gantt-row { display: flex; align-items: center; gap: 1rem; padding: 0.5rem 0; }
-        .gantt-track { flex: 1; height: 12px; background: rgba(0,0,0,0.05); border-radius: var(--radius-full); position: relative; overflow: hidden; }
-        .gantt-bar { height: 100%; border-radius: var(--radius-full); position: absolute; transition: var(--transition); }
-        .gantt-completed { background: var(--success); }
-        .gantt-in-progress { background: var(--accent); }
-        .gantt-pending { background: var(--text-secondary); opacity: 0.3; }
-        .gantt-overdue { background: var(--error); }
-        .gantt-blocked { background: var(--warning); }
-
-        .list-card { display: flex; flex-direction: column; gap: 0.75rem; }
-        .list-item { 
-            display: flex; 
-            align-items: flex-start; 
-            gap: 1rem; 
-            padding: 1rem; 
-            border-bottom: 1px solid var(--glass-border);
-            transition: var(--transition);
+    <title>247profits | Project Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#FAF8F5',
+                        surface: '#FFFFFF',
+                        primary: '#0D0D12',
+                        accent: '#0071E3',
+                        text: '#111111',
+                        muted: '#666666',
+                        success: '#34d399',
+                        warning: '#fbbf24',
+                        error: '#ef4444'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Inter', 'sans-serif'],
+                        drama: ['Playfair Display', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
         }
-        .list-item:last-child { border-bottom: none; }
-        .list-item:hover { background: rgba(0, 113, 227, 0.02); }
-        
-        .grid-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2.5rem; }
-        .grid-main { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 2.5rem; }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass {
+                background: rgba(255, 255, 255, 0.4);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
-<body>
-    <div class="bg-layer">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
+<body class="bg-background text-text antialiased selection:bg-accent selection:text-white min-h-screen flex flex-col items-center">
+    
+    <!-- Global Noise Overlay -->
+    <svg style="position: absolute; width: 0; height: 0;">
+        <filter id="noiseFilter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+        </filter>
+    </svg>
+    <div class="pointer-events-none fixed inset-0 z-50 opacity-[0.03]" style="filter: url(#noiseFilter);"></div>
+
+    <!-- Animated background orbs -->
+    <div class="fixed inset-0 pointer-events-none -z-10 bg-background overflow-hidden flex justify-center items-center">
+        <div class="absolute w-[600px] h-[600px] rounded-full blur-[100px] opacity-[0.1] bg-gradient-radial from-accent/20 to-transparent top-[20%] right-[-10%] animate-[pulse_10s_ease-in-out_infinite]"></div>
     </div>
 
-    <main class="container" style="padding: 4rem 0;">
-        <header style="margin-bottom: 4rem; display: flex; justify-content: space-between; align-items: flex-end;">
+    <!-- Top Navigation (Floating) -->
+    <nav class="fixed top-6 z-[100] glass px-8 py-4 rounded-full flex items-center gap-12 shadow-xl border border-white/40 nav-anim">
+        <a href="/" class="font-display font-bold text-xl tracking-tight text-primary flex items-center gap-2">
+            <div class="w-4 h-4 rounded-full bg-accent animate-pulse shadow-[0_0_15px_rgba(0,113,227,0.5)]"></div>
+            247<span class="font-light">Profits</span>
+        </a>
+        <div class="hidden md:flex gap-6 text-sm font-semibold text-muted">
+            <a href="/dashboard" class="hover:text-primary transition-colors">Overview</a>
+            <a href="/sourcing" class="hover:text-primary transition-colors">Sourcing Matrix</a>
+            <a href="/audit" class="hover:text-primary transition-colors">Audit Engine</a>
+            <a href="/ceo" class="hover:text-primary transition-colors">CEO Command Center</a>
+            <a href="/stalker" class="hover:text-primary transition-colors">Entity Monitor</a>
+        </div>
+    </nav>
+
+    <main class="w-full max-w-7xl mt-40 px-8 pb-32">
+        <header id="header" class="flex justify-between items-end mb-12">
             <div>
-                <div class="logo" style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-                        <circle cx="16" cy="16" r="14" stroke="url(#logo-grad)" stroke-width="2.5" />
-                        <circle cx="16" cy="16" r="6" fill="url(#logo-grad)" />
-                        <defs>
-                            <linearGradient id="logo-grad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
-                                <stop offset="0%" stop-color="#0071e3" />
-                                <stop offset="100%" stop-color="#5e5ce6" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <span class="text-gradient">247profits</span>
-                </div>
-                <h1 style="font-size: 3rem; margin-bottom: 0.5rem;">Project Manager</h1>
-                <p style="color: var(--text-secondary); font-size: 1.1rem;">Milestones, dependencies, and operational congruence.</p>
+                <h1 class="text-5xl font-display font-bold tracking-tight mb-3">Project Manager</h1>
+                <p class="text-lg text-muted">Milestones, dependencies, and operational congruence.</p>
             </div>
-            <div style="display: flex; gap: 1rem;">
-                <a href="/ceo" class="btn" style="background: rgba(0,0,0,0.05); color: var(--text-primary);">CEO Master</a>
-                <a href="/dashboard" class="btn" style="background: rgba(0,0,0,0.05); color: var(--text-primary);">Dashboard</a>
-                <button onclick="refreshAll()" class="btn btn-primary">Refresh Data</button>
+            <div class="flex gap-4">
+                <a href="/ceo" class="px-6 py-4 bg-black/5 text-primary rounded-xl font-bold hover:bg-black/10 transition-colors">CEO Master</a>
+                <button onclick="refreshAll()" class="px-8 py-4 bg-primary text-white rounded-xl font-bold shadow-2xl hover:bg-black hover:scale-[1.03] transition-all flex items-center gap-2 group">
+                    <svg class="group-hover:rotate-180 transition-transform duration-500" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                    Refresh Data
+                </button>
             </div>
         </header>
 
         <!-- High Level Stats -->
-        <section class="grid-stats">
-            <div class="glass card" style="padding: 1.5rem;">
-                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Active Initiatives</p>
-                <h3 id="stat-active" style="font-size: 2rem; margin-top: 0.5rem;">--</h3>
+        <section class="grid grid-cols-4 gap-6 mb-12">
+            <div class="glass p-6 rounded-[2rem] hover:-translate-y-1 hover:shadow-xl transition-all block-stagger">
+                <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-2">Active Initiatives</p>
+                <h3 id="stat-active" class="text-4xl font-display font-bold mt-4">--</h3>
             </div>
-            <div class="glass card" style="padding: 1.5rem;">
-                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">At Risk</p>
-                <h3 id="stat-atrisk" style="font-size: 2rem; margin-top: 0.5rem; color: var(--warning);">--</h3>
+            <div class="glass p-6 rounded-[2rem] hover:-translate-y-1 hover:shadow-xl transition-all block-stagger relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-tr from-warning/10 to-transparent"></div>
+                <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-2 relative z-10">At Risk</p>
+                <h3 id="stat-atrisk" class="text-4xl font-display font-bold text-warning mt-4 relative z-10">--</h3>
             </div>
-            <div class="glass card" style="padding: 1.5rem;">
-                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Blockers</p>
-                <h3 id="stat-blockers" style="font-size: 2rem; margin-top: 0.5rem; color: var(--error);">--</h3>
+            <div class="glass p-6 rounded-[2rem] hover:-translate-y-1 hover:shadow-xl transition-all block-stagger relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-tr from-error/10 to-transparent"></div>
+                <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-2 relative z-10">Blockers</p>
+                <h3 id="stat-blockers" class="text-4xl font-display font-bold text-error mt-4 relative z-10">--</h3>
             </div>
-            <div class="glass card" style="padding: 1.5rem;">
-                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">System Health</p>
-                <h3 id="stat-health" style="font-size: 2rem; margin-top: 0.5rem; color: var(--success);">--</h3>
+            <div class="glass p-6 rounded-[2rem] hover:-translate-y-1 hover:shadow-xl transition-all block-stagger">
+                <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-2">System Health</p>
+                <h3 id="stat-health" class="text-4xl font-display font-bold text-success mt-4">--</h3>
             </div>
         </section>
 
         <!-- Congruence Banner -->
-        <section id="congruence-banner" class="glass card congruence-banner hidden" style="padding: 1.5rem; margin-bottom: 2.5rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleCongruence()">
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <span style="font-size: 1.25rem;">⚠️</span>
-                    <h2 id="congruence-title" style="font-size: 1.1rem; color: var(--warning); font-weight: 700;">CONGRUENCE ANOMALIES DETECTED</h2>
+        <section id="congruence-banner" class="hidden glass p-8 rounded-[2rem] border-l-[6px] border-warning bg-warning/5 mb-12 shadow-xl block-stagger">
+            <div class="flex justify-between items-center cursor-pointer" onclick="toggleCongruence()">
+                <div class="flex items-center gap-4">
+                    <span class="text-2xl animate-pulse">⚠️</span>
+                    <h2 id="congruence-title" class="text-lg font-display font-bold text-warning tracking-tight">CONGRUENCE ANOMALIES DETECTED</h2>
                 </div>
-                <button class="btn" id="congruence-toggle" style="font-size: 0.75rem; padding: 0.4rem 1rem;">Expand Logic</button>
+                <button class="px-4 py-2 rounded-lg bg-black/5 text-primary text-xs font-bold hover:bg-black/10 transition-colors" id="congruence-toggle">Expand Logic</button>
             </div>
-            <div id="congruence-details" class="hidden" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--glass-border);">
-                <div id="congruence-list" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+            <div id="congruence-details" class="hidden mt-6 pt-6 border-t border-black/5">
+                <div id="congruence-list" class="flex flex-col gap-4"></div>
             </div>
         </section>
 
-        <section class="grid-main">
+        <section class="grid grid-cols-3 gap-8 mb-12">
             <!-- Project Health Table -->
-            <div class="glass card" style="padding: 2rem;">
-                <h3 style="margin-bottom: 2rem;">Portfolio Performance</h3>
-                <div class="table-wrapper">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+            <div class="col-span-2 glass p-10 rounded-[2rem] shadow-xl block-stagger">
+                <h3 class="text-2xl font-display font-bold mb-8 text-primary">Portfolio Performance</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse text-sm">
                         <thead>
-                            <tr style="text-align: left; border-bottom: 1px solid var(--glass-border);">
-                                <th style="padding: 1rem;">Project</th>
-                                <th style="padding: 1rem;">Business Unit</th>
-                                <th style="padding: 1rem; text-align: center;">Health</th>
-                                <th style="padding: 1rem;">Status</th>
-                                <th style="padding: 1rem; text-align: right;">Deadline</th>
+                            <tr class="border-b border-black/5">
+                                <th class="py-4 text-left font-bold text-muted uppercase tracking-wider text-xs">Project</th>
+                                <th class="py-4 text-left font-bold text-muted uppercase tracking-wider text-xs">Business Unit</th>
+                                <th class="py-4 text-center font-bold text-muted uppercase tracking-wider text-xs">Health</th>
+                                <th class="py-4 text-left font-bold text-muted uppercase tracking-wider text-xs">Status</th>
+                                <th class="py-4 text-right font-bold text-muted uppercase tracking-wider text-xs">Deadline</th>
                             </tr>
                         </thead>
                         <tbody id="projects-table">
-                            <tr><td colspan="5" style="padding: 3rem; text-align: center; color: var(--text-secondary);">Initializing project matrix...</td></tr>
+                            <tr><td colspan="5" class="py-16 text-center text-muted font-medium opacity-50">Initializing project matrix...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
             <!-- Sidebar: Blockers + Activity -->
-            <div style="display: flex; flex-direction: column; gap: 2rem;">
-                <div class="glass card" style="padding: 1.5rem;">
-                    <h3 style="margin-bottom: 1.25rem; font-size: 1.1rem;">Critical Blockers</h3>
-                    <div id="blockers-list" class="list-card" style="max-height: 300px; overflow-y: auto;">
-                        <p style="color: var(--text-secondary); font-size: 0.85rem;">Scanning for impediments...</p>
+            <div class="flex flex-col gap-8">
+                <div class="glass p-8 rounded-[2rem] shadow-xl block-stagger">
+                    <h3 class="text-lg font-display font-bold mb-6 text-primary">Critical Blockers</h3>
+                    <div id="blockers-list" class="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                        <p class="text-sm text-muted font-medium opacity-70">Scanning for impediments...</p>
                     </div>
                 </div>
 
-                <div class="glass card" style="padding: 1.5rem;">
-                    <h3 style="margin-bottom: 1.25rem; font-size: 1.1rem;">Activity Stream</h3>
-                    <div id="activity-list" class="list-card" style="max-height: 400px; overflow-y: auto;">
-                        <p style="color: var(--text-secondary); font-size: 0.85rem;">Listening for system events...</p>
+                <div class="glass p-8 rounded-[2rem] shadow-xl block-stagger">
+                    <h3 class="text-lg font-display font-bold mb-6 text-primary">Activity Stream</h3>
+                    <div id="activity-list" class="flex flex-col gap-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                        <p class="text-sm text-muted font-medium opacity-70">Listening for system events...</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Gantt Timeline -->
-        <section class="glass card" style="padding: 2.5rem; margin-bottom: 3rem;">
-            <h3 style="margin-bottom: 2rem;">Milestone Velocity Timeline</h3>
-            <div id="timeline-container" style="display: flex; flex-direction: column; gap: 1rem;">
-                <p style="color: var(--text-secondary); font-size: 0.85rem;">Rendering temporal projection...</p>
+        <section class="glass p-10 rounded-[2rem] shadow-xl mb-12 block-stagger">
+            <h3 class="text-2xl font-display font-bold mb-8 text-primary">Milestone Velocity Timeline</h3>
+            <div id="timeline-container" class="flex flex-col gap-4">
+                <p class="text-sm text-muted font-medium opacity-70">Rendering temporal projection...</p>
             </div>
         </section>
 
         <!-- Workload -->
-        <section class="glass card" style="padding: 2.5rem;">
-            <h3 style="margin-bottom: 2rem;">Agent Allocation & Capacity</h3>
-            <div class="table-wrapper">
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+        <section class="glass p-10 rounded-[2rem] shadow-xl block-stagger">
+            <h3 class="text-2xl font-display font-bold mb-8 text-primary">Agent Allocation & Capacity</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse text-sm">
                     <thead>
-                        <tr style="text-align: left; border-bottom: 1px solid var(--glass-border);">
-                            <th style="padding: 1rem;">Agent</th>
-                            <th style="padding: 1rem;">Assigned Initiatives</th>
-                            <th style="padding: 1rem; text-align: center;">Utilization</th>
-                            <th style="padding: 1rem; text-align: right;">Status</th>
+                        <tr class="border-b border-black/5">
+                            <th class="py-4 text-left font-bold text-muted uppercase tracking-wider text-xs">Agent</th>
+                            <th class="py-4 text-left font-bold text-muted uppercase tracking-wider text-xs">Assigned Initiatives</th>
+                            <th class="py-4 text-center font-bold text-muted uppercase tracking-wider text-xs">Utilization</th>
+                            <th class="py-4 text-right font-bold text-muted uppercase tracking-wider text-xs">Status</th>
                         </tr>
                     </thead>
                     <tbody id="workload-table">
-                        <tr><td colspan="4" style="padding: 2rem; text-align: center; color: var(--text-secondary);">Calculating workloads...</td></tr>
+                        <tr><td colspan="4" class="py-16 text-center text-muted font-medium opacity-50">Calculating workloads...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -185,10 +200,17 @@
     </main>
 
     <script>
+        // GSAP Initialization
+        document.addEventListener("DOMContentLoaded", () => {
+            gsap.from(".nav-anim", { y: -50, opacity: 0, duration: 1, ease: "power3.out" });
+            gsap.from("#header", { y: 20, opacity: 0, duration: 0.8, delay: 0.1, ease: "power2.out" });
+            gsap.from(".block-stagger", { y: 30, opacity: 0, duration: 0.8, stagger: 0.1, ease: "back.out(1.2)", delay: 0.2 });
+        });
+
         function healthClass(score) {
-            if (score >= 70) return 'health-ok';
-            if (score >= 40) return 'health-warn';
-            return 'health-crit';
+            if (score >= 70) return 'text-success font-bold font-mono';
+            if (score >= 40) return 'text-warning font-bold font-mono';
+            return 'text-error font-bold font-mono';
         }
 
         async function fetchJSON(url) {
@@ -207,7 +229,7 @@
             const avg = data.avg_health || 0;
             const el = document.getElementById('stat-health');
             el.textContent = avg + '%';
-            el.className = healthClass(avg);
+            el.className = `text-4xl font-display mt-4 ${healthClass(avg)}`;
         }
 
         async function loadProjects() {
@@ -215,51 +237,64 @@
             if (!data || data.error) return;
             const tbody = document.getElementById('projects-table');
             if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="padding: 3rem; text-align: center; color: var(--text-secondary);">No initiatives found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="py-16 text-center text-muted font-medium opacity-50">No initiatives found.</td></tr>';
                 return;
             }
-            tbody.innerHTML = data.map(p => `
-                <tr style="border-bottom: 1px solid var(--glass-border); transition: var(--transition);">
-                    <td style="padding: 1.25rem 1rem;"><strong>${p.name}</strong></td>
-                    <td style="padding: 1.25rem 1rem; color: var(--text-secondary);">${p.business}</td>
-                    <td style="padding: 1.25rem 1rem; text-align: center;"><span class="${healthClass(p.health_score)}">${p.health_score}</span></td>
-                    <td style="padding: 1.25rem 1rem;"><span class="status-${p.status || 'active'}" style="font-weight:700; font-size:0.8rem; text-transform:uppercase;">${p.status}</span></td>
-                    <td style="padding: 1.25rem 1rem; text-align: right; color: var(--text-secondary);">${p.target_date || '--'}</td>
+            tbody.innerHTML = data.map(p => {
+                let statusClass = "text-muted";
+                if (p.status === 'active') statusClass = "text-success";
+                if (p.status === 'paused') statusClass = "text-warning";
+                if (p.status === 'blocked') statusClass = "text-error";
+                if (p.status === 'planning') statusClass = "text-accent";
+
+                return `
+                <tr class="border-b border-black/5 hover:bg-black/5 transition-colors">
+                    <td class="py-5 pr-4 font-bold text-primary">${p.name}</td>
+                    <td class="py-5 pr-4 text-xs font-bold text-muted uppercase tracking-wider">${p.business}</td>
+                    <td class="py-5 px-4 text-center"><span class="${healthClass(p.health_score)} p-2 rounded-lg bg-surface border border-black/5 shadow-sm">${p.health_score}</span></td>
+                    <td class="py-5 pr-4"><span class="${statusClass} text-[0.65rem] font-bold uppercase tracking-widest px-2 py-1 rounded bg-black/5 border border-black/5">${p.status || 'unknown'}</span></td>
+                    <td class="py-5 pl-4 text-right text-xs font-mono font-bold text-muted tracking-tight">${p.target_date || '--'}</td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
 
         async function loadBlockers() {
             const data = await fetchJSON('/projects/api/blockers');
             const el = document.getElementById('blockers-list');
             if (!data || data.error || data.length === 0) {
-                el.innerHTML = '<p style="color: var(--text-secondary); font-size: 0.85rem; padding: 1rem;">No active impediments.</p>';
+                el.innerHTML = '<p class="text-sm text-muted font-medium opacity-70 p-4">No active impediments.</p>';
                 return;
             }
-            el.innerHTML = data.map(b => `
-                <div class="list-item">
-                    <div style="flex:1">
-                        <p style="font-size: 0.9rem; font-weight: 700;">${b.title}</p>
-                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">${b.project_name}</p>
+            el.innerHTML = data.map(b => {
+                let sevClass = "text-muted";
+                if (b.severity === 'critical') sevClass = "text-error bg-error/10 border-error/20";
+                if (b.severity === 'high') sevClass = "text-warning bg-warning/10 border-warning/20";
+                if (b.severity === 'medium') sevClass = "text-accent bg-accent/10 border-accent/20";
+
+                return `
+                <div class="p-4 rounded-xl border border-black/5 bg-surface shadow-sm hover:border-black/20 transition-colors flex justify-between items-start gap-4">
+                    <div class="flex-1">
+                        <p class="text-sm font-bold text-primary mb-1 leading-tight">${b.title}</p>
+                        <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider">${b.project_name}</p>
                     </div>
-                    <span class="sev-${b.severity || 'medium'}" style="font-size: 0.6rem; text-transform: uppercase;">${b.severity}</span>
+                    <span class="${sevClass} border px-2 py-1 rounded text-[0.6rem] font-bold uppercase tracking-widest break-normal whitespace-nowrap">${b.severity}</span>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         async function loadActivity() {
             const data = await fetchJSON('/projects/api/activity?limit=15');
             const el = document.getElementById('activity-list');
             if (!data || data.error || data.length === 0) {
-                el.innerHTML = '<p style="color: var(--text-secondary); font-size: 0.85rem; padding: 1rem;">Stationary system state.</p>';
+                el.innerHTML = '<p class="text-sm text-muted font-medium opacity-70 p-4">Stationary system state.</p>';
                 return;
             }
             el.innerHTML = data.map(a => `
-                <div class="list-item" style="padding: 0.75rem 1rem;">
-                    <div style="font-size: 0.8rem;">
-                        <span style="font-weight: 700;">${a.project_name}:</span>
-                        <span style="color: var(--text-secondary);">${a.details || a.action}</span>
-                        <div style="font-size: 0.6rem; color: var(--accent); margin-top: 0.15rem;">${a.date}</div>
+                <div class="p-4 rounded-xl border-l-[3px] border-black/10 bg-surface shadow-sm hover:border-accent transition-colors">
+                    <div class="text-xs">
+                        <span class="font-bold text-primary">${a.project_name}:</span>
+                        <span class="text-muted font-medium leading-relaxed">${a.details || a.action}</span>
+                        <div class="text-[0.65rem] font-mono font-bold text-accent mt-2">${a.date}</div>
                     </div>
                 </div>
             `).join('');
@@ -269,7 +304,7 @@
             const data = await fetchJSON('/projects/api/timeline');
             const el = document.getElementById('timeline-container');
             if (!data || data.error || data.length === 0) {
-                el.innerHTML = '<p style="color: var(--text-secondary); font-size: 0.85rem;">No milestone data available.</p>';
+                el.innerHTML = '<p class="text-sm text-muted font-medium opacity-70">No milestone data available.</p>';
                 return;
             }
 
@@ -300,9 +335,9 @@
 
             let html = '';
             for (const [projName, milestones] of Object.entries(projects)) {
-                html += `<div class="gantt-row">
-                    <span style="width: 150px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${projName}</span>
-                    <div class="gantt-track">`;
+                html += `<div class="flex items-center gap-6 py-3">
+                    <span class="w-40 text-xs font-bold text-primary uppercase tracking-wider truncate" title="${projName}">${projName}</span>
+                    <div class="flex-1 h-3 bg-black/5 rounded-full relative overflow-hidden group">`;
 
                 milestones.forEach(m => {
                     const start = dayOffset(m.start_date || m.due_date);
@@ -310,24 +345,24 @@
                     const left = (start / totalDays * 100).toFixed(1);
                     const width = Math.max(((end - start) / totalDays * 100), 2).toFixed(1);
 
-                    let barClass = 'gantt-pending';
-                    if (m.status === 'completed') barClass = 'gantt-completed';
-                    else if (m.status === 'in_progress') barClass = 'gantt-in-progress';
-                    else if (m.status === 'blocked') barClass = 'gantt-blocked';
-                    if (m.due_date && new Date(m.due_date) < today && m.status !== 'completed') barClass = 'gantt-overdue';
+                    let barClass = 'bg-black/20 opacity-50';
+                    if (m.status === 'completed') barClass = 'bg-success';
+                    else if (m.status === 'in_progress') barClass = 'bg-accent';
+                    else if (m.status === 'blocked') barClass = 'bg-warning';
+                    if (m.due_date && new Date(m.due_date) < today && m.status !== 'completed') barClass = 'bg-error shadow-[0_0_10px_rgba(239,68,68,0.5)]';
 
-                    html += `<div class="gantt-bar ${barClass}" style="left:${left}%; width:${width}%;" title="${m.milestone_name}"></div>`;
+                    html += `<div class="absolute h-full rounded-full transition-all group-hover:brightness-110 ${barClass}" style="left:${left}%; width:${width}%;" title="${m.milestone_name}"></div>`;
                 });
 
                 const todayLeft = (dayOffset(today.toISOString().split('T')[0]) / totalDays * 100).toFixed(1);
-                html += `<div style="position: absolute; top: 0; bottom: 0; width: 2px; background: var(--error); z-index: 5; left:${todayLeft}%"></div>`;
+                html += `<div class="absolute top-0 bottom-0 w-[2px] bg-error z-10 shadow-[0_0_8px_rgba(239,68,68,0.8)]" style="left:${todayLeft}%" title="Today"></div>`;
                 html += `</div></div>`;
             }
 
-            html += `<div style="display: flex; gap: 1.5rem; justify-content: flex-end; margin-top: 1rem; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">
-                <span><span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--success); margin-right:5px;"></span>Completed</span>
-                <span><span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--accent); margin-right:5px;"></span>Active</span>
-                <span><span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--error); margin-right:5px;"></span>Overdue</span>
+            html += `<div class="flex gap-8 justify-end mt-6 text-[0.65rem] font-bold uppercase tracking-widest text-muted">
+                <span class="flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full bg-success"></div>Completed</span>
+                <span class="flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full bg-accent"></div>Active</span>
+                <span class="flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full bg-error"></div>Overdue</span>
             </div>`;
             el.innerHTML = html;
         }
@@ -336,16 +371,18 @@
             const data = await fetchJSON('/projects/api/workload');
             const tbody = document.getElementById('workload-table');
             if (!data || data.error || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="padding: 2rem; text-align: center; color: var(--text-secondary);">No assignment data.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" class="py-16 text-center text-muted font-medium opacity-50">No assignment data.</td></tr>';
                 return;
             }
             tbody.innerHTML = data.map(a => `
-                <tr style="border-bottom: 1px solid var(--glass-border);">
-                    <td style="padding: 1.25rem 1rem;"><strong>${a.agent}</strong></td>
-                    <td style="padding: 1.25rem 1rem; color: var(--text-secondary);">${a.projects.map(p => p.project).join(', ')}</td>
-                    <td style="padding: 1.25rem 1rem; text-align: center;"><span style="font-weight: 800; color: ${a.total_allocation > 100 ? 'var(--error)' : 'var(--text-primary)'}">${a.total_allocation}%</span></td>
-                    <td style="padding: 1.25rem 1rem; text-align: right;">
-                        <span class="badge ${a.overloaded ? 'severity-high' : 'severity-low'}" style="padding: 0.4rem 1rem; display: inline-block;">${a.overloaded ? 'OVERLOAD' : 'NOMINAL'}</span>
+                <tr class="border-b border-black/5 hover:bg-black/5 transition-colors">
+                    <td class="py-5 pr-4 font-bold text-primary">${a.agent}</td>
+                    <td class="py-5 pr-4 text-xs font-bold text-muted uppercase tracking-wider">${a.projects.map(p => p.project).join(', ')}</td>
+                    <td class="py-5 px-4 text-center">
+                        <span class="font-mono font-bold text-lg ${a.total_allocation > 100 ? 'text-error animate-pulse' : 'text-primary'}">${a.total_allocation}%</span>
+                    </td>
+                    <td class="py-5 pl-4 text-right">
+                        <span class="px-3 py-1.5 rounded-lg text-[0.65rem] font-bold uppercase tracking-widest ${a.overloaded ? 'bg-error/10 text-error border border-error/20' : 'bg-black/5 text-muted'}">${a.overloaded ? 'OVERLOAD' : 'NOMINAL'}</span>
                     </td>
                 </tr>
             `).join('');
@@ -353,24 +390,37 @@
 
         async function loadCongruence() {
             const data = await fetchJSON('/projects/api/congruence');
+            const banner = document.getElementById('congruence-banner');
+            
             if (!data || data.error || data.total_issues === 0) {
-                document.getElementById('congruence-banner').classList.add('hidden');
+                banner.classList.add('hidden');
                 return;
             }
-            const banner = document.getElementById('congruence-banner');
+            
             banner.classList.remove('hidden');
-            if (data.critical > 0) banner.classList.add('critical'); else banner.classList.remove('critical');
+            if (data.critical > 0) {
+                banner.className = 'glass p-8 rounded-[2rem] border-l-[6px] border-error bg-error/5 mb-12 shadow-xl block-stagger';
+                document.getElementById('congruence-title').className = 'text-lg font-display font-bold text-error tracking-tight';
+            } else {
+                banner.className = 'glass p-8 rounded-[2rem] border-l-[6px] border-warning bg-warning/5 mb-12 shadow-xl block-stagger';
+                document.getElementById('congruence-title').className = 'text-lg font-display font-bold text-warning tracking-tight';
+            }
 
             document.getElementById('congruence-title').textContent = `${data.total_issues} CONGRUENCE ANOMALIES (${data.critical} CRITICAL)`;
-            document.getElementById('congruence-list').innerHTML = data.issues.map(i => `
-                <div style="display: flex; gap: 1rem; padding: 1rem; background: rgba(0,0,0,0.02); border-radius: var(--radius-sm);">
-                    <span class="sev-${i.severity}" style="width: 80px; font-weight: 800; font-size: 0.6rem; text-transform: uppercase;">${i.severity}</span>
+            document.getElementById('congruence-list').innerHTML = data.issues.map(i => {
+                let sevClass = "text-muted border-black/10";
+                if (i.severity === 'critical') sevClass = "text-error border-error/20 bg-error/10";
+                if (i.severity === 'high') sevClass = "text-warning border-warning/20 bg-warning/10";
+                
+                return `
+                <div class="flex items-start gap-6 p-5 bg-surface border border-black/5 rounded-xl">
+                    <span class="px-2 py-1 rounded text-[0.65rem] font-bold uppercase tracking-widest border ${sevClass}">${i.severity}</span>
                     <div>
-                        <p style="font-size: 0.9rem; font-weight: 600;">${i.message}</p>
-                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">Recommendation: ${i.fix}</p>
+                        <p class="text-sm font-bold text-primary mb-1">${i.message}</p>
+                        <p class="text-xs text-muted font-medium">Recommendation: <span class="text-primary">${i.fix}</span></p>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function toggleCongruence() {

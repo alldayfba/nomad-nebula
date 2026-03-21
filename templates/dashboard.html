@@ -3,244 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>247profits — Intelligence Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        body { background: var(--bg-color); min-height: 100vh; display: flex; }
-        
-        .sidebar { 
-            width: 260px; 
-            height: 100vh; 
-            position: fixed; 
-            left: 0; 
-            top: 0; 
-            padding: 2.5rem 1.5rem; 
-            border-right: 1px solid var(--glass-border);
-            display: flex;
-            flex-direction: column;
-            z-index: 100;
+    <title>247profits | Intelligence Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#FAF8F5',
+                        surface: '#FFFFFF',
+                        primary: '#0D0D12',
+                        accent: '#0071E3',
+                        text: '#111111',
+                        muted: '#666666'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Inter', 'sans-serif'],
+                        drama: ['Playfair Display', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
         }
-
-        .main-content {
-            margin-left: 260px;
-            flex: 1;
-            padding: 3rem 4rem;
-            max-width: 1400px;
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass {
+                background: rgba(255, 255, 255, 0.4);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .glass-dark {
+                background: rgba(13, 13, 18, 0.6);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+            }
         }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.85rem 1rem;
-            border-radius: var(--radius-sm);
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 500;
-            transition: var(--transition);
-            margin-bottom: 0.5rem;
-        }
-
-        .nav-link.active {
-            background: rgba(0, 113, 227, 0.08);
-            color: var(--accent);
-        }
-
-        .nav-link:hover:not(.active) {
-            background: rgba(0, 0, 0, 0.03);
-            color: var(--text-primary);
-        }
-
-        .stat-card {
-            padding: 1.75rem;
-        }
-
-        .stat-value {
-            font-size: 2.25rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-top: 0.25rem;
-        }
-
-        .status-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: var(--radius-full);
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-current { background: rgba(40, 205, 65, 0.1); color: var(--success); }
-        .status-stale { background: rgba(255, 204, 0, 0.1); color: var(--warning); }
-        .status-missing { background: rgba(255, 59, 48, 0.1); color: var(--error); }
-
-        .proposal-item {
-            padding: 1.25rem;
-            border-radius: var(--radius-sm);
-            background: rgba(0, 0, 0, 0.02);
-            border: 1px solid var(--glass-border);
-            margin-bottom: 1rem;
-            transition: var(--transition);
-        }
-
-        .proposal-item:hover {
-            border-color: var(--accent);
-            background: white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        table th {
-            padding: 1rem;
-            text-align: left;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        table td {
-            padding: 1.25rem 1rem;
-            border-bottom: 1px solid var(--glass-border);
-            color: var(--text-primary);
-        }
+        body { font-family: 'Inter', sans-serif; }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
-<body>
-    <!-- Animated background -->
-    <div class="bg-layer" style="opacity: 0.5;">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
+<body class="bg-background text-text antialiased selection:bg-accent selection:text-white min-h-screen flex overflow-x-hidden">
+    
+    <!-- Global Noise Overlay -->
+    <svg style="position: absolute; width: 0; height: 0;">
+        <filter id="noiseFilter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+        </filter>
+    </svg>
+    <div class="pointer-events-none fixed inset-0 z-50 opacity-[0.03]" style="filter: url(#noiseFilter);"></div>
+
+    <!-- Animated background orbs matching the landing page -->
+    <div class="fixed inset-0 pointer-events-none -z-10 bg-background overflow-hidden">
+        <div class="absolute w-[800px] h-[800px] rounded-full blur-[100px] opacity-20 bg-gradient-radial from-accent/20 to-transparent -top-48 -left-48 animate-[spin_30s_linear_infinite]"></div>
+        <div class="absolute w-[600px] h-[600px] rounded-full blur-[100px] opacity-[0.15] bg-gradient-radial from-black/5 to-transparent -bottom-24 -right-24"></div>
     </div>
 
-    <aside class="sidebar glass">
-        <a href="/" class="logo" style="margin-bottom: 3rem; display: flex; align-items: center; gap: 0.75rem;">
-            <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
-                <circle cx="16" cy="16" r="14" stroke="url(#logo-grad)" stroke-width="2.5" />
-                <circle cx="16" cy="16" r="6" fill="url(#logo-grad)" />
-                <defs>
-                    <linearGradient id="logo-grad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stop-color="#0071e3" />
-                        <stop offset="100%" stop-color="#5e5ce6" />
-                    </linearGradient>
-                </defs>
-            </svg>
-            <span class="text-gradient">247profits</span>
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar fixed left-0 top-0 w-72 h-[100dvh] flex flex-col p-8 border-r border-black/5 z-[100] glass">
+        <a href="/" class="flex items-center gap-2 mb-16 text-primary">
+            <div class="w-5 h-5 rounded-full bg-accent animate-pulse shadow-[0_0_15px_rgba(0,113,227,0.5)]"></div>
+            <span class="font-display font-bold text-xl tracking-tight">247<span class="font-light">Profits</span></span>
         </a>
 
-        <nav>
-            <a href="/dashboard" class="nav-link active">
+        <nav class="flex flex-col gap-2">
+            <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-accent/10 text-accent font-semibold transition-all hover:bg-accent/20">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                 Overview
             </a>
-            <a href="/audit" class="nav-link">
+            <a href="/audit" class="flex items-center gap-3 px-4 py-3 rounded-xl text-muted font-medium transition-all hover:bg-black/5 hover:text-primary">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                 Audits
             </a>
-            <a href="/ceo" class="nav-link">
+            <a href="/ceo" class="flex items-center gap-3 px-4 py-3 rounded-xl text-muted font-medium transition-all hover:bg-black/5 hover:text-primary">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 CEO View
             </a>
+            <a href="/sourcing" class="flex items-center gap-3 px-4 py-3 rounded-xl text-muted font-medium transition-all hover:bg-black/5 hover:text-primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                Sourcing Matrix
+            </a>
         </nav>
 
-        <div style="margin-top: auto;">
-            <div class="glass card" style="padding: 1rem; border-radius: var(--radius-sm);">
-                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem;">System Status</p>
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <div style="width: 8px; height: 8px; background: var(--success); border-radius: 50%;"></div>
-                    <span style="font-size: 0.8rem; font-weight: 600;">All Systems Operational</span>
+        <div class="mt-auto">
+            <div class="bg-surface/50 p-4 rounded-xl border border-black/5 shadow-inner">
+                <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-2">System Status</p>
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                    <span class="text-xs font-mono font-bold text-primary">All Systems Operational</span>
                 </div>
             </div>
         </div>
     </aside>
 
-    <main class="main-content">
-        <header style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem;">
+    <!-- Main Content -->
+    <main class="flex-1 ml-72 p-12 max-w-7xl">
+        <header id="header" class="flex justify-between items-end mb-12">
             <div>
-                <h1 style="font-size: 2.5rem; margin-bottom: 0.25rem;">Intelligence Dashboard</h1>
-                <p style="color: var(--text-secondary);">Real-time agent monitoring and system performance</p>
+                <h1 class="text-4xl font-display font-bold tracking-tight mb-2">Intelligence Dashboard</h1>
+                <p class="text-muted">Real-time agent monitoring and system performance</p>
             </div>
-            <div style="display: flex; gap: 1rem;">
-                <button onclick="refreshData()" class="btn btn-glass">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+            <div class="flex gap-4">
+                <button onclick="refreshData()" class="group flex items-center gap-2 px-6 py-3 rounded-full bg-surface border border-black/5 font-semibold text-sm hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
+                    <svg class="group-hover:rotate-180 transition-transform duration-500" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
                     Refresh
                 </button>
-                <button onclick="runScan()" class="btn btn-primary">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
+                <button onclick="runScan()" class="group flex items-center gap-2 px-6 py-3 rounded-full bg-accent text-white font-semibold text-sm hover:bg-blue-600 hover:scale-[1.03] transition-all duration-300 shadow-[0_10px_20px_rgba(0,113,227,0.2)]">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
                     Run Master Scan
                 </button>
             </div>
         </header>
 
         <!-- Stats Row -->
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 3rem;">
-            <div class="glass card stat-card">
-                <p style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Active Agents</p>
-                <p id="stat-agents" class="stat-value text-gradient">—</p>
+        <div id="stats-grid" class="grid grid-cols-4 gap-6 mb-12">
+            <div class="stat-card glass p-6 rounded-[2rem] hover:translate-y-[-4px] hover:shadow-2xl transition-all duration-500">
+                <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-2">Active Agents</p>
+                <p id="stat-agents" class="text-4xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-gray-400">—</p>
             </div>
-            <div class="glass card stat-card">
-                <p style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Pending Proposals</p>
-                <p id="stat-pending" class="stat-value" style="color: var(--accent);">—</p>
+            <div class="stat-card glass p-6 rounded-[2rem] hover:translate-y-[-4px] hover:shadow-2xl transition-all duration-500">
+                <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-2">Pending Proposals</p>
+                <p id="stat-pending" class="text-4xl font-display font-bold text-accent">—</p>
             </div>
-            <div class="glass card stat-card">
-                <p style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Quality Score</p>
-                <p id="stat-quality" class="stat-value" style="color: var(--success);">—</p>
+            <div class="stat-card glass p-6 rounded-[2rem] hover:translate-y-[-4px] hover:shadow-2xl transition-all duration-500">
+                <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-2">Quality Score</p>
+                <p id="stat-quality" class="text-4xl font-display font-bold text-green-500">—</p>
             </div>
-            <div class="glass card stat-card">
-                <p style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Last Scan</p>
-                <p id="stat-lastscan" style="font-size: 1rem; font-weight: 600; margin-top: 1rem; color: var(--text-primary);">—</p>
+            <div class="stat-card glass p-6 rounded-[2rem] hover:translate-y-[-4px] hover:shadow-2xl transition-all duration-500">
+                <p class="text-[0.65rem] font-bold text-muted uppercase tracking-wider mb-2">Last Scan</p>
+                <p id="stat-lastscan" class="text-xl font-mono font-bold text-primary mt-4">—</p>
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 2fr 1.25fr; gap: 2rem;">
+        <div class="grid grid-cols-3 gap-8">
             <!-- Health Scorecard -->
-            <section class="glass card" style="padding: 2rem;">
-                <h2 style="font-size: 1.5rem; margin-bottom: 2rem;">Agent Health Scorecard</h2>
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse;">
+            <section id="table-card" class="col-span-2 glass p-8 rounded-[2rem]">
+                <h2 class="text-2xl font-display font-bold mb-6">Agent Health Scorecard</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr>
-                                <th>Agent</th>
-                                <th>Domain</th>
-                                <th>Last Updated</th>
-                                <th>Status</th>
-                                <th>Quality</th>
+                            <tr class="border-b border-black/5">
+                                <th class="py-4 text-xs font-bold text-muted uppercase tracking-wider">Agent</th>
+                                <th class="py-4 text-xs font-bold text-muted uppercase tracking-wider">Domain</th>
+                                <th class="py-4 text-xs font-bold text-muted uppercase tracking-wider">Last Updated</th>
+                                <th class="py-4 text-xs font-bold text-muted uppercase tracking-wider">Status</th>
+                                <th class="py-4 text-xs font-bold text-muted uppercase tracking-wider">Quality</th>
                             </tr>
                         </thead>
                         <tbody id="health-table">
-                            <tr><td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 3rem;">Loading intelligence data...</td></tr>
+                            <tr><td colspan="5" class="text-center text-muted font-medium py-12">Loading intelligence data...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </section>
 
             <!-- Sidebar Column -->
-            <div style="display: flex; flex-direction: column; gap: 2rem;">
+            <div id="side-cards" class="col-span-1 flex flex-col gap-8">
                 <!-- Pending Proposals -->
-                <section class="glass card" style="padding: 2rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                        <h2 style="font-size: 1.25rem;">Proposals</h2>
-                        <button onclick="approveAll()" style="font-size: 0.75rem; font-weight: 600; color: var(--accent); background: none; border: none; cursor: pointer;">APPROVE ALL</button>
+                <section class="glass p-8 rounded-[2rem]">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold font-display">Proposals</h2>
+                        <button onclick="approveAll()" class="text-[0.65rem] font-bold text-accent bg-transparent tracking-widest hover:scale-105 transition-transform">APPROVE ALL</button>
                     </div>
-                    <div id="proposals-list" style="max-height: 400px; overflow-y: auto;">
-                        <p style="color: var(--text-secondary);">Syncing proposals...</p>
+                    <div id="proposals-list" class="max-h-[400px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+                        <p class="text-sm text-muted">Syncing proposals...</p>
                     </div>
                 </section>
 
                 <!-- Rejection Learnings -->
-                <section class="glass card" style="padding: 2rem;">
-                    <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem;">Critical Learnings</h2>
-                    <div id="learnings-list" style="max-height: 250px; overflow-y: auto;">
-                        <p style="color: var(--text-secondary);">No active alerts.</p>
+                <section class="glass p-8 rounded-[2rem]">
+                    <h2 class="text-xl font-bold font-display mb-6">Critical Learnings</h2>
+                    <div id="learnings-list" class="max-h-[250px] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
+                        <p class="text-sm text-muted">No active alerts.</p>
                     </div>
                 </section>
             </div>
         </div>
     </main>
 
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
+    </style>
+
     <script>
-        const API_BASE = '';  // Same origin
+        // GSAP Animations
+        document.addEventListener("DOMContentLoaded", (event) => {
+            gsap.from("#sidebar", { x: -100, opacity: 0, duration: 1, ease: "power3.out" });
+            gsap.from("#header", { y: -20, opacity: 0, duration: 0.8, ease: "power2.out", delay: 0.2 });
+            gsap.from(".stat-card", { y: 40, opacity: 0, duration: 0.8, stagger: 0.1, ease: "back.out(1.5)", delay: 0.3 });
+            gsap.from("#table-card", { y: 40, opacity: 0, duration: 0.8, ease: "power3.out", delay: 0.6 });
+            gsap.from("#side-cards > section", { x: 40, opacity: 0, duration: 0.8, stagger: 0.15, ease: "power3.out", delay: 0.7 });
+        });
+
+        // Dashboard Logic (Preserved identically)
+        const API_BASE = '';
 
         async function fetchJSON(url) {
             try {
@@ -251,14 +215,12 @@
         }
 
         async function refreshData() {
-            // Fetch health
             const health = await fetchJSON('/dashboard/api/health');
             if (health) {
                 renderHealth(health);
                 document.getElementById('stat-agents').textContent = Object.keys(health).length;
             }
 
-            // Fetch proposals
             const proposals = await fetchJSON('/dashboard/api/proposals');
             if (proposals) {
                 renderProposals(proposals);
@@ -266,7 +228,6 @@
                 document.getElementById('stat-pending').textContent = pending.length;
             }
 
-            // Fetch quality
             const quality = await fetchJSON('/dashboard/api/quality');
             if (quality) {
                 const allRatings = quality.map(q => q.rating);
@@ -276,11 +237,9 @@
                 }
             }
 
-            // Fetch learnings
             const learnings = await fetchJSON('/dashboard/api/learnings');
             if (learnings) renderLearnings(learnings);
 
-            // Last scan
             const scan = await fetchJSON('/dashboard/api/last-scan');
             if (scan && scan.last_scan) {
                 const d = new Date(scan.last_scan);
@@ -292,13 +251,17 @@
             const tbody = document.getElementById('health-table');
             let html = '';
             for (const [name, h] of Object.entries(health)) {
-                const statusClass = `status-${h.status}`;
-                html += `<tr>
-                    <td style="font-weight: 600;">${name}</td>
-                    <td style="color: var(--text-secondary);">${h.domain}</td>
-                    <td style="font-variant-numeric: tabular-nums;">${h.last_updated}</td>
-                    <td><span class="status-badge ${statusClass}">${h.status}</span></td>
-                    <td style="font-weight: 600;">—</td>
+                let statusClasses = 'bg-black/5 text-primary';
+                if (h.status === 'stale') statusClasses = 'bg-yellow-500/10 text-yellow-600';
+                if (h.status === 'missing') statusClasses = 'bg-red-500/10 text-red-600';
+                if (h.status === 'current') statusClasses = 'bg-green-500/10 text-green-600';
+
+                html += `<tr class="border-b border-black/5 hover:bg-black/5 transition-colors">
+                    <td class="py-4 font-bold">${name}</td>
+                    <td class="py-4 text-muted">${h.domain}</td>
+                    <td class="py-4 font-mono text-sm">${h.last_updated}</td>
+                    <td class="py-4"><span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${statusClasses}">${h.status}</span></td>
+                    <td class="py-4 font-bold">—</td>
                 </tr>`;
             }
             tbody.innerHTML = html;
@@ -308,21 +271,21 @@
             const div = document.getElementById('proposals-list');
             const pending = proposals.filter(p => p.status === 'pending');
             if (!pending.length) {
-                div.innerHTML = '<p style="color: var(--text-secondary);">No pending proposals.</p>';
+                div.innerHTML = '<p class="text-sm text-muted">No pending proposals.</p>';
                 return;
             }
             let html = '';
             for (const p of pending) {
-                html += `<div class="proposal-item">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <span style="font-size: 0.7rem; font-weight: 700; color: var(--accent); font-mono;">${p.id}</span>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <button onclick="approveOne('${p.id}')" style="font-size: 0.7rem; font-weight: 700; color: var(--success); background: none; border: none; cursor: pointer;">APPROVE</button>
-                            <button onclick="rejectOne('${p.id}')" style="font-size: 0.7rem; font-weight: 700; color: var(--error); background: none; border: none; cursor: pointer;">REJECT</button>
+                html += `<div class="p-5 rounded-2xl bg-surface/50 border border-black/5 hover:bg-surface hover:border-accent hover:shadow-lg transition-all duration-300">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[0.65rem] font-bold text-accent font-mono bg-accent/10 px-2 py-0.5 rounded-md">${p.id}</span>
+                        <div class="flex gap-3">
+                            <button onclick="approveOne('${p.id}')" class="text-[0.65rem] font-bold text-green-600 hover:scale-105 transition-transform tracking-wider">APPROVE</button>
+                            <button onclick="rejectOne('${p.id}')" class="text-[0.65rem] font-bold text-red-500 hover:scale-105 transition-transform tracking-wider">REJECT</button>
                         </div>
                     </div>
-                    <p style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem;">${p.title || 'Untitled Action'}</p>
-                    <span style="font-size: 0.75rem; color: var(--text-secondary);">${p.agent || 'Standard Agent'}</span>
+                    <p class="font-bold text-primary mb-1">${p.title || 'Untitled Action'}</p>
+                    <span class="text-xs font-mono text-muted">${p.agent || 'Standard Agent'}</span>
                 </div>`;
             }
             div.innerHTML = html;
@@ -331,14 +294,14 @@
         function renderLearnings(learnings) {
             const div = document.getElementById('learnings-list');
             if (!learnings.length) {
-                div.innerHTML = '<p style="color: var(--text-secondary);">No active alerts.</p>';
+                div.innerHTML = '<p class="text-sm text-muted">No active alerts.</p>';
                 return;
             }
             let html = '';
             for (const l of learnings.slice(-5).reverse()) {
-                html += `<div style="font-size: 0.85rem; padding: 0.75rem; border-left: 3px solid var(--error); background: rgba(255,59,48,0.05); margin-bottom: 0.75rem;">
-                    <div style="color: var(--text-secondary); font-size: 0.7rem; margin-bottom: 0.25rem;">${l.date}</div>
-                    <p><strong>${l.proposal}</strong>: ${l.reason}</p>
+                html += `<div class="p-4 border-l-4 border-red-500 bg-red-500/5 rounded-r-xl mb-3">
+                    <div class="text-[0.65rem] font-mono text-muted mb-1">${l.date}</div>
+                    <p class="text-sm text-primary"><strong class="font-bold">${l.proposal}</strong>: ${l.reason}</p>
                 </div>`;
             }
             div.innerHTML = html;
@@ -352,15 +315,14 @@
         }
 
         async function approveOne(id) {
-            const resp = await fetch(`/dashboard/api/approve/${id}`, { method: 'POST' });
-            const data = await resp.json();
+            await fetch(`/dashboard/api/approve/${id}`, { method: 'POST' });
             refreshData();
         }
 
         async function rejectOne(id) {
             const reason = prompt('Rejection reason:');
             if (!reason) return;
-            const resp = await fetch(`/dashboard/api/reject/${id}`, {
+            await fetch(`/dashboard/api/reject/${id}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ reason })
@@ -370,7 +332,7 @@
 
         async function approveAll() {
             if (!confirm('Approve ALL pending proposals?')) return;
-            const resp = await fetch('/dashboard/api/approve-all', { method: 'POST' });
+            await fetch('/dashboard/api/approve-all', { method: 'POST' });
             refreshData();
         }
 
@@ -379,4 +341,3 @@
     </script>
 </body>
 </html>
-

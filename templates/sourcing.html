@@ -3,96 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>247profits — Sourcing Matrix</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-    <style>
-        .badge-buy { background: rgba(52, 211, 153, 0.1); color: var(--success); font-weight: 800; }
-        .badge-maybe { background: rgba(255, 149, 0, 0.1); color: var(--warning); font-weight: 800; }
-        .badge-skip { background: rgba(0,0,0,0.05); color: var(--text-secondary); font-weight: 800; }
-        
-        .mode-tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; overflow-x: auto; padding-bottom: 0.5rem; scrollbar-width: none; }
-        .mode-tab { 
-            padding: 0.75rem 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--glass-border);
-            background: rgba(255, 255, 255, 0.02); color: var(--text-secondary); white-space: nowrap;
-            font-size: 0.85rem; font-weight: 600; transition: var(--transition);
+    <title>247profits | Sourcing Matrix</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#FAF8F5',
+                        surface: '#FFFFFF',
+                        primary: '#0D0D12',
+                        accent: '#0071E3',
+                        text: '#111111',
+                        muted: '#666666'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Inter', 'sans-serif'],
+                        drama: ['Playfair Display', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
         }
-        .mode-tab:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-primary); }
-        .mode-tab.active { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 4px 15px rgba(0, 113, 227, 0.2); }
-
-        .form-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; align-items: end; }
-        .settings-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.5rem; }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass {
+                background: rgba(255, 255, 255, 0.4);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+        }
+        body { font-family: 'Inter', sans-serif; }
         
-        .field label { display: block; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.5rem; letter-spacing: 0.05em; }
-        
-        .progress-indicator { display: flex; align-items: center; gap: 1rem; margin-top: 2rem; padding: 1rem; background: rgba(0, 113, 227, 0.05); border-radius: var(--radius-sm); border: 1px solid rgba(0, 113, 227, 0.1); }
-        .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--glass-border); }
-        .step-active .step-dot { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
-        .step-done .step-dot { background: var(--success); }
-
-        .verdict-buy { background: rgba(52, 211, 153, 0.02); }
-        .verdict-maybe { background: rgba(255, 149, 0, 0.02); }
-        .verdict-skip { opacity: 0.6; }
+        /* Hide scrollbar for tabs */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
-<body>
-    <div class="bg-layer">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
+<body class="bg-background text-text antialiased selection:bg-accent selection:text-white min-h-screen flex flex-col items-center">
+    
+    <!-- Global Noise Overlay -->
+    <svg style="position: absolute; width: 0; height: 0;">
+        <filter id="noiseFilter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+        </filter>
+    </svg>
+    <div class="pointer-events-none fixed inset-0 z-50 opacity-[0.03]" style="filter: url(#noiseFilter);"></div>
+
+    <!-- Animated background orbs -->
+    <div class="fixed inset-0 pointer-events-none -z-10 bg-background overflow-hidden flex justify-center items-center">
+        <div class="absolute w-[800px] h-[800px] rounded-full blur-[100px] opacity-[0.15] bg-gradient-radial from-accent/20 to-transparent top-0 -left-64 animate-[spin_40s_linear_infinite]"></div>
     </div>
 
-    <main class="container" style="padding: 4rem 0;">
-        <header style="margin-bottom: 4rem; display: flex; justify-content: space-between; align-items: flex-end;">
-            <div>
-                <div class="logo" style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-                        <circle cx="16" cy="16" r="14" stroke="url(#logo-grad)" stroke-width="2.5" />
-                        <circle cx="16" cy="16" r="6" fill="url(#logo-grad)" />
-                        <defs>
-                            <linearGradient id="logo-grad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
-                                <stop offset="0%" stop-color="#0071e3" />
-                                <stop offset="100%" stop-color="#5e5ce6" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <span class="text-gradient">247profits</span>
-                </div>
-                <h1 style="font-size: 3rem; margin-bottom: 0.5rem;">Sourcing Matrix</h1>
-                <p style="color: var(--text-secondary); font-size: 1.1rem;">High-fidelity Amazon FBA product harvesting system.</p>
-            </div>
-            <div style="display: flex; gap: 1rem;">
-                <a href="/stalker" class="btn" style="background: rgba(0,0,0,0.05); color: var(--text-primary);">Entity Monitor</a>
-                <a href="/audit" class="btn" style="background: rgba(0,0,0,0.05); color: var(--text-primary);">Audit Engine</a>
-            </div>
+    <!-- Top Navigation (Floating) -->
+    <nav class="fixed top-6 z-[100] glass px-8 py-4 rounded-full flex items-center gap-12 shadow-xl border border-white/40 slide-down">
+        <a href="/" class="font-display font-bold text-xl tracking-tight text-primary flex items-center gap-2">
+            <div class="w-4 h-4 rounded-full bg-accent animate-pulse shadow-[0_0_15px_rgba(0,113,227,0.5)]"></div>
+            247<span class="font-light">Profits</span>
+        </a>
+        <div class="hidden md:flex gap-6 text-sm font-semibold text-muted">
+            <a href="/dashboard" class="hover:text-primary transition-colors">Overview</a>
+            <a href="/sourcing" class="text-accent hover:text-accent transition-colors">Sourcing Matrix</a>
+            <a href="/audit" class="hover:text-primary transition-colors">Audit Engine</a>
+            <a href="/stalker" class="hover:text-primary transition-colors">Entity Monitor</a>
+        </div>
+    </nav>
+
+    <main class="w-full max-w-6xl mt-40 px-8 pb-32">
+        <header id="header" class="mb-12">
+            <h1 class="text-5xl font-display font-bold tracking-tight mb-3">Sourcing Matrix</h1>
+            <p class="text-lg text-muted">High-fidelity Amazon FBA product harvesting system.</p>
         </header>
 
-        <!-- Mode Navigation -->
-        <nav class="mode-tabs">
-            <button class="mode-tab active" data-mode="search" onclick="switchMode('search')">Product Search</button>
-            <button class="mode-tab" data-mode="url" onclick="switchMode('url')">URL Harvesting</button>
-            <button class="mode-tab" data-mode="clearance" onclick="switchMode('clearance')">Clearance Radar</button>
-            <button class="mode-tab" data-mode="brand" onclick="switchMode('brand')">Brand Extraction</button>
-            <button class="mode-tab" data-mode="oos" onclick="switchMode('oos')">OOS Arbitrage</button>
-            <button class="mode-tab" data-mode="deals" onclick="switchMode('deals')">Neural Drop Feed</button>
-            <button class="mode-tab" data-mode="a2a" onclick="switchMode('a2a')">A2A Flips</button>
-            <button class="mode-tab" data-mode="finder" onclick="switchMode('finder')">Opportunity Discovery</button>
-            <button class="mode-tab" data-mode="wholesale" onclick="switchMode('wholesale')">Wholesale Matrix</button>
-            <button class="mode-tab" data-mode="history" onclick="switchMode('history')">Transmission History</button>
+        <!-- Dynamic Mode segmented control -->
+        <nav id="mode-tabs" class="flex gap-2 overflow-x-auto hide-scrollbar mb-8 p-1">
+            <button class="mode-tab active px-6 py-3 rounded-full text-sm font-bold bg-primary text-white shadow-lg transition-all" data-mode="search" onclick="switchMode('search')">Product Search</button>
+            <button class="mode-tab px-6 py-3 rounded-full text-sm font-bold text-muted bg-white/50 border border-black/5 hover:bg-white hover:text-primary transition-all" data-mode="url" onclick="switchMode('url')">URL Harvesting</button>
+            <button class="mode-tab px-6 py-3 rounded-full text-sm font-bold text-muted bg-white/50 border border-black/5 hover:bg-white hover:text-primary transition-all" data-mode="clearance" onclick="switchMode('clearance')">Clearance Radar</button>
+            <button class="mode-tab px-6 py-3 rounded-full text-sm font-bold text-muted bg-white/50 border border-black/5 hover:bg-white hover:text-primary transition-all" data-mode="brand" onclick="switchMode('brand')">Brand Extraction</button>
+            <button class="mode-tab px-6 py-3 rounded-full text-sm font-bold text-muted bg-white/50 border border-black/5 hover:bg-white hover:text-primary transition-all" data-mode="oos" onclick="switchMode('oos')">OOS Arbitrage</button>
+            <button class="mode-tab px-6 py-3 rounded-full text-sm font-bold text-muted bg-white/50 border border-black/5 hover:bg-white hover:text-primary transition-all" data-mode="deals" onclick="switchMode('deals')">Neural Drop Feed</button>
         </nav>
 
-        <section class="glass card" style="padding: 2.5rem; margin-bottom: 3rem;">
+        <section id="control-panel" class="glass p-10 rounded-[2rem] mb-12 shadow-2xl">
             <!-- SEARCH MODE -->
             <div id="mode-search" class="search-panel">
-                <div class="form-grid">
-                    <div class="field">
-                        <label>Target Product Name</label>
-                        <input id="search-query" type="text" placeholder="e.g. reeses easter eggs, protein powder, dewalt drill..." style="width: 100%;" />
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                    <div class="md:col-span-2 flex flex-col gap-2">
+                        <label class="text-[0.65rem] font-bold uppercase tracking-wider text-muted">Target Product Name</label>
+                        <input id="search-query" type="text" placeholder="e.g. reeses easter eggs, protein powder, dewalt drill..." class="w-full px-5 py-4 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all text-sm font-medium" />
                     </div>
-                    <button id="search-btn" class="btn btn-primary" onclick="startMultiSearch()" style="width: 100%;">Initialize Search</button>
+                    <button class="w-full px-6 py-4 bg-accent text-white rounded-xl font-bold shadow-[0_10px_20px_rgba(0,113,227,0.2)] hover:scale-[1.02] transition-transform flex items-center justify-center gap-2" onclick="startMultiSearch()">
+                        Initialize Search
+                    </button>
                 </div>
-                <div class="settings-row">
-                    <div class="field">
-                        <label>Category Logic</label>
-                        <select id="search-category" style="width: 100%;">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8">
+                    <div class="flex flex-col gap-2">
+                        <label class="text-[0.65rem] font-bold uppercase tracking-wider text-muted">Category Logic</label>
+                        <select id="search-category" class="w-full px-4 py-3 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 text-sm font-medium">
                             <option value="">Auto-detect</option>
                             <option value="Grocery">Grocery</option>
                             <option value="Health">Health</option>
@@ -100,46 +115,48 @@
                             <option value="Electronics">Electronics</option>
                         </select>
                     </div>
-                    <div class="field">
-                        <label>Retailer Nodes</label>
-                        <select id="search-max-retailers" style="width: 100%;">
+                    <div class="flex flex-col gap-2">
+                        <label class="text-[0.65rem] font-bold uppercase tracking-wider text-muted">Retailer Nodes</label>
+                        <select id="search-max-retailers" class="w-full px-4 py-3 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 text-sm font-medium">
                             <option value="5">5 Centers</option>
                             <option value="10" selected>10 Centers</option>
                             <option value="15">15 Centers</option>
                         </select>
                     </div>
-                    <div class="field">
-                        <label>ROI Threshold %</label>
-                        <input id="search-min-roi" type="number" value="30" style="width: 100%;" />
+                    <div class="flex flex-col gap-2">
+                        <label class="text-[0.65rem] font-bold uppercase tracking-wider text-muted">ROI Threshold %</label>
+                        <input id="search-min-roi" type="number" value="30" class="w-full px-4 py-3 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 text-sm font-medium font-mono" />
                     </div>
-                    <div class="field">
-                        <label>Max Acquisition $</label>
-                        <input id="search-max-price" type="number" value="50.00" style="width: 100%;" />
+                    <div class="flex flex-col gap-2">
+                        <label class="text-[0.65rem] font-bold uppercase tracking-wider text-muted">Max Acquisition $</label>
+                        <input id="search-max-price" type="number" value="50.00" class="w-full px-4 py-3 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 text-sm font-medium font-mono" />
                     </div>
                 </div>
             </div>
 
             <!-- URL MODE -->
             <div id="mode-url" class="search-panel hidden">
-                <div class="form-grid">
-                    <div class="field">
-                        <label>Direct Retail Source URL</label>
-                        <input id="source-url" type="url" placeholder="https://www.walmart.com/browse/clearance/..." style="width: 100%;" />
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                    <div class="md:col-span-2 flex flex-col gap-2">
+                        <label class="text-[0.65rem] font-bold uppercase tracking-wider text-muted">Direct Retail Source URL</label>
+                        <input id="source-url" type="url" placeholder="https://www.walmart.com/browse/clearance/..." class="w-full px-5 py-4 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all text-sm font-medium text-primary" />
                     </div>
-                    <button id="source-btn" class="btn btn-primary" onclick="startSourcing()" style="width: 100%;">Scrape Source</button>
+                    <button class="w-full px-6 py-4 bg-accent text-white rounded-xl font-bold shadow-[0_10px_20px_rgba(0,113,227,0.2)] hover:scale-[1.02] transition-transform flex items-center justify-center gap-2" onclick="startSourcing()">
+                        Scrape Source
+                    </button>
                 </div>
-                <div class="settings-row">
-                    <div class="field">
-                        <label>Min ROI %</label>
-                        <input id="min-roi" type="number" value="30" style="width: 100%;" />
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                    <div class="flex flex-col gap-2">
+                        <label class="text-[0.65rem] font-bold uppercase tracking-wider text-muted">Min ROI %</label>
+                        <input id="min-roi" type="number" value="30" class="w-full px-4 py-3 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 text-sm font-medium font-mono" />
                     </div>
-                    <div class="field">
-                        <label>Min Profit $</label>
-                        <input id="min-profit" type="number" value="3.00" style="width: 100%;" />
+                    <div class="flex flex-col gap-2">
+                        <label class="text-[0.65rem] font-bold uppercase tracking-wider text-muted">Min Profit $</label>
+                        <input id="min-profit" type="number" value="3.00" class="w-full px-4 py-3 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 text-sm font-medium font-mono" />
                     </div>
-                    <div class="field">
-                        <label>Extraction Limit</label>
-                        <select id="max-products">
+                    <div class="flex flex-col gap-2">
+                        <label class="text-[0.65rem] font-bold uppercase tracking-wider text-muted">Extraction Limit</label>
+                        <select id="max-products" class="w-full px-4 py-3 bg-surface rounded-xl border border-black/5 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 text-sm font-medium">
                             <option value="20">20 Units</option>
                             <option value="50" selected>50 Units</option>
                             <option value="100">100 Units</option>
@@ -148,35 +165,36 @@
                 </div>
             </div>
 
-            <div id="progress-area" class="progress-indicator hidden">
-                <div class="step-dot"></div>
-                <div style="flex: 1; font-size: 0.85rem; font-weight: 600;" id="status-text">Ready for operation...</div>
-                <button class="btn" style="font-size: 0.7rem; padding: 0.3rem 0.6rem;">Abort</button>
+            <!-- Progress Terminal -->
+            <div id="progress-area" class="hidden mt-8 p-6 bg-primary rounded-xl border border-black/10 shadow-inner flex items-center gap-4 text-white font-mono text-sm">
+                <div class="w-2 h-2 rounded-full bg-accent animate-pulse"></div>
+                <div id="status-text" class="flex-1 opacity-90">Ready for operation...</div>
+                <button class="px-4 py-2 rounded-md bg-white/10 hover:bg-white/20 transition-colors text-xs font-bold uppercase tracking-widest text-white/50 hover:text-white">Abort</button>
             </div>
         </section>
 
         <!-- Output matrix -->
-        <section class="glass card" style="padding: 2.5rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h3>Active Intelligence Feed</h3>
-                <button class="btn" onclick="exportCSV()" disabled id="export-btn" style="font-size: 0.75rem; padding: 0.4rem 1.25rem;">Broadcast to CSV</button>
+        <section id="feed-matrix" class="glass p-10 rounded-[2rem] shadow-2xl">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-2xl font-display font-bold">Active Intelligence Feed</h3>
+                <button id="export-btn" disabled onclick="exportCSV()" class="px-5 py-2.5 rounded-full bg-surface border border-black/5 text-xs font-bold uppercase tracking-wider shadow-sm hover:shadow-md transition-shadow disabled:opacity-50 disabled:cursor-not-allowed text-primary">Broadcast to CSV</button>
             </div>
             
-            <div class="table-wrapper">
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse text-sm">
                     <thead>
-                        <tr style="text-align: left; border-bottom: 1px solid var(--glass-border);">
-                            <th style="padding: 1rem;">Asset Information</th>
-                            <th style="padding: 1rem;">Retail Node</th>
-                            <th style="padding: 1rem;">Cost</th>
-                            <th style="padding: 1rem;">ROI %</th>
-                            <th style="padding: 1rem;">Net Profit</th>
-                            <th style="padding: 1rem; text-align: center;">Confidence</th>
-                            <th style="padding: 1rem; text-align: right;">Verdict</th>
+                        <tr class="border-b border-black/5">
+                            <th class="py-4 text-left font-bold text-muted uppercase tracking-wider text-xs">Asset Information</th>
+                            <th class="py-4 text-left font-bold text-muted uppercase tracking-wider text-xs">Retail Node</th>
+                            <th class="py-4 text-left font-bold text-muted uppercase tracking-wider text-xs">Cost</th>
+                            <th class="py-4 text-left font-bold text-muted uppercase tracking-wider text-xs">ROI %</th>
+                            <th class="py-4 text-left font-bold text-muted uppercase tracking-wider text-xs">Net Profit</th>
+                            <th class="py-4 text-center font-bold text-muted uppercase tracking-wider text-xs">Confidence</th>
+                            <th class="py-4 text-right font-bold text-muted uppercase tracking-wider text-xs">Verdict</th>
                         </tr>
                     </thead>
                     <tbody id="sourcing-tbody">
-                        <tr><td colspan="7" style="padding: 4rem; text-align: center; color: var(--text-secondary);">Initializing neural sourcing feed...</td></tr>
+                        <tr><td colspan="7" class="py-16 text-center text-muted">Initializing neural sourcing feed... waiting for input.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -184,14 +202,35 @@
     </main>
 
     <script>
+        // GSAP Animations on Load
+        document.addEventListener("DOMContentLoaded", () => {
+            gsap.from(".slide-down", { y: -50, opacity: 0, duration: 1, ease: "power3.out" });
+            gsap.from("#header", { y: 20, opacity: 0, duration: 0.8, delay: 0.2, ease: "power2.out" });
+            gsap.from("#mode-tabs", { y: 20, opacity: 0, duration: 0.8, delay: 0.3, ease: "power2.out" });
+            gsap.from("#control-panel", { y: 40, opacity: 0, duration: 1, delay: 0.4, ease: "back.out(1.2)" });
+            gsap.from("#feed-matrix", { y: 40, opacity: 0, duration: 1, delay: 0.6, ease: "power3.out" });
+        });
+
         let isRunning = false;
         let eventSource = null;
 
         function switchMode(mode) {
-            document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.getAttribute('data-mode') === mode));
+            // Update tabs styling
+            document.querySelectorAll('.mode-tab').forEach(t => {
+                if (t.getAttribute('data-mode') === mode) {
+                    t.className = 'mode-tab active px-6 py-3 rounded-full text-sm font-bold bg-primary text-white shadow-lg transition-all scale-105';
+                } else {
+                    t.className = 'mode-tab px-6 py-3 rounded-full text-sm font-bold text-muted bg-white/50 border border-black/5 hover:bg-white hover:text-primary transition-all';
+                }
+            });
+
+            // Hide all panels, show active
             document.querySelectorAll('.search-panel').forEach(p => p.classList.add('hidden'));
             const panel = document.getElementById('mode-' + mode);
-            if (panel) panel.classList.remove('hidden');
+            if (panel) {
+                panel.classList.remove('hidden');
+                gsap.from(panel, { opacity: 0, y: 10, duration: 0.4 });
+            }
         }
 
         async function startMultiSearch() {
@@ -220,7 +259,11 @@
         function initSourcing(endpoint, body) {
             if (isRunning) return;
             isRunning = true;
-            document.getElementById('progress-area').classList.remove('hidden');
+            
+            const progress = document.getElementById('progress-area');
+            progress.classList.remove('hidden');
+            gsap.from(progress, { height: 0, opacity: 0, duration: 0.4 });
+
             document.getElementById('sourcing-tbody').innerHTML = '';
             document.getElementById('status-text').textContent = 'Initializing link...';
 
@@ -247,27 +290,48 @@
         function renderProduct(p) {
             const tbody = document.getElementById('sourcing-tbody');
             const row = document.createElement('tr');
-            row.style.borderBottom = '1px solid var(--glass-border)';
-            const verdict = p.roi >= 35 ? 'buy' : (p.roi >= 20 ? 'maybe' : 'skip');
-            row.className = 'verdict-' + verdict;
+            
+            const isBuy = p.roi >= 35;
+            const isMaybe = p.roi >= 20 && p.roi < 35;
+            
+            let verdictLabel = "SKIP";
+            let verdictClass = "bg-black/5 text-muted";
+            let rowClass = "hover:bg-black/5 transition-colors border-b border-black/5 opacity-60";
+            let roiColor = "text-primary";
+            let confColor = "text-yellow-600";
+
+            if (isBuy) {
+                verdictLabel = "BUY";
+                verdictClass = "bg-green-500/10 text-green-600 border border-green-500/20";
+                rowClass = "hover:bg-green-500/5 transition-colors border-b border-black/5 bg-green-500/[0.02]";
+                roiColor = "text-green-600";
+            } else if (isMaybe) {
+                verdictLabel = "MAYBE";
+                verdictClass = "bg-yellow-500/10 text-yellow-600 border border-yellow-500/20";
+                rowClass = "hover:bg-yellow-500/5 transition-colors border-b border-black/5 bg-yellow-500/[0.02]";
+                roiColor = "text-primary";
+            }
+
+            if(p.confidence >= 80) confColor = "text-green-600";
+
+            row.className = rowClass;
             
             row.innerHTML = `
-                <td style="padding: 1.25rem 1rem;">
-                    <strong>${p.name}</strong>
-                    <div style="font-size: 0.75rem; color: var(--accent); margin-top: 0.25rem;">ASIN: ${p.asin || 'PENDING'}</div>
+                <td class="py-5 pr-4">
+                    <strong class="font-bold text-primary block">${p.name}</strong>
+                    <div class="text-[0.65rem] font-mono font-bold uppercase tracking-widest text-accent mt-1">ASIN: ${p.asin || 'PENDING'}</div>
                 </td>
-                <td style="padding: 1.25rem 1rem; color: var(--text-secondary);">${p.retailer}</td>
-                <td style="padding: 1.25rem 1rem;">$${p.price}</td>
-                <td style="padding: 1.25rem 1rem;"><span style="font-weight: 800; color: ${p.roi >= 30 ? 'var(--success)' : 'var(--text-primary)'}">${p.roi}%</span></td>
-                <td style="padding: 1.25rem 1rem; font-weight: 700; color: var(--success);">$${p.profit}</td>
-                <td style="padding: 1.25rem 1rem; text-align: center;">
-                    <div style="font-size: 0.75rem; font-weight: 800; color: ${p.confidence >= 80 ? 'var(--success)' : 'var(--warning)'}">${p.confidence}%</div>
-                </td>
-                <td style="padding: 1.25rem 1rem; text-align: right;">
-                    <span class="badge-${verdict}" style="padding: 0.4rem 1.25rem; font-size: 0.7rem; border-radius: 4px;">${verdict.toUpperCase()}</span>
+                <td class="py-5 pr-4 text-muted font-medium">${p.retailer}</td>
+                <td class="py-5 pr-4 font-mono font-medium text-primary">$${p.price}</td>
+                <td class="py-5 pr-4 font-mono"><span class="font-bold ${roiColor}">${p.roi}%</span></td>
+                <td class="py-5 pr-4 font-mono font-bold text-green-600">$${p.profit}</td>
+                <td class="py-5 px-4 text-center text-xs font-mono font-bold ${confColor}">${p.confidence}%</td>
+                <td class="py-5 pl-4 text-right">
+                    <span class="inline-block px-3 py-1 font-bold text-[0.65rem] uppercase tracking-wider rounded-md ${verdictClass}">${verdictLabel}</span>
                 </td>
             `;
             tbody.prepend(row);
+            gsap.from(row, { backgroundColor: "rgba(0,113,227,0.1)", duration: 1 });
         }
 
         function finishSourcing() {
@@ -275,6 +339,11 @@
             if (eventSource) eventSource.close();
             document.getElementById('status-text').textContent = 'Operation complete.';
             document.getElementById('export-btn').disabled = false;
+            
+            gsap.to(document.getElementById('progress-area'), {
+                opacity: 0, height: 0, duration: 0.5, delay: 2,
+                onComplete: () => document.getElementById('progress-area').classList.add('hidden')
+            });
         }
 
         function exportCSV() {
