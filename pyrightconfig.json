@@ -1,0 +1,9 @@
+{
+    "venvPath": ".",
+    "venv": ".venv",
+    "pythonVersion": "3.9",
+    "typeCheckingMode": "off",
+    "reportMissingImports": "warning",
+    "reportMissingModuleSource": "none",
+    "extraPaths": ["."]
+}

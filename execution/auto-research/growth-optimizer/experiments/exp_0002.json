@@ -1,0 +1,22 @@
+{
+  "id": 2,
+  "hypothesis": "Fix 0 growth system issues to improve throughput",
+  "challenger": {
+    "hypothesis": "Fix 0 growth system issues to improve throughput",
+    "issues": [],
+    "total_issues": 0,
+    "conversion_rates": {
+      "_counts": {}
+    }
+  },
+  "baseline_metric": 66.0,
+  "challenger_metric": 66.0,
+  "status": "discard",
+  "details": {
+    "ref": "{\"fixed\": [], \"queued\": [], \"skipped\": []}",
+    "metric": 66.0,
+    "queued_count": 0,
+    "queued": []
+  },
+  "created_at": "2026-03-16T00:31:00.143661"
+}

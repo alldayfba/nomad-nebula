@@ -1,0 +1,60 @@
+name: sourcing_report
+version: "1.0"
+description: "FBA sourcing opportunity report for Amazon products"
+
+input:
+  required:
+    - asin:
+        type: string
+        description: "Amazon ASIN"
+    - buy_cost:
+        type: number
+        description: "Purchase price per unit"
+    - sell_price:
+        type: number
+        description: "Expected Amazon sell price"
+  optional:
+    - source_type:
+        type: string
+        default: "OA"
+        description: "OA, RA, or wholesale"
+    - category:
+        type: string
+        description: "Amazon category"
+    - bsr:
+        type: number
+        description: "Best Sellers Rank"
+    - keepa_data:
+        type: object
+        description: "Keepa price/rank history"
+
+output:
+  format: markdown
+  sections:
+    - product_summary
+    - profitability_analysis
+    - risk_assessment
+    - recommendation
+  constraints:
+    no_placeholders: true
+
+definition_of_done:
+  - "All 4 sections present"
+  - "Profitability includes ROI %, net profit per unit, FBA fees estimate"
+  - "Risk assessment covers IP risk, competition, price volatility, gating"
+  - "Recommendation is clear: BUY, PASS, or WATCHLIST with reasoning"
+  - "No placeholder text"
+
+failure_conditions:
+  - "Profitability section missing ROI %, net profit per unit, or FBA fees estimate"
+  - "Risk assessment doesn't cover IP risk, competition, price volatility, or gating"
+  - "Recommendation is ambiguous — not clearly BUY, PASS, or WATCHLIST"
+  - "No reasoning behind the recommendation"
+  - "Contains placeholder text or TODO markers"
+  - "Profitability calculated without accounting for FBA fees"
+  - "Missing ASIN or price data in the product summary"
+
+error_handling:
+  missing_input: "ask_user"
+  validation_fail: "auto_revise_max_2"
+  partial_output: "return_partial_with_warning"

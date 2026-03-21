@@ -1,0 +1,59 @@
+name: business_audit
+version: "1.0"
+description: "4-asset business audit report for prospective agency clients"
+
+input:
+  required:
+    - company_name:
+        type: string
+        description: "Company being audited"
+    - website_url:
+        type: string
+        description: "Company website"
+    - industry:
+        type: string
+        description: "Industry vertical"
+  optional:
+    - current_traffic:
+        type: string
+        description: "Estimated monthly traffic"
+    - ad_spend:
+        type: string
+        description: "Current monthly ad spend"
+    - competitors:
+        type: list
+        description: "Known competitors"
+
+output:
+  format: markdown
+  sections:
+    - executive_summary
+    - website_audit
+    - seo_opportunities
+    - paid_media_analysis
+    - recommendations
+  constraints:
+    total_words: "500-1500"
+    no_placeholders: true
+
+definition_of_done:
+  - "All 5 sections present"
+  - "Executive summary is under 100 words"
+  - "Each section has at least 2 specific, actionable findings"
+  - "Recommendations are prioritized (high/medium/low impact)"
+  - "No generic advice — all findings reference the specific company"
+  - "No placeholder text"
+
+failure_conditions:
+  - "Recommendations are generic ('improve SEO', 'run ads') without specific actions"
+  - "Findings don't reference the actual company — could be any business"
+  - "Executive summary exceeds 100 words"
+  - "Any section has fewer than 2 specific, actionable findings"
+  - "No prioritization on recommendations (missing high/medium/low impact)"
+  - "Contains placeholder text or TODO markers"
+  - "SEO section based purely on assumptions without data from the actual site"
+
+error_handling:
+  missing_input: "ask_user"
+  validation_fail: "auto_revise_max_2"
+  partial_output: "return_partial_with_warning"

@@ -1,0 +1,58 @@
+name: vsl_section
+version: "1.0"
+description: "Individual section of a Video Sales Letter script"
+
+input:
+  required:
+    - section_type:
+        type: string
+        description: "Which VSL section (headline, lead, body, close, stack, guarantee, urgency)"
+    - offer:
+        type: string
+        description: "The offer being sold"
+    - icp:
+        type: string
+        description: "Target audience description"
+  optional:
+    - previous_sections:
+        type: list
+        description: "Already-written sections for context continuity"
+    - framework:
+        type: string
+        default: "jeremy_haynes"
+        description: "VSL framework to follow"
+    - tone:
+        type: string
+        default: "authoritative_casual"
+
+output:
+  format: markdown
+  sections:
+    - script_text
+    - stage_directions
+    - visual_cues
+  constraints:
+    total_words: "200-600"
+    no_placeholders: true
+
+definition_of_done:
+  - "Script text present and reads naturally when spoken aloud"
+  - "Stage directions included (pauses, emphasis, tone shifts)"
+  - "Visual cues present (what to show on screen)"
+  - "Flows from previous section (if provided)"
+  - "No placeholder text"
+  - "Follows specified framework structure"
+
+failure_conditions:
+  - "Script doesn't read naturally when spoken aloud (written-language syntax)"
+  - "No stage directions — just raw text without performance cues"
+  - "No visual cues — nothing for the editor to work with"
+  - "Doesn't flow from previous section (abrupt topic change, no transition)"
+  - "Generic language that could apply to any offer/audience"
+  - "Contains placeholder text or TODO markers"
+  - "Violates the specified framework structure (e.g., missing required beats)"
+
+error_handling:
+  missing_input: "ask_user"
+  validation_fail: "auto_revise_max_2"
+  partial_output: "return_partial_with_warning"

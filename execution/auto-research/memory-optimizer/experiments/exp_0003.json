@@ -1,0 +1,124 @@
+{
+  "id": 3,
+  "hypothesis": "If we recategorize 6 memories from 'general', recall precision should improve",
+  "challenger": {
+    "hypothesis": "If we recategorize 6 memories from 'general', recall precision should improve",
+    "actions": [
+      [
+        "recategorize",
+        [
+          {
+            "id": 130,
+            "title": "`directives/client-health-sop.md` \u2014 Client health monitor (signals, scoring, thr",
+            "from": "general",
+            "to": "agent",
+            "score": 2
+          },
+          {
+            "id": 131,
+            "title": "`directives/student-tracking-sop.md` \u2014 Student tracking (milestones, stuck detec",
+            "from": "general",
+            "to": "agent",
+            "score": 2
+          },
+          {
+            "id": 132,
+            "title": "`directives/content-engine-sop.md` \u2014 Content engine (6 platforms, voice context,",
+            "from": "general",
+            "to": "agent",
+            "score": 2
+          },
+          {
+            "id": 133,
+            "title": "`directives/outreach-sequencer-sop.md` \u2014 Outreach sequencer (3 templates, person",
+            "from": "general",
+            "to": "agent",
+            "score": 2
+          },
+          {
+            "id": 134,
+            "title": "`directives/creator-intel-sop.md` \u2014 Creator intelligence pipeline (scrape YT/IG ",
+            "from": "general",
+            "to": "agent",
+            "score": 2
+          },
+          {
+            "id": 135,
+            "title": "`directives/automation-builder-sop.md` \u2014 Zapier + GHL automation design/build/fi",
+            "from": "general",
+            "to": "agent",
+            "score": 2
+          }
+        ]
+      ]
+    ],
+    "diagnostics": {
+      "general_count": 50,
+      "recategorize_candidates": [
+        {
+          "id": 130,
+          "title": "`directives/client-health-sop.md` \u2014 Client health monitor (signals, scoring, thr",
+          "from": "general",
+          "to": "agent",
+          "score": 2
+        },
+        {
+          "id": 131,
+          "title": "`directives/student-tracking-sop.md` \u2014 Student tracking (milestones, stuck detec",
+          "from": "general",
+          "to": "agent",
+          "score": 2
+        },
+        {
+          "id": 132,
+          "title": "`directives/content-engine-sop.md` \u2014 Content engine (6 platforms, voice context,",
+          "from": "general",
+          "to": "agent",
+          "score": 2
+        },
+        {
+          "id": 133,
+          "title": "`directives/outreach-sequencer-sop.md` \u2014 Outreach sequencer (3 templates, person",
+          "from": "general",
+          "to": "agent",
+          "score": 2
+        },
+        {
+          "id": 134,
+          "title": "`directives/creator-intel-sop.md` \u2014 Creator intelligence pipeline (scrape YT/IG ",
+          "from": "general",
+          "to": "agent",
+          "score": 2
+        },
+        {
+          "id": 135,
+          "title": "`directives/automation-builder-sop.md` \u2014 Zapier + GHL automation design/build/fi",
+          "from": "general",
+          "to": "agent",
+          "score": 2
+        }
+      ],
+      "duplicate_groups": {},
+      "dead_weight": [],
+      "no_tags_count": 21
+    }
+  },
+  "baseline_metric": 42.64,
+  "challenger_metric": 43.07,
+  "status": "keep",
+  "details": {
+    "ref": "{\"applied\": [\"Recategorized #130 '`directives/client-health-sop.md` \\u2014 Clie' \\u2192 agent\", \"Recategorized #131 '`directives/student-tracking-sop.md` \\u2014 S' \\u2192 agent\", \"Recategorized #132 '`directives/content-engine-sop.md` \\u2014 Con' \\u2192 agent\", \"Recategorized #133 '`directives/outreach-sequencer-sop.md` \\u2014' \\u2192 agent\", \"Recategorized #134 '`directives/creator-intel-sop.md` \\u2014 Crea' \\u2192 agent\", \"Recategorized #135 '`directives/automation-builder-sop.md` \\u2014' \\u2192 agent\"], \"errors\": []}",
+    "metric": 43.07,
+    "applied_count": 6,
+    "error_count": 0,
+    "applied": [
+      "Recategorized #130 '`directives/client-health-sop.md` \u2014 Clie' \u2192 agent",
+      "Recategorized #131 '`directives/student-tracking-sop.md` \u2014 S' \u2192 agent",
+      "Recategorized #132 '`directives/content-engine-sop.md` \u2014 Con' \u2192 agent",
+      "Recategorized #133 '`directives/outreach-sequencer-sop.md` \u2014' \u2192 agent",
+      "Recategorized #134 '`directives/creator-intel-sop.md` \u2014 Crea' \u2192 agent",
+      "Recategorized #135 '`directives/automation-builder-sop.md` \u2014' \u2192 agent"
+    ]
+  },
+  "created_at": "2026-03-16T00:27:55.938750"
+}

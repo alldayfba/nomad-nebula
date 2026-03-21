@@ -1,0 +1,42 @@
+{
+  "id": 31,
+  "hypothesis": "Fix 1 growth system issues to improve throughput",
+  "challenger": {
+    "hypothesis": "Fix 1 growth system issues to improve throughput",
+    "issues": [
+      {
+        "type": "low_conversion",
+        "metric": "sourcing_hit_rate",
+        "value": 0.0,
+        "fix": "Only 0% of sourced products are profitable \u2014 refine sourcing criteria"
+      }
+    ],
+    "total_issues": 1,
+    "conversion_rates": {
+      "lead_to_contact": 0.0,
+      "sourcing_hit_rate": 0.0,
+      "audit_response_rate": 0.0,
+      "_counts": {
+        "lead_generated": 1,
+        "product_sourced": 1,
+        "audit_sent": 1
+      }
+    }
+  },
+  "baseline_metric": 75.0,
+  "challenger_metric": 75.0,
+  "status": "discard",
+  "details": {
+    "ref": "{\"fixed\": [], \"queued\": [{\"type\": \"low_conversion\", \"fix\": \"Only 0% of sourced products are profitable \\u2014 refine sourcing criteria\", \"priority\": \"low_conversion\"}], \"skipped\": []}",
+    "metric": 75.0,
+    "queued_count": 1,
+    "queued": [
+      {
+        "type": "low_conversion",
+        "fix": "Only 0% of sourced products are profitable \u2014 refine sourcing criteria",
+        "priority": "low_conversion"
+      }
+    ]
+  },
+  "created_at": "2026-03-19T20:00:37.895110"
+}

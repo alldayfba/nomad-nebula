@@ -1,0 +1,32 @@
+[
+  {
+    "skill": "lead-gen",
+    "score": 8,
+    "correction": null,
+    "details": {
+      "tool": "Bash"
+    },
+    "timestamp": "2026-03-16T00:41:14.470846",
+    "source": "hook"
+  },
+  {
+    "skill": "source-products",
+    "score": 8,
+    "correction": null,
+    "details": {
+      "tool": "Bash"
+    },
+    "timestamp": "2026-03-16T00:41:14.489181",
+    "source": "hook"
+  },
+  {
+    "skill": "business-audit",
+    "score": 8,
+    "correction": null,
+    "details": {
+      "tool": "Bash"
+    },
+    "timestamp": "2026-03-16T00:41:14.507617",
+    "source": "hook"
+  }
+]

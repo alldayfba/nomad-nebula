@@ -1,0 +1,64 @@
+{
+  "id": 1,
+  "hypothesis": "Fix 4 growth system issues to improve throughput",
+  "challenger": {
+    "hypothesis": "Fix 4 growth system issues to improve throughput",
+    "issues": [
+      {
+        "type": "missing_pipeline_data",
+        "stage": "lead_generated",
+        "fix": "No 'lead_generated' data tracked \u2014 add outcome logging"
+      },
+      {
+        "type": "missing_pipeline_data",
+        "stage": "lead_contacted",
+        "fix": "No 'lead_contacted' data tracked \u2014 add outcome logging"
+      },
+      {
+        "type": "missing_pipeline_data",
+        "stage": "call_booked",
+        "fix": "No 'call_booked' data tracked \u2014 add outcome logging"
+      },
+      {
+        "type": "missing_pipeline_data",
+        "stage": "deal_closed",
+        "fix": "No 'deal_closed' data tracked \u2014 add outcome logging"
+      }
+    ],
+    "total_issues": 4,
+    "conversion_rates": {
+      "_counts": {}
+    }
+  },
+  "baseline_metric": 66.0,
+  "challenger_metric": 66.0,
+  "status": "discard",
+  "details": {
+    "ref": "{\"fixed\": [], \"queued\": [{\"type\": \"missing_pipeline_data\", \"fix\": \"No 'lead_generated' data tracked \\u2014 add outcome logging\", \"priority\": \"missing_pipeline_data\"}, {\"type\": \"missing_pipeline_data\", \"fix\": \"No 'lead_contacted' data tracked \\u2014 add outcome logging\", \"priority\": \"missing_pipeline_data\"}, {\"type\": \"missing_pipeline_data\", \"fix\": \"No 'call_booked' data tracked \\u2014 add outcome logging\", \"priority\": \"missing_pipeline_data\"}, {\"type\": \"missing_pipeline_data\", \"fix\": \"No 'deal_closed' data tracked \\u2014 add outcome logging\", \"priority\": \"missing_pipeline_data\"}], \"skipped\": []}",
+    "metric": 66.0,
+    "queued_count": 4,
+    "queued": [
+      {
+        "type": "missing_pipeline_data",
+        "fix": "No 'lead_generated' data tracked \u2014 add outcome logging",
+        "priority": "missing_pipeline_data"
+      },
+      {
+        "type": "missing_pipeline_data",
+        "fix": "No 'lead_contacted' data tracked \u2014 add outcome logging",
+        "priority": "missing_pipeline_data"
+      },
+      {
+        "type": "missing_pipeline_data",
+        "fix": "No 'call_booked' data tracked \u2014 add outcome logging",
+        "priority": "missing_pipeline_data"
+      },
+      {
+        "type": "missing_pipeline_data",
+        "fix": "No 'deal_closed' data tracked \u2014 add outcome logging",
+        "priority": "missing_pipeline_data"
+      }
+    ]
+  },
+  "created_at": "2026-03-16T00:27:50.357016"
+}

@@ -1,0 +1,45 @@
+# Virtual environments
+.venv/
+.venv-sabbojb/
+.venv314/
+venv/
+
+# Large media / temp
+my-video/
+.tmp/
+
+# Secrets
+.env
+credentials.json
+token.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Agent workspaces
+.agent/
+.antigravity/
+.kombai/
+
+# Symlinks to other projects
+247profits
+
+# Temp files
+*.tmp.*
+autoresearch/
+clients/
+execution/remotion/
+service_account.json

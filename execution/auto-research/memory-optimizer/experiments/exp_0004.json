@@ -1,0 +1,79 @@
+{
+  "id": 4,
+  "hypothesis": "If we recategorize 3 memories from 'general', recall precision should improve",
+  "challenger": {
+    "hypothesis": "If we recategorize 3 memories from 'general', recall precision should improve",
+    "actions": [
+      [
+        "recategorize",
+        [
+          {
+            "id": 146,
+            "title": "`execution/multi_retailer_search.py` \u2014 Multi-retailer product search + clearance",
+            "from": "general",
+            "to": "sourcing",
+            "score": 2
+          },
+          {
+            "id": 148,
+            "title": "`execution/run_sourcing_pipeline.py` \u2014 FBA sourcing orchestrator (single-URL mod",
+            "from": "general",
+            "to": "sourcing",
+            "score": 2
+          },
+          {
+            "id": 150,
+            "title": "`execution/match_amazon_products.py` \u2014 Amazon ASIN matcher",
+            "from": "general",
+            "to": "sourcing",
+            "score": 3
+          }
+        ]
+      ]
+    ],
+    "diagnostics": {
+      "general_count": 50,
+      "recategorize_candidates": [
+        {
+          "id": 146,
+          "title": "`execution/multi_retailer_search.py` \u2014 Multi-retailer product search + clearance",
+          "from": "general",
+          "to": "sourcing",
+          "score": 2
+        },
+        {
+          "id": 148,
+          "title": "`execution/run_sourcing_pipeline.py` \u2014 FBA sourcing orchestrator (single-URL mod",
+          "from": "general",
+          "to": "sourcing",
+          "score": 2
+        },
+        {
+          "id": 150,
+          "title": "`execution/match_amazon_products.py` \u2014 Amazon ASIN matcher",
+          "from": "general",
+          "to": "sourcing",
+          "score": 3
+        }
+      ],
+      "duplicate_groups": {},
+      "dead_weight": [],
+      "no_tags_count": 21
+    }
+  },
+  "baseline_metric": 43.07,
+  "challenger_metric": 43.29,
+  "status": "keep",
+  "details": {
+    "ref": "{\"applied\": [\"Recategorized #146 '`execution/multi_retailer_search.py` \\u2014 M' \\u2192 sourcing\", \"Recategorized #148 '`execution/run_sourcing_pipeline.py` \\u2014 F' \\u2192 sourcing\", \"Recategorized #150 '`execution/match_amazon_products.py` \\u2014 A' \\u2192 sourcing\"], \"errors\": []}",
+    "metric": 43.29,
+    "applied_count": 3,
+    "error_count": 0,
+    "applied": [
+      "Recategorized #146 '`execution/multi_retailer_search.py` \u2014 M' \u2192 sourcing",
+      "Recategorized #148 '`execution/run_sourcing_pipeline.py` \u2014 F' \u2192 sourcing",
+      "Recategorized #150 '`execution/match_amazon_products.py` \u2014 A' \u2192 sourcing"
+    ]
+  },
+  "created_at": "2026-03-16T00:27:55.942603"
+}

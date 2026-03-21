@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>247profits — AI Business Audit</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <style>
+    .nav-tabs {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 3rem;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .nav-tab {
+      padding: 1rem 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-bottom: 2px solid transparent;
+      transition: var(--transition);
+    }
+    .nav-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .mode-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      background: rgba(0,0,0,0.03);
+      padding: 0.25rem;
+      border-radius: var(--radius-sm);
+      width: fit-content;
+    }
+    .mode-tab {
+      padding: 0.6rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+    .mode-tab.active {
+      background: white;
+      color: var(--text-primary);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .mode-panel { display: none; }
+    .mode-panel.active { display: block; }
+
+    .btn-audit {
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: rgba(0, 113, 227, 0.05);
+      color: var(--accent);
+      border: 1px solid rgba(0, 113, 227, 0.1);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .btn-audit:hover { background: var(--accent); color: white; }
+    .btn-audit.selected { background: var(--success); color: white; border-color: var(--success); }
+
+    .progress-step {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    .progress-step.active { color: var(--text-primary); font-weight: 600; background: rgba(0, 113, 227, 0.03); }
+    .progress-step.done { color: var(--success); }
+    
+    .step-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid currentColor;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 800;
+    }
+
+    .output-section {
+      margin-bottom: 2rem;
+      overflow: hidden;
+    }
+    .output-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .audit-body { padding: 2.5rem; line-height: 1.8; color: var(--text-secondary); }
+    .audit-body h1, .audit-body h2 { color: var(--text-primary); margin-top: 2rem; }
+    .audit-body h1:first-child { margin-top: 0; }
+
+    .ad-angle-card {
+      background: white;
+      border: 1px solid var(--glass-border);
+      padding: 1.5rem;
+      border-radius: var(--radius-sm);
+    }
+    .angle-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .angle-pain { background: rgba(255, 59, 48, 0.1); color: var(--error); }
+    .angle-opportunity { background: rgba(40, 205, 65, 0.1); color: var(--success); }
+    .angle-credibility { background: rgba(0, 113, 227, 0.1); color: var(--accent); }
+
+    .hidden { display: none !important; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin-mini { width: 12px; height: 12px; border: 2px solid rgba(0,0,0,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  </style>
+</head>
+<body>
+  <div class="bg-layer">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <main class="container" style="padding: 4rem 0;">
+    <header style="margin-bottom: 4rem;">
+      <a href="/" class="logo" style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="14" stroke="url(#logo-grad)" stroke-width="2.5" />
+          <circle cx="16" cy="16" r="6" fill="url(#logo-grad)" />
+          <defs>
+            <linearGradient id="logo-grad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#0071e3" />
+              <stop offset="100%" stop-color="#5e5ce6" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="text-gradient">247profits</span>
+      </a>
+      <h1 style="font-size: 3.5rem; margin-bottom: 1rem;">AI Business Audit</h1>
+      <p style="font-size: 1.25rem; color: var(--text-secondary); max-width: 700px;">
+        Generate comprehensive marketing audits, ad angles, and outreach strategy for any business in seconds.
+      </p>
+    </header>
+
+    <nav class="nav-tabs">
+      <a href="/" class="nav-tab">Lead Finder</a>
+      <a href="/audit" class="nav-tab active">Audit Generator</a>
+      <a href="/dashboard" class="nav-tab">Dashboard</a>
+    </nav>
+
+    <section class="glass card" style="padding: 2.5rem; margin-bottom: 3rem;">
+      <div class="mode-tabs">
+        <button class="mode-tab active" onclick="switchMode('search')">🔍 Search Market</button>
+        <button class="mode-tab" onclick="switchMode('direct')">🔗 Direct URL</button>
+      </div>
+
+      <div id="mode-search" class="mode-panel active">
+        <div style="display: grid; grid-template-columns: 2fr 1fr 100px; gap: 1rem; margin-bottom: 1.5rem;">
+          <div class="field">
+            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 0.5rem;">Industry</label>
+            <input id="a-query" type="text" placeholder="e.g. dentists, gyms, law firms" />
+          </div>
+          <div class="field">
+            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 0.5rem;">Location</label>
+            <input id="a-location" type="text" placeholder="e.g. Dallas, TX" />
+          </div>
+          <div class="field">
+            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 0.5rem;">Limit</label>
+            <select id="a-max">
+              <option value="10" selected>10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+        </div>
+        <div style="display: flex; justify-content: flex-end;">
+          <button class="btn btn-primary" onclick="searchLeads()">Find Businesses</button>
+        </div>
+      </div>
+
+      <div id="mode-direct" class="mode-panel">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div class="field">
+            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 0.5rem;">Business Name *</label>
+            <input id="d-name" type="text" placeholder="e.g. Skyline Dental" />
+          </div>
+          <div class="field">
+            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 0.5rem;">Website URL</label>
+            <input id="d-website" type="text" placeholder="https://example.com" />
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div class="field">
+            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 0.5rem;">Category</label>
+            <input id="d-category" type="text" placeholder="e.g. Medical" />
+          </div>
+          <div class="field">
+            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 0.5rem;">Phone</label>
+            <input id="d-phone" type="text" placeholder="(555) 000-0000" />
+          </div>
+          <div class="field">
+            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 0.5rem;">Owner Name</label>
+            <input id="d-owner" type="text" placeholder="Optional" />
+          </div>
+        </div>
+        <div style="display: flex; justify-content: flex-end;">
+          <button id="direct-generate-btn" class="btn btn-primary" onclick="startAuditDirect()">Generate AI Audit</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Search Status -->
+    <div id="search-status" class="hidden" style="text-align: center; margin-bottom: 2rem;">
+      <div class="spin-mini" style="display: inline-block; width: 24px; height: 24px; vertical-align: middle; margin-right: 0.75rem;"></div>
+      <span id="search-status-text" style="font-weight: 600; color: var(--accent);">Scanning market data...</span>
+    </div>
+
+    <!-- Error Box -->
+    <div id="audit-error" class="hidden" style="padding: 1.5rem; background: rgba(255, 59, 48, 0.1); border: 1px solid var(--error); border-radius: var(--radius-sm); color: var(--error); margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      <span id="audit-error-text"></span>
+    </div>
+
+    <!-- Search Results -->
+    <section id="search-results" class="hidden glass card" style="padding: 1.5rem; margin-bottom: 3rem;">
+      <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h3 id="search-results-count" style="margin-bottom: 0.25rem;">0 found</h3>
+          <p id="search-results-query" style="color: var(--text-secondary); font-size: 0.85rem;"></p>
+        </div>
+        <p style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">SELECT A BUSINESS TO AUDIT</p>
+      </div>
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 1px solid var(--glass-border);">
+              <th style="padding: 1rem;">Business</th>
+              <th style="padding: 1rem;">Category</th>
+              <th style="padding: 1rem;">Rating</th>
+              <th style="padding: 1rem; text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="search-results-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Selected Biz Card -->
+    <section id="selected-card" class="hidden glass card" style="padding: 2rem; background: rgba(0, 113, 227, 0.03); border: 1px solid var(--accent); margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h2 id="selected-name" style="margin-bottom: 0.5rem;">Business Name</h2>
+        <div id="selected-meta" style="display: flex; gap: 1.5rem; color: var(--text-secondary); font-size: 0.85rem; font-weight: 500;">
+          <span id="selected-category"></span>
+          <span id="selected-location"></span>
+          <span id="selected-rating"></span>
+          <span id="selected-website"></span>
+        </div>
+      </div>
+      <button id="generate-btn" class="btn btn-primary" onclick="startAudit()" style="padding: 1rem 2rem; font-size: 1rem;">
+        🚀 Run Full Audit
+      </button>
+    </section>
+
+    <!-- Progress -->
+    <section id="progress-container" class="hidden glass card" style="padding: 2rem; margin-bottom: 3rem;">
+      <h3 style="margin-bottom: 1.5rem; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.1em; color: var(--text-secondary);">Neural Pipeline Active</h3>
+      <div id="progress-steps" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+    </section>
+
+    <!-- Final Output -->
+    <div id="output-panel" class="hidden">
+      <!-- Drive CTA -->
+      <div id="drive-cta-card" class="glass card" style="padding: 2rem; border: 1px solid var(--success); background: rgba(40, 205, 65, 0.05); margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="font-size: 0.7rem; font-weight: 800; color: var(--success); text-transform: uppercase; margin-bottom: 0.5rem;">Asset Package Ready</div>
+          <h2 id="drive-folder-name" style="margin-bottom: 0.25rem;">Drive Folder Name</h2>
+          <p id="drive-file-list" style="color: var(--text-secondary); font-size: 0.85rem;"></p>
+        </div>
+        <a id="drive-folder-link" href="#" target="_blank" class="btn btn-primary" style="background: var(--success);">
+          Open in Google Drive
+        </a>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+          <!-- Audit Doc -->
+          <div class="glass card output-section">
+            <div class="output-header">
+              <h3 style="font-size: 1rem;">1-Page Market Audit</h3>
+              <button class="btn-audit" onclick="copySection('audit-doc-content', this)">Copy Markdown</button>
+            </div>
+            <div id="audit-doc-rendered" class="audit-body"></div>
+            <textarea id="audit-doc-content" class="hidden"></textarea>
+          </div>
+
+          <!-- Outreach -->
+          <div class="glass card output-section">
+            <div class="output-header">
+              <h3 style="font-size: 1rem;">Strategic Outreach</h3>
+              <button class="btn-audit" onclick="copySection('outreach-content', this)">Copy Message</button>
+            </div>
+            <div id="outreach-display" style="padding: 2.5rem; font-family: monospace; font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap;"></div>
+            <textarea id="outreach-content" class="hidden"></textarea>
+          </div>
+        </div>
+
+        <!-- Ad Angles Sidebar -->
+        <div class="glass card output-section">
+          <div class="output-header">
+            <h3 style="font-size: 1rem;">Meta Ad Angles</h3>
+          </div>
+          <div id="ad-angles-grid" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;"></div>
+        </div>
+      </div>
+
+      <div style="text-align: right; margin-top: 2rem; color: var(--text-secondary); font-size: 0.8rem;">
+        <span id="cost-badge" class="glass" style="padding: 0.5rem 1rem; border-radius: var(--radius-full);"></span>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let currentMode = "search";
+    let selectedBusiness = null;
+    let searchResults = [];
+
+    const STEPS = [
+      "Fetching business markers...",
+      "Analyzing digital presence with Claude...",
+      "Structuring 1-page market audit...",
+      "Synthesizing high-intent landing page...",
+      "Generating strategic ad creative angles...",
+      "Drafting hyper-personalized outreach...",
+      "Syncing assets to Google Drive pipeline...",
+    ];
+
+    function switchMode(mode) {
+      currentMode = mode;
+      document.querySelectorAll(".mode-tab").forEach(t => t.classList.toggle("active", t.innerText.toLowerCase().includes(mode)));
+      document.getElementById("mode-search").classList.toggle("active", mode === "search");
+      document.getElementById("mode-direct").classList.toggle("active", mode === "direct");
+      document.getElementById("selected-card").classList.add("hidden");
+      document.getElementById("search-results").classList.add("hidden");
+      clearError();
+      hideOutput();
+    }
+
+    async function searchLeads() {
+      const query = document.getElementById("a-query").value.trim();
+      const location = document.getElementById("a-location").value.trim();
+      const max = parseInt(document.getElementById("a-max").value);
+
+      if (!query || !location) { showError("Please enter industry and location."); return; }
+      clearError();
+      setSearchLoading(true);
+      document.getElementById("search-results").classList.add("hidden");
+      document.getElementById("selected-card").classList.add("hidden");
+
+      try {
+        const resp = await fetch("/scrape", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query, location, max_results: max, fetch_emails: false }),
+        });
+        const data = await resp.json();
+        if (!resp.ok || data.error) { showError(data.error || "Search failed."); return; }
+        searchResults = data.results;
+        renderSearchResults(data.results, query, location);
+      } catch (e) { showError("Network error: " + e.message); }
+      finally { setSearchLoading(false); }
+    }
+
+    function renderSearchResults(results, query, location) {
+      const body = document.getElementById("search-results-body");
+      document.getElementById("search-results-count").textContent = `${results.length} found`;
+      document.getElementById("search-results-query").textContent = `"${query}" in ${location}`;
+      body.innerHTML = results.map((r, i) => `
+        <tr style="border-bottom: 1px solid var(--glass-border); transition: var(--transition);">
+          <td style="padding: 1.25rem 1rem;"><strong>${escHtml(r.business_name)}</strong><br><small style="color:var(--text-secondary)">${escHtml(r.address || '')}</small></td>
+          <td style="padding: 1.25rem 1rem; color: var(--text-secondary);">${escHtml(r.category || '—')}</td>
+          <td style="padding: 1.25rem 1rem;">${r.rating ? '⭐ ' + r.rating : '—'}</td>
+          <td style="padding: 1.25rem 1rem; text-align: right;">
+            <button class="btn-audit" onclick="selectBusiness(${i})">Audit This</button>
+          </td>
+        </tr>
+      `).join("");
+      document.getElementById("search-results").classList.remove("hidden");
+    }
+
+    function selectBusiness(idx) {
+      selectedBusiness = searchResults[idx];
+      document.getElementById("selected-name").textContent = selectedBusiness.business_name;
+      document.getElementById("selected-category").textContent = selectedBusiness.category || "";
+      document.getElementById("selected-location").textContent = selectedBusiness.address ? selectedBusiness.address.split(',').slice(-2).join(',') : "";
+      document.getElementById("selected-rating").textContent = selectedBusiness.rating ? "⭐ " + selectedBusiness.rating : "";
+      document.getElementById("selected-website").textContent = selectedBusiness.website && selectedBusiness.website !== "N/A" ? "🌐 " + truncateUrl(selectedBusiness.website) : "";
+      document.getElementById("selected-card").classList.remove("hidden");
+      hideOutput();
+    }
+
+    function startAudit() { runAudit(selectedBusiness); }
+    function startAuditDirect() {
+      const name = document.getElementById("d-name").value.trim();
+      if (!name) { showError("Business name is required."); return; }
+      selectedBusiness = {
+        business_name: name,
+        website: document.getElementById("d-website").value.trim(),
+        category: document.getElementById("d-category").value.trim(),
+        phone: document.getElementById("d-phone").value.trim(),
+        owner_name: document.getElementById("d-owner").value.trim()
+      };
+      runAudit(selectedBusiness);
+    }
+
+    async function runAudit(business) {
+      clearError(); hideOutput(); showProgress();
+      const btn = document.getElementById("generate-btn");
+      if (btn) btn.disabled = true;
+
+      try {
+        const resp = await fetch("/audit/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ business }),
+        });
+        if (!resp.ok) { showError("Failed to start pipeline."); if (btn) btn.disabled = false; return; }
+
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop();
+
+          for (const line of lines) {
+            if (line.startsWith("data: ")) {
+              try { handleEvent(JSON.parse(line.slice(6))); } catch(e) {}
+            }
+          }
+        }
+      } catch (e) { showError(e.message); }
+      finally { if (btn) btn.disabled = false; }
+    }
+
+    function handleEvent(event) {
+      if (event.type === "progress") updateProgress(event.step, event.total, event.message);
+      else if (event.type === "done") renderOutput(event.result);
+      else if (event.type === "error") showError(event.message);
+    }
+
+    function showProgress() {
+      const container = document.getElementById("progress-container");
+      container.classList.remove("hidden");
+      document.getElementById("progress-steps").innerHTML = STEPS.map((label, i) => `
+        <div class="progress-step" id="step-${i + 1}">
+          <div class="step-icon">${i + 1}</div>
+          <span>${label}</span>
+        </div>
+      `).join("");
+    }
+
+    function updateProgress(step, total, message) {
+      for (let i = 1; i < step; i++) {
+        const el = document.getElementById(`step-${i}`);
+        if (el) { el.classList.remove("active"); el.classList.add("done"); el.querySelector(".step-icon").innerHTML = "✓"; }
+      }
+      const cur = document.getElementById(`step-${step}`);
+      if (cur) { cur.classList.add("active"); cur.querySelector(".step-icon").innerHTML = `<div class="spin-mini"></div>`; cur.querySelector("span").textContent = message; }
+    }
+
+    function renderOutput(result) {
+      for (let i = 1; i <= STEPS.length; i++) {
+        const el = document.getElementById(`step-${i}`);
+        if (el) { el.classList.remove("active"); el.classList.add("done"); el.querySelector(".step-icon").innerHTML = "✓"; }
+      }
+      if (result.folder_url) {
+        document.getElementById("drive-folder-link").href = result.folder_url;
+        document.getElementById("drive-folder-name").textContent = result.business_name;
+        document.getElementById("drive-file-list").textContent = `${(result.files || []).length} assets synced`;
+        document.getElementById("drive-cta-card").classList.remove("hidden");
+      }
+      document.getElementById("audit-doc-content").value = result.audit_md || "";
+      document.getElementById("audit-doc-rendered").innerHTML = renderMarkdown(result.audit_md || "");
+      renderAdAngles(result.ad_angles || []);
+      document.getElementById("outreach-content").value = result.outreach || "";
+      document.getElementById("outreach-display").textContent = result.outreach || "";
+      if (result.total_cost_usd) document.getElementById("cost-badge").textContent = `Pipeline Cost: $${result.total_cost_usd.toFixed(4)}`;
+      document.getElementById("output-panel").classList.remove("hidden");
+    }
+
+    function renderAdAngles(angles) {
+      const grid = document.getElementById("ad-angles-grid");
+      grid.innerHTML = angles.map(a => `
+        <div class="ad-angle-card">
+          <div class="angle-badge angle-${a.angle ? a.angle.toLowerCase() : 'pain'}">${a.angle}</div>
+          <p style="font-size: 0.9rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">"${escHtml(a.hook)}"</p>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">${escHtml(a.body)}</p>
+        </div>
+      `).join("");
+    }
+
+    function renderMarkdown(md) {
+      return md.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/^# (.+)$/gm, "<h1>$1</h1>").replace(/^## (.+)$/gm, "<h2>$1</h2>")
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\n{2,}/g, "</p><p>")
+        .replace(/^(?!<h)/gm, "<p>").trim();
+    }
+
+    function setSearchLoading(loading) {
+      document.getElementById("search-status").classList.toggle("hidden", !loading);
+    }
+
+    function showError(msg) {
+      document.getElementById("audit-error-text").textContent = msg;
+      document.getElementById("audit-error").classList.remove("hidden");
+    }
+
+    function clearError() { document.getElementById("audit-error").classList.add("hidden"); }
+    function hideOutput() { document.getElementById("output-panel").classList.add("hidden"); document.getElementById("progress-container").classList.add("hidden"); }
+
+    function copySection(id, btn) {
+      navigator.clipboard.writeText(document.getElementById(id).value).then(() => {
+        const old = btn.innerText; btn.innerText = "✓ Copied"; setTimeout(() => btn.innerText = old, 2000);
+      });
+    }
+
+    function escHtml(s) { return s ? String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : ""; }
+    function truncateUrl(u) { try { const url = new URL(u); return url.hostname.replace('www.',''); } catch(e) { return u; } }
+  </script>
+</body>
+</html>

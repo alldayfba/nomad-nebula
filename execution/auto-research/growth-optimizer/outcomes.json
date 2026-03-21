@@ -1,0 +1,29 @@
+[
+  {
+    "type": "lead_generated",
+    "details": {
+      "script": "run_scraper.py",
+      "command": "python3 execution/run_scraper.py --query dentists"
+    },
+    "success": true,
+    "timestamp": "2026-03-16T00:41:16.357946"
+  },
+  {
+    "type": "product_sourced",
+    "details": {
+      "script": "source.py",
+      "command": "python3 execution/source.py brand --brand Jellycat"
+    },
+    "success": true,
+    "timestamp": "2026-03-16T00:41:16.377173"
+  },
+  {
+    "type": "audit_sent",
+    "details": {
+      "script": "generate_business_audit.py",
+      "command": "python3 execution/generate_business_audit.py --business Acme"
+    },
+    "success": true,
+    "timestamp": "2026-03-16T00:41:16.397096"
+  }
+]

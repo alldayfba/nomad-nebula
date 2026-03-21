@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>247profits — Storefront Stalker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <style>
+        .severity-high { background: var(--error); color: white; }
+        .severity-medium { background: var(--warning); color: white; }
+        .severity-low { background: var(--success); color: white; }
+        
+        .status-active { color: var(--success); font-weight: 700; }
+        .status-quiet { color: var(--warning); font-weight: 700; }
+        .status-retired { color: var(--text-secondary); font-weight: 700; }
+        
+        .alert-card {
+            border-left: 4px solid var(--glass-border);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+        .alert-card:hover { transform: translateX(4px); }
+        .alert-card.grade-a { border-left-color: var(--success); }
+        .alert-card.grade-b { border-left-color: var(--warning); }
+        .alert-card.grade-c { border-left-color: var(--text-secondary); opacity: 0.7; }
+        .alert-card.hot-deal { 
+            border-left-color: #ff9500; 
+            background: rgba(255, 149, 0, 0.05);
+            box-shadow: 0 0 20px rgba(255, 149, 0, 0.1);
+        }
+
+        .accuracy-track { height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden; width: 100px; }
+        .accuracy-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+        .accuracy-high { background: var(--success); }
+        .accuracy-med { background: var(--warning); }
+        .accuracy-low { background: var(--error); }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.5rem; letter-spacing: 0.05em; }
+        
+        .grid-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 2.5rem; }
+        .grid-main { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem; }
+        
+        .webhook-badge { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; margin-top: 1rem; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .dot-online { background: var(--success); box-shadow: 0 0 8px var(--success); }
+        .dot-offline { background: var(--error); }
+
+        .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; margin-bottom: 2rem; display: inline-block; transition: var(--transition); }
+        .nav-link:hover { color: var(--accent); }
+    </style>
+</head>
+<body>
+    <div class="bg-layer">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <main class="container" style="padding: 4rem 0;">
+        <a href="/sourcing" class="nav-link">&larr; Back to Sourcing Matrix</a>
+        
+        <header style="margin-bottom: 4rem; display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+                <div class="logo" style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="16" r="14" stroke="url(#logo-grad)" stroke-width="2.5" />
+                        <circle cx="16" cy="16" r="6" fill="url(#logo-grad)" />
+                        <defs>
+                            <linearGradient id="logo-grad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#0071e3" />
+                                <stop offset="100%" stop-color="#5e5ce6" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="text-gradient">247profits</span>
+                </div>
+                <h1 style="font-size: 3rem; margin-bottom: 0.5rem;">Storefront Stalker</h1>
+                <p style="color: var(--text-secondary); font-size: 1.1rem;">Autonomous Amazon seller monitoring with AI grading.</p>
+            </div>
+            <button onclick="triggerScan()" id="btn-trigger" class="btn btn-primary" style="padding: 0.75rem 2rem;">Scan All Nodes</button>
+        </header>
+
+        <!-- Stats Matrix -->
+        <section class="grid-stats">
+            <div class="glass card" style="padding: 1.5rem;">
+                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Tracked Sellers</p>
+                <h3 id="stat-sellers" style="font-size: 2rem; margin-top: 0.5rem;">0</h3>
+            </div>
+            <div class="glass card" style="padding: 1.5rem;">
+                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Alerts Today</p>
+                <h3 id="stat-alerts-today" style="font-size: 2rem; margin-top: 0.5rem; color: var(--accent);">0</h3>
+            </div>
+            <div class="glass card" style="padding: 1.5rem;">
+                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Grade A Discoveries</p>
+                <h3 id="stat-grade-a" style="font-size: 2rem; margin-top: 0.5rem; color: var(--success);">0</h3>
+            </div>
+            <div class="glass card" style="padding: 1.5rem;">
+                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Avg Precision</p>
+                <h3 id="stat-accuracy" style="font-size: 2rem; margin-top: 0.5rem;">0%</h3>
+            </div>
+            <div class="glass card" style="padding: 1.5rem;">
+                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Hot Deals (24h)</p>
+                <h3 id="stat-convergence" style="font-size: 2rem; margin-top: 0.5rem; color: #ff9500;">0</h3>
+            </div>
+        </section>
+
+        <section class="grid-main">
+            <!-- Add Node -->
+            <div class="glass card" style="padding: 2.5rem;">
+                <h3 style="margin-bottom: 2rem;">+ Deploy New Watcher</h3>
+                <div class="form-group">
+                    <label>Amazon Seller ID</label>
+                    <input type="text" id="input-seller-id" placeholder="e.g., A2VIDQ35RC54UG" maxlength="16" style="width: 100%;" />
+                    <p style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.5rem;">The 10-16 character code found after <code>seller=</code> in the URL.</p>
+                </div>
+                <div class="form-group">
+                    <label>Operations Nickname</label>
+                    <input type="text" id="input-seller-name" placeholder="e.g., EliteSupply" style="width: 100%;" />
+                </div>
+                <div class="form-group">
+                    <label>Intelligence Notes</label>
+                    <textarea id="input-notes" rows="3" placeholder="Category specialization, sourcing patterns, etc..." style="width: 100%;"></textarea>
+                </div>
+                <button onclick="addStorefront()" id="btn-add" class="btn btn-primary" style="width: 100%;">Authorize Monitoring</button>
+                <p id="add-error" style="color: var(--error); font-size: 0.8rem; margin-top: 1rem; display: none;"></p>
+            </div>
+
+            <!-- Configuration -->
+            <div class="glass card" style="padding: 2.5rem;">
+                <h3 style="margin-bottom: 2rem;">Neural Notifications</h3>
+                <div class="form-group">
+                    <label>Discord Webhook Endpoint</label>
+                    <input type="text" id="input-webhook" placeholder="https://discord.com/api/webhooks/..." style="width: 100%;" />
+                </div>
+                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                    <button onclick="saveWebhook()" class="btn btn-primary" style="flex: 1;">Save Configuration</button>
+                    <button onclick="testWebhook()" class="btn" style="background: rgba(0,0,0,0.05); color: var(--text-primary); flex: 1;">Test Signal</button>
+                </div>
+                <div id="webhook-status" class="webhook-badge">
+                    <span class="dot dot-offline"></span>
+                    <span style="color: var(--text-secondary);">Endpoint disconnected</span>
+                </div>
+
+                <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
+                    <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 1rem;">Operating Protocol</h4>
+                    <ul style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; padding-left: 1.25rem;">
+                        <li>Monitor profitable sellers while sourcing.</li>
+                        <li>Automated checks occur every 15 minutes.</li>
+                        <li>Grade A/B/C alerts sent to Discord instantly.</li>
+                        <li>Real-time deal analysis via neural processing.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tracked Entities -->
+        <section class="glass card" style="padding: 2.5rem; margin-bottom: 2.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h3>Monitored Storefront Entities</h3>
+                <span id="seller-count-label" style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 700;">0 NODES ACTIVE</span>
+            </div>
+            <div class="table-wrapper">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 1px solid var(--glass-border);">
+                            <th style="padding: 1rem;">Entity Name</th>
+                            <th style="padding: 1rem;">Seller Signature</th>
+                            <th style="padding: 1rem;">Status</th>
+                            <th style="padding: 1rem;">Precision</th>
+                            <th style="padding: 1rem;">Alert Count</th>
+                            <th style="padding: 1rem; text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sellers-tbody"></tbody>
+                </table>
+                <div id="sellers-empty" style="padding: 4rem; text-align: center; color: var(--text-secondary);">
+                    <p style="font-size: 2rem; margin-bottom: 1rem;">🔍</p>
+                    <p>No storefront entities currently under surveillance.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Alert Intelligence Feed -->
+        <section>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2>Intelligence Feed</h2>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn filter-btn active" data-grade="" onclick="filterAlerts('')" style="font-size:0.75rem; padding: 0.4rem 1rem;">All Signal</button>
+                    <button class="btn filter-btn" data-grade="A" onclick="filterAlerts('A')" style="font-size:0.75rem; padding: 0.4rem 1rem;">Grade A Only</button>
+                    <button class="btn filter-btn" data-grade="B" onclick="filterAlerts('B')" style="font-size:0.75rem; padding: 0.4rem 1rem;">Grade B Only</button>
+                    <button class="btn filter-btn" data-grade="C" onclick="filterAlerts('C')" style="font-size:0.75rem; padding: 0.4rem 1rem;">Grade C Only</button>
+                </div>
+            </div>
+            <div id="alert-feed" class="alert-feed">
+                <div id="alerts-empty" class="glass card" style="padding: 4rem; text-align: center; color: var(--text-secondary);">
+                    <p style="font-size: 2rem; margin-bottom: 1rem;">🔔</p>
+                    <p>Alert feed clear. Monitoring in progress...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast" style="position: fixed; bottom: 2rem; right: 2rem; padding: 1rem 2rem; border-radius: var(--radius-md); background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); color: var(--text-primary); font-weight: 600; font-size: 0.9rem; transform: translateY(150%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; box-shadow: var(--glass-shadow);"></div>
+
+    <script>
+        let lastAlertId = 0;
+        let currentGradeFilter = '';
+        let refreshInterval = null;
+
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.borderLeft = type === 'success' ? '4px solid var(--success)' : '4px solid var(--error)';
+            t.style.transform = 'translateY(0)';
+            setTimeout(() => { t.style.transform = 'translateY(150%)'; }, 3000);
+        }
+
+        async function addStorefront() {
+            const sellerId = document.getElementById('input-seller-id').value.trim().toUpperCase();
+            const sellerName = document.getElementById('input-seller-name').value.trim();
+            const notes = document.getElementById('input-notes').value.trim();
+            const errEl = document.getElementById('add-error');
+            errEl.style.display = 'none';
+            if (!sellerId) { errEl.textContent = 'Seller ID required'; errEl.style.display = 'block'; return; }
+            const btn = document.getElementById('btn-add');
+            btn.disabled = true; btn.textContent = 'Deploying...';
+            try {
+                const resp = await fetch('/stalker/api/storefronts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ seller_id: sellerId, seller_name: sellerName || sellerId, notes }),
+                });
+                const data = await resp.json();
+                if (data.ok) {
+                    showToast('Entity surveillance authorized: ' + (sellerName || sellerId));
+                    document.getElementById('input-seller-id').value = '';
+                    document.getElementById('input-seller-name').value = '';
+                    document.getElementById('input-notes').value = '';
+                    loadStorefronts();
+                } else { errEl.textContent = data.error || 'Authorization failed'; errEl.style.display = 'block'; }
+            } catch (e) { errEl.textContent = 'Neural link error'; errEl.style.display = 'block'; }
+            btn.disabled = false; btn.textContent = 'Authorize Monitoring';
+        }
+
+        async function removeStorefront(sellerId, name) {
+            if (!confirm('Decommission surveillance for ' + name + '?')) return;
+            try {
+                await fetch('/stalker/api/storefronts/' + sellerId, { method: 'DELETE' });
+                showToast('Entity decommissioned: ' + name);
+                loadStorefronts();
+            } catch (e) { showToast('Decommission error', 'error'); }
+        }
+
+        async function loadStorefronts() {
+            try {
+                const resp = await fetch('/stalker/api/storefronts');
+                const data = await resp.json();
+                const tbody = document.getElementById('sellers-tbody');
+                const empty = document.getElementById('sellers-empty');
+                const label = document.getElementById('seller-count-label');
+                if (!data.ok || !data.storefronts || data.storefronts.length === 0) {
+                    tbody.innerHTML = ''; empty.style.display = 'block'; label.textContent = '0 NODES ACTIVE'; return;
+                }
+                empty.style.display = 'none';
+                label.textContent = data.storefronts.length + ' NODE' + (data.storefronts.length !== 1 ? 'S' : '') + ' ACTIVE';
+                tbody.innerHTML = data.storefronts.map(sf => {
+                    const accPct = sf.accuracy_total > 0 ? Math.round(sf.accuracy_score * 100) : 0;
+                    const accClass = accPct >= 60 ? 'accuracy-high' : (accPct >= 30 ? 'accuracy-med' : 'accuracy-low');
+                    return `
+                    <tr style="border-bottom: 1px solid var(--glass-border);">
+                        <td style="padding: 1.25rem 1rem;"><strong>${sf.seller_name}</strong></td>
+                        <td style="padding: 1.25rem 1rem; font-family: monospace; color: var(--text-secondary);">${sf.seller_id}</td>
+                        <td style="padding: 1.25rem 1rem;"><span class="status-${sf.status}">${sf.status.toUpperCase()}</span></td>
+                        <td style="padding: 1.25rem 1rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div class="accuracy-track"><div class="accuracy-fill ${accClass}" style="width: ${accPct}%"></div></div>
+                                <span style="font-weight: 700; font-size: 0.75rem;">${accPct}%</span>
+                            </div>
+                        </td>
+                        <td style="padding: 1.25rem 1rem; font-weight: 700; color: var(--accent);">${sf.total_alerts}</td>
+                        <td style="padding: 1.25rem 1rem; text-align: right;">
+                            <button onclick="removeStorefront('${sf.seller_id}', '${sf.seller_name}')" class="btn" style="color: var(--error); padding: 0.4rem 0.8rem; font-size: 0.7rem;">DECOMMISSION</button>
+                        </td>
+                    </tr>`;
+                }).join("");
+                updateStats(data.storefronts);
+            } catch (e) {}
+        }
+
+        function updateStats(sfs) {
+            document.getElementById('stat-sellers').textContent = sfs.length;
+            const hitTotal = sfs.reduce((a, b) => a + (b.accuracy_hits || 0), 0);
+            const sumTotal = sfs.reduce((a, b) => a + (b.accuracy_total || 0), 0);
+            document.getElementById('stat-accuracy').textContent = sumTotal > 0 ? Math.round((hitTotal / sumTotal) * 100) + '%' : '0%';
+        }
+
+        async function loadAlerts() {
+            try {
+                const resp = await fetch('/stalker/api/alerts?grade=' + currentGradeFilter);
+                const data = await resp.json();
+                const feed = document.getElementById('alert-feed');
+                const empty = document.getElementById('alerts-empty');
+                if (!data.ok || !data.alerts || data.alerts.length === 0) {
+                    feed.innerHTML = ''; feed.appendChild(empty); empty.style.display = 'block'; return;
+                }
+                empty.style.display = 'none';
+                feed.innerHTML = data.alerts.map(a => renderAlertCard(a)).join("");
+                if (data.alerts.length > 0) {
+                    const today = new Date().toISOString().split('T')[0];
+                    const todayAlerts = data.alerts.filter(al => al.created_at.startsWith(today));
+                    document.getElementById('stat-alerts-today').textContent = todayAlerts.length;
+                    document.getElementById('stat-grade-a').textContent = todayAlerts.filter(al => al.grade === 'A').length;
+                    document.getElementById('stat-convergence').textContent = data.alerts.filter(al => al.is_hot).length;
+                }
+            } catch (e) {}
+        }
+
+        function renderAlertCard(a) {
+            const isHot = a.is_hot ? 'hot-deal' : '';
+            const gradeClass = "grade-" + a.grade.toLowerCase();
+            const profit = a.analysis && a.analysis.profit ? a.analysis.profit : 0;
+            const roi = a.analysis && a.analysis.roi ? a.analysis.roi : 0;
+            return `
+            <div class="glass card alert-card ${gradeClass} ${isHot}">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                    <div>
+                        <div style="font-size: 0.7rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">${a.seller_name} — ${timeAgo(a.created_at)}</div>
+                        <h4 style="font-size: 1.1rem; margin-bottom: 0.25rem;">${a.product_name}</h4>
+                        <code style="font-size: 0.75rem; color: var(--accent);">${a.asin}</code>
+                    </div>
+                    <div class="badge ${a.grade === 'A' ? 'severity-low' : a.grade === 'B' ? 'severity-medium' : 'severity-none'}" style="padding: 0.4rem 1.25rem;">GRADE ${a.grade}</div>
+                </div>
+                <div style="display: flex; gap: 2rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Est. Profit</p>
+                        <p style="font-weight: 800; color: var(--success);">$${profit}</p>
+                    </div>
+                    <div>
+                        <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">ROI</p>
+                        <p style="font-weight: 800; color: var(--accent);">${roi}%</p>
+                    </div>
+                    <div>
+                        <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Rank</p>
+                        <p style="font-weight: 800;">#${a.analysis?.rank || 'N/A'}</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <a href="https://www.amazon.com/dp/${a.asin}" target="_blank" class="btn" style="background: rgba(255,153,0,0.1); color: #ff9900; font-size: 0.8rem; flex: 1; text-align: center;">View Amazon</a>
+                    <button onclick="submitFeedback(${a.id}, 'bought')" class="btn" style="background: rgba(52,211,153,0.1); color: var(--success); font-size: 0.8rem; flex: 1;">Logged Purchase</button>
+                    <button onclick="submitFeedback(${a.id}, 'skipped')" class="btn" style="background: rgba(239,68,68,0.1); color: var(--error); font-size: 0.8rem; flex: 1;">Irrelevant Signal</button>
+                </div>
+            </div>`;
+        }
+
+        async function submitFeedback(alertId, action) {
+            try {
+                const resp = await fetch('/stalker/api/alerts/' + alertId + '/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action }),
+                });
+                const data = await resp.json();
+                if (data.ok) { showToast('Neural feedback incorporated: ' + action); loadAlerts(); loadStorefronts(); }
+            } catch (e) {}
+        }
+
+        async function triggerScan() {
+            const btn = document.getElementById('btn-trigger');
+            btn.disabled = true; btn.textContent = 'Scanning Nodes...';
+            try {
+                const resp = await fetch('/stalker/api/scan', { method: 'POST' });
+                const data = await resp.json();
+                showToast(data.message || 'Node scan initiated');
+                setTimeout(() => { loadAlerts(); btn.disabled = false; btn.textContent = 'Scan All Nodes'; }, 2000);
+            } catch (e) { btn.disabled = false; btn.textContent = 'Scan All Nodes'; }
+        }
+
+        async function saveWebhook() {
+            const url = document.getElementById('input-webhook').value.trim();
+            try {
+                await fetch('/stalker/api/webhook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url }),
+                });
+                showToast('Endpoint configuration saved');
+                checkWebhook();
+            } catch (e) {}
+        }
+
+        async function testWebhook() {
+            try {
+                const resp = await fetch('/stalker/api/webhook/test', { method: 'POST' });
+                const data = await resp.json();
+                showToast(data.message || 'Signal test complete');
+            } catch (e) {}
+        }
+
+        async function checkWebhook() {
+            try {
+                const resp = await fetch('/stalker/api/webhook');
+                const data = await resp.json();
+                const dot = document.querySelector('.dot');
+                const text = document.querySelector('#webhook-status span:last-child');
+                if (data.url) {
+                    dot.className = 'dot dot-online';
+                    text.textContent = 'Neural link established';
+                    document.getElementById('input-webhook').value = data.url;
+                } else { dot.className = 'dot dot-offline'; text.textContent = 'Endpoint disconnected'; }
+            } catch (e) {}
+        }
+
+        function filterAlerts(grade) {
+            currentGradeFilter = grade;
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.toggle('active', b.getAttribute('data-grade') === grade);
+            });
+            loadAlerts();
+        }
+
+        function timeAgo(date) {
+            const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+            let interval = seconds / 31536000;
+            if (interval > 1) return Math.floor(interval) + "y ago";
+            interval = seconds / 2592000;
+            if (interval > 1) return Math.floor(interval) + "mo ago";
+            interval = seconds / 86400;
+            if (interval > 1) return Math.floor(interval) + "d ago";
+            interval = seconds / 3600;
+            if (interval > 1) return Math.floor(interval) + "h ago";
+            interval = seconds / 60;
+            if (interval > 1) return Math.floor(interval) + "m ago";
+            return "just now";
+        }
+
+        refreshAll();
+        function refreshAll() { loadStorefronts(); loadAlerts(); checkWebhook(); }
+        setInterval(refreshAll, 60000);
+    </script>
+</body>
+</html>

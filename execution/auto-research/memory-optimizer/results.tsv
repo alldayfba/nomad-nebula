@@ -1,0 +1,66 @@
+id	baseline_metric	challenger_metric	status	hypothesis
+1	39.78	41.38	keep	If we recategorize 22 memories from 'general', recall precision should improve
+2	41.51	42.6	keep	If we recategorize 15 memories from 'general', recall precision should improve
+3	42.64	43.07	keep	If we recategorize 6 memories from 'general', recall precision should improve
+4	43.07	43.29	keep	If we recategorize 3 memories from 'general', recall precision should improve
+5	43.37	43.37	discard	If we no actionable improvements found — system is clean, recall precision should improve
+6	88.11	88.11	discard	If we no actionable improvements found — system is clean, recall precision should improve
+7	100.0	100.0	discard	If we no actionable improvements found — system is clean, recall precision should improve
+8	85.2	85.2	discard	If we no actionable improvements found — system is clean, recall precision should improve
+9	100.0	100.0	discard	If we no actionable improvements found — system is clean, recall precision should improve
+10	100.0	100.0	discard	If we no actionable improvements found — system is clean, recall precision should improve
+11	100.0	100.0	discard	If we no actionable improvements found — system is clean, recall precision should improve
+12	100.0	100.0	discard	If we no actionable improvements found — system is clean, recall precision should improve
+13	100.0	100.0	discard	If we no actionable improvements found — system is clean, recall precision should improve
+14	99.88	100.0	keep	If we recategorize 2 memories from 'general', recall precision should improve
+15	99.83	99.94	keep	If we recategorize 2 memories from 'general', recall precision should improve
+16	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+17	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+18	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+19	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+20	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+21	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+22	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+23	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+24	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+25	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+26	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+27	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+28	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+29	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+30	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+31	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+32	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+33	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+34	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+35	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+36	99.9	99.95	keep	If we recategorize 1 memories from 'general', recall precision should improve
+37	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+38	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+39	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+40	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+41	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+42	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+43	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+44	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+45	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+46	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+47	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+48	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+49	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+50	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+51	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+52	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+53	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+54	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+55	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+56	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+57	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+58	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+59	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+60	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+61	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+62	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+63	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+64	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve
+65	99.95	99.95	discard	If we no actionable improvements found — system is clean, recall precision should improve

@@ -1,0 +1,38 @@
+name: template
+version: "1.0"
+description: "Template contract — copy and customize for new output types"
+
+input:
+  required:
+    - field_name:
+        type: string
+        description: "Describe this field"
+  optional:
+    - optional_field:
+        type: string
+        default: "default value"
+        description: "Describe this field"
+
+output:
+  format: markdown
+  sections:
+    - section_name
+  constraints:
+    total_words: "100-500"
+    no_placeholders: true
+
+definition_of_done:
+  - "All required sections present"
+  - "No placeholder text"
+  - "Constraints validated"
+
+failure_conditions:
+  - "Contains placeholder text ([NAME], {company}, TODO, etc.)"
+  - "Missing any required section"
+  - "Exceeds word count constraints"
+  - "Generic content that could apply to any input"
+
+error_handling:
+  missing_input: "ask_user"
+  validation_fail: "auto_revise_max_2"
+  partial_output: "return_partial_with_warning"

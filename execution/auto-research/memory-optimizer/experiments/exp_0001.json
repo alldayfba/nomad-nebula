@@ -1,0 +1,364 @@
+{
+  "id": 1,
+  "hypothesis": "If we recategorize 22 memories from 'general', recall precision should improve",
+  "challenger": {
+    "hypothesis": "If we recategorize 22 memories from 'general', recall precision should improve",
+    "actions": [
+      [
+        "recategorize",
+        [
+          {
+            "id": 91,
+            "title": "| 2026-02-22 | Keepa API burns tokens too fast on $19/mo plan (5 tokens/min). On",
+            "from": "general",
+            "to": "sourcing",
+            "score": 3
+          },
+          {
+            "id": 106,
+            "title": "| 2026-02-27 | Keepa Deals endpoint works: `priceTypes=[0]`, returns 150 deals f",
+            "from": "general",
+            "to": "sourcing",
+            "score": 2
+          },
+          {
+            "id": 194,
+            "title": "`tests/test_sourcing.py` \u2014 NEW (2026-03-13): 23-test suite covering schema adapt",
+            "from": "general",
+            "to": "sourcing",
+            "score": 2
+          },
+          {
+            "id": 211,
+            "title": "`.tmp/creators/bonus-pdf-extractions/agency-yap-doc.md` \u2014 Agency Yap Doc extract",
+            "from": "general",
+            "to": "agency",
+            "score": 2
+          },
+          {
+            "id": 218,
+            "title": "`.tmp/creators/growth-os-parts/part6-math.md` \u2014 Growth OS Brain Part 6: The Math",
+            "from": "general",
+            "to": "agency",
+            "score": 4
+          },
+          {
+            "id": 221,
+            "title": "`.tmp/creators/growth-os-parts/part1-foundation.md` \u2014 Growth OS Brain Part 1: Th",
+            "from": "general",
+            "to": "agency",
+            "score": 3
+          },
+          {
+            "id": 46,
+            "title": "chmod errors on /Users/Shared/ can be silenced \u2014 permissions are already correct",
+            "from": "general",
+            "to": "technical",
+            "score": 2
+          },
+          {
+            "id": 60,
+            "title": "Target does NOT support UPC search at all (\"We couldn't find a match\"). Must sea",
+            "from": "general",
+            "to": "sourcing",
+            "score": 2
+          },
+          {
+            "id": 61,
+            "title": "Added Playwright-powered search functions: `search_target_pw()` and `search_walg",
+            "from": "general",
+            "to": "sourcing",
+            "score": 2
+          },
+          {
+            "id": 77,
+            "title": "Model routing: Haiku for scraping/parsing, Sonnet for code/orchestration, Opus f",
+            "from": "general",
+            "to": "technical",
+            "score": 2
+          },
+          {
+            "id": 86,
+            "title": "| 2026-02-20 | macOS TCC blocks ~/Documents access from launchd scripts \u2014 must u",
+            "from": "general",
+            "to": "technical",
+            "score": 3
+          },
+          {
+            "id": 87,
+            "title": "| 2026-02-20 | chmod errors on /Users/Shared/ can be silenced \u2014 permissions are ",
+            "from": "general",
+            "to": "technical",
+            "score": 2
+          },
+          {
+            "id": 89,
+            "title": "| 2026-02-21 | Amazon product matching benefits from title similarity scoring + ",
+            "from": "general",
+            "to": "sourcing",
+            "score": 2
+          },
+          {
+            "id": 93,
+            "title": "| 2026-02-22 | Free deal pipeline (RSS + UPCitemdb) runs full 20-product scan in",
+            "from": "general",
+            "to": "sourcing",
+            "score": 2
+          },
+          {
+            "id": 95,
+            "title": "| 2026-02-22 | Hip2Save RSS (`hip2save.com/feed/`) returns 200 deals, ~17 from r",
+            "from": "general",
+            "to": "sourcing",
+            "score": 2
+          },
+          {
+            "id": 97,
+            "title": "| 2026-02-23 | Sabbo requested Easter leads \u2014 20 ASINs from Walmart/Target. Walm",
+            "from": "general",
+            "to": "sourcing",
+            "score": 4
+          },
+          {
+            "id": 99,
+            "title": "| 2026-02-27 | Target Redsky API is DEAD \u2014 all endpoints (plp_search v1/v2/v3, p",
+            "from": "general",
+            "to": "sourcing",
+            "score": 2
+          },
+          {
+            "id": 100,
+            "title": "| 2026-02-27 | HTTP scraping of retailer search pages is dead for all major reta",
+            "from": "general",
+            "to": "technical",
+            "score": 2
+          },
+          {
+            "id": 103,
+            "title": "| 2026-02-27 | Pack size mismatch is the #1 false positive issue \u2014 retailer sear",
+            "from": "general",
+            "to": "sourcing",
+            "score": 2
+          },
+          {
+            "id": 104,
+            "title": "| 2026-02-27 | Sabbo REQUIRES buy links for every product in leads \u2014 explicitly ",
+            "from": "general",
+            "to": "sourcing",
+            "score": 2
+          },
+          {
+            "id": 105,
+            "title": "| 2026-02-27 | deal_scanner.py upgraded to v4.0: added fetch_retailer_clearance(",
+            "from": "general",
+            "to": "sourcing",
+            "score": 2
+          },
+          {
+            "id": 107,
+            "title": "| 2026-02-27 | First successful reverse sourcing scan: 49 products scanned, 20 r",
+            "from": "general",
+            "to": "sourcing",
+            "score": 3
+          }
+        ]
+      ]
+    ],
+    "diagnostics": {
+      "general_count": 50,
+      "recategorize_candidates": [
+        {
+          "id": 91,
+          "title": "| 2026-02-22 | Keepa API burns tokens too fast on $19/mo plan (5 tokens/min). On",
+          "from": "general",
+          "to": "sourcing",
+          "score": 3
+        },
+        {
+          "id": 106,
+          "title": "| 2026-02-27 | Keepa Deals endpoint works: `priceTypes=[0]`, returns 150 deals f",
+          "from": "general",
+          "to": "sourcing",
+          "score": 2
+        },
+        {
+          "id": 194,
+          "title": "`tests/test_sourcing.py` \u2014 NEW (2026-03-13): 23-test suite covering schema adapt",
+          "from": "general",
+          "to": "sourcing",
+          "score": 2
+        },
+        {
+          "id": 211,
+          "title": "`.tmp/creators/bonus-pdf-extractions/agency-yap-doc.md` \u2014 Agency Yap Doc extract",
+          "from": "general",
+          "to": "agency",
+          "score": 2
+        },
+        {
+          "id": 218,
+          "title": "`.tmp/creators/growth-os-parts/part6-math.md` \u2014 Growth OS Brain Part 6: The Math",
+          "from": "general",
+          "to": "agency",
+          "score": 4
+        },
+        {
+          "id": 221,
+          "title": "`.tmp/creators/growth-os-parts/part1-foundation.md` \u2014 Growth OS Brain Part 1: Th",
+          "from": "general",
+          "to": "agency",
+          "score": 3
+        },
+        {
+          "id": 46,
+          "title": "chmod errors on /Users/Shared/ can be silenced \u2014 permissions are already correct",
+          "from": "general",
+          "to": "technical",
+          "score": 2
+        },
+        {
+          "id": 60,
+          "title": "Target does NOT support UPC search at all (\"We couldn't find a match\"). Must sea",
+          "from": "general",
+          "to": "sourcing",
+          "score": 2
+        },
+        {
+          "id": 61,
+          "title": "Added Playwright-powered search functions: `search_target_pw()` and `search_walg",
+          "from": "general",
+          "to": "sourcing",
+          "score": 2
+        },
+        {
+          "id": 77,
+          "title": "Model routing: Haiku for scraping/parsing, Sonnet for code/orchestration, Opus f",
+          "from": "general",
+          "to": "technical",
+          "score": 2
+        },
+        {
+          "id": 86,
+          "title": "| 2026-02-20 | macOS TCC blocks ~/Documents access from launchd scripts \u2014 must u",
+          "from": "general",
+          "to": "technical",
+          "score": 3
+        },
+        {
+          "id": 87,
+          "title": "| 2026-02-20 | chmod errors on /Users/Shared/ can be silenced \u2014 permissions are ",
+          "from": "general",
+          "to": "technical",
+          "score": 2
+        },
+        {
+          "id": 89,
+          "title": "| 2026-02-21 | Amazon product matching benefits from title similarity scoring + ",
+          "from": "general",
+          "to": "sourcing",
+          "score": 2
+        },
+        {
+          "id": 93,
+          "title": "| 2026-02-22 | Free deal pipeline (RSS + UPCitemdb) runs full 20-product scan in",
+          "from": "general",
+          "to": "sourcing",
+          "score": 2
+        },
+        {
+          "id": 95,
+          "title": "| 2026-02-22 | Hip2Save RSS (`hip2save.com/feed/`) returns 200 deals, ~17 from r",
+          "from": "general",
+          "to": "sourcing",
+          "score": 2
+        },
+        {
+          "id": 97,
+          "title": "| 2026-02-23 | Sabbo requested Easter leads \u2014 20 ASINs from Walmart/Target. Walm",
+          "from": "general",
+          "to": "sourcing",
+          "score": 4
+        },
+        {
+          "id": 99,
+          "title": "| 2026-02-27 | Target Redsky API is DEAD \u2014 all endpoints (plp_search v1/v2/v3, p",
+          "from": "general",
+          "to": "sourcing",
+          "score": 2
+        },
+        {
+          "id": 100,
+          "title": "| 2026-02-27 | HTTP scraping of retailer search pages is dead for all major reta",
+          "from": "general",
+          "to": "technical",
+          "score": 2
+        },
+        {
+          "id": 103,
+          "title": "| 2026-02-27 | Pack size mismatch is the #1 false positive issue \u2014 retailer sear",
+          "from": "general",
+          "to": "sourcing",
+          "score": 2
+        },
+        {
+          "id": 104,
+          "title": "| 2026-02-27 | Sabbo REQUIRES buy links for every product in leads \u2014 explicitly ",
+          "from": "general",
+          "to": "sourcing",
+          "score": 2
+        },
+        {
+          "id": 105,
+          "title": "| 2026-02-27 | deal_scanner.py upgraded to v4.0: added fetch_retailer_clearance(",
+          "from": "general",
+          "to": "sourcing",
+          "score": 2
+        },
+        {
+          "id": 107,
+          "title": "| 2026-02-27 | First successful reverse sourcing scan: 49 products scanned, 20 r",
+          "from": "general",
+          "to": "sourcing",
+          "score": 3
+        }
+      ],
+      "duplicate_groups": {},
+      "dead_weight": [],
+      "no_tags_count": 21
+    }
+  },
+  "baseline_metric": 39.78,
+  "challenger_metric": 41.38,
+  "status": "keep",
+  "details": {
+    "ref": "{\"applied\": [\"Recategorized #91 '| 2026-02-22 | Keepa API burns tokens to' \\u2192 sourcing\", \"Recategorized #106 '| 2026-02-27 | Keepa Deals endpoint work' \\u2192 sourcing\", \"Recategorized #194 '`tests/test_sourcing.py` \\u2014 NEW (2026-03-' \\u2192 sourcing\", \"Recategorized #211 '`.tmp/creators/bonus-pdf-extractions/age' \\u2192 agency\", \"Recategorized #218 '`.tmp/creators/growth-os-parts/part6-mat' \\u2192 agency\", \"Recategorized #221 '`.tmp/creators/growth-os-parts/part1-fou' \\u2192 agency\", \"Recategorized #46 'chmod errors on /Users/Shared/ can be si' \\u2192 technical\", \"Recategorized #60 'Target does NOT support UPC search at al' \\u2192 sourcing\", \"Recategorized #61 'Added Playwright-powered search function' \\u2192 sourcing\", \"Recategorized #77 'Model routing: Haiku for scraping/parsin' \\u2192 technical\", \"Recategorized #86 '| 2026-02-20 | macOS TCC blocks ~/Docume' \\u2192 technical\", \"Recategorized #87 '| 2026-02-20 | chmod errors on /Users/Sh' \\u2192 technical\", \"Recategorized #89 '| 2026-02-21 | Amazon product matching b' \\u2192 sourcing\", \"Recategorized #93 '| 2026-02-22 | Free deal pipeline (RSS +' \\u2192 sourcing\", \"Recategorized #95 '| 2026-02-22 | Hip2Save RSS (`hip2save.c' \\u2192 sourcing\", \"Recategorized #97 '| 2026-02-23 | Sabbo requested Easter le' \\u2192 sourcing\", \"Recategorized #99 '| 2026-02-27 | Target Redsky API is DEAD' \\u2192 sourcing\", \"Recategorized #100 '| 2026-02-27 | HTTP scraping of retailer' \\u2192 technical\", \"Recategorized #103 '| 2026-02-27 | Pack size mismatch is the' \\u2192 sourcing\", \"Recategorized #104 '| 2026-02-27 | Sabbo REQUIRES buy links ' \\u2192 sourcing\", \"Recategorized #105 '| 2026-02-27 | deal_scanner.py upgraded ' \\u2192 sourcing\", \"Recategorized #107 '| 2026-02-27 | First successful reverse ' \\u2192 sourcing\"], \"errors\": []}",
+    "metric": 41.38,
+    "applied_count": 22,
+    "error_count": 0,
+    "applied": [
+      "Recategorized #91 '| 2026-02-22 | Keepa API burns tokens to' \u2192 sourcing",
+      "Recategorized #106 '| 2026-02-27 | Keepa Deals endpoint work' \u2192 sourcing",
+      "Recategorized #194 '`tests/test_sourcing.py` \u2014 NEW (2026-03-' \u2192 sourcing",
+      "Recategorized #211 '`.tmp/creators/bonus-pdf-extractions/age' \u2192 agency",
+      "Recategorized #218 '`.tmp/creators/growth-os-parts/part6-mat' \u2192 agency",
+      "Recategorized #221 '`.tmp/creators/growth-os-parts/part1-fou' \u2192 agency",
+      "Recategorized #46 'chmod errors on /Users/Shared/ can be si' \u2192 technical",
+      "Recategorized #60 'Target does NOT support UPC search at al' \u2192 sourcing",
+      "Recategorized #61 'Added Playwright-powered search function' \u2192 sourcing",
+      "Recategorized #77 'Model routing: Haiku for scraping/parsin' \u2192 technical",
+      "Recategorized #86 '| 2026-02-20 | macOS TCC blocks ~/Docume' \u2192 technical",
+      "Recategorized #87 '| 2026-02-20 | chmod errors on /Users/Sh' \u2192 technical",
+      "Recategorized #89 '| 2026-02-21 | Amazon product matching b' \u2192 sourcing",
+      "Recategorized #93 '| 2026-02-22 | Free deal pipeline (RSS +' \u2192 sourcing",
+      "Recategorized #95 '| 2026-02-22 | Hip2Save RSS (`hip2save.c' \u2192 sourcing",
+      "Recategorized #97 '| 2026-02-23 | Sabbo requested Easter le' \u2192 sourcing",
+      "Recategorized #99 '| 2026-02-27 | Target Redsky API is DEAD' \u2192 sourcing",
+      "Recategorized #100 '| 2026-02-27 | HTTP scraping of retailer' \u2192 technical",
+      "Recategorized #103 '| 2026-02-27 | Pack size mismatch is the' \u2192 sourcing",
+      "Recategorized #104 '| 2026-02-27 | Sabbo REQUIRES buy links ' \u2192 sourcing",
+      "Recategorized #105 '| 2026-02-27 | deal_scanner.py upgraded ' \u2192 sourcing",
+      "Recategorized #107 '| 2026-02-27 | First successful reverse ' \u2192 sourcing"
+    ]
+  },
+  "created_at": "2026-03-16T00:27:44.299202"
+}

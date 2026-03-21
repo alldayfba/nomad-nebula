@@ -1,0 +1,49 @@
+{
+  "id": 36,
+  "hypothesis": "If we recategorize 1 memories from 'general', recall precision should improve",
+  "challenger": {
+    "hypothesis": "If we recategorize 1 memories from 'general', recall precision should improve",
+    "actions": [
+      [
+        "recategorize",
+        [
+          {
+            "id": 531,
+            "title": "Kabrin March 19: Automation framework \u2014 brain dump to Claude, build plan, deploy",
+            "from": "general",
+            "to": "technical",
+            "score": 2
+          }
+        ]
+      ]
+    ],
+    "diagnostics": {
+      "general_count": 2,
+      "recategorize_candidates": [
+        {
+          "id": 531,
+          "title": "Kabrin March 19: Automation framework \u2014 brain dump to Claude, build plan, deploy",
+          "from": "general",
+          "to": "technical",
+          "score": 2
+        }
+      ],
+      "duplicate_groups": {},
+      "dead_weight": [],
+      "no_tags_count": 0
+    }
+  },
+  "baseline_metric": 99.9,
+  "challenger_metric": 99.95,
+  "status": "keep",
+  "details": {
+    "ref": "{\"applied\": [\"Recategorized #531 'Kabrin March 19: Automation framework \\u2014 ' \\u2192 technical\"], \"errors\": []}",
+    "metric": 99.95,
+    "applied_count": 1,
+    "error_count": 0,
+    "applied": [
+      "Recategorized #531 'Kabrin March 19: Automation framework \u2014 ' \u2192 technical"
+    ]
+  },
+  "created_at": "2026-03-19T18:10:00.048624"
+}

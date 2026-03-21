@@ -1,0 +1,259 @@
+{
+  "id": 2,
+  "hypothesis": "If we recategorize 15 memories from 'general', recall precision should improve",
+  "challenger": {
+    "hypothesis": "If we recategorize 15 memories from 'general', recall precision should improve",
+    "actions": [
+      [
+        "recategorize",
+        [
+          {
+            "id": 108,
+            "title": "| 2026-02-28 | Walmart data access research (non-SerpAPI alternatives): 5 approa",
+            "from": "general",
+            "to": "technical",
+            "score": 2
+          },
+          {
+            "id": 109,
+            "title": "| 2026-03-13 | Sourcing pipeline production-hardened (15 items across 4 tiers) \u2014",
+            "from": "general",
+            "to": "technical",
+            "score": 6
+          },
+          {
+            "id": 110,
+            "title": "| 2026-03-13 | Sales team management identified as potential biggest bottleneck ",
+            "from": "general",
+            "to": "agent",
+            "score": 3
+          },
+          {
+            "id": 118,
+            "title": "`directives/whisper-flow-sop.md` \u2014 WhisperFlow usage SOP (2026-03-14)",
+            "from": "general",
+            "to": "agent",
+            "score": 2
+          },
+          {
+            "id": 119,
+            "title": "### Directives (SOPs)",
+            "from": "general",
+            "to": "agent",
+            "score": 2
+          },
+          {
+            "id": 120,
+            "title": "`directives/lead-gen-sop.md` \u2014 Google Maps scraping workflow",
+            "from": "general",
+            "to": "agent",
+            "score": 2
+          },
+          {
+            "id": 121,
+            "title": "`directives/ceo-agent-sop.md` \u2014 CEO agent execution flow (v2.1 \u2014 with automated ",
+            "from": "general",
+            "to": "agent",
+            "score": 3
+          },
+          {
+            "id": 122,
+            "title": "`directives/training-officer-sop.md` \u2014 Training Officer execution flow",
+            "from": "general",
+            "to": "agent",
+            "score": 3
+          },
+          {
+            "id": 123,
+            "title": "`directives/amazon-sourcing-sop.md` \u2014 FBA sourcing pipeline",
+            "from": "general",
+            "to": "sourcing",
+            "score": 3
+          },
+          {
+            "id": 124,
+            "title": "`directives/openclaw-handoff-sop.md` \u2014 OpenClaw \u2194 Claude Code bridge",
+            "from": "general",
+            "to": "agent",
+            "score": 2
+          },
+          {
+            "id": 125,
+            "title": "`directives/api-cost-management-sop.md` \u2014 LLM model routing + budget",
+            "from": "general",
+            "to": "agent",
+            "score": 2
+          },
+          {
+            "id": 126,
+            "title": "`directives/security-guardrails-sop.md` \u2014 Access + incident rules + CodeSec auto",
+            "from": "general",
+            "to": "agent",
+            "score": 2
+          },
+          {
+            "id": 127,
+            "title": "`directives/agent-training-sop.md` \u2014 Bot onboarding",
+            "from": "general",
+            "to": "agent",
+            "score": 5
+          },
+          {
+            "id": 128,
+            "title": "`directives/codesec-sop.md` \u2014 CodeSec scan workflow, CSR lifecycle, security/qua",
+            "from": "general",
+            "to": "agent",
+            "score": 2
+          },
+          {
+            "id": 129,
+            "title": "`directives/pipeline-analytics-sop.md` \u2014 Pipeline analytics (import, report, bot",
+            "from": "general",
+            "to": "agent",
+            "score": 3
+          }
+        ]
+      ]
+    ],
+    "diagnostics": {
+      "general_count": 50,
+      "recategorize_candidates": [
+        {
+          "id": 108,
+          "title": "| 2026-02-28 | Walmart data access research (non-SerpAPI alternatives): 5 approa",
+          "from": "general",
+          "to": "technical",
+          "score": 2
+        },
+        {
+          "id": 109,
+          "title": "| 2026-03-13 | Sourcing pipeline production-hardened (15 items across 4 tiers) \u2014",
+          "from": "general",
+          "to": "technical",
+          "score": 6
+        },
+        {
+          "id": 110,
+          "title": "| 2026-03-13 | Sales team management identified as potential biggest bottleneck ",
+          "from": "general",
+          "to": "agent",
+          "score": 3
+        },
+        {
+          "id": 118,
+          "title": "`directives/whisper-flow-sop.md` \u2014 WhisperFlow usage SOP (2026-03-14)",
+          "from": "general",
+          "to": "agent",
+          "score": 2
+        },
+        {
+          "id": 119,
+          "title": "### Directives (SOPs)",
+          "from": "general",
+          "to": "agent",
+          "score": 2
+        },
+        {
+          "id": 120,
+          "title": "`directives/lead-gen-sop.md` \u2014 Google Maps scraping workflow",
+          "from": "general",
+          "to": "agent",
+          "score": 2
+        },
+        {
+          "id": 121,
+          "title": "`directives/ceo-agent-sop.md` \u2014 CEO agent execution flow (v2.1 \u2014 with automated ",
+          "from": "general",
+          "to": "agent",
+          "score": 3
+        },
+        {
+          "id": 122,
+          "title": "`directives/training-officer-sop.md` \u2014 Training Officer execution flow",
+          "from": "general",
+          "to": "agent",
+          "score": 3
+        },
+        {
+          "id": 123,
+          "title": "`directives/amazon-sourcing-sop.md` \u2014 FBA sourcing pipeline",
+          "from": "general",
+          "to": "sourcing",
+          "score": 3
+        },
+        {
+          "id": 124,
+          "title": "`directives/openclaw-handoff-sop.md` \u2014 OpenClaw \u2194 Claude Code bridge",
+          "from": "general",
+          "to": "agent",
+          "score": 2
+        },
+        {
+          "id": 125,
+          "title": "`directives/api-cost-management-sop.md` \u2014 LLM model routing + budget",
+          "from": "general",
+          "to": "agent",
+          "score": 2
+        },
+        {
+          "id": 126,
+          "title": "`directives/security-guardrails-sop.md` \u2014 Access + incident rules + CodeSec auto",
+          "from": "general",
+          "to": "agent",
+          "score": 2
+        },
+        {
+          "id": 127,
+          "title": "`directives/agent-training-sop.md` \u2014 Bot onboarding",
+          "from": "general",
+          "to": "agent",
+          "score": 5
+        },
+        {
+          "id": 128,
+          "title": "`directives/codesec-sop.md` \u2014 CodeSec scan workflow, CSR lifecycle, security/qua",
+          "from": "general",
+          "to": "agent",
+          "score": 2
+        },
+        {
+          "id": 129,
+          "title": "`directives/pipeline-analytics-sop.md` \u2014 Pipeline analytics (import, report, bot",
+          "from": "general",
+          "to": "agent",
+          "score": 3
+        }
+      ],
+      "duplicate_groups": {},
+      "dead_weight": [],
+      "no_tags_count": 21
+    }
+  },
+  "baseline_metric": 41.51,
+  "challenger_metric": 42.6,
+  "status": "keep",
+  "details": {
+    "ref": "{\"applied\": [\"Recategorized #108 '| 2026-02-28 | Walmart data access resea' \\u2192 technical\", \"Recategorized #109 '| 2026-03-13 | Sourcing pipeline product' \\u2192 technical\", \"Recategorized #110 '| 2026-03-13 | Sales team management ide' \\u2192 agent\", \"Recategorized #118 '`directives/whisper-flow-sop.md` \\u2014 Whisp' \\u2192 agent\", \"Recategorized #119 '### Directives (SOPs)' \\u2192 agent\", \"Recategorized #120 '`directives/lead-gen-sop.md` \\u2014 Google Ma' \\u2192 agent\", \"Recategorized #121 '`directives/ceo-agent-sop.md` \\u2014 CEO agen' \\u2192 agent\", \"Recategorized #122 '`directives/training-officer-sop.md` \\u2014 T' \\u2192 agent\", \"Recategorized #123 '`directives/amazon-sourcing-sop.md` \\u2014 FB' \\u2192 sourcing\", \"Recategorized #124 '`directives/openclaw-handoff-sop.md` \\u2014 O' \\u2192 agent\", \"Recategorized #125 '`directives/api-cost-management-sop.md` ' \\u2192 agent\", \"Recategorized #126 '`directives/security-guardrails-sop.md` ' \\u2192 agent\", \"Recategorized #127 '`directives/agent-training-sop.md` \\u2014 Bot' \\u2192 agent\", \"Recategorized #128 '`directives/codesec-sop.md` \\u2014 CodeSec sc' \\u2192 agent\", \"Recategorized #129 '`directives/pipeline-analytics-sop.md` \\u2014' \\u2192 agent\"], \"errors\": []}",
+    "metric": 42.6,
+    "applied_count": 15,
+    "error_count": 0,
+    "applied": [
+      "Recategorized #108 '| 2026-02-28 | Walmart data access resea' \u2192 technical",
+      "Recategorized #109 '| 2026-03-13 | Sourcing pipeline product' \u2192 technical",
+      "Recategorized #110 '| 2026-03-13 | Sales team management ide' \u2192 agent",
+      "Recategorized #118 '`directives/whisper-flow-sop.md` \u2014 Whisp' \u2192 agent",
+      "Recategorized #119 '### Directives (SOPs)' \u2192 agent",
+      "Recategorized #120 '`directives/lead-gen-sop.md` \u2014 Google Ma' \u2192 agent",
+      "Recategorized #121 '`directives/ceo-agent-sop.md` \u2014 CEO agen' \u2192 agent",
+      "Recategorized #122 '`directives/training-officer-sop.md` \u2014 T' \u2192 agent",
+      "Recategorized #123 '`directives/amazon-sourcing-sop.md` \u2014 FB' \u2192 sourcing",
+      "Recategorized #124 '`directives/openclaw-handoff-sop.md` \u2014 O' \u2192 agent",
+      "Recategorized #125 '`directives/api-cost-management-sop.md` ' \u2192 agent",
+      "Recategorized #126 '`directives/security-guardrails-sop.md` ' \u2192 agent",
+      "Recategorized #127 '`directives/agent-training-sop.md` \u2014 Bot' \u2192 agent",
+      "Recategorized #128 '`directives/codesec-sop.md` \u2014 CodeSec sc' \u2192 agent",
+      "Recategorized #129 '`directives/pipeline-analytics-sop.md` \u2014' \u2192 agent"
+    ]
+  },
+  "created_at": "2026-03-16T00:27:55.933438"
+}

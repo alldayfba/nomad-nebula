@@ -1,0 +1,63 @@
+name: lead_gen_email
+version: "1.0"
+description: "Cold outreach email for B2B lead generation"
+
+input:
+  required:
+    - company_name:
+        type: string
+        description: "Target company name"
+    - contact_name:
+        type: string
+        description: "First name of the contact"
+    - pain_points:
+        type: list
+        description: "1-3 specific pain points identified via ICP filter or research"
+  optional:
+    - industry:
+        type: string
+        default: "inferred from company"
+        description: "Industry vertical"
+    - revenue_range:
+        type: string
+        default: "unknown"
+        description: "Estimated revenue range"
+    - personalization_hook:
+        type: string
+        description: "Something specific to this lead (recent post, event, news)"
+
+output:
+  format: plaintext
+  sections:
+    - subject_line
+    - opening_hook
+    - body
+    - cta
+    - ps_line
+  constraints:
+    total_words: "80-200"
+    no_placeholders: true
+
+definition_of_done:
+  - "All 5 sections present (subject, hook, body, CTA, PS)"
+  - "No placeholder text"
+  - "Subject line under 60 characters"
+  - "CTA includes specific next step (not generic 'let me know')"
+  - "Subject line is personalized (mentions company or pain point)"
+  - "Opening hook references something specific to the lead"
+  - "No 'Dear Sir/Madam' or generic salutations"
+
+failure_conditions:
+  - "Contains placeholder text ([NAME], {company}, TODO, etc.)"
+  - "No personalization — email could be sent to anyone without changes"
+  - "CTA is generic ('let me know', 'would love to chat')"
+  - "Opening hook doesn't reference anything specific to the lead"
+  - "Subject line is generic clickbait with no company/pain point reference"
+  - "Reads like a template, not a personal message"
+  - "Contains 'Dear Sir/Madam' or formal corporate-speak"
+  - "Over 200 words — too long for cold outreach"
+
+error_handling:
+  missing_input: "ask_user"
+  validation_fail: "auto_revise_max_2"
+  partial_output: "return_partial_with_warning"

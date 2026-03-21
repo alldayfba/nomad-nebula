@@ -1,0 +1,84 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/Shared/antigravity/projects/nomad-nebula/execution/memory_boot.py --verbose > /dev/null 2>&1 || true",
+            "timeout": 2000,
+            "runOnce": true
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/Shared/antigravity/projects/nomad-nebula/execution/memory_file_change.py \"$CLAUDE_FILE_PATH\" > /dev/null 2>&1 || true",
+            "timeout": 2000
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/Shared/antigravity/projects/nomad-nebula/execution/auto-research/skill_telemetry_hook.py \"Bash\" \"$CLAUDE_TOOL_INPUT\" \"$CLAUDE_EXIT_CODE\" > /dev/null 2>&1 || true",
+            "timeout": 2000
+          },
+          {
+            "type": "command",
+            "command": "python3 /Users/Shared/antigravity/projects/nomad-nebula/execution/auto-research/growth_outcome_hook.py \"Bash\" \"$CLAUDE_TOOL_INPUT\" \"$CLAUDE_EXIT_CODE\" > /dev/null 2>&1 || true",
+            "timeout": 2000
+          }
+        ]
+      },
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/Shared/antigravity/projects/nomad-nebula/execution/auto-research/skill_telemetry_hook.py \"Skill\" \"$CLAUDE_TOOL_INPUT\" > /dev/null 2>&1 || true",
+            "timeout": 2000
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/Shared/antigravity/projects/nomad-nebula/execution/memory_session_close.py > /dev/null 2>&1 && python3 /Users/Shared/antigravity/projects/nomad-nebula/execution/memory_maintenance.py > /dev/null 2>&1 || true",
+            "timeout": 10000
+          }
+        ]
+      }
+    ]
+  },
+  "mcpServers": {
+    "gemini": {
+      "command": "python",
+      "args": ["execution/mcp_servers/gemini_mcp_server.py"],
+      "cwd": "/Users/Shared/antigravity/projects/nomad-nebula",
+      "env": {
+        "PYTHONPATH": "/Users/Shared/antigravity/projects/nomad-nebula/execution/mcp_servers"
+      }
+    },
+    "openai": {
+      "command": "python",
+      "args": ["execution/mcp_servers/openai_mcp_server.py"],
+      "cwd": "/Users/Shared/antigravity/projects/nomad-nebula",
+      "env": {
+        "PYTHONPATH": "/Users/Shared/antigravity/projects/nomad-nebula/execution/mcp_servers"
+      }
+    }
+  }
+}

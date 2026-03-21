@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The AI FBA Method | AllDayFBA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://fast.wistia.com/assets/external/E-v1.js" async></script>
+    <script src="//embed.typeform.com/next/embed.js"></script>
+    <style>
+        :root {
+            --accent-sales: #0071e3;
+            --accent-urgent: #ff3b30;
+        }
+        
+        body { padding-top: 44px; overflow-x: hidden; }
+
+        /* Scarcity Bar */
+        #scarcityBar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 9999; height: 44px;
+            background: rgba(0, 113, 227, 0.95); backdrop-filter: blur(20px);
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            font-size: 0.8rem; font-weight: 600; color: white;
+        }
+        .scar-timer { background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 4px; font-family: monospace; }
+        
+        /* Video Section */
+        .video-container {
+            position: relative; max-width: 900px; margin: 4rem auto;
+            padding: 1rem; border-radius: var(--radius-lg);
+            background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.3);
+        }
+        .video-inner { aspect-ratio: 16/9; border-radius: var(--radius-md); overflow: hidden; background: #000; }
+
+        /* Content Blocks */
+        .sales-card { padding: 3rem; margin-bottom: 2rem; }
+        .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin: 4rem 0; }
+        .comparison-table { width: 100%; border-collapse: collapse; margin: 4rem 0; font-size: 0.95rem; }
+        .comparison-table th, .comparison-table td { padding: 1.5rem; text-align: left; border-bottom: 1px solid var(--glass-border); }
+        .check-icon { color: var(--success); font-weight: 800; margin-right: 0.5rem; }
+        .cross-icon { color: var(--error); opacity: 0.5; margin-right: 0.5rem; }
+
+        /* Typography Enhancements */
+        .display-lg { font-size: clamp(2.5rem, 8vw, 4.5rem); font-weight: 800; letter-spacing: -0.04em; line-height: 1.05; }
+        .subheadline { font-size: 1.25rem; color: var(--text-secondary); max-width: 700px; margin: 1.5rem auto; line-height: 1.6; }
+        
+        .section-tag { 
+            display: inline-block; padding: 0.5rem 1.25rem; border-radius: var(--radius-full);
+            background: rgba(0, 113, 227, 0.1); color: var(--accent);
+            font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-btn-lg {
+            padding: 1.5rem 4rem; font-size: 1.25rem; font-weight: 700;
+            border-radius: var(--radius-md); background: var(--accent); color: white;
+            box-shadow: 0 20px 40px rgba(0, 113, 227, 0.3);
+            transition: var(--transition);
+        }
+        .cta-btn-lg:hover { transform: translateY(-4px); box-shadow: 0 30px 60px rgba(0, 113, 227, 0.4); }
+
+        /* Stars Background */
+        #bgStars { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0; animation: twinkle var(--d) infinite; }
+        @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(0.5); } 50% { opacity: 0.4; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div id="bgStars"></div>
+    <div class="bg-layer">
+        <div class="orb orb-1" style="background: radial-gradient(circle, rgba(0, 113, 227, 0.1) 0%, transparent 70%);"></div>
+        <div class="orb orb-2" style="background: radial-gradient(circle, rgba(94, 92, 230, 0.1) 0%, transparent 70%);"></div>
+    </div>
+
+    <div id="scarcityBar">
+        <span class="live-dot"></span>
+        <span>FINAL COHORT ENROLLMENT ENDS IN:</span>
+        <span class="scar-timer" id="timer">14:59:59</span>
+        <span style="opacity: 0.6; margin-left: 2rem;">4 SPOTS REMAINING</span>
+    </div>
+
+    <main class="container" style="text-align: center; padding: 6rem 0;">
+        <header style="margin-bottom: 5rem;">
+            <div class="section-tag">2026 AI-MODIFIED FBA STRATEGY</div>
+            <h1 class="display-lg">Find Your First <span class="text-gradient">6-Figure Product</span><br/>Using Autonomous AI Agents</h1>
+            <p class="subheadline">The "Space" Method: Skip the manual grind. Use AI to scrape, audit, and source high-margin Amazon products while you sleep.</p>
+        </header>
+
+        <div class="video-container">
+            <div class="video-inner">
+                <div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;">
+                    <div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;">
+                        <div class="wistia_embed wistia_async_j3p4g7u9d6 videoFoam=true" style="height:100%;position:relative;width:100%">&nbsp;</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin: 4rem 0;">
+            <button data-tf-popup="H1zR6X" class="cta-btn-lg">Join The AI FBA Method</button>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 1.5rem;">Join 1,400+ students scaling with AI automation.</p>
+        </div>
+
+        <!-- Problem Section -->
+        <section style="margin: 8rem 0;">
+            <div class="section-tag" style="background: rgba(255, 59, 48, 0.1); color: var(--error);">The Problem</div>
+            <h2 style="font-size: 3rem; margin-bottom: 3rem;">Why 95% of FBA Sellers Fail</h2>
+            <div class="feature-grid">
+                <div class="glass card sales-card">
+                    <span style="font-size: 2rem;">⏳</span>
+                    <h4 style="margin: 1rem 0;">The Manual Grind</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Spending 8 hours a day staring at spreadsheets and retailer sites just to find one "maybe" product.</p>
+                </div>
+                <div class="glass card sales-card">
+                    <span style="font-size: 2rem;">📉</span>
+                    <h4 style="margin: 1rem 0;">Saturated Tools</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Using the same public software as 100,000 other sellers, leading to immediate price wars.</p>
+                </div>
+                <div class="glass card sales-card">
+                    <span style="font-size: 2rem;">🧩</span>
+                    <h4 style="margin: 1rem 0;">Data Confusion</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Struggling to calculate real ROI after shipping, fees, and prep costs, leading to hidden losses.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Comparison -->
+        <section class="glass card" style="padding: 4rem; margin: 8rem 0; text-align: left;">
+            <h3 style="font-size: 2rem; margin-bottom: 2rem;">The Nebula Difference</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th style="color: var(--text-secondary);">Capability</th>
+                        <th style="color: var(--error);">Old Manual Way</th>
+                        <th style="color: var(--success);">The AI Method</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Sourcing Speed</strong></td>
+                        <td><span class="cross-icon">✕</span> 50 items / hour</td>
+                        <td><span class="check-icon">✓</span> 5,000+ items / minute</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Accuracy</strong></td>
+                        <td><span class="cross-icon">✕</span> Guesstimates</td>
+                        <td><span class="check-icon">✓</span> 100% Precise Math</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Competition</strong></td>
+                        <td><span class="cross-icon">✕</span> High (Same leads)</td>
+                        <td><span class="check-icon">✓</span> Low (Unique AI logic)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Execution</strong></td>
+                        <td><span class="cross-icon">✕</span> You work for the biz</td>
+                        <td><span class="check-icon">✓</span> AI agents work for you</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Final CTA -->
+        <section style="margin: 8rem 0; padding: 6rem; background: rgba(0, 113, 227, 0.05); border-radius: var(--radius-lg); border: 1px solid rgba(0, 113, 227, 0.2);">
+            <h2 style="font-size: 3.5rem; margin-bottom: 1.5rem;">Ready to Automate Your Profits?</h2>
+            <p class="subheadline" style="margin-bottom: 3rem;">Stop sourcing. Start managing. Let our AI agents find the gold while you build the empire.</p>
+            <button data-tf-popup="H1zR6X" class="cta-btn-lg">Initialize AI Enrollment</button>
+        </section>
+    </main>
+
+    <script>
+        // Star Generation
+        const starsContainer = document.getElementById('bgStars');
+        for (let i = 0; i < 150; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 2;
+            star.style.width = size + 'px';
+            star.style.height = size + 'px';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.setProperty('--d', (Math.random() * 3 + 2) + 's');
+            star.style.animationDelay = Math.random() * 5 + 's';
+            starsContainer.appendChild(star);
+        }
+
+        // Timer Logic
+        let time = 15 * 60 * 60 + 34 * 60 + 12;
+        const timerEl = document.getElementById('timer');
+        setInterval(() => {
+            time--;
+            if (time <= 0) time = 0;
+            const h = Math.floor(time / 3600);
+            const m = Math.floor((time % 3600) / 60);
+            const s = time % 60;
+            timerEl.textContent = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }, 1000);
+    </script>
+</body>
+</html>

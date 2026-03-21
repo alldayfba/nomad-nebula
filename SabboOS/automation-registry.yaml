@@ -1,0 +1,18 @@
+# Automation Registry — Master list of all Zapier + GHL automations
+# Updated by AutomationBuilder agent
+# Format: one entry per automation
+
+automations: []
+# Example entry:
+# - id: "AUT-001"
+#   name: "New Lead → Slack + Google Sheet"
+#   platform: "zapier"
+#   business: "agency"
+#   status: "active"
+#   trigger_summary: "GHL webhook on new contact"
+#   action_summary: "Post to #leads Slack channel + append to Leads Google Sheet"
+#   created: "2026-03-14"
+#   last_tested: "2026-03-14"
+#   monthly_runs: 150
+#   zapier_folder: "Agency/"
+#   notes: ""

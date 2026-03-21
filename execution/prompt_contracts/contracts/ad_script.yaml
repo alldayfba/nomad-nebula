@@ -1,0 +1,62 @@
+name: ad_script
+version: "1.0"
+description: "Meta/YouTube ad script for paid campaigns"
+
+input:
+  required:
+    - offer:
+        type: string
+        description: "The offer being promoted (Agency OS or Amazon OS)"
+    - platform:
+        type: string
+        description: "Ad platform (Meta, YouTube, TikTok)"
+    - target_audience:
+        type: string
+        description: "ICP description"
+  optional:
+    - ad_type:
+        type: string
+        default: "direct_response"
+        description: "direct_response, awareness, retargeting"
+    - duration:
+        type: string
+        default: "30-60s"
+        description: "Target video length"
+    - hook_angle:
+        type: string
+        description: "Specific angle for the hook (pain, curiosity, authority)"
+
+output:
+  format: markdown
+  sections:
+    - hook
+    - problem
+    - agitate
+    - solution
+    - proof
+    - cta
+  constraints:
+    total_words: "150-400"
+    no_placeholders: true
+
+definition_of_done:
+  - "All 6 sections present (hook, problem, agitate, solution, proof, CTA)"
+  - "Hook is under 15 words and creates curiosity or tension"
+  - "Proof section includes specific numbers or social proof"
+  - "CTA is clear and single-action"
+  - "No placeholder text"
+  - "Tone matches platform (casual for Meta, slightly longer for YouTube)"
+
+failure_conditions:
+  - "Hook is over 15 words or doesn't create immediate curiosity/tension"
+  - "No specific numbers or social proof in the proof section"
+  - "CTA has multiple competing actions instead of one clear next step"
+  - "Problem/agitate sections are generic — could apply to any business"
+  - "Solution section reveals everything (no reason to click/engage)"
+  - "Contains placeholder text or [FILL IN] markers"
+  - "Tone mismatch — formal language on a casual platform or vice versa"
+
+error_handling:
+  missing_input: "ask_user"
+  validation_fail: "auto_revise_max_2"
+  partial_output: "abort"

@@ -1,0 +1,263 @@
+# Scheduled Skills Configuration
+# Maps skills to cron execution schedules
+# Runner: execution/run_scheduled_skills.py
+# Integration: launchd plist or Modal cron
+
+schedules:
+  # Daily
+  - skill: morning-brief
+    cron: "0 8 * * *"          # 8 AM daily
+    script: execution/send_morning_briefing.py
+    auto_run: true
+    expensive: true
+    description: Daily CEO briefing with competitor intel and KPIs
+
+  # Weekly
+  - skill: competitor-intel
+    cron: "0 7 * * 1"          # 7 AM Mondays
+    script: execution/scrape_competitor_ads.py
+    args: "--business agency"
+    auto_run: true
+    description: Weekly Meta Ad Library competitor scrape
+
+  - skill: competitor-intel
+    cron: "0 7 * * 1"          # 7 AM Mondays (coaching)
+    script: execution/scrape_competitor_ads.py
+    args: "--business coaching"
+    auto_run: true
+    description: Weekly coaching competitor scrape
+
+  # Twice weekly
+  - skill: training-officer-scan
+    cron: "0 6 * * 1,4"        # 6 AM Mon + Thu
+    script: execution/training_officer_scan.py
+    auto_run: true
+    description: Training Officer agent health scan and proposal generation
+
+  - skill: client-health
+    cron: "0 9 * * 1,4"        # 9 AM Mon + Thu
+    script: execution/client_health_monitor.py
+    args: "health-report"
+    auto_run: true
+    description: Client health scoring and at-risk detection
+
+  # Weekly
+  - skill: pipeline-analytics
+    cron: "0 9 * * 5"          # 9 AM Fridays
+    script: execution/pipeline_analytics.py
+    args: "report --period weekly"
+    auto_run: true
+    description: Weekly funnel conversion report
+
+  # Daily (sourcing)
+  - skill: source-products
+    cron: "0 6 * * *"          # 6 AM daily
+    script: execution/scheduled_sourcing.py
+    args: "run-due"
+    auto_run: true
+    description: Run due scheduled sourcing bookmarks
+
+  # Daily (project health)
+  - skill: project-status
+    cron: "0 7 * * *"          # 7 AM daily
+    script: execution/project_manager.py
+    args: "health-report"
+    auto_run: true
+    description: Daily project health check and at-risk detection
+
+  - skill: project-status
+    cron: "30 7 * * *"         # 7:30 AM daily
+    script: execution/project_manager.py
+    args: "congruence"
+    auto_run: true
+    description: Daily system congruence check
+
+  # Auto Research — Self-Improving System (Karpathy pattern)
+  - skill: auto-research-meta
+    cron: "0 */4 * * *"          # Every 4 hours
+    script: execution/auto-research/meta_orchestrator.py
+    auto_run: true
+    expensive: true
+    description: Run all 3 optimizers (memory, skill, growth) + cross-pollinate learnings
+
+  - skill: auto-research-memory
+    cron: "0 2 * * *"            # 2 AM daily (extra cycle)
+    script: execution/auto-research/memory-optimizer/orchestrator.py
+    args: "--cycles 5"
+    auto_run: true
+    expensive: true
+    description: 5 memory quality improvement cycles overnight
+
+  # CSM — Student Health Monitoring
+  - skill: student-health
+    cron: "0 7 * * *"            # 7 AM daily
+    script: execution/student_health_monitor.py
+    args: "daily-scan"
+    auto_run: true
+    description: CSM daily student health scan, at-risk detection, and auto-DM queue
+
+  - skill: student-health
+    cron: "0 9 * * 5"            # 9 AM Fridays
+    script: execution/student_health_monitor.py
+    args: "leaderboard"
+    auto_run: true
+    description: Weekly student leaderboard generation for Discord
+
+  - skill: student-health
+    cron: "0 17 * * *"           # 5 PM daily
+    script: execution/student_health_monitor.py
+    args: "engagement-digest"
+    auto_run: true
+    description: Daily student engagement digest for CEO brain
+
+  - skill: student-health
+    cron: "0 8 * * 1"            # 8 AM Mondays
+    script: execution/student_health_monitor.py
+    args: "graduation-check"
+    auto_run: true
+    description: Weekly graduation pipeline check (Day 75-90 students)
+
+  - skill: student-health
+    cron: "30 7 * * *"           # 7:30 AM daily (after health scan)
+    script: execution/student_saas_sync.py
+    args: "sync"
+    auto_run: true
+    description: Bidirectional student progress sync with 247profits.org SaaS
+
+  # CSM — Coaching Cadence (accountability prompts)
+  - skill: student-health
+    cron: "0 8 * * 1"            # 8 AM Mondays
+    script: execution/coaching_cadence.py
+    args: "send-accountability --day monday --channel-id 1250966307021656115"
+    auto_run: true
+    description: Monday focus accountability prompt in IC groupchat
+
+  - skill: student-health
+    cron: "0 8 * * 3"            # 8 AM Wednesdays
+    script: execution/coaching_cadence.py
+    args: "send-accountability --day wednesday --channel-id 1250966307021656115"
+    auto_run: true
+    description: Wednesday midweek check-in prompt
+
+  - skill: student-health
+    cron: "0 8 * * 5"            # 8 AM Fridays
+    script: execution/coaching_cadence.py
+    args: "send-accountability --day friday --channel-id 1250966307021656115"
+    auto_run: true
+    description: Friday win collection prompt
+
+  # CSM — Daily Challenges
+  - skill: student-health
+    cron: "0 9 * * *"            # 9 AM daily
+    script: execution/coaching_cadence.py
+    args: "send-challenge --channel-id 1250966307021656115"
+    auto_run: true
+    description: Daily group challenge post
+
+  # CSM — Testimonial auto-requests
+  - skill: student-health
+    cron: "0 10 * * *"           # 10 AM daily
+    script: execution/testimonial_engine.py
+    args: "auto-request"
+    auto_run: true
+    description: Auto-request testimonials for qualifying milestone students
+
+  # CSM — Graduation pipeline
+  - skill: student-health
+    cron: "0 8 * * 1"            # 8 AM Mondays (after graduation-check)
+    script: execution/graduation_flow.py
+    args: "send-next"
+    auto_run: true
+    description: Send next graduation sequence touchpoints
+
+  # CSM — Auto-DM Outreach Engine (process queued touchpoints)
+  - skill: student-health
+    cron: "*/30 * * * *"          # Every 30 minutes
+    script: execution/auto_outreach_engine.py
+    args: "process"
+    auto_run: false
+    description: Process queued intervention DMs (DISABLED — requires Sabbo approval before sending)
+
+  # CSM — Sourcing Drops (weekly Monday product drops)
+  # DISABLED: Sabbo must approve before any student-facing sends
+  - skill: student-health
+    cron: "0 7 * * 1"            # 7 AM Mondays
+    script: execution/sourcing_drop.py
+    args: "weekly-drop --channel-id 1250966307021656115 --dry-run"
+    auto_run: false
+    description: Post weekly sourcing product drops for students (REQUIRES MANUAL APPROVAL)
+
+  # CSM — Sourcing Dispatch (stuck students get products)
+  # DISABLED: Sabbo must approve before any student-facing sends
+  - skill: student-health
+    cron: "0 10 * * 2,5"         # 10 AM Tue + Fri
+    script: execution/sourcing_drop.py
+    args: "dispatch-stuck --days 14 --dry-run"
+    auto_run: false
+    description: Auto-dispatch sourcing results to students stuck on product milestones (REQUIRES MANUAL APPROVAL)
+
+  # CSM — Exit Interview / Win-Back (process sequences)
+  - skill: student-health
+    cron: "0 11 * * *"           # 11 AM daily
+    script: execution/exit_interview.py
+    args: "send-next"
+    auto_run: false
+    description: Send next win-back touchpoint for churning students (DISABLED — requires Sabbo approval)
+
+  # CSM — Churn Analysis (weekly report)
+  - skill: student-health
+    cron: "0 9 * * 5"            # 9 AM Fridays
+    script: execution/exit_interview.py
+    args: "report"
+    auto_run: true
+    description: Weekly churn root cause analysis
+
+  # CSM — Milestone Rewards (scan for ungiven rewards)
+  - skill: student-health
+    cron: "0 8 * * *"            # 8 AM daily
+    script: execution/milestone_rewards.py
+    args: "scan"
+    auto_run: true
+    description: Check for milestone completions and grant rewards + celebrations
+
+  # CSM — Accountability Pods (weekly check-in)
+  - skill: student-health
+    cron: "0 9 * * 0"            # 9 AM Sundays
+    script: execution/accountability_pods.py
+    args: "send-checkin"
+    auto_run: true
+    description: Weekly accountability pod check-in prompts
+
+  # CSM — Pod Rotation (monthly)
+  - skill: student-health
+    cron: "0 8 1 * *"            # 8 AM 1st of each month
+    script: execution/accountability_pods.py
+    args: "rotate"
+    auto_run: true
+    description: Monthly pod rotation for fresh accountability groups
+
+  # ── Sync Orchestrator — Cross-System Data Bridges ──────────────────────
+
+  # Full sync: all bridges (students, churn, testimonials, Discord, leads)
+  - skill: sync-all
+    cron: "0 6 * * *"            # 6 AM daily (before morning brief)
+    script: execution/sync_orchestrator.py
+    args: "all"
+    auto_run: true
+    description: Full cross-system sync — all 6 bridges
+
+  # Ad metrics sync (weekly — avoid burning Meta API quota daily)
+  - skill: sync-ads
+    cron: "0 5 * * 1"            # 5 AM Mondays
+    script: execution/sync_orchestrator.py
+    args: "ads --days 7"
+    auto_run: true
+    description: Push Meta Ads metrics to 247growth for CAC calculations
+
+  # Churn alerts (twice daily — morning + afternoon → 247profits student dashboard)
+  - skill: sync-churn
+    cron: "0 7,14 * * *"         # 7 AM + 2 PM daily
+    script: execution/sync_orchestrator.py
+    args: "churn-alerts"
+    auto_run: true
+    description: Push at-risk/churned student alerts to 247profits for student dashboard

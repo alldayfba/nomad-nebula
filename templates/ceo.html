@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>247profits — CEO Command Center</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <style>
+        .severity-high { background: var(--error); color: white; }
+        .severity-medium { background: var(--warning); color: white; }
+        .severity-low { background: var(--success); color: white; }
+        .severity-none { background: rgba(0,0,0,0.05); color: var(--text-secondary); }
+        
+        .status-ok { color: var(--success); }
+        .status-warn { color: var(--warning); }
+        .status-crit { color: var(--error); }
+        
+        .funnel-bar { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .funnel-bar-low { background: var(--error); }
+        
+        .badge { font-size: 0.65rem; padding: 0.15rem 0.6rem; border-radius: var(--radius-full); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .grid-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .grid-main { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+        .grid-triple { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-bottom: 2rem; }
+        
+        .dispatch-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+        .btn-dispatch { 
+            padding: 0.75rem; 
+            border-radius: var(--radius-sm); 
+            font-size: 0.8rem; 
+            font-weight: 600; 
+            border: 1px solid var(--glass-border); 
+            background: rgba(0, 113, 227, 0.05);
+            color: var(--accent);
+            text-align: left;
+            transition: var(--transition);
+        }
+        .btn-dispatch:hover { background: var(--accent); color: white; transform: translateY(-2px); }
+
+        .list-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 0.75rem; 
+            border-bottom: 1px solid var(--glass-border);
+            transition: var(--transition);
+        }
+        .list-item:last-child { border-bottom: none; }
+        .list-item:hover { background: rgba(0, 113, 227, 0.02); }
+
+        .constraint-banner {
+            padding: 2rem;
+            border-left: 6px solid var(--warning);
+            margin-bottom: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-layer">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <main class="container" style="padding: 4rem 0;">
+        <header style="margin-bottom: 4rem; display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+                <div class="logo" style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="16" r="14" stroke="url(#logo-grad)" stroke-width="2.5" />
+                        <circle cx="16" cy="16" r="6" fill="url(#logo-grad)" />
+                        <defs>
+                            <linearGradient id="logo-grad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#0071e3" />
+                                <stop offset="100%" stop-color="#5e5ce6" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="text-gradient">247profits</span>
+                </div>
+                <h1 style="font-size: 3rem; margin-bottom: 0.5rem;">CEO Command Center</h1>
+                <p style="color: var(--text-secondary); font-size: 1.1rem;">Constraint detection, delegation, and ecosystem health.</p>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <a href="/dashboard" class="btn" style="background: rgba(0,0,0,0.05); color: var(--text-primary);">Dashboard</a>
+                <button onclick="refreshAll()" class="btn btn-primary" style="padding: 0.75rem 2rem;">Refresh System</button>
+            </div>
+        </header>
+
+        <!-- Constraint Banner -->
+        <section id="constraint-banner" class="glass card constraint-banner">
+            <div>
+                <p style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.1em; margin-bottom: 0.5rem;">Critical Priority</p>
+                <h2 id="constraint-text" style="font-size: 1.75rem; margin-bottom: 0.25rem;">Detecting constraints...</h2>
+                <p id="constraint-detail" style="color: var(--text-secondary); font-size: 0.95rem;"></p>
+            </div>
+            <div id="constraint-badge" class="badge" style="padding: 0.5rem 1.5rem; font-size: 0.8rem;">—</div>
+        </section>
+
+        <!-- High Level Stats -->
+        <section class="grid-stats">
+            <div class="glass card" style="padding: 1.5rem;">
+                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.5rem;">Bottleneck</p>
+                <h3 id="stat-bottleneck" style="font-size: 1.5rem; color: var(--warning);">—</h3>
+            </div>
+            <div class="glass card" style="padding: 1.5rem;">
+                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.5rem;">Clients At Risk</p>
+                <h3 id="stat-clients-risk" style="font-size: 1.5rem; color: var(--error);">—</h3>
+            </div>
+            <div class="glass card" style="padding: 1.5rem;">
+                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.5rem;">Students At Risk</p>
+                <h3 id="stat-students-risk" style="font-size: 1.5rem; color: var(--error);">—</h3>
+            </div>
+            <div class="glass card" style="padding: 1.5rem;">
+                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.5rem;">Pending Proposals</p>
+                <h3 id="stat-proposals" style="font-size: 1.5rem; color: var(--accent);">—</h3>
+            </div>
+            <div class="glass card" style="padding: 1.5rem;">
+                <p style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.5rem;">Memory Brain</p>
+                <h3 id="stat-brain" style="font-size: 1.25rem; color: var(--success);">—</h3>
+            </div>
+        </section>
+
+        <section class="grid-main">
+            <!-- Pipeline Funnel -->
+            <div class="glass card" style="padding: 2rem;">
+                <h3 style="margin-bottom: 1.5rem;">Weekly Pipeline Performance</h3>
+                <div id="funnel-agency" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Initializing agency analytics...</p>
+                </div>
+                <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
+                    <p style="font-size: 0.7rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 1rem;">Coaching Division</p>
+                    <div id="funnel-coaching" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Initializing coaching analytics...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Client Health List -->
+            <div class="glass card" style="padding: 2rem;">
+                <h3 style="margin-bottom: 1.5rem;">Portfolio Health Monitor</h3>
+                <div id="client-health-list" style="max-height: 500px; overflow-y: auto;">
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Scanning client status...</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid-main">
+            <!-- Student Progress -->
+            <div class="glass card" style="padding: 2rem;">
+                <h3 style="margin-bottom: 1.5rem;">Student Success Pipeline</h3>
+                <div id="student-list" style="max-height: 400px; overflow-y: auto;">
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Tracking student progress...</p>
+                </div>
+            </div>
+
+            <!-- Outreach -->
+            <div class="glass card" style="padding: 2rem;">
+                <h3 style="margin-bottom: 1.5rem;">Outreach Campaign Performance</h3>
+                <div id="outreach-stats">
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Aggregating sequence data...</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid-triple">
+            <!-- Agents -->
+            <div class="glass card" style="padding: 1.5rem;">
+                <h4 style="margin-bottom: 1rem; font-size: 0.9rem;">Specialized Agents</h4>
+                <div id="agent-status-list" style="max-height: 300px; overflow-y: auto;"></div>
+            </div>
+
+            <!-- Proposals -->
+            <div class="glass card" style="padding: 1.5rem;">
+                <h4 style="margin-bottom: 1rem; font-size: 0.9rem;">Decision Queue</h4>
+                <div id="proposals-list" style="max-height: 300px; overflow-y: auto;"></div>
+            </div>
+
+            <!-- Delegations -->
+            <div class="glass card" style="padding: 1.5rem;">
+                <h4 style="margin-bottom: 1rem; font-size: 0.9rem;">Execution Log</h4>
+                <div id="delegations-list" style="max-height: 300px; overflow-y: auto;"></div>
+            </div>
+        </section>
+
+        <section class="grid-main" style="align-items: start;">
+            <!-- Dispatcher -->
+            <div class="glass card" style="padding: 2rem;">
+                <h3 style="margin-bottom: 1.5rem;">Neural Dispatch</h3>
+                <div class="dispatch-grid">
+                    <button onclick="dispatch('ads-copy', 'CPL optimization')" class="btn-dispatch">Ads Specialist</button>
+                    <button onclick="dispatch('outreach', 'Dream 100 flow')" class="btn-dispatch">Outreach Bot</button>
+                    <button onclick="dispatch('content', 'VSL generation')" class="btn-dispatch">Content Pro</button>
+                    <button onclick="dispatch('sourcing', 'Product research')" class="btn-dispatch">Sourcing Bot</button>
+                    <button onclick="dispatch('amazon', 'Student coaching')" class="btn-dispatch">Amazon Agent</button>
+                    <button onclick="dispatch('training-officer', 'Knowledge sync')" class="btn-dispatch">System Tech</button>
+                </div>
+            </div>
+
+            <!-- Changelog -->
+            <div class="glass card" style="padding: 2rem;">
+                <h3 style="margin-bottom: 1.5rem;">System Mutation Log</h3>
+                <div id="changelog-list" style="font-family: monospace; font-size: 0.75rem; color: var(--text-secondary); max-height: 200px; overflow-y: auto; line-height: 1.6;">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        async function fetchJSON(url) {
+            try {
+                const resp = await fetch(url);
+                if (!resp.ok) return null;
+                return await resp.json();
+            } catch { return null; }
+        }
+
+        const BENCHMARKS = {
+            agency: {
+                'leads->icp_qualified': 40, 'icp_qualified->emails_sent': 90,
+                'emails_sent->replies': 5, 'replies->calls_booked': 30,
+                'calls_booked->shows': 65, 'shows->closes': 20
+            },
+            coaching: {
+                'leads->icp_qualified': 35, 'icp_qualified->emails_sent': 90,
+                'emails_sent->replies': 5, 'replies->calls_booked': 35,
+                'calls_booked->shows': 65, 'shows->closes': 25
+            }
+        };
+
+        const STEPS = ['leads', 'icp_qualified', 'emails_sent', 'replies', 'calls_booked', 'shows', 'closes'];
+
+        function renderFunnel(containerId, data, biz) {
+            const el = document.getElementById(containerId);
+            if (!data || !data.funnel || Object.keys(data.funnel).length === 0) {
+                el.innerHTML = '<p style="color: var(--text-secondary); font-size: 0.85rem;">No active signal detected.</p>';
+                return;
+            }
+            const funnel = data.funnel;
+            const maxCount = Math.max(...STEPS.map(s => (funnel[s]?.count || 0)), 1);
+            let html = '';
+            for (let i = 0; i < STEPS.length; i++) {
+                const step = STEPS[i];
+                const count = funnel[step]?.count || 0;
+                const width = Math.max((count / maxCount) * 100, 2);
+                let convText = '';
+                if (i > 0) {
+                    const prev = funnel[STEPS[i-1]]?.count || 0;
+                    if (prev > 0) {
+                        const rate = ((count / prev) * 100).toFixed(1);
+                        const key = `${STEPS[i-1]}->${step}`;
+                        const bench = (BENCHMARKS[biz] || {})[key] || 0;
+                        const isLow = parseFloat(rate) < bench;
+                        convText = `<span style="color: ${isLow ? 'var(--error)' : 'var(--text-secondary)'}">${rate}%${bench ? ` <small>/ ${bench}%</small>` : ''}</span>`;
+                    }
+                }
+                html += `
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span style="font-size: 0.75rem; font-weight: 600; text-transform: capitalize; width: 100px;">${step.replace('_', ' ')}</span>
+                    <div style="flex: 1; height: 12px; background: rgba(0,0,0,0.05); border-radius: var(--radius-full); overflow: hidden;">
+                        <div class="funnel-bar ${convText.includes('var(--error)') ? 'funnel-bar-low' : ''}" style="width: ${width}%"></div>
+                    </div>
+                    <span style="font-size: 0.8rem; font-weight: 700; width: 40px; text-align: right;">${count}</span>
+                    <span style="font-size: 0.75rem; width: 80px; text-align: right;">${convText}</span>
+                </div>`;
+            }
+            el.innerHTML = html;
+        }
+
+        async function refreshAll() {
+            const constraint = await fetchJSON('/ceo/api/constraint');
+            if (constraint) {
+                const ct = document.getElementById('constraint-text');
+                const cd = document.getElementById('constraint-detail');
+                const cb = document.getElementById('constraint-badge');
+                const banner = document.getElementById('constraint-banner');
+                if (constraint.step) {
+                    ct.textContent = constraint.step;
+                    cd.textContent = `Conversion: ${constraint.current_rate}% (Target: ${constraint.benchmark_rate}%) | Delta: -${constraint.gap}%`;
+                    cb.textContent = constraint.business?.toUpperCase() || 'AGENCY';
+                    cb.className = 'badge severity-medium';
+                    banner.style.borderLeftColor = 'var(--warning)';
+                    document.getElementById('stat-bottleneck').textContent = constraint.step.split('->')[1] || constraint.step;
+                } else {
+                    ct.textContent = 'System Optimal';
+                    cd.textContent = 'No bottlenecks detected in current active pipeline.';
+                    cb.textContent = 'STABLE';
+                    cb.className = 'badge severity-low';
+                    banner.style.borderLeftColor = 'var(--success)';
+                    document.getElementById('stat-bottleneck').textContent = 'None';
+                }
+            }
+
+            const pipeline = await fetchJSON('/ceo/api/pipeline');
+            if (pipeline) {
+                renderFunnel('funnel-agency', pipeline.agency, 'agency');
+                renderFunnel('funnel-coaching', pipeline.coaching, 'coaching');
+            }
+
+            const clients = await fetchJSON('/ceo/api/client-health');
+            if (clients && clients.clients) {
+                const el = document.getElementById('client-health-list');
+                el.innerHTML = clients.clients.length === 0 ? '<p style="color: var(--text-secondary); font-size: 0.85rem;">No active clients.</p>' : 
+                    clients.clients.map(c => {
+                        const color = c.health_score >= 60 ? 'status-ok' : c.health_score >= 30 ? 'status-warn' : 'status-crit';
+                        return `
+                        <div class="list-item">
+                            <span style="font-size: 0.9rem; font-weight: 600;">${c.name}</span>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <span style="font-size: 0.8rem; color: var(--text-secondary);">$${(c.mrr || 0).toLocaleString()}</span>
+                                <span class="${color}" style="font-weight: 800; font-size: 1rem;">${c.health_score}</span>
+                            </div>
+                        </div>`;
+                    }).join("");
+                document.getElementById('stat-clients-risk').textContent = clients.at_risk_count || 0;
+            }
+
+            const students = await fetchJSON('/ceo/api/student-health');
+            if (students && students.students) {
+                const el = document.getElementById('student-list');
+                el.innerHTML = students.students.length === 0 ? '<p style="color: var(--text-secondary); font-size: 0.85rem;">No students tracked.</p>' :
+                    students.students.map(s => `
+                    <div class="list-item">
+                        <div>
+                            <span style="font-size: 0.9rem; font-weight: 600;">${s.name}</span>
+                            <span style="font-size: 0.7rem; color: var(--text-secondary); margin-left: 0.5rem;">Tier ${s.tier}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <span style="font-size: 0.75rem; color: var(--text-secondary);">${(s.current_milestone || '').replace('_', ' ')}</span>
+                            <span class="badge ${s.status === 'at_risk' ? 'severity-high' : 'severity-none'}">${s.status}</span>
+                        </div>
+                    </div>`).join("");
+                document.getElementById('stat-students-risk').textContent = students.at_risk_count || 0;
+            }
+
+            const outreach = await fetchJSON('/ceo/api/outreach-stats');
+            if (outreach && outreach.stats) {
+                const s = outreach.stats;
+                document.getElementById('outreach-stats').innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div style="padding: 1rem; background: rgba(0,0,0,0.02); border-radius: var(--radius-sm);">
+                            <p style="font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Total Active</p>
+                            <p style="font-size: 1.25rem; font-weight: 800;">${s.total_prospects}</p>
+                        </div>
+                        <div style="padding: 1rem; background: rgba(0,0,0,0.02); border-radius: var(--radius-sm);">
+                            <p style="font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Reply Rate</p>
+                            <p style="font-size: 1.25rem; font-weight: 800; color: var(--success);">${s.response_rate}%</p>
+                        </div>
+                        <div style="padding: 1rem; background: rgba(0,0,0,0.02); border-radius: var(--radius-sm);">
+                            <p style="font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Book Rate</p>
+                            <p style="font-size: 1.25rem; font-weight: 800; color: var(--accent);">${s.book_rate}%</p>
+                        </div>
+                        <div style="padding: 1rem; background: rgba(0,0,0,0.02); border-radius: var(--radius-sm);">
+                            <p style="font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Pending</p>
+                            <p style="font-size: 1.25rem; font-weight: 800; color: var(--warning);">${s.touches_pending}</p>
+                        </div>
+                    </div>`;
+            }
+
+            const agents = await fetchJSON('/ceo/api/agent-status');
+            if (agents) {
+                document.getElementById('agent-status-list').innerHTML = Object.entries(agents).map(([n, h]) => `
+                    <div class="list-item">
+                        <span style="font-size: 0.85rem; font-weight: 600;">${n}</span>
+                        <span class="badge ${h.status === 'current' ? 'severity-low' : 'severity-high'}">${h.status}</span>
+                    </div>`).join("");
+            }
+
+            const proposals = await fetchJSON('/ceo/api/pending-proposals');
+            if (proposals) {
+                document.getElementById('proposals-list').innerHTML = proposals.length === 0 ? '<p style="color: var(--text-secondary); font-size: 0.8rem;">Queue clear.</p>' :
+                    proposals.map(p => `
+                    <div style="padding: 0.75rem; border-bottom: 1px solid var(--glass-border);">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                            <span style="font-size: 0.6rem; font-family: monospace; color: var(--accent);">${p.id}</span>
+                            <span style="font-size: 0.6rem; font-weight: 800; text-transform: uppercase;">${p.agent}</span>
+                        </div>
+                        <p style="font-size: 0.8rem; font-weight: 600;">${p.title}</p>
+                    </div>`).join("");
+                document.getElementById('stat-proposals').textContent = proposals.length;
+            }
+
+            const delegations = await fetchJSON('/ceo/api/delegations');
+            if (delegations) {
+                document.getElementById('delegations-list').innerHTML = delegations.length === 0 ? '<p style="color: var(--text-secondary); font-size: 0.8rem;">No recent actions.</p>' :
+                    delegations.slice(-8).reverse().map(d => `
+                    <div style="padding: 0.75rem; border-bottom: 1px solid var(--glass-border);">
+                        <p style="font-size: 0.75rem; font-weight: 600; margin-bottom: 0.15rem;">${d.task}</p>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.6rem; color: var(--text-secondary);">
+                            <span>${d.agent}</span>
+                            <span>${d.date}</span>
+                        </div>
+                    </div>`).join("");
+            }
+
+            const brain = await fetchJSON('/ceo/api/brain-health');
+            if (brain) {
+                const el = document.getElementById('stat-brain');
+                el.textContent = brain.exists ? `${brain.lines}L / ${brain.sections}S` : 'OFFLINE';
+                el.style.color = brain.exists ? (brain.lines > 3000 ? 'var(--warning)' : 'var(--success)') : 'var(--error)';
+            }
+
+            const changelog = await fetchJSON('/ceo/api/changelog');
+            if (changelog) {
+                document.getElementById('changelog-list').innerHTML = changelog.reverse().slice(0, 50).map(e => `
+                    <div style="margin-bottom: 0.25rem;">
+                        <span style="color: var(--accent);">${e.date}</span> ${e.file}: ${e.change.substring(0, 100)}...
+                    </div>`).join("");
+            }
+        }
+
+        async function dispatch(agent, constraint) {
+            const output = prompt(`Neural dispatch target for ${agent}:`, constraint);
+            if (!output) return;
+            const resp = await fetch('/ceo/api/dispatch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ agent, constraint, output })
+            });
+            const data = await resp.json();
+            alert(data.message || 'Transmission sent');
+        }
+
+        refreshAll();
+        setInterval(refreshAll, 60000);
+    </script>
+</body>
+</html>
