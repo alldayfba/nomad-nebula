@@ -13,11 +13,20 @@ from datetime import datetime
 from pathlib import Path
 from flask import Flask, render_template, request, jsonify, Response, stream_with_context
 from flask_cors import CORS
-from scraper import run_scraper
+
+# Lazy imports for modules with heavy deps (playwright, etc.)
+# These won't be available on Vercel but the web UI routes still work
+try:
+    from scraper import run_scraper
+except ImportError:
+    run_scraper = None  # type: ignore
 
 # Make execution/ importable
 sys.path.insert(0, str(Path(__file__).parent / "execution"))
-from generate_business_audit import run_audit
+try:
+    from generate_business_audit import run_audit
+except ImportError:
+    run_audit = None  # type: ignore
 
 app = Flask(__name__)
 CORS(app, resources={
