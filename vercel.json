@@ -1,6 +1,11 @@
 {
   "builds": [
     {
+      "src": "landing/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    },
+    {
       "src": "app.py",
       "use": "@vercel/python"
     },
@@ -10,13 +15,17 @@
     }
   ],
   "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/app.py"
-    }
+    { "src": "/static/(.*)", "dest": "/static/$1" },
+    { "src": "/scrape", "dest": "/app.py" },
+    { "src": "/export", "dest": "/app.py" },
+    { "src": "/audit(.*)", "dest": "/app.py" },
+    { "src": "/sourcing(.*)", "dest": "/app.py" },
+    { "src": "/dashboard(.*)", "dest": "/app.py" },
+    { "src": "/ceo(.*)", "dest": "/app.py" },
+    { "src": "/projects(.*)", "dest": "/app.py" },
+    { "src": "/api/(.*)", "dest": "/app.py" },
+    { "src": "/assets/(.*)", "dest": "/landing/$1" },
+    { "src": "/(.*\\.(js|css|ico|png|jpg|svg|woff2?))", "dest": "/landing/$1" },
+    { "src": "/", "dest": "/landing/index.html" }
   ]
 }

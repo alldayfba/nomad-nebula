@@ -13,6 +13,9 @@ my-video/
 credentials.json
 token.json
 
+# Node
+node_modules/
+
 # Python
 __pycache__/
 *.pyc
