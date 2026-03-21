@@ -11,7 +11,7 @@ import time
 import uuid
 from datetime import datetime
 from pathlib import Path
-from flask import Flask, render_template, request, jsonify, Response, stream_with_context
+from flask import Flask, render_template, request, jsonify, Response, stream_with_context, send_from_directory
 from flask_cors import CORS
 
 # Lazy imports for modules with heavy deps (playwright, etc.)
@@ -54,7 +54,19 @@ _sourcing_lock = threading.Lock()
 
 
 @app.route("/")
-def index():
+def landing():
+    landing_dir = os.path.join(os.path.dirname(__file__), "landing", "dist")
+    return send_from_directory(landing_dir, "index.html")
+
+
+@app.route("/assets/<path:filename>")
+def landing_assets(filename):
+    landing_dir = os.path.join(os.path.dirname(__file__), "landing", "dist", "assets")
+    return send_from_directory(landing_dir, filename)
+
+
+@app.route("/leads")
+def leads():
     return render_template("index.html")
 
 

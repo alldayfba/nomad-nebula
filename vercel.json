@@ -15,15 +15,7 @@
   ],
   "routes": [
     { "src": "/static/(.*)", "dest": "/static/$1" },
-    { "src": "/scrape", "dest": "/app.py" },
-    { "src": "/export", "dest": "/app.py" },
-    { "src": "/audit(.*)", "dest": "/app.py" },
-    { "src": "/sourcing(.*)", "dest": "/app.py" },
-    { "src": "/dashboard(.*)", "dest": "/app.py" },
-    { "src": "/ceo(.*)", "dest": "/app.py" },
-    { "src": "/projects(.*)", "dest": "/app.py" },
-    { "src": "/api/(.*)", "dest": "/app.py" },
     { "src": "/assets/(.*)", "dest": "/landing/dist/assets/$1" },
-    { "src": "/", "dest": "/landing/dist/index.html" }
+    { "src": "/(.*)", "dest": "/app.py" }
   ]
 }
