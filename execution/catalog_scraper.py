@@ -476,29 +476,49 @@ def _extract_jsonld_product(html: str, url: str) -> dict | None:
     for match in jsonld_pattern.finditer(html):
         try:
             data = json.loads(match.group(1))
+
+            # Handle @graph arrays (common pattern on many e-commerce sites)
+            if isinstance(data, dict) and "@graph" in data:
+                graph = data["@graph"]
+                if isinstance(graph, list):
+                    data = next((d for d in graph if d.get("@type") == "Product"), None)
+                    if not data:
+                        continue
+
             if isinstance(data, list):
                 data = next((d for d in data if d.get("@type") == "Product"), None)
             if not data or data.get("@type") != "Product":
                 continue
 
             upc = None
-            for field in ("gtin12", "gtin13", "gtin", "productID", "sku"):
+            for field in ("gtin12", "gtin13", "gtin", "gtin14", "productID", "sku", "mpn"):
                 val = data.get(field, "")
                 cleaned = _clean_upc(str(val))
                 if cleaned:
                     upc = cleaned
                     break
 
-            # Price from offers
+            # Price from offers (handle multiple nesting patterns)
             price = 0
             offers = data.get("offers", {})
             if isinstance(offers, list):
                 offers = offers[0] if offers else {}
+            # Handle nested offers.offers pattern
+            if isinstance(offers, dict) and "offers" in offers:
+                inner = offers["offers"]
+                if isinstance(inner, list) and inner:
+                    offers = inner[0]
+                elif isinstance(inner, dict):
+                    offers = inner
             price_str = offers.get("price", "0")
             try:
                 price = float(price_str)
             except (ValueError, TypeError):
-                pass
+                # Try lowPrice/highPrice
+                try:
+                    price = float(offers.get("lowPrice", "0"))
+                except (ValueError, TypeError):
+                    pass
 
             return {
                 "title": data.get("name", ""),
@@ -518,12 +538,21 @@ def _extract_jsonld_product(html: str, url: str) -> dict | None:
         except (json.JSONDecodeError, KeyError, TypeError):
             continue
 
-    # ── Fallback: meta tags ─────────────────────────────────────────────
+    # ── Fallback: meta tags + data attributes ────────────────────────────
     upc = None
     for pattern in [
         r'<meta[^>]*itemprop=["\']gtin12["\'][^>]*content=["\'](\d{12})["\']',
         r'<meta[^>]*itemprop=["\']gtin13["\'][^>]*content=["\'](\d{13})["\']',
+        r'<meta[^>]*itemprop=["\']gtin["\'][^>]*content=["\'](\d{12,13})["\']',
         r'<meta[^>]*name=["\']upc["\'][^>]*content=["\'](\d{12,13})["\']',
+        r'<meta[^>]*property=["\']product:upc["\'][^>]*content=["\'](\d{12,13})["\']',
+        r'<meta[^>]*property=["\']og:upc["\'][^>]*content=["\'](\d{12,13})["\']',
+        r'data-upc=["\'](\d{12,13})["\']',
+        r'data-gtin=["\'](\d{12,13})["\']',
+        r'data-ean=["\'](\d{12,13})["\']',
+        r'"upc"\s*:\s*"(\d{12,13})"',
+        r'"gtin12"\s*:\s*"(\d{12})"',
+        r'"gtin13"\s*:\s*"(\d{13})"',
     ]:
         m = re.search(pattern, html, re.IGNORECASE)
         if m:

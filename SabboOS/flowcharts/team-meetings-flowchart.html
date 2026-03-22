@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Meetings Flowchart | 247 Growth</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:hsl(250,18%,6%);--card:hsl(250,16%,9%);--card-hover:hsl(250,16%,11%);--gold:hsl(265,80%,55%);--gold-dim:hsl(265,40%,20%);--white:#F5F5F5;--muted:hsl(250,8%,62%);--green:hsl(142,71%,45%);--yellow:hsl(38,92%,50%);--red:hsl(0,72%,51%);--blue:hsl(217,91%,60%);--radius:14px;--shadow:0 4px 24px rgba(0,0,0,.45);--glow:0 0 30px -5px hsl(265 80% 55% / 0.12);--border:hsl(250,14%,15%)}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,'Inter','Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--white);line-height:1.6;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:24px 16px 80px}
+h1{font-size:1.75rem;font-weight:700;text-align:center;margin-bottom:4px}
+.subtitle{text-align:center;color:var(--muted);font-size:.9rem;margin-bottom:32px}
+.gold{color:var(--gold)}
+
+/* Tabs */
+.tab-bar{display:flex;gap:4px;background:hsla(250,16%,9%,0.85);backdrop-filter:blur(40px) saturate(150%);-webkit-backdrop-filter:blur(40px) saturate(150%);border:1px solid var(--border);border-radius:var(--radius);padding:4px;margin-bottom:32px;flex-wrap:wrap}
+.tab-btn{flex:1;padding:12px 10px;border:none;background:transparent;color:var(--muted);font-size:.82rem;font-weight:600;border-radius:8px;cursor:pointer;transition:all .25s;min-width:100px;text-align:center}
+.tab-btn.active{background:var(--gold);color:var(--bg)}
+.tab-content{display:none;animation:fadeIn .35s ease}
+.tab-content.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* Flow step */
+.flow-step{position:relative;padding-left:36px;margin-bottom:0}
+.flow-step::before{content:'';position:absolute;left:14px;top:0;bottom:0;width:2px;background:hsl(265 80% 55% / 0.15)}
+.flow-step:last-child::before{display:none}
+.step-dot{position:absolute;left:7px;top:20px;width:16px;height:16px;border-radius:50%;background:var(--card);border:2px solid var(--gold);z-index:1}
+.step-dot.active-dot{background:var(--gold);box-shadow:0 0 12px hsl(265 80% 55% / 0.5)}
+
+.step-card{background:hsla(250,16%,9%,0.85);backdrop-filter:blur(40px) saturate(150%);-webkit-backdrop-filter:blur(40px) saturate(150%);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;box-shadow:var(--shadow);transition:all .3s;border-left:3px solid transparent}
+.step-card.current{border-left-color:var(--gold);background:var(--card-hover);box-shadow:var(--glow)}
+.step-card.done{opacity:.6;border-left-color:var(--green)}
+.step-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.step-title{font-weight:700;font-size:1rem}
+.step-time-badge{font-size:.75rem;background:hsl(265 80% 55% / 0.12);color:var(--gold);padding:3px 10px;border-radius:99px;font-weight:600}
+.step-script{background:rgba(255,255,255,.04);border-radius:8px;padding:12px 14px;font-size:.88rem;color:var(--muted);margin-top:10px;border-left:2px solid var(--gold-dim);white-space:pre-line;line-height:1.5}
+.step-prompt{font-style:italic;color:var(--gold-dim);font-size:.88rem;margin-top:6px}
+
+/* Timer */
+.timer-box{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.timer-display{font-family:'SF Mono',SFMono-Regular,ui-monospace,monospace;font-size:1.4rem;font-weight:700;min-width:72px;color:var(--gold)}
+.timer-display.warn{color:var(--red)}
+.timer-btn{padding:8px 16px;border:none;border-radius:8px;font-weight:600;font-size:.82rem;cursor:pointer;transition:all .2s}
+.btn-start{background:var(--green);color:#000}
+.btn-pause{background:var(--yellow);color:#000}
+.btn-reset{background:rgba(255,255,255,.1);color:var(--muted)}
+.btn-next{background:var(--gold);color:var(--bg)}
+
+/* Scorecard */
+.scorecard{width:100%;border-collapse:collapse;margin-top:12px;font-size:.85rem}
+.scorecard th{text-align:left;color:var(--muted);font-weight:600;padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.1)}
+.scorecard td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.05)}
+.scorecard input[type=text],.scorecard input[type=number]{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--white);padding:6px 8px;border-radius:6px;width:100%;font-size:.85rem;font-family:inherit}
+
+/* Notes area */
+.notes-area{width:100%;min-height:100px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:var(--white);padding:12px;font-family:inherit;font-size:.88rem;resize:vertical;margin-top:10px}
+.notes-area:focus{outline:none;border-color:var(--gold);box-shadow:var(--glow)}
+.notes-label{font-size:.82rem;color:var(--muted);margin-top:12px;margin-bottom:4px}
+
+/* Meeting total timer */
+.meeting-timer{text-align:center;margin-bottom:24px;padding:16px;background:hsla(250,16%,9%,0.85);backdrop-filter:blur(40px) saturate(150%);-webkit-backdrop-filter:blur(40px) saturate(150%);border:1px solid var(--border);border-radius:var(--radius)}
+.meeting-timer .label{font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.meeting-timer .big-time{font-family:'SF Mono',SFMono-Regular,ui-monospace,monospace;font-size:2.2rem;font-weight:700;color:var(--gold);margin:4px 0}
+
+@media(max-width:600px){
+  h1{font-size:1.3rem}
+  .tab-btn{font-size:.72rem;padding:10px 6px;min-width:70px}
+  .container{padding:16px 12px 60px}
+  .timer-display{font-size:1.1rem}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Team Meetings <span class="gold">Flowchart</span></h1>
+  <p class="subtitle">247 Growth &mdash; Sales Manager Daily Playbook</p>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="morning">11 AM Meeting</button>
+    <button class="tab-btn" data-tab="eod">6 PM EOD</button>
+    <button class="tab-btn" data-tab="weekly">Weekly Team</button>
+    <button class="tab-btn" data-tab="oneone">Weekly 1-on-1</button>
+  </div>
+
+  <!-- ======= 11 AM TEAM MEETING ======= -->
+  <div class="tab-content active" id="tab-morning">
+    <div class="meeting-timer"><div class="label">Total Meeting Time</div><div class="big-time" id="morning-total">30:00</div></div>
+
+    <div class="flow-step"><div class="step-dot active-dot" id="m-dot-0"></div>
+      <div class="step-card current" id="m-step-0">
+        <div class="step-header"><span class="step-title">1. Energy Check</span><span class="step-time-badge">3 min</span></div>
+        <div class="step-script">"Good morning everyone. Before we get into numbers -- how's everyone feeling today?
+Give me a 1-10 in the chat. 1 is 'barely alive,' 10 is 'ready to run through a wall.'"
+
+If anyone is below a 5: "[Name], what's going on? What do you need today?"
+If everyone is 7+: "Love it. Let's match that energy on the phones today."</div>
+        <div class="timer-box">
+          <span class="timer-display" id="m-timer-0">3:00</span>
+          <button class="timer-btn btn-start" onclick="startTimer('m',0)">Start</button>
+          <button class="timer-btn btn-pause" onclick="pauseTimer('m',0)">Pause</button>
+          <button class="timer-btn btn-reset" onclick="resetTimer('m',0)">Reset</button>
+          <button class="timer-btn btn-next" onclick="nextStep('m',0)">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step"><div class="step-dot" id="m-dot-1"></div>
+      <div class="step-card" id="m-step-1">
+        <div class="step-header"><span class="step-title">2. Yesterday's Wins</span><span class="step-time-badge">5 min</span></div>
+        <div class="step-script">"Alright, wins from yesterday. I want to hear from everyone.
+Doesn't have to be a close -- could be a great conversation, a lesson learned, a new technique that worked. [Name], you're up first."
+
+After each win: "Nice. [Brief acknowledgment or tactical insight.]"
+If someone closed: "[Name] closed yesterday -- [deal details]. Ring the bell. Let's go."</div>
+        <div class="step-prompt">Every rep shares. No spectators. There is always something.</div>
+        <div class="timer-box">
+          <span class="timer-display" id="m-timer-1">5:00</span>
+          <button class="timer-btn btn-start" onclick="startTimer('m',1)">Start</button>
+          <button class="timer-btn btn-pause" onclick="pauseTimer('m',1)">Pause</button>
+          <button class="timer-btn btn-reset" onclick="resetTimer('m',1)">Reset</button>
+          <button class="timer-btn btn-next" onclick="nextStep('m',1)">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step"><div class="step-dot" id="m-dot-2"></div>
+      <div class="step-card" id="m-step-2">
+        <div class="step-header"><span class="step-title">3. Numbers Review</span><span class="step-time-badge">7 min</span></div>
+        <div class="step-script">"Numbers. Here's where we stand."
+
+Yesterday's team numbers:
+- Total dials: ___
+- Connections: ___
+- Appointments set: ___
+- Calls scheduled today: ___
+- Shows yesterday: ___ / ___ = ___% show rate
+- Closes: ___
+- Cash collected: $___
+
+Week-to-date: We're at $___ against $___ target. That's ___%.</div>
+        <table class="scorecard">
+          <tr><th>Metric</th><th>Yesterday</th><th>WTD</th><th>Target</th></tr>
+          <tr><td>Dials</td><td><input type="text" data-save="m-dials-y"></td><td><input type="text" data-save="m-dials-w"></td><td><input type="text" data-save="m-dials-t"></td></tr>
+          <tr><td>Connections</td><td><input type="text" data-save="m-conn-y"></td><td><input type="text" data-save="m-conn-w"></td><td><input type="text" data-save="m-conn-t"></td></tr>
+          <tr><td>Appts Set</td><td><input type="text" data-save="m-appt-y"></td><td><input type="text" data-save="m-appt-w"></td><td><input type="text" data-save="m-appt-t"></td></tr>
+          <tr><td>Shows</td><td><input type="text" data-save="m-shows-y"></td><td><input type="text" data-save="m-shows-w"></td><td><input type="text" data-save="m-shows-t"></td></tr>
+          <tr><td>Closes</td><td><input type="text" data-save="m-closes-y"></td><td><input type="text" data-save="m-closes-w"></td><td><input type="text" data-save="m-closes-t"></td></tr>
+          <tr><td>Cash</td><td><input type="text" data-save="m-cash-y"></td><td><input type="text" data-save="m-cash-w"></td><td><input type="text" data-save="m-cash-t"></td></tr>
+        </table>
+        <div class="timer-box">
+          <span class="timer-display" id="m-timer-2">7:00</span>
+          <button class="timer-btn btn-start" onclick="startTimer('m',2)">Start</button>
+          <button class="timer-btn btn-pause" onclick="pauseTimer('m',2)">Pause</button>
+          <button class="timer-btn btn-reset" onclick="resetTimer('m',2)">Reset</button>
+          <button class="timer-btn btn-next" onclick="nextStep('m',2)">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step"><div class="step-dot" id="m-dot-3"></div>
+      <div class="step-card" id="m-step-3">
+        <div class="step-header"><span class="step-title">4. Today's Focus</span><span class="step-time-badge">10 min</span></div>
+        <div class="step-script">"Today's focus: [ONE thing]."
+
+Examples:
+- "Discovery depth. On every call, go three questions deep."
+- "Energy on the opener. First 30 seconds set the tone."
+- "Clearing the follow-up pipeline before new calls."
+
+Assign specific targets:
+"[Name], I want 60 dials from you today."
+"[Name], you have 5 calls scheduled. Goal is 3 shows minimum."</div>
+        <div class="step-prompt">ONE focus. Not three. Connect it to yesterday's data.</div>
+        <div class="notes-label">Today's Focus Notes</div>
+        <textarea class="notes-area" data-save="m-focus-notes" placeholder="Write today's ONE focus..."></textarea>
+        <div class="timer-box">
+          <span class="timer-display" id="m-timer-3">10:00</span>
+          <button class="timer-btn btn-start" onclick="startTimer('m',3)">Start</button>
+          <button class="timer-btn btn-pause" onclick="pauseTimer('m',3)">Pause</button>
+          <button class="timer-btn btn-reset" onclick="resetTimer('m',3)">Reset</button>
+          <button class="timer-btn btn-next" onclick="nextStep('m',3)">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step"><div class="step-dot" id="m-dot-4"></div>
+      <div class="step-card" id="m-step-4">
+        <div class="step-header"><span class="step-title">5. Pump-Up Close</span><span class="step-time-badge">5 min</span></div>
+        <div class="step-script">"Alright. We've got [X] calls on the calendar today. [X] dials to make.
+The opportunity is right in front of us.
+
+- 'Every dial is a chance to change someone's life. Let's go find them.'
+- 'We're [X]% to target this week. Today we close the gap.'
+- 'Remember why you're here. [Reference a recent win]. That's what's possible.'
+
+Let's have a massive day. Training Block 1 starts in 5."</div>
+        <div class="step-prompt">End on energy, not logistics. Reference real wins. Keep it under 2 minutes.</div>
+        <div class="timer-box">
+          <span class="timer-display" id="m-timer-4">5:00</span>
+          <button class="timer-btn btn-start" onclick="startTimer('m',4)">Start</button>
+          <button class="timer-btn btn-pause" onclick="pauseTimer('m',4)">Pause</button>
+          <button class="timer-btn btn-reset" onclick="resetTimer('m',4)">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= 6 PM EOD MEETING ======= -->
+  <div class="tab-content" id="tab-eod">
+    <div class="meeting-timer"><div class="label">Total Meeting Time</div><div class="big-time" id="eod-total">30:00</div></div>
+
+    <div class="flow-step"><div class="step-dot active-dot" id="e-dot-0"></div>
+      <div class="step-card current" id="e-step-0">
+        <div class="step-header"><span class="step-title">1. Numbers Check</span><span class="step-time-badge">10 min</span></div>
+        <div class="step-script">"EOD numbers. Let's go around the room. [Name], you're first."
+
+SETTERS report: Dials, Connections, Conversations (2 min+), Appointments set
+CLOSERS report: Calls scheduled, Calls shown, Offers given, Closes, Cash collected
+
+"Team total today: [X] dials, [X] convos, [X] booked, [X] closes, $[X] collected."</div>
+        <table class="scorecard">
+          <tr><th>Rep</th><th>Dials/Sched</th><th>Convos/Shown</th><th>Booked/Closed</th><th>Cash</th></tr>
+          <tr><td><input type="text" data-save="e-r1-name" placeholder="Name"></td><td><input type="text" data-save="e-r1-d"></td><td><input type="text" data-save="e-r1-c"></td><td><input type="text" data-save="e-r1-b"></td><td><input type="text" data-save="e-r1-cash"></td></tr>
+          <tr><td><input type="text" data-save="e-r2-name" placeholder="Name"></td><td><input type="text" data-save="e-r2-d"></td><td><input type="text" data-save="e-r2-c"></td><td><input type="text" data-save="e-r2-b"></td><td><input type="text" data-save="e-r2-cash"></td></tr>
+          <tr><td><input type="text" data-save="e-r3-name" placeholder="Name"></td><td><input type="text" data-save="e-r3-d"></td><td><input type="text" data-save="e-r3-c"></td><td><input type="text" data-save="e-r3-b"></td><td><input type="text" data-save="e-r3-cash"></td></tr>
+          <tr><td><input type="text" data-save="e-r4-name" placeholder="Name"></td><td><input type="text" data-save="e-r4-d"></td><td><input type="text" data-save="e-r4-c"></td><td><input type="text" data-save="e-r4-b"></td><td><input type="text" data-save="e-r4-cash"></td></tr>
+        </table>
+        <div class="timer-box">
+          <span class="timer-display" id="e-timer-0">10:00</span>
+          <button class="timer-btn btn-start" onclick="startTimer('e',0)">Start</button>
+          <button class="timer-btn btn-pause" onclick="pauseTimer('e',0)">Pause</button>
+          <button class="timer-btn btn-reset" onclick="resetTimer('e',0)">Reset</button>
+          <button class="timer-btn btn-next" onclick="nextStep('e',0)">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step"><div class="step-dot" id="e-dot-1"></div>
+      <div class="step-card" id="e-step-1">
+        <div class="step-header"><span class="step-title">2. Wins</span><span class="step-time-badge">5 min</span></div>
+        <div class="step-script">"Wins. What was the best thing that happened today?
+Best call, best conversation, best lesson learned."
+
+If someone closed: "[Name] closed! $[X] collected. Let's go!"
+If no closes: "No closes today -- but [X] great conversations and [X] bookings for tomorrow. The pipeline is building."</div>
+        <div class="timer-box">
+          <span class="timer-display" id="e-timer-1">5:00</span>
+          <button class="timer-btn btn-start" onclick="startTimer('e',1)">Start</button>
+          <button class="timer-btn btn-pause" onclick="pauseTimer('e',1)">Pause</button>
+          <button class="timer-btn btn-reset" onclick="resetTimer('e',1)">Reset</button>
+          <button class="timer-btn btn-next" onclick="nextStep('e',1)">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step"><div class="step-dot" id="e-dot-2"></div>
+      <div class="step-card" id="e-step-2">
+        <div class="step-header"><span class="step-title">3. Pipeline Status</span><span class="step-time-badge">10 min</span></div>
+        <div class="step-script">"Pipeline check. What's pending? What needs follow-up tomorrow?"
+
+Each rep reports:
+- Hot leads needing follow-up call tomorrow
+- Rescheduled appointments
+- Leads that went dark (re-engagement)
+- Proposals / payment links sent but not completed
+
+Manager assigns: "[Name], your priority tomorrow morning is calling [prospect]. They're hot."</div>
+        <div class="notes-label">Pipeline Notes</div>
+        <textarea class="notes-area" data-save="e-pipeline-notes" placeholder="Follow-ups, rescheduled, hot leads..."></textarea>
+        <div class="timer-box">
+          <span class="timer-display" id="e-timer-2">10:00</span>
+          <button class="timer-btn btn-start" onclick="startTimer('e',2)">Start</button>
+          <button class="timer-btn btn-pause" onclick="pauseTimer('e',2)">Pause</button>
+          <button class="timer-btn btn-reset" onclick="resetTimer('e',2)">Reset</button>
+          <button class="timer-btn btn-next" onclick="nextStep('e',2)">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step"><div class="step-dot" id="e-dot-3"></div>
+      <div class="step-card" id="e-step-3">
+        <div class="step-header"><span class="step-title">4. Tomorrow Prep</span><span class="step-time-badge">5 min</span></div>
+        <div class="step-script">"Tomorrow's focus: [ONE thing, building on today's performance]."
+
+"Here's what I need from each of you:
+- [Name]: [specific target or task]
+- [Name]: [specific target or task]
+
+EODs due before you log off tonight. No exceptions.
+Good work today. See you at 11 AM tomorrow."</div>
+        <div class="timer-box">
+          <span class="timer-display" id="e-timer-3">5:00</span>
+          <button class="timer-btn btn-start" onclick="startTimer('e',3)">Start</button>
+          <button class="timer-btn btn-pause" onclick="pauseTimer('e',3)">Pause</button>
+          <button class="timer-btn btn-reset" onclick="resetTimer('e',3)">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= WEEKLY TEAM MEETING ======= -->
+  <div class="tab-content" id="tab-weekly">
+    <div class="meeting-timer"><div class="label">Total Meeting Time</div><div class="big-time" id="weekly-total">55:00</div></div>
+
+    <div class="flow-step"><div class="step-dot active-dot" id="w-dot-0"></div>
+      <div class="step-card current" id="w-step-0">
+        <div class="step-header"><span class="step-title">1. Scoreboard Review</span><span class="step-time-badge">10 min</span></div>
+        <div class="step-script">"Here are this week's numbers."
+
+"Top performer this week: [Name] -- [stats]. [Name], how'd you do it?"
+"Team total: $[X] collected against $[X] target. We're at [X]%."
+
+On target: "We're tracking. Foot on the gas."
+Behind: "We're [X]% behind. Here's what needs to happen next week."</div>
+        <div class="timer-box">
+          <span class="timer-display" id="w-timer-0">10:00</span>
+          <button class="timer-btn btn-start" onclick="startTimer('w',0)">Start</button>
+          <button class="timer-btn btn-pause" onclick="pauseTimer('w',0)">Pause</button>
+          <button class="timer-btn btn-reset" onclick="resetTimer('w',0)">Reset</button>
+          <button class="timer-btn btn-next" onclick="nextStep('w',0)">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step"><div class="step-dot" id="w-dot-1"></div>
+      <div class="step-card" id="w-step-1">
+        <div class="step-header"><span class="step-title">2. Game Film</span><span class="step-time-badge">20 min</span></div>
+        <div class="step-script">"Game film time. I've got a call from this week I want us to listen to.
+[Rep name], thanks for letting us use this -- takes guts to put your work out there."
+
+After playing: "What did [rep] do well?" [3-4 responses]
+"What could be improved?" [3-4 responses]
+"Here's what I'd coach: [one takeaway]. This applies to all of us."</div>
+        <div class="notes-label">Which call are we reviewing?</div>
+        <textarea class="notes-area" data-save="w-gamefilm-notes" placeholder="Rep name, prospect, key moments..."></textarea>
+        <div class="timer-box">
+          <span class="timer-display" id="w-timer-1">20:00</span>
+          <button class="timer-btn btn-start" onclick="startTimer('w',1)">Start</button>
+          <button class="timer-btn btn-pause" onclick="pauseTimer('w',1)">Pause</button>
+          <button class="timer-btn btn-reset" onclick="resetTimer('w',1)">Reset</button>
+          <button class="timer-btn btn-next" onclick="nextStep('w',1)">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step"><div class="step-dot" id="w-dot-2"></div>
+      <div class="step-card" id="w-step-2">
+        <div class="step-header"><span class="step-title">3. Objection Workshop</span><span class="step-time-badge">15 min</span></div>
+        <div class="step-script">"What's the hardest objection you're hearing right now? The one that's killing your calls?"
+
+[Collect 2-3 from team]
+
+"Let's work on [most common one]. Here's how I handle it:"
+[Manager models the handle -- full delivery, in character]
+
+"Pair up. One throws the objection, the other handles it. Switch after 2 reps. Go."</div>
+        <div class="notes-label">What was the hardest objection this week?</div>
+        <textarea class="notes-area" data-save="w-objection-notes" placeholder="Objection + handle..."></textarea>
+        <div class="timer-box">
+          <span class="timer-display" id="w-timer-2">15:00</span>
+          <button class="timer-btn btn-start" onclick="startTimer('w',2)">Start</button>
+          <button class="timer-btn btn-pause" onclick="pauseTimer('w',2)">Pause</button>
+          <button class="timer-btn btn-reset" onclick="resetTimer('w',2)">Reset</button>
+          <button class="timer-btn btn-next" onclick="nextStep('w',2)">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step"><div class="step-dot" id="w-dot-3"></div>
+      <div class="step-card" id="w-step-3">
+        <div class="step-header"><span class="step-title">4. Announcements</span><span class="step-time-badge">5 min</span></div>
+        <div class="step-script">- Offer changes (pricing, bonuses, guarantees)
+- New case studies or testimonials to reference
+- Upcoming events (webinars, launches)
+- Changes to lead flow, scheduling, or CRM process</div>
+        <div class="timer-box">
+          <span class="timer-display" id="w-timer-3">5:00</span>
+          <button class="timer-btn btn-start" onclick="startTimer('w',3)">Start</button>
+          <button class="timer-btn btn-pause" onclick="pauseTimer('w',3)">Pause</button>
+          <button class="timer-btn btn-reset" onclick="resetTimer('w',3)">Reset</button>
+          <button class="timer-btn btn-next" onclick="nextStep('w',3)">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step"><div class="step-dot" id="w-dot-4"></div>
+      <div class="step-card" id="w-step-4">
+        <div class="step-header"><span class="step-title">5. Energy Close</span><span class="step-time-badge">5 min</span></div>
+        <div class="step-script">"This was a [good/tough/great] week. Here's what I'm proud of: [specific example].
+Next week's focus: [ONE theme for the week].
+Let's have our best week yet."</div>
+        <div class="timer-box">
+          <span class="timer-display" id="w-timer-4">5:00</span>
+          <button class="timer-btn btn-start" onclick="startTimer('w',4)">Start</button>
+          <button class="timer-btn btn-pause" onclick="pauseTimer('w',4)">Pause</button>
+          <button class="timer-btn btn-reset" onclick="resetTimer('w',4)">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= WEEKLY 1-ON-1 ======= -->
+  <div class="tab-content" id="tab-oneone">
+    <div class="meeting-timer"><div class="label">Total Meeting Time</div><div class="big-time" id="oneone-total">40:00</div></div>
+
+    <div class="flow-step"><div class="step-dot active-dot" id="o-dot-0"></div>
+      <div class="step-card current" id="o-step-0">
+        <div class="step-header"><span class="step-title">1. Personal</span><span class="step-time-badge">10 min</span></div>
+        <div class="step-script">"Before we get into numbers -- how are you doing? What's going on in your life?"
+
+Follow-ups if needed:
+- "Are you sleeping okay?"
+- "Anything stressing you out outside of work?"
+- "How's [thing they mentioned last week]?"</div>
+        <div class="step-prompt">Never skip this. Never use what they share against them. This is trust-building.</div>
+        <div class="notes-label">Personal Notes</div>
+        <textarea class="notes-area" data-save="o-personal-notes" placeholder="What's going on with this rep personally..."></textarea>
+        <div class="timer-box">
+          <span class="timer-display" id="o-timer-0">10:00</span>
+          <button class="timer-btn btn-start" onclick="startTimer('o',0)">Start</button>
+          <button class="timer-btn btn-pause" onclick="pauseTimer('o',0)">Pause</button>
+          <button class="timer-btn btn-reset" onclick="resetTimer('o',0)">Reset</button>
+          <button class="timer-btn btn-next" onclick="nextStep('o',0)">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step"><div class="step-dot" id="o-dot-1"></div>
+      <div class="step-card" id="o-step-1">
+        <div class="step-header"><span class="step-title">2. Short-Term Performance</span><span class="step-time-badge">20 min</span></div>
+        <div class="step-script">"Let's look at your calls this week. You submitted [X] recordings."
+
+[Play a specific moment]
+"Hear that? At [timestamp], [describe what happened]."
+"Here's what I'd do differently: [model the alternative]."
+
+"This week, focus on one thing: [specific behavior].
+Not two things. Not five. This one thing."
+
+[Role play for 5-10 minutes. Manager plays prospect.]</div>
+        <div class="step-prompt">Rep MUST submit 3 recordings before the meeting. Always practice during the 1-on-1. ONE skill gap.</div>
+        <div class="notes-label">Call Review Notes (3 submitted recordings)</div>
+        <textarea class="notes-area" data-save="o-shortterm-notes" placeholder="Call timestamps, observations, ONE thing to fix..."></textarea>
+        <div class="timer-box">
+          <span class="timer-display" id="o-timer-1">20:00</span>
+          <button class="timer-btn btn-start" onclick="startTimer('o',1)">Start</button>
+          <button class="timer-btn btn-pause" onclick="pauseTimer('o',1)">Pause</button>
+          <button class="timer-btn btn-reset" onclick="resetTimer('o',1)">Reset</button>
+          <button class="timer-btn btn-next" onclick="nextStep('o',1)">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step"><div class="step-dot" id="o-dot-2"></div>
+      <div class="step-card" id="o-step-2">
+        <div class="step-header"><span class="step-title">3. Long-Term Development</span><span class="step-time-badge">10 min</span></div>
+        <div class="step-script">"Zooming out -- where do you want to be in 6 months? 12 months?"
+
+"Here's what it takes to get there:
+- To move from [current role] to [next role], you need to hit [metrics] for [timeframe].
+- You're currently at [current]. The gap is [gap].
+- If you close that gap, we'll have the conversation about [advancement]."
+
+"What can I do to help you get there faster?"
+
+Career path:
+Junior Setter > Setter > Senior Setter > Junior Closer > Closer > Senior Closer > Sales Manager</div>
+        <div class="notes-label">Long-Term Notes</div>
+        <textarea class="notes-area" data-save="o-longterm-notes" placeholder="Where do they want to be? What's the gap?"></textarea>
+        <div class="timer-box">
+          <span class="timer-display" id="o-timer-2">10:00</span>
+          <button class="timer-btn btn-start" onclick="startTimer('o',2)">Start</button>
+          <button class="timer-btn btn-pause" onclick="pauseTimer('o',2)">Pause</button>
+          <button class="timer-btn btn-reset" onclick="resetTimer('o',2)">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+// Timer system
+const DURATIONS={
+  m:[180,300,420,600,300],
+  e:[600,300,600,300],
+  w:[600,1200,900,300,300],
+  o:[600,1200,600]
+};
+const timers={};
+const intervals={};
+
+function fmt(s){const m=Math.floor(s/60);const ss=s%60;return m+':'+(ss<10?'0':'')+ss}
+
+function startTimer(prefix,idx){
+  const key=prefix+'-'+idx;
+  if(!timers[key]&&timers[key]!==0)timers[key]=DURATIONS[prefix][idx];
+  if(intervals[key])return;
+  const el=document.getElementById(prefix+'-timer-'+idx);
+  intervals[key]=setInterval(()=>{
+    timers[key]--;
+    if(timers[key]<=0){
+      timers[key]=0;
+      clearInterval(intervals[key]);
+      intervals[key]=null;
+      el.classList.add('warn');
+      // auto advance
+      const maxIdx=DURATIONS[prefix].length-1;
+      if(idx<maxIdx)setTimeout(()=>nextStep(prefix,idx),500);
+    }
+    el.textContent=fmt(timers[key]);
+    if(timers[key]<=10)el.classList.add('warn');
+  },1000);
+}
+function pauseTimer(prefix,idx){
+  const key=prefix+'-'+idx;
+  if(intervals[key]){clearInterval(intervals[key]);intervals[key]=null}
+}
+function resetTimer(prefix,idx){
+  const key=prefix+'-'+idx;
+  pauseTimer(prefix,idx);
+  timers[key]=DURATIONS[prefix][idx];
+  const el=document.getElementById(prefix+'-timer-'+idx);
+  el.textContent=fmt(timers[key]);
+  el.classList.remove('warn');
+}
+function nextStep(prefix,idx){
+  pauseTimer(prefix,idx);
+  const maxIdx=DURATIONS[prefix].length-1;
+  if(idx>=maxIdx)return;
+  // mark current done
+  document.getElementById(prefix+'-step-'+idx).classList.remove('current');
+  document.getElementById(prefix+'-step-'+idx).classList.add('done');
+  document.getElementById(prefix+'-dot-'+idx).classList.remove('active-dot');
+  // activate next
+  const next=idx+1;
+  document.getElementById(prefix+'-step-'+next).classList.add('current');
+  document.getElementById(prefix+'-dot-'+next).classList.add('active-dot');
+  document.getElementById(prefix+'-step-'+next).scrollIntoView({behavior:'smooth',block:'center'});
+  // auto-start next timer
+  startTimer(prefix,next);
+}
+
+// LocalStorage for inputs
+const STORAGE_KEY='team-meetings-state';
+function loadState(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{}}catch(e){return{}}}
+function saveState(st){localStorage.setItem(STORAGE_KEY,JSON.stringify(st))}
+const state=loadState();
+
+document.querySelectorAll('[data-save]').forEach(el=>{
+  const key=el.dataset.save;
+  if(state[key])el.value=state[key];
+  el.addEventListener('input',()=>{state[key]=el.value;saveState(state)});
+});
+</script>
+</body>
+</html>

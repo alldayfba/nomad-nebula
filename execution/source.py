@@ -2445,26 +2445,40 @@ Examples:
     p_catalog.add_argument("retailer_url", help="Retailer URL (e.g., https://www.shopwss.com)")
     p_catalog.add_argument("--max-tokens", type=int, default=3000,
                            help="Max Keepa tokens to spend (default: 3000)")
-    p_catalog.add_argument("--min-roi", type=float, default=30.0,
-                           help="Min ROI %% (default: 30)")
-    p_catalog.add_argument("--min-profit", type=float, default=3.0,
-                           help="Min profit per unit (default: $3)")
-    p_catalog.add_argument("--max-bsr", type=int, default=200000,
-                           help="Max BSR (default: 200000)")
+    p_catalog.add_argument("--min-roi", type=float, default=15.0,
+                           help="Min ROI %% (default: 15)")
+    p_catalog.add_argument("--min-profit", type=float, default=2.0,
+                           help="Min profit per unit (default: $2)")
+    p_catalog.add_argument("--max-bsr", type=int, default=500000,
+                           help="Max BSR (default: 500000)")
     p_catalog.add_argument("--min-price", type=float, default=5.0,
                            help="Min retail price filter (default: $5)")
-    p_catalog.add_argument("--max-price", type=float, default=60.0,
-                           help="Max retail price filter (default: $60)")
+    p_catalog.add_argument("--max-price", type=float, default=0,
+                           help="Max retail price filter (0=no cap, default: no cap)")
     p_catalog.add_argument("--coupon", type=str, default=None,
                            help="Coupon to apply (e.g., '20%% off')")
     p_catalog.add_argument("--limit-scrape", type=int, default=0,
                            help="Max products to scrape (0=unlimited)")
     p_catalog.add_argument("--deep-verify", type=int, default=0,
                            help="Deep verify top N with Keepa offers (21 tokens each)")
-    p_catalog.add_argument("--no-verify-links", action="store_true",
-                           help="Skip buy link verification")
+    p_catalog.add_argument("--verify-links", action="store_true",
+                           help="Enable buy link verification (off by default)")
     p_catalog.add_argument("--no-coupon", action="store_true",
                            help="Skip coupon auto-discovery")
+    p_catalog.add_argument("--strict", action="store_true",
+                           help="Drop products below thresholds instead of tagging")
+
+    # ── Mode 15: Storefront Stalker ──────────────────────────────────────
+    p_storefront = sub.add_parser("storefront", help="Scrape Amazon seller storefront for product ideas")
+    sf_group = p_storefront.add_mutually_exclusive_group(required=True)
+    sf_group.add_argument("--seller", help="Amazon seller ID (e.g., A1B2C3D4E5F6G7)")
+    sf_group.add_argument("--url", help="Full Amazon storefront URL")
+    p_storefront.add_argument("--max-products", type=int, default=100,
+                              help="Max products to extract (default: 100)")
+    p_storefront.add_argument("--no-details", action="store_true",
+                              help="Skip detail page enrichment (faster)")
+    p_storefront.add_argument("--reverse-source", action="store_true",
+                              help="Reverse source top products at retail stores")
 
     # Global flags (apply to all modes)
     parser.add_argument("--export", choices=["sheets"], default=None,
@@ -2579,12 +2593,30 @@ Examples:
             limit_scrape=args.limit_scrape,
             resume=getattr(args, "resume", False),
             deep_verify=getattr(args, "deep_verify", 0),
-            verify_links=not getattr(args, "no_verify_links", False),
+            verify_links=getattr(args, "verify_links", False),
             no_coupon=getattr(args, "no_coupon", False),
+            strict=getattr(args, "strict", False),
         )
         # Catalog has its own output — convert to source.py result format
         results = output.get("products", [])
         mode_name = f"Catalog: {args.retailer_url}"
+
+    elif args.mode == "storefront":
+        from storefront_stalker import run_stalker, extract_seller_id, normalize_stalker_results
+        raw_input = getattr(args, "seller", None) or getattr(args, "url", None)
+        seller_id = extract_seller_id(raw_input)
+        if not seller_id:
+            print(f"ERROR: Could not extract seller ID from: {raw_input}", file=sys.stderr)
+            sys.exit(1)
+        output = run_stalker(
+            seller_id=seller_id,
+            max_products=args.max_products,
+            fetch_details=not getattr(args, "no_details", False),
+            reverse_source=getattr(args, "reverse_source", False),
+        )
+        # Normalize to Schema B for unified results
+        results = normalize_stalker_results(output) if output else []
+        mode_name = f"Storefront: {seller_id}"
 
     elif args.mode == "reverse":
         from mode_reverse import run_reverse_search, load_asins_from_file

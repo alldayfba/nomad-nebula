@@ -3,7 +3,7 @@
 
 > Synthesized from two sources:
 > 1. **112 onboarding form responses** — real buyers explaining in their own words why they paid
-> 2. **Mentor frameworks** — Ben Bader, Alex Hormozi, Nik Setting, Jeremy Haynes, Pierre Khoury (full brain files in `bots/creators/`)
+> 2. **Mentor frameworks** — Ben Bader, Alex Hormozi, Nik Setting, Jeremy Haynes, Pierre Khoury, SoWei Goh, Jace England (full brain files in `bots/creators/`)
 >
 > **MANDATORY:** Before scripting, planning, or writing any content, cross-reference this file AND the relevant mentor brain.
 > The question is always: "Does this match what buyers said they responded to, AND does it align with what our mentors say works?"

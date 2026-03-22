@@ -99,22 +99,24 @@ def pick_best_match(products: list[dict], wholesale_name: str) -> dict | None:
         avg30 = stats.get("avg30", [])
         avg90 = stats.get("avg90", [])
 
-        # Priority: buyBoxPrice > current[18] > current[1] > current[10] > current[0] > averages
-        buy_box_price = stats.get("buyBoxPrice", -1)
-        if buy_box_price and buy_box_price > 0:
-            current_price = buy_box_price / 100.0
-        if not current_price and len(current) > 18 and current[18] and current[18] > 0:
-            current_price = current[18] / 100.0
-        if not current_price and len(current) > 1 and current[1] and current[1] > 0:
-            current_price = current[1] / 100.0  # New 3rd party price
+        # Priority: Amazon price > FBA price > Buy Box > New 3P > buyBoxPrice stat
+        # Rationale: For arbitrage, you want the actual sell price, not the lowest
+        # competitor price (Buy Box). Amazon's price or FBA price = what you'd sell at.
+        if not current_price and len(current) > 0 and current[0] and current[0] > 0:
+            current_price = current[0] / 100.0  # Amazon's own price
         if not current_price and len(current) > 10 and current[10] and current[10] > 0:
             current_price = current[10] / 100.0  # FBA price
-        if not current_price and len(current) > 0 and current[0] and current[0] > 0:
-            current_price = current[0] / 100.0  # Amazon's price
-        # Fallback to 30-day or 90-day averages
+        if not current_price and len(current) > 18 and current[18] and current[18] > 0:
+            current_price = current[18] / 100.0  # Buy Box price
+        if not current_price and len(current) > 1 and current[1] and current[1] > 0:
+            current_price = current[1] / 100.0  # New 3rd party price
+        buy_box_price = stats.get("buyBoxPrice", -1)
+        if not current_price and buy_box_price and buy_box_price > 0:
+            current_price = buy_box_price / 100.0
+        # Fallback to 30-day or 90-day averages (same priority order)
         if not current_price:
             for avg_arr in [avg30, avg90]:
-                for idx in [18, 1, 10, 0]:  # same priority
+                for idx in [0, 10, 18, 1]:
                     if len(avg_arr) > idx and avg_arr[idx] and avg_arr[idx] > 0:
                         current_price = avg_arr[idx] / 100.0
                         break

@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Onboarding Flowchart | 247 Growth</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:hsl(250,18%,6%);--card:hsl(250,16%,9%);--card-hover:hsl(250,16%,11%);--gold:hsl(265,80%,55%);--gold-dim:hsl(265,40%,20%);--white:#F5F5F5;--muted:hsl(250,8%,62%);--green:hsl(142,71%,45%);--yellow:hsl(38,92%,50%);--red:hsl(0,72%,51%);--blue:hsl(217,91%,60%);--radius:14px;--shadow:0 4px 24px rgba(0,0,0,.45);--glow:0 0 30px -5px hsl(265 80% 55% / 0.12);--border:hsl(250,14%,15%)}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,'Inter','Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--white);line-height:1.6;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:24px 16px 80px}
+h1{font-size:1.75rem;font-weight:700;text-align:center;margin-bottom:4px}
+.subtitle{text-align:center;color:var(--muted);font-size:.9rem;margin-bottom:24px}
+.gold{color:var(--gold)}
+
+/* Client info header */
+.client-header{background:hsla(250,16%,9%,0.85);backdrop-filter:blur(40px) saturate(150%);-webkit-backdrop-filter:blur(40px) saturate(150%);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:28px;box-shadow:var(--shadow)}
+.client-header h3{font-size:.85rem;text-transform:uppercase;letter-spacing:.5px;color:var(--gold);margin-bottom:12px}
+.client-fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.client-field label{display:block;font-size:.75rem;color:var(--muted);margin-bottom:3px}
+.client-field input,.client-field select{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--white);padding:8px 10px;border-radius:8px;font-family:inherit;font-size:.88rem}
+.client-field input:focus,.client-field select:focus{outline:none;border-color:var(--gold);box-shadow:var(--glow)}
+.client-field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394A3B8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+
+/* Overall progress */
+.overall-progress{margin-bottom:28px}
+.progress-label{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+.progress-bar{height:8px;background:hsl(250 14% 15%);border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,hsl(265,80%,55%),hsl(265,90%,65%));border-radius:99px;transition:width .5s ease}
+
+/* Timeline */
+.timeline{position:relative;padding-left:32px}
+.timeline::before{content:'';position:absolute;left:12px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,hsl(265,80%,55%),hsl(265 80% 55% / 0.1))}
+
+/* Stage */
+.stage{position:relative;margin-bottom:32px}
+.stage-dot{position:absolute;left:-32px;top:4px;width:24px;height:24px;border-radius:50%;background:var(--bg);border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;z-index:1}
+.stage-dot .num{font-size:.65rem;font-weight:700;color:var(--gold)}
+.stage-dot.complete{background:var(--gold)}
+.stage-dot.complete .num{color:var(--bg)}
+
+.stage-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.stage-title{font-size:1.15rem;font-weight:700}
+.stage-badge{font-size:.7rem;background:hsl(265 80% 55% / 0.12);color:var(--gold);padding:3px 10px;border-radius:99px;font-weight:600}
+.stage-pct{font-size:.78rem;color:var(--muted)}
+
+/* Check card */
+.check-card{background:hsla(250,16%,9%,0.85);backdrop-filter:blur(40px) saturate(150%);-webkit-backdrop-filter:blur(40px) saturate(150%);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px;box-shadow:var(--shadow);transition:all .2s}
+.check-card:hover{background:var(--card-hover);box-shadow:var(--glow)}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.check-item:last-child{border-bottom:none}
+.check-item input[type=checkbox]{appearance:none;width:20px;height:20px;min-width:20px;border:2px solid var(--muted);border-radius:5px;cursor:pointer;position:relative;top:2px;transition:all .2s}
+.check-item input[type=checkbox]:checked{background:var(--gold);border-color:var(--gold)}
+.check-item input[type=checkbox]:checked::after{content:'';position:absolute;left:5px;top:1px;width:6px;height:11px;border:solid var(--bg);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.check-item label{cursor:pointer;font-size:.9rem}
+.check-item label .sub{display:block;color:var(--muted);font-size:.78rem;margin-top:2px}
+
+/* Expandable */
+.expandable{cursor:pointer;user-select:none;padding:12px 18px;background:hsla(250,16%,9%,0.85);backdrop-filter:blur(40px) saturate(150%);-webkit-backdrop-filter:blur(40px) saturate(150%);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;box-shadow:var(--shadow);transition:all .2s}
+.expandable:hover{background:var(--card-hover);box-shadow:var(--glow)}
+.expandable .arrow{display:inline-block;transition:transform .25s;margin-right:6px;font-size:.75rem;color:var(--gold)}
+.expandable.open .arrow{transform:rotate(90deg)}
+.expand-body{display:none;background:var(--card);border-radius:0 0 var(--radius) var(--radius);padding:4px 18px 16px;margin-top:-10px;margin-bottom:10px}
+.expandable.open+.expand-body{display:block}
+
+/* Week cards */
+.week-card{background:hsla(250,16%,9%,0.85);backdrop-filter:blur(40px) saturate(150%);-webkit-backdrop-filter:blur(40px) saturate(150%);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px;box-shadow:var(--shadow);border-left:3px solid var(--gold)}
+.week-card h4{font-size:.92rem;font-weight:700;color:var(--gold);margin-bottom:8px}
+.week-card ul{list-style:none;padding:0}
+.week-card li{padding:4px 0;font-size:.88rem;color:var(--muted)}
+.week-card li::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold-dim);margin-right:8px;vertical-align:middle}
+
+/* Warning cards */
+.warning-card{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px}
+.warning-card .warn-title{color:var(--red);font-weight:700;font-size:.9rem;margin-bottom:6px}
+.warning-card .warn-signal{font-size:.85rem;color:var(--muted);margin-bottom:4px}
+.warning-card .warn-action{font-size:.85rem;color:var(--white);padding-left:16px;border-left:2px solid var(--gold-dim);margin-top:6px}
+
+/* Hover template */
+.template-trigger{color:var(--gold);text-decoration:underline;text-decoration-style:dotted;cursor:pointer;position:relative}
+.template-popup{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:hsla(250,16%,9%,0.95);backdrop-filter:blur(40px) saturate(150%);-webkit-backdrop-filter:blur(40px) saturate(150%);border:1px solid hsl(265 80% 55% / 0.3);border-radius:var(--radius);padding:24px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;z-index:1000;box-shadow:0 20px 60px rgba(0,0,0,.6),var(--glow)}
+.template-popup.show{display:block}
+.template-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:999}
+.template-overlay.show{display:block}
+.template-popup pre{white-space:pre-wrap;font-size:.82rem;color:var(--muted);line-height:1.5;font-family:inherit}
+.template-popup .close-btn{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer}
+.template-popup h4{color:var(--gold);margin-bottom:12px;font-size:1rem}
+
+/* Cadence table */
+.cadence-table{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:8px}
+.cadence-table th{text-align:left;color:var(--muted);font-weight:600;padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.1)}
+.cadence-table td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--muted)}
+.cadence-table td:first-child{color:var(--white);font-weight:500}
+
+@media(max-width:600px){
+  h1{font-size:1.3rem}
+  .client-fields{grid-template-columns:1fr}
+  .container{padding:16px 12px 60px}
+  .timeline{padding-left:28px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Client Onboarding <span class="gold">Flowchart</span></h1>
+  <p class="subtitle">247 Growth &mdash; Agency OS Client Onboarding SOP</p>
+
+  <!-- Client info header -->
+  <div class="client-header">
+    <h3>Client Information</h3>
+    <div class="client-fields">
+      <div class="client-field"><label>Client Name</label><input type="text" data-save="cl-name" placeholder="Full name"></div>
+      <div class="client-field"><label>Business Name</label><input type="text" data-save="cl-biz" placeholder="Business"></div>
+      <div class="client-field"><label>Tier</label>
+        <select data-save="cl-tier">
+          <option value="">Select...</option>
+          <option value="Starter">Starter ($5K/mo)</option>
+          <option value="Growth">Growth ($10K/mo)</option>
+          <option value="Enterprise">Enterprise ($25K/mo)</option>
+        </select>
+      </div>
+      <div class="client-field"><label>Monthly Retainer</label><input type="text" data-save="cl-retainer" placeholder="$"></div>
+      <div class="client-field"><label>Start Date</label><input type="date" data-save="cl-start"></div>
+      <div class="client-field"><label>Operator Assigned</label><input type="text" data-save="cl-operator" placeholder="Name"></div>
+    </div>
+  </div>
+
+  <!-- Overall progress -->
+  <div class="overall-progress">
+    <div class="progress-label"><span>Overall Onboarding Progress</span><span id="overall-pct">0%</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="overall-fill" style="width:0%"></div></div>
+  </div>
+
+  <div class="timeline">
+
+    <!-- ====== STAGE 1 ====== -->
+    <div class="stage">
+      <div class="stage-dot" id="dot-1"><span class="num">1</span></div>
+      <div class="stage-header">
+        <span class="stage-title">Day of Close</span>
+        <span class="stage-badge">Within 2 Hours</span>
+        <span class="stage-pct" id="s1-pct"></span>
+      </div>
+
+      <div class="check-card">
+        <div class="check-item"><input type="checkbox" data-stage="1" id="o1"><label for="o1">Payment collected (Stripe)<span class="sub">Send payment link within 15 min of verbal close. No work begins until payment clears.</span></label></div>
+        <div class="check-item"><input type="checkbox" data-stage="1" id="o2"><label for="o2">Contract signed<span class="sub">DocuSign. Includes scope, tier, retainer, 90-day minimum, performance guarantee, NDA.</span></label></div>
+        <div class="check-item"><input type="checkbox" data-stage="1" id="o3"><label for="o3"><span class="template-trigger" onclick="showTemplate('welcome-email')">Welcome email sent</span><span class="sub">Subject: "Welcome to 247 Growth -- Here's What Happens Next"</span></label></div>
+        <div class="check-item"><input type="checkbox" data-stage="1" id="o4"><label for="o4">Slack channel created: #client-[name]<span class="sub">Add client, operator, Sabbo, media buyer. Pin welcome message + checklist.</span></label></div>
+        <div class="check-item"><input type="checkbox" data-stage="1" id="o5"><label for="o5">CRM status updated to "Won -- Onboarding"<span class="sub">Deal value = monthly retainer x 12. Tags: active-client, tier-[X], onboarding.</span></label></div>
+        <div class="check-item"><input type="checkbox" data-stage="1" id="o6"><label for="o6"><span class="template-trigger" onclick="showTemplate('internal-notif')">Internal Slack notification sent</span><span class="sub">Post in #sales-wins with client, tier, monthly, annual value, industry, closer.</span></label></div>
+        <div class="check-item"><input type="checkbox" data-stage="1" id="o7"><label for="o7">Onboarding questionnaire sent<span class="sub">Typeform or Google Form. Included in welcome email. Must complete before kickoff.</span></label></div>
+      </div>
+    </div>
+
+    <!-- ====== STAGE 2 ====== -->
+    <div class="stage">
+      <div class="stage-dot" id="dot-2"><span class="num">2</span></div>
+      <div class="stage-header">
+        <span class="stage-title">Week 1 &mdash; Kickoff + Discovery</span>
+        <span class="stage-badge">Days 1-7</span>
+        <span class="stage-pct" id="s2-pct"></span>
+      </div>
+
+      <div class="expandable" onclick="this.classList.toggle('open')">
+        <span class="arrow">&#9654;</span> <strong>Kickoff Call Agenda (90 min)</strong>
+      </div>
+      <div class="expand-body">
+        <table class="cadence-table">
+          <tr><th>Block</th><th>Duration</th><th>Content</th></tr>
+          <tr><td>Introductions + Expectations</td><td>15 min</td><td>Team intros, communication norms, response times, approval workflow, reporting cadence.</td></tr>
+          <tr><td>Questionnaire Review + Discovery</td><td>30 min</td><td>Business model walkthrough, revenue breakdown, sales process, past marketing, pain points, dream outcome.</td></tr>
+          <tr><td>Access Provisioning</td><td>15 min</td><td>Walk through access checklist. Get admin access granted live on call (screen share).</td></tr>
+          <tr><td>30-Day Milestones</td><td>15 min</td><td>Infrastructure live Day 28-30. Set 90-day KPI targets together: leads, CPL, close rate, revenue, ROAS.</td></tr>
+          <tr><td>Q&A + Next Steps</td><td>15 min</td><td>Recap action items. Schedule Week 1 check-in call.</td></tr>
+        </table>
+      </div>
+
+      <div class="check-card">
+        <div class="check-item"><input type="checkbox" data-stage="2" id="o8"><label for="o8">Kickoff call completed</label></div>
+      </div>
+
+      <div class="expandable" onclick="this.classList.toggle('open')">
+        <span class="arrow">&#9654;</span> <strong>Access Checklist</strong>
+      </div>
+      <div class="expand-body">
+        <div class="check-item"><input type="checkbox" data-stage="2" id="o9"><label for="o9">Meta Business Manager &mdash; Admin access</label></div>
+        <div class="check-item"><input type="checkbox" data-stage="2" id="o10"><label for="o10">Meta Ad Account(s) &mdash; Advertiser access</label></div>
+        <div class="check-item"><input type="checkbox" data-stage="2" id="o11"><label for="o11">Google Ads &mdash; Manager access</label></div>
+        <div class="check-item"><input type="checkbox" data-stage="2" id="o12"><label for="o12">Google Analytics / GA4 &mdash; Editor access</label></div>
+        <div class="check-item"><input type="checkbox" data-stage="2" id="o13"><label for="o13">Google Tag Manager &mdash; Publish access</label></div>
+        <div class="check-item"><input type="checkbox" data-stage="2" id="o14"><label for="o14">CRM access (GHL / HubSpot / Salesforce)</label></div>
+        <div class="check-item"><input type="checkbox" data-stage="2" id="o15"><label for="o15">Email platform access (Klaviyo / Mailchimp / ActiveCampaign)</label></div>
+        <div class="check-item"><input type="checkbox" data-stage="2" id="o16"><label for="o16">Instagram &mdash; Collaborator or login</label></div>
+        <div class="check-item"><input type="checkbox" data-stage="2" id="o17"><label for="o17">LinkedIn company page &mdash; Admin</label></div>
+        <div class="check-item"><input type="checkbox" data-stage="2" id="o18"><label for="o18">Facebook page &mdash; Admin</label></div>
+        <div class="check-item"><input type="checkbox" data-stage="2" id="o19"><label for="o19">Website backend &mdash; Editor access</label></div>
+        <div class="check-item"><input type="checkbox" data-stage="2" id="o20"><label for="o20">Brand asset folder received (logos, fonts, colors, photos)</label></div>
+      </div>
+
+      <div class="check-card">
+        <div class="check-item"><input type="checkbox" data-stage="2" id="o21"><label for="o21">Brand voice extraction initiated<span class="sub">Run extract_brand_voice.py. Review with client on Week 1 check-in.</span></label></div>
+        <div class="check-item"><input type="checkbox" data-stage="2" id="o22"><label for="o22">Competitor audit initiated<span class="sub">Min 3 competitors: ad creative, landing pages, offers, positioning, content.</span></label></div>
+        <div class="check-item"><input type="checkbox" data-stage="2" id="o23"><label for="o23">Week 1 check-in call completed</label></div>
+      </div>
+    </div>
+
+    <!-- ====== STAGE 3 ====== -->
+    <div class="stage">
+      <div class="stage-dot" id="dot-3"><span class="num">3</span></div>
+      <div class="stage-header">
+        <span class="stage-title">Weeks 2-4 &mdash; Infrastructure Install</span>
+        <span class="stage-badge">Days 8-30</span>
+        <span class="stage-pct" id="s3-pct"></span>
+      </div>
+
+      <div class="week-card">
+        <h4>Week 2: Tracking + Attribution</h4>
+        <ul>
+          <li>Install/verify Meta Pixel on all pages</li>
+          <li>Install/verify GA4 events + conversions</li>
+          <li>Set up UTM taxonomy</li>
+          <li>Configure attribution dashboard</li>
+          <li>Audit existing funnel</li>
+          <li>Finalize funnel architecture</li>
+          <li>Configure CRM pipeline stages</li>
+        </ul>
+        <div class="check-item"><input type="checkbox" data-stage="3" id="o24"><label for="o24">Week 2 deliverables complete</label></div>
+      </div>
+
+      <div class="week-card">
+        <h4>Week 3: Email Sequences + Ad Creative + Landing Page</h4>
+        <ul>
+          <li>Lead intake email sequence (5 emails)</li>
+          <li>Pre-call nurture sequence (2 emails)</li>
+          <li>No-show re-engagement (3 emails)</li>
+          <li>Long-term nurture (weekly template)</li>
+          <li>Win-back sequence (30/60/90 day)</li>
+          <li>Ad creative briefs (3 angles)</li>
+          <li>Ad copy: 5 cold traffic + 3 retargeting scripts</li>
+          <li>Landing page copy + design/build</li>
+        </ul>
+        <div class="check-item"><input type="checkbox" data-stage="3" id="o25"><label for="o25">Week 3 deliverables complete</label></div>
+      </div>
+
+      <div class="week-card">
+        <h4>Week 4: Campaign Build + Launch</h4>
+        <ul>
+          <li>Ad account structure (campaigns, ad sets)</li>
+          <li>Creative uploaded and configured</li>
+          <li>Audience segments built (cold, warm, retarget)</li>
+          <li>Landing page tested (mobile + desktop, all forms)</li>
+          <li>Email sequences loaded + tested</li>
+          <li>Tracking end-to-end verified</li>
+          <li>Client review call (pre-launch approval)</li>
+          <li>Campaigns go live</li>
+        </ul>
+        <div class="check-item"><input type="checkbox" data-stage="3" id="o26"><label for="o26">Week 4 deliverables complete &mdash; CAMPAIGNS LIVE</label></div>
+      </div>
+
+      <div class="expandable" onclick="this.classList.toggle('open')">
+        <span class="arrow">&#9654;</span> <strong>Weekly Check-In Call Template (30 min)</strong>
+      </div>
+      <div class="expand-body">
+        <table class="cadence-table">
+          <tr><th>Section</th><th>Duration</th><th>Content</th></tr>
+          <tr><td>What We Did This Week</td><td>10 min</td><td>Tasks completed. Status: On track / Behind / Ahead.</td></tr>
+          <tr><td>What's Coming Next Week</td><td>5 min</td><td>Planned tasks and deliverables.</td></tr>
+          <tr><td>Approvals Needed</td><td>5 min</td><td>Items needing client sign-off.</td></tr>
+          <tr><td>Questions / Blockers</td><td>5 min</td><td>Open questions and proposed solutions.</td></tr>
+          <tr><td>Client Questions</td><td>5 min</td><td>Open floor.</td></tr>
+        </table>
+      </div>
+
+      <div class="expandable" onclick="this.classList.toggle('open')">
+        <span class="arrow">&#9654;</span> <strong>Weekly Report Template</strong>
+      </div>
+      <div class="expand-body">
+        <table class="cadence-table">
+          <tr><th>Metric</th><th>This Week</th><th>Last Week</th><th>Target</th></tr>
+          <tr><td>Ad Spend</td><td>--</td><td>--</td><td>--</td></tr>
+          <tr><td>Leads</td><td>--</td><td>--</td><td>--</td></tr>
+          <tr><td>CPL</td><td>--</td><td>--</td><td>--</td></tr>
+          <tr><td>Calls Booked</td><td>--</td><td>--</td><td>--</td></tr>
+          <tr><td>Show Rate</td><td>--</td><td>--</td><td>&gt; 70%</td></tr>
+          <tr><td>Closed Deals</td><td>--</td><td>--</td><td>--</td></tr>
+          <tr><td>Revenue</td><td>--</td><td>--</td><td>--</td></tr>
+        </table>
+        <p style="font-size:.82rem;color:var(--muted);margin-top:8px">Sent every Friday by 5pm ET. Pinned in client Slack channel.</p>
+      </div>
+    </div>
+
+    <!-- ====== STAGE 4 ====== -->
+    <div class="stage">
+      <div class="stage-dot" id="dot-4"><span class="num">4</span></div>
+      <div class="stage-header">
+        <span class="stage-title">Month 2-3 &mdash; Operation</span>
+        <span class="stage-badge">Days 31-90</span>
+        <span class="stage-pct" id="s4-pct"></span>
+      </div>
+
+      <div class="check-card">
+        <div class="check-item"><input type="checkbox" data-stage="4" id="o27"><label for="o27">Daily campaign monitoring active<span class="sub">9am ET: Check spend vs budget, conversion metrics, disapproved ads, email deliverability.</span></label></div>
+        <div class="check-item"><input type="checkbox" data-stage="4" id="o28"><label for="o28">Weekly strategy calls scheduled<span class="sub">Performance report + strategy discussion every week.</span></label></div>
+        <div class="check-item"><input type="checkbox" data-stage="4" id="o29"><label for="o29">Creative refresh cycle running<span class="sub">New hooks every 10 days. New static every 2 weeks. New video every 3 weeks.</span></label></div>
+        <div class="check-item"><input type="checkbox" data-stage="4" id="o30"><label for="o30">First optimization pass complete (Day 35-37)</label></div>
+      </div>
+
+      <div class="expandable" onclick="this.classList.toggle('open')">
+        <span class="arrow">&#9654;</span> <strong>Monthly Strategy Review Agenda (60 min)</strong>
+      </div>
+      <div class="expand-body">
+        <table class="cadence-table">
+          <tr><th>Section</th><th>Duration</th><th>Content</th></tr>
+          <tr><td>Performance vs KPIs</td><td>15 min</td><td>Lead volume, CPL, close rate, revenue, ROAS vs targets.</td></tr>
+          <tr><td>What's Working</td><td>10 min</td><td>Top ad angle, best audience, email highlights.</td></tr>
+          <tr><td>What to Kill</td><td>10 min</td><td>Underperforming campaigns (2x CPL after $500+), fatigued creative, dead audiences.</td></tr>
+          <tr><td>Budget Reallocation</td><td>10 min</td><td>Shift from losers to winners. New test budget.</td></tr>
+          <tr><td>New Tests</td><td>10 min</td><td>Hypothesis, budget, success criteria for each test.</td></tr>
+          <tr><td>Next Month Priorities</td><td>5 min</td><td>Top 3 priorities.</td></tr>
+        </table>
+      </div>
+
+      <div class="expandable" onclick="this.classList.toggle('open')">
+        <span class="arrow">&#9654;</span> <strong>90-Day OKR Template</strong>
+      </div>
+      <div class="expand-body">
+        <table class="cadence-table">
+          <tr><th>Objective</th><th>Key Result</th><th>Status</th></tr>
+          <tr><td rowspan="3">Revenue / Growth</td><td>80+ qualified leads/mo by Month 3</td><td style="color:var(--green)">GREEN</td></tr>
+          <tr><td>CPL below target by Month 2</td><td style="color:var(--yellow)">YELLOW</td></tr>
+          <tr><td>70%+ show rate on booked calls</td><td style="color:var(--green)">GREEN</td></tr>
+          <tr><td rowspan="3">Efficiency / Cost</td><td>Blended CAC below target</td><td style="color:var(--yellow)">YELLOW</td></tr>
+          <tr><td>Email revenue &gt; 20% of total</td><td style="color:var(--red)">RED</td></tr>
+          <tr><td>Retargeting ROAS above 5x</td><td style="color:var(--green)">GREEN</td></tr>
+          <tr><td rowspan="3">Infrastructure</td><td>Full attribution dashboard live</td><td style="color:var(--green)">GREEN</td></tr>
+          <tr><td>All email flows automated</td><td style="color:var(--green)">GREEN</td></tr>
+          <tr><td>3+ ad angles tested with winner</td><td style="color:var(--yellow)">YELLOW</td></tr>
+        </table>
+        <p style="font-size:.78rem;color:var(--muted);margin-top:6px">GREEN = On track. YELLOW = At risk, action plan in place. RED = Behind, escalation needed.</p>
+      </div>
+
+      <div class="check-card">
+        <div class="check-item"><input type="checkbox" data-stage="4" id="o31"><label for="o31">Month 2 monthly strategy review complete</label></div>
+        <div class="check-item"><input type="checkbox" data-stage="4" id="o32"><label for="o32">Month 3 monthly strategy review complete</label></div>
+        <div class="check-item"><input type="checkbox" data-stage="4" id="o33"><label for="o33">90-day OKR review + renewal conversation (Day 75-85)</label></div>
+      </div>
+    </div>
+
+    <!-- ====== STAGE 5 ====== -->
+    <div class="stage">
+      <div class="stage-dot" id="dot-5"><span class="num">5</span></div>
+      <div class="stage-header">
+        <span class="stage-title">Health Monitoring</span>
+        <span class="stage-badge">Ongoing</span>
+      </div>
+
+      <div class="warning-card">
+        <div class="warn-title">Missed 2+ check-in calls</div>
+        <div class="warn-signal">Risk Level: HIGH</div>
+        <div class="warn-action">Operator reaches out directly. Sabbo texts client.</div>
+      </div>
+      <div class="warning-card">
+        <div class="warn-title">Reduced Slack activity (&lt; 2 messages/week)</div>
+        <div class="warn-signal">Risk Level: MEDIUM</div>
+        <div class="warn-action">Operator sends proactive value update. Share a win or insight unprompted.</div>
+      </div>
+      <div class="warning-card">
+        <div class="warn-title">"When does the contract end?"</div>
+        <div class="warn-signal">Risk Level: CRITICAL</div>
+        <div class="warn-action">Sabbo calls client within 24 hours. Ask: "What would make this a no-brainer to continue?" Present a concrete 30-day win plan.</div>
+      </div>
+      <div class="warning-card">
+        <div class="warn-title">"I need to think about whether to continue"</div>
+        <div class="warn-signal">Risk Level: CRITICAL</div>
+        <div class="warn-action">Executive check-in call within 48 hours. Offer value-add (free month, bonus service). If leaving, conduct exit interview.</div>
+      </div>
+      <div class="warning-card">
+        <div class="warn-title">Client stops approving creative / stops responding</div>
+        <div class="warn-signal">Risk Level: HIGH</div>
+        <div class="warn-action">Operator escalates to Sabbo. Reposition value. Deliver something unexpected.</div>
+      </div>
+      <div class="warning-card">
+        <div class="warn-title">Client hires internal marketing person</div>
+        <div class="warn-signal">Risk Level: MEDIUM</div>
+        <div class="warn-action">Reposition as complement, not replacement. Emphasize knowledge transfer and infrastructure.</div>
+      </div>
+    </div>
+
+  </div><!-- end timeline -->
+</div>
+
+<!-- Template Popups -->
+<div class="template-overlay" id="tmpl-overlay" onclick="hideTemplate()"></div>
+<div class="template-popup" id="tmpl-welcome-email">
+  <button class="close-btn" onclick="hideTemplate()">&times;</button>
+  <h4>Welcome Email Template</h4>
+  <pre>Subject: Welcome to 247 Growth -- Here's What Happens Next
+
+Hi [FIRST NAME],
+
+Welcome to 247 Growth. We're excited to build your growth engine.
+
+Here's exactly what happens from here:
+
+1. ONBOARDING QUESTIONNAIRE (linked below)
+   Please complete this before our kickoff call. It takes about
+   15 minutes and gives us everything we need to hit the ground
+   running.
+
+   [QUESTIONNAIRE LINK]
+
+2. KICKOFF CALL
+   Use the link below to book your 90-minute kickoff call. Aim
+   for this week if possible -- the sooner we kick off, the
+   sooner your infrastructure is live.
+
+   [CALENDLY/CAL.COM LINK]
+
+3. SLACK CHANNEL
+   You've been added to #client-[name] on Slack. This is your
+   direct line to your growth operator.
+
+   [SLACK INVITE LINK]
+
+4. WHAT TO EXPECT
+   - Week 1: Kickoff call + discovery + access provisioning
+   - Weeks 2-4: Full infrastructure build
+   - Month 2+: Campaigns live, weekly optimization
+
+Your growth operator is [OPERATOR NAME].
+
+Let's build.
+
+Sabbo Jean-Baptiste
+247 Growth
+sabbo@247growth.org</pre>
+</div>
+<div class="template-popup" id="tmpl-internal-notif">
+  <button class="close-btn" onclick="hideTemplate()">&times;</button>
+  <h4>Internal Notification Template</h4>
+  <pre>NEW CLIENT CLOSED
+
+Client: [Full Name / Business Name]
+Tier: [Starter / Growth / Enterprise]
+Monthly: $[X],000/mo
+Annual value: $[X * 12]K
+Industry: [Industry]
+Closer: [Name]
+Operator assigned: [Name]
+
+Kickoff call: [Date if booked, "TBD" if not]</pre>
+</div>
+
+<script>
+// LocalStorage
+const STORAGE_KEY='client-onboarding-state';
+function loadState(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{}}catch(e){return{}}}
+function saveState(st){localStorage.setItem(STORAGE_KEY,JSON.stringify(st))}
+const state=loadState();
+
+// Checkboxes
+document.querySelectorAll('input[type=checkbox][data-stage]').forEach(cb=>{
+  if(state[cb.id])cb.checked=true;
+  cb.addEventListener('change',()=>{
+    state[cb.id]=cb.checked;
+    saveState(state);
+    updateProgress();
+  });
+});
+
+// Text inputs
+document.querySelectorAll('[data-save]').forEach(el=>{
+  const key=el.dataset.save;
+  if(state[key])el.value=state[key];
+  el.addEventListener('input',()=>{state[key]=el.value;saveState(state)});
+});
+
+function updateProgress(){
+  const stages={1:[],2:[],3:[],4:[]};
+  document.querySelectorAll('input[type=checkbox][data-stage]').forEach(cb=>{
+    stages[cb.dataset.stage].push(cb.checked);
+  });
+  let totalChecked=0,totalAll=0;
+  for(const s in stages){
+    const checked=stages[s].filter(Boolean).length;
+    const total=stages[s].length;
+    totalChecked+=checked;totalAll+=total;
+    const pct=total?Math.round(checked/total*100):0;
+    const el=document.getElementById('s'+s+'-pct');
+    if(el)el.textContent=pct+'%';
+    const dot=document.getElementById('dot-'+s);
+    if(dot){pct===100?dot.classList.add('complete'):dot.classList.remove('complete')}
+  }
+  const overall=totalAll?Math.round(totalChecked/totalAll*100):0;
+  document.getElementById('overall-pct').textContent=overall+'%';
+  document.getElementById('overall-fill').style.width=overall+'%';
+}
+updateProgress();
+
+// Template popups
+function showTemplate(name){
+  document.getElementById('tmpl-overlay').classList.add('show');
+  document.getElementById('tmpl-'+name).classList.add('show');
+}
+function hideTemplate(){
+  document.getElementById('tmpl-overlay').classList.remove('show');
+  document.querySelectorAll('.template-popup').forEach(p=>p.classList.remove('show'));
+}
+
+// Expandable sections
+document.querySelectorAll('.expandable').forEach(el=>{
+  // Already handled via inline onclick
+});
+</script>
+</body>
+</html>

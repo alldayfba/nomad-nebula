@@ -655,6 +655,78 @@ def reverse_source_top_products(products, output_path=None, max_products=10):
     return reverse_source_batch(asins, output_path=rs_output)
 
 
+# ── Schema B Normalization (Unified Sourcing) ──────────────────────────────
+
+
+def normalize_to_schema_b(stalker_product: dict, seller_id: str = "") -> dict:
+    """Convert a stalker product dict to Schema B (unified sourcing format).
+
+    This allows storefront stalker results to be stored in the same scan_results
+    table as all other sourcing modes (brand, category, catalog, etc.).
+    """
+    asin = stalker_product.get("asin", "")
+    price = stalker_product.get("price", 0)
+    deal_score = stalker_product.get("deal_score", 0)
+
+    # Map deal_score to standard verdict
+    if deal_score >= 70:
+        verdict = "BUY"
+    elif deal_score >= 50:
+        verdict = "MAYBE"
+    elif deal_score >= 30:
+        verdict = "RESEARCH"
+    else:
+        verdict = "SKIP"
+
+    return {
+        "asin": asin,
+        "amazon_title": stalker_product.get("title", ""),
+        "amazon_url": f"https://www.amazon.com/dp/{asin}",
+        "amazon_price": price,
+        "buy_cost": None,  # Storefront stalking = no retail source
+        "source_url": f"https://www.amazon.com/dp/{asin}",
+        "source_retailer": f"Amazon Storefront ({seller_id})",
+        "estimated_profit": None,
+        "estimated_roi": None,
+        "verdict": verdict,
+        "match_method": "storefront_stalk",
+        "match_confidence": 1.0,
+        "profitability": {
+            "profit_per_unit": None,
+            "roi_percent": None,
+            "verdict": verdict,
+        },
+        "bsr": stalker_product.get("sales_rank"),
+        "brand": stalker_product.get("brand", ""),
+        "category": stalker_product.get("category", ""),
+        "fba_seller_count": stalker_product.get("fba_seller_count"),
+        "amazon_on_listing": stalker_product.get("amazon_on_listing"),
+        "deal_score": deal_score,
+        "estimated_monthly_sales": stalker_product.get("estimated_monthly_sales"),
+        "rating": stalker_product.get("rating"),
+        "review_count": stalker_product.get("review_count"),
+        "seller_id": seller_id,
+        "mode": "storefront",
+    }
+
+
+def normalize_stalker_results(output_data: dict) -> list[dict]:
+    """Normalize all products from a stalker run to Schema B.
+
+    Args:
+        output_data: Full output dict from run_stalker().
+
+    Returns:
+        List of Schema B dicts ready for scan_results insertion.
+    """
+    if not output_data:
+        return []
+
+    seller_id = output_data.get("seller_id", "")
+    products = output_data.get("products", [])
+    return [normalize_to_schema_b(p, seller_id) for p in products]
+
+
 # ── Main Flow ────────────────────────────────────────────────────────────────
 
 def run_stalker(seller_id, max_products=100, output_path=None,

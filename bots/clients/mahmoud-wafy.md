@@ -11,7 +11,7 @@
 | Name | Mahmoud Wafy |
 | Business | Mahmoud Wafy Real Estate (at FiND Real Estate brokerage) |
 | Offer | Real estate buyer/seller representation — LES, Williamsburg, Greenpoint, Downtown Brooklyn |
-| Price point | Commission-based (2.5-3% buyer agent, 5-6% listing split) |
+| Price point | $2K setup fee (paid) + % commission on closed deals (no monthly retainer) |
 | ICP | First-time NYC buyers (28-40, $120K-$300K HH income, renting in Brooklyn/Manhattan) |
 | Primary platform | Instagram (@wafyrealestateman) |
 | Stage | Active client (reactivation) |
@@ -152,3 +152,6 @@ Access to 40-60% hidden inventory + micro-neighborhood specialization (4 specifi
 - Full Growth OS scope (ads + funnels + email sequences)
 - Reactivation client — previously worked with Sabbo
 - Key gaps to fix: add social proof to site, create lead magnet, install Meta pixel
+- GHL Location ID: 7ngLPETcED2qCG75B4PL (credentials in .env as WAFY_GHL_*)
+- Meta Ad Account: act_732974396176446 (in .env as WAFY_META_AD_ACCOUNT_ID) — needs BM access grant
+- Deal structure: $2K setup (paid), % on closed deals, no retainer

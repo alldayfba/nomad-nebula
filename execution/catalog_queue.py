@@ -36,9 +36,9 @@ RESULTS_DIR = Path(__file__).parent.parent / ".tmp" / "sourcing" / "results"
 def run_queue(
     retailers: list[str],
     total_tokens: int = 5000,
-    min_roi: float = 30.0,
-    min_profit: float = 3.0,
-    max_price: float = 60.0,
+    min_roi: float = 15.0,
+    min_profit: float = 2.0,
+    max_price: float = 0,
     resume: bool = False,
 ) -> dict:
     """Run catalog sourcing across multiple retailers sequentially.

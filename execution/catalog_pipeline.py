@@ -40,7 +40,7 @@ load_dotenv(Path(__file__).parent.parent / ".env")
 import requests
 
 from execution.catalog_scraper import scrape_catalog, CATALOG_DIR
-from execution.velocity_analyzer import analyze_velocity, score_confidence
+from execution.velocity_analyzer import analyze_velocity, score_confidence, detect_ip_risk
 from execution.calculate_fba_profitability import calculate_product_profitability
 from execution.batch_keepa_analyzer import (
     batch_upc_lookup, check_tokens, pick_best_match, extract_keepa_data,
@@ -78,7 +78,7 @@ TOKEN_SAFETY_BUFFER = 50
 # ── Stage 2: Pre-Filter ─────────────────────────────────────────────────────
 
 
-def prefilter(products: list[dict], min_price: float = 5.0, max_price: float = 60.0,
+def prefilter(products: list[dict], min_price: float = 5.0, max_price: float = 0,
               coupon: str | None = None) -> list[dict]:
     """Filter catalog products before Keepa verification (0 tokens).
 
@@ -124,8 +124,10 @@ def prefilter(products: list[dict], min_price: float = 5.0, max_price: float = 6
         if not p.get("available", True):
             continue
 
-        # Price range
-        if price < min_price or price > max_price:
+        # Price range (max_price=0 means no cap)
+        if price < min_price:
+            continue
+        if max_price > 0 and price > max_price:
             continue
 
         seen_upcs.add(upc)
@@ -261,18 +263,21 @@ def batch_match(products: list[dict], max_tokens: int = 3000,
 # ── Stage 4: Profitability + Velocity ────────────────────────────────────────
 
 
-def analyze_matches(matched: list[dict], min_roi: float = 30.0,
-                    min_profit: float = 3.0, max_bsr: int = 200000) -> list[dict]:
+def analyze_matches(matched: list[dict], min_roi: float = 15.0,
+                    min_profit: float = 2.0, max_bsr: int = 500000,
+                    strict: bool = False) -> list[dict]:
     """Run profitability calc + velocity analysis on matched products.
 
     Args:
         matched: Products matched to Amazon (from batch_match).
-        min_roi: Minimum ROI % to keep.
-        min_profit: Minimum profit per unit to keep.
-        max_bsr: Maximum BSR to keep.
+        min_roi: Minimum ROI % to keep (default 15%, was 30%).
+        min_profit: Minimum profit per unit to keep (default $2, was $3).
+        max_bsr: Maximum BSR to keep (default 500K, was 200K).
+        strict: If True, drop products below thresholds. If False (default),
+                tag them but keep them (StartUpFBA style).
 
     Returns:
-        List of analyzed products that pass filters.
+        List of analyzed products (all with positive margin unless strict=True).
     """
     results = []
 
@@ -287,15 +292,28 @@ def analyze_matches(matched: list[dict], min_roi: float = 30.0,
         if retail_price >= amazon_price:
             continue  # No arbitrage opportunity
 
-        # Profitability calculation
+        # Step 1 fix: Build proper product dict for calculate_product_profitability
         try:
-            profitability = calculate_product_profitability(
-                buy_price=retail_price,
-                sell_price=amazon_price,
-                category=m.get("root_category", ""),
-            )
+            product_for_calc = {
+                "name": m.get("retailer_title", ""),
+                "sale_price": retail_price,
+                "retail_price": retail_price,
+                "retailer": m.get("retailer_url", ""),
+                "amazon": {
+                    "asin": m.get("asin", ""),
+                    "amazon_price": amazon_price,
+                    "title": m.get("title", ""),
+                    "category": m.get("category", ""),
+                    "root_category": m.get("root_category", ""),
+                    "sales_rank": m.get("sales_rank"),
+                    "fba_seller_count": m.get("fba_seller_count"),
+                    "amazon_on_listing": m.get("amazon_on_listing"),
+                    "match_confidence": m.get("match_confidence", 0.9),
+                },
+            }
+            profitability = calculate_product_profitability(product_for_calc)
         except Exception:
-            # Simple fallback calc
+            # Fallback calc (only if real calc fails)
             referral_fee = amazon_price * 0.15
             fba_fee = 5.0
             profit = amazon_price - retail_price - referral_fee - fba_fee
@@ -310,17 +328,33 @@ def analyze_matches(matched: list[dict], min_roi: float = 30.0,
         roi = profitability.get("roi_percent", 0)
         bsr = m.get("sales_rank")
 
-        # Apply filters
+        # Step 7: Tag products instead of dropping them (StartUpFBA style)
+        filter_status = "PASS"
+        if profit <= 0:
+            continue  # No margin at all — always skip
         if roi < min_roi:
-            continue
+            filter_status = "BELOW_ROI"
         if profit < min_profit:
-            continue
+            filter_status = "BELOW_PROFIT"
         if bsr and bsr > max_bsr:
-            continue
+            filter_status = "HIGH_BSR"
+
+        if strict and filter_status != "PASS":
+            continue  # Old behavior: drop filtered products
+
+        m["filter_status"] = filter_status
 
         # Velocity analysis (cheap mode — uses data already in the Keepa response)
         keepa_raw = m.pop("keepa_raw", {})
         velocity = analyze_velocity(keepa_raw, mode="cheap")
+
+        # Step 18: IP complaint risk detection from seller count history
+        csv_data = keepa_raw.get("csv", [])
+        fba_csv = csv_data[34] if csv_data and len(csv_data) > 34 else []
+        ip_risk = detect_ip_risk(fba_csv)
+        m["ip_risk"] = ip_risk.get("ip_risk", "low")
+        if ip_risk.get("reason") and ip_risk["reason"] != "insufficient_data":
+            m["ip_risk_detail"] = ip_risk.get("reason", "")
 
         # Confidence scoring
         confidence = score_confidence(
@@ -330,6 +364,17 @@ def analyze_matches(matched: list[dict], min_roi: float = 30.0,
             fba_count=m.get("fba_seller_count"),
         )
 
+        # Step 14: Surface Amazon-as-seller prominently
+        amazon_on = m.get("amazon_on_listing")
+        if amazon_on:
+            # Lower confidence when Amazon is a seller
+            conf_score = confidence.get("score", 0)
+            confidence["score"] = max(0, conf_score - 15)
+            confidence["amazon_penalty"] = True
+            # Recalc verdict
+            s = confidence["score"]
+            confidence["verdict"] = "BUY" if s >= 65 else "MAYBE" if s >= 40 else "RESEARCH" if s >= 20 else "SKIP"
+
         m["profitability"] = profitability
         m["velocity"] = {
             "score": velocity["velocity_score"],
@@ -337,6 +382,7 @@ def analyze_matches(matched: list[dict], min_roi: float = 30.0,
             "bsr_trend": velocity.get("bsr", {}).get("bsr_trend", "unknown"),
         }
         m["confidence"] = confidence
+        m["amazon_on_listing"] = amazon_on
         results.append(m)
 
     # Sort by confidence score descending
@@ -441,7 +487,8 @@ def deep_verify_top(results: list[dict], n: int = 20) -> tuple[list[dict], int]:
 
 OOS_SIGNALS = [
     "out of stock", "sold out", "unavailable", "not available",
-    "coming soon", "notify me", "currently unavailable",
+    "coming soon", "currently unavailable",
+    # "notify me" removed — causes false positives on partially stocked items
 ]
 
 
@@ -473,17 +520,20 @@ def verify_buy_links(results: list[dict]) -> list[dict]:
                 is_oos = any(sig in html_lower for sig in OOS_SIGNALS)
                 r["link_verified"] = not is_oos
                 if is_oos:
+                    r["link_status"] = "oos_warning"
                     dead += 1
-                    continue  # Skip OOS products
+                else:
+                    r["link_status"] = "verified"
             else:
                 r["link_verified"] = False
+                r["link_status"] = "http_error"
                 dead += 1
-                continue
         except Exception:
             r["link_verified"] = False
+            r["link_status"] = "timeout"
             dead += 1
-            continue
 
+        # Non-destructive: always keep the product (flag, don't remove)
         verified.append(r)
         time.sleep(0.5)
 
@@ -507,16 +557,12 @@ def check_ungating(results: list[dict]) -> list[dict]:
         brand = r.get("brand", "")
         if brand and _is_ungated(brand):
             r["ungated"] = True
+            r["gating_risk"] = False
         else:
             r["ungated"] = False
+            r["gating_risk"] = True
             r["gating_warning"] = f"Brand '{brand}' may be gated — verify before purchasing"
-            # Lower confidence by 10 points
-            conf = r.get("confidence", {})
-            if conf.get("score"):
-                conf["score"] = max(0, conf["score"] - 10)
-                # Recalc verdict
-                s = conf["score"]
-                conf["verdict"] = "BUY" if s >= 70 else "MAYBE" if s >= 50 else "RESEARCH" if s >= 30 else "SKIP"
+            # Step 6: No score penalty — informational flag only
             gated_count += 1
 
     if gated_count:
@@ -607,6 +653,13 @@ def format_output(results: list[dict], domain: str, tokens_used: int,
                 "monthly_sales_est": r.get("velocity", {}).get("monthly_est"),
                 "confidence_score": r.get("confidence", {}).get("score", 0),
                 "confidence_verdict": r.get("confidence", {}).get("verdict", "SKIP"),
+                # Smart filters (Part 3)
+                "amazon_on_listing": r.get("amazon_on_listing"),
+                "ip_risk": r.get("ip_risk", "low"),
+                "ip_risk_detail": r.get("ip_risk_detail", ""),
+                "gating_risk": r.get("gating_risk"),
+                "gating_warning": r.get("gating_warning", ""),
+                "filter_status": r.get("filter_status", "PASS"),
             }
             for r in results
         ],
@@ -652,17 +705,18 @@ def _load_pipeline_checkpoint(path: str) -> dict | None:
 def run_pipeline(
     url: str,
     max_tokens: int = 3000,
-    min_roi: float = 30.0,
-    min_profit: float = 3.0,
-    max_bsr: int = 200000,
+    min_roi: float = 15.0,
+    min_profit: float = 2.0,
+    max_bsr: int = 500000,
     min_price: float = 5.0,
-    max_price: float = 60.0,
+    max_price: float = 0,
     coupon: str | None = None,
     limit_scrape: int = 0,
     resume: bool = False,
     deep_verify: int = 0,
-    verify_links: bool = True,
+    verify_links: bool = False,
     no_coupon: bool = False,
+    strict: bool = False,
 ) -> dict:
     """Run the full catalog sourcing pipeline.
 
@@ -765,7 +819,7 @@ def run_pipeline(
 
     # ── Stage 4: Profitability + Velocity ───────────────────────────────
     print("[STAGE 4] Analyzing profitability + velocity...", file=sys.stderr)
-    analyzed = analyze_matches(matched, min_roi=min_roi, min_profit=min_profit, max_bsr=max_bsr)
+    analyzed = analyze_matches(matched, min_roi=min_roi, min_profit=min_profit, max_bsr=max_bsr, strict=strict)
     print(f"[STAGE 4] Complete: {len(analyzed)} profitable products\n", file=sys.stderr)
 
     # ── Stage 4b: Deep Verify top N ─────────────────────────────────────
@@ -833,16 +887,17 @@ def main():
     )
     parser.add_argument("url", help="Retailer URL (e.g., https://www.shopwss.com)")
     parser.add_argument("--max-tokens", type=int, default=3000, help="Max Keepa tokens to spend (default: 3000)")
-    parser.add_argument("--min-roi", type=float, default=30.0, help="Min ROI %% (default: 30)")
-    parser.add_argument("--min-profit", type=float, default=3.0, help="Min profit per unit (default: $3)")
-    parser.add_argument("--max-bsr", type=int, default=200000, help="Max BSR (default: 200000)")
+    parser.add_argument("--min-roi", type=float, default=15.0, help="Min ROI %% (default: 15)")
+    parser.add_argument("--min-profit", type=float, default=2.0, help="Min profit per unit (default: $2)")
+    parser.add_argument("--max-bsr", type=int, default=500000, help="Max BSR (default: 500000)")
     parser.add_argument("--min-price", type=float, default=5.0, help="Min retail price (default: $5)")
-    parser.add_argument("--max-price", type=float, default=60.0, help="Max retail price (default: $60)")
+    parser.add_argument("--max-price", type=float, default=0, help="Max retail price (0=no cap, default: no cap)")
     parser.add_argument("--coupon", type=str, default=None, help="Coupon to apply (e.g., '20%% off')")
     parser.add_argument("--limit-scrape", type=int, default=0, help="Max products to scrape (0=unlimited)")
     parser.add_argument("--resume", action="store_true", help="Resume from last checkpoint")
     parser.add_argument("--deep-verify", type=int, default=0, help="Deep verify top N with Keepa offers (21 tokens each)")
-    parser.add_argument("--no-verify-links", action="store_true", help="Skip buy link verification")
+    parser.add_argument("--verify-links", action="store_true", help="Enable buy link verification (off by default)")
+    parser.add_argument("--strict", action="store_true", help="Drop products below thresholds instead of tagging them")
     parser.add_argument("--no-coupon", action="store_true", help="Skip coupon auto-discovery")
     parser.add_argument("--json", action="store_true", help="Output full JSON to stdout")
     args = parser.parse_args()
@@ -859,8 +914,9 @@ def main():
         limit_scrape=args.limit_scrape,
         resume=args.resume,
         deep_verify=args.deep_verify,
-        verify_links=not args.no_verify_links,
+        verify_links=args.verify_links,
         no_coupon=args.no_coupon,
+        strict=args.strict,
     )
 
     if args.json:

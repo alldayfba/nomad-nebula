@@ -1,4 +1,4 @@
-<!-- Last Updated: 2026-03-13 -->
+<!-- Last Updated: 2026-03-21 -->
 <!-- Sources: YouTube, Instagram, X, Podcasts, Website -->
 # SooWei Goh -- Creator Intelligence Report
 > Synthesized from 17 YouTube video transcripts (~240K words)
@@ -882,3 +882,66 @@ SooWei's entire model IS high-ticket coaching. The Amazon FBA coaching offer is 
 - @sooweigoh: 97K followers
 - @gohconsulting: 40K followers
 - @sooweigohh (X): ~2K followers
+
+---
+
+## Updates Log
+
+### 2026-03-21 — "$100,400 in 1 Day at 20" (Group Call Recording)
+**Source:** https://www.youtube.com/watch?v=Va3AAHANFkM
+**Context:** Private community call where SoWei broke down the 4 changes that took him from $100K/month to $100K/day. Now on track for $500K/month, purely organic. 9 full-time employees.
+
+#### The 4 Scaling Changes
+
+**1. Treat Personal Brand Like a Media Company**
+- Volume without intention = "aimlessly shooting doors in the dark"
+- Test 3-5 content formats — find what gives you energy, not drains it
+- SoWei records group coaching calls because he's in natural flow state (best tonality, conviction, camera presence)
+- "I don't have insanely good camera presence — I just know how to capture myself in the right moments"
+- Measure content by business KPIs (time-to-book-call, LTV), NOT views/likes
+- Add to onboarding: "How long did it take to book a call? How many pieces of content? Which piece pushed you over the edge?"
+- Deep market research > copying competitors: surveyed 10 dream ICP sales calls, found "inbound leads" is #1 pain point → all content targets that
+- Dream follower vs ICP content split: need views → broader dream follower content. Need conversions → specific ICP content. Toggle based on bottleneck.
+- Invested $50K+ to study backend systems of biggest personal brands
+
+**2. Best Proof in Your Industry**
+- Stack case studies until undeniable — 27+ client interview videos on YouTube
+- Package proof as entertainment — podcast-style interviews, ask "why did you get into this?" not "how was it working with me?"
+- Open-ended questions create flow and resonance
+- Make being a case study aspirational — built culture where clients WANT testimonials. Tier structure: every $100K/month client gets interview + hundreds of followers from association
+- **KILLER FORMAT: 1-on-1 live business breakdowns** — sit down, audit client's business on camera. Can't fake live competence. Minimum 3 highly qualified inbound bookings per video.
+- **The proof loop:** Do live 1-on-1 breakdown → 3 months later do client interview → reference the original strategies → "did this work?" → unstoppable social proof flywheel
+- "If you do it well and you show a client interview 3 months after that breakdown... we're probably going to sign 10 qualified clients from it. We're minimum making six figures from that video."
+- Don't fall into fulfillment trap — draw the line. Specific check-in days (Mon/Wed) + office hours model. "If you never draw the line, they'll walk all over you."
+- One-to-many outputs: if you're answering the same question on 1-on-1 calls, build a course/doc/system instead. "Scale into pleasure, not pain."
+
+**3. Spend Money to Make Money**
+- Used to hoard profit margins, pay team as little as possible — that was wrong
+- Introduced bonus structures, higher pay → A-players who run through walls
+- Look at take-home profit, not profit margin. If take-home is increasing but margin decreasing, that's natural scaling.
+- "Apple/Nvidia CEOs don't have 80% profit — they have leverage"
+- Creative direction team + sales team are biggest investments. The $100K day happened because of team, not 14-hour days.
+- "When you find an A-player and don't pay what he deserves, a better opportunity will come and he'll leave in an instant"
+
+**4. Be Mission-Driven (Internal Desire Shift)**
+- Shifted from chasing record months (dopamine) to industry impact + team mission
+- "Your business has to be big enough to fit every team member's dream"
+- 9 employees left six-figure jobs for his vision — that responsibility > money motivation
+- "In 5-10 years, would your team stick with you? Can they achieve their goals inside your business?"
+- Anti-lifestyle selling: 5 years in business, still no car. Doesn't sell with material items, sells with value + who you become. This was a major selling point for his clients.
+
+#### Key Quotes
+- "I don't have insanely good camera presence — I just know how to capture myself in the right moments"
+- "If you're posting garbage, posting more garbage doesn't help"
+- "My best ideas don't come from copying competitors — they come from doing the work nobody wants to do"
+- "Scale into pleasure, not pain, by intentionally designing what you do day-to-day"
+- "The best drug you can ever take is finding a business model and clients you genuinely enjoy serving"
+
+#### Sabbo Application Notes
+- Record coaching calls as content (natural flow state = best camera presence)
+- Add "how did you find us?" + "what content pushed you over?" to booking form
+- Do 1-on-1 live breakdown of a student's Amazon business on camera (min 3 qualified inbound per video)
+- Post all 1,498 extracted testimonials — sitting on a goldmine
+- Proof loop: live breakdown now → client interview 3 months later referencing the strategies
+- Align with Ben Bader's "AI Amazon" positioning — show the system, not lifestyle
+- Scale into pleasure not pain — one-to-many systems (course modules, office hours) over repetitive 1-on-1s

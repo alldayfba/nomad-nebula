@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agency OS - Setter Cold Call Flowchart</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: hsl(250, 18%, 6%);
+  --bg-card: hsl(250, 16%, 9%);
+  --bg-card-hover: hsl(250, 16%, 11%);
+  --slate: hsl(250, 14%, 15%);
+  --primary: #8B5CF6;
+  --primary-dim: rgba(139, 92, 246, 0.15);
+  --primary-glow: rgba(139, 92, 246, 0.3);
+  --white: #F5F5F5;
+  --white-60: rgba(255, 255, 255, 0.6);
+  --white-40: rgba(255, 255, 255, 0.4);
+  --green: #22C55E;
+  --red: #EF4444;
+  --blue: #3B82F6;
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--white);
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Progress Bar ── */
+#progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  z-index: 1000;
+}
+#progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), #A78BFA);
+  width: 0%;
+  transition: width 0.4s ease;
+  border-radius: 0 2px 2px 0;
+}
+
+/* ── Top Bar ── */
+.top-bar {
+  position: fixed;
+  top: 4px;
+  left: 0;
+  right: 0;
+  background: hsla(250, 18%, 6%, 0.92);
+  backdrop-filter: blur(40px) saturate(150%);
+  -webkit-backdrop-filter: blur(40px) saturate(150%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 12px 24px;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.top-bar-title {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--primary);
+}
+.phase-indicators {
+  display: flex;
+  gap: 6px;
+}
+.phase-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--slate);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.phase-dot.active { background: var(--primary); box-shadow: 0 0 8px var(--primary-glow); }
+.phase-dot.completed { background: var(--green); }
+
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.stats-mini {
+  font-size: 11px;
+  color: var(--white-60);
+  display: flex;
+  gap: 12px;
+}
+.stats-mini span { white-space: nowrap; }
+.stats-mini .num { color: var(--primary); font-weight: 600; }
+
+.btn-icon {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--white-60);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+.btn-icon:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ── Main Layout ── */
+.main-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 80px 20px 60px;
+}
+
+/* ── Stats Banner ── */
+.stats-banner {
+  background: hsla(250, 16%, 9%, 0.85);
+  backdrop-filter: blur(40px) saturate(150%);
+  -webkit-backdrop-filter: blur(40px) saturate(150%);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.stat-item {
+  text-align: center;
+  flex: 1;
+  min-width: 80px;
+}
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary);
+}
+.stat-label {
+  font-size: 11px;
+  color: var(--white-40);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+.stat-arrow {
+  color: var(--white-40);
+  font-size: 14px;
+  flex: 0;
+}
+.daily-target-badge {
+  background: var(--primary-dim);
+  border: 1px solid rgba(139,92,246,0.2);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+/* ── Phase Card ── */
+.phase-card {
+  background: hsla(250, 16%, 9%, 0.85);
+  backdrop-filter: blur(40px) saturate(150%);
+  -webkit-backdrop-filter: blur(40px) saturate(150%);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+.phase-card.active {
+  opacity: 1;
+  transform: scale(1);
+  border-color: rgba(139, 92, 246, 0.2);
+  box-shadow: 0 0 30px -5px hsla(265, 80%, 55%, 0.15);
+}
+.phase-card.completed {
+  opacity: 0.7;
+  transform: scale(0.98);
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+.phase-header {
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+.phase-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.phase-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--slate);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+.phase-card.active .phase-number { background: var(--primary); color: var(--bg); }
+.phase-card.completed .phase-number { background: var(--green); color: var(--bg); }
+.phase-card.completed .phase-number::after { content: '\2713'; }
+.phase-card.completed .phase-number span { display: none; }
+
+.phase-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+.phase-meta {
+  font-size: 12px;
+  color: var(--white-40);
+  margin-top: 2px;
+}
+.phase-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.phase-time {
+  font-size: 12px;
+  color: var(--primary);
+  background: var(--primary-dim);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+.phase-chevron {
+  color: var(--white-40);
+  font-size: 18px;
+  transition: transform 0.3s;
+}
+.phase-card.active .phase-chevron { transform: rotate(180deg); }
+
+.phase-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease;
+}
+.phase-card.active .phase-body { max-height: 3000px; }
+.phase-content {
+  padding: 0 24px 24px;
+}
+
+/* ── Script Block ── */
+.script-block {
+  background: rgba(139, 92, 246, 0.06);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--white);
+  font-weight: 400;
+}
+.script-block .placeholder {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* ── Expandable Card ── */
+.expandable {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.expandable-trigger {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.expandable-trigger:hover { background: rgba(255,255,255,0.04); }
+.expandable-trigger .arrow {
+  font-size: 12px;
+  color: var(--white-40);
+  transition: transform 0.2s;
+}
+.expandable.open .expandable-trigger .arrow { transform: rotate(90deg); }
+.expandable-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.expandable.open .expandable-body { max-height: 500px; }
+.expandable-content {
+  padding: 0 16px 14px;
+  font-size: 14px;
+  color: var(--white-60);
+  line-height: 1.6;
+}
+.expandable-content .response {
+  background: rgba(139,92,246,0.06);
+  border-left: 2px solid var(--primary);
+  padding: 10px 14px;
+  border-radius: 0 6px 6px 0;
+  margin-top: 6px;
+  color: var(--white);
+  font-size: 14px;
+}
+
+/* ── Section Labels ── */
+.section-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--white-40);
+  margin: 20px 0 10px;
+  font-weight: 600;
+}
+
+/* ── Rules Box ── */
+.rules-box {
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin: 12px 0;
+}
+.rules-box li {
+  font-size: 13px;
+  color: var(--white-60);
+  margin-bottom: 4px;
+  margin-left: 16px;
+}
+.rules-box .rule-icon { color: var(--red); margin-right: 6px; }
+
+.reminder-box {
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  margin: 12px 0;
+  font-size: 13px;
+  color: var(--blue);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ── Next Phase Button ── */
+.next-btn {
+  display: block;
+  width: 100%;
+  background: linear-gradient(135deg, var(--primary), #A78BFA);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+.next-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--primary-glow); }
+.next-btn:active { transform: translateY(0); }
+
+.exit-btn {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--red);
+}
+.exit-btn:hover { background: rgba(239, 68, 68, 0.15); box-shadow: none; transform: none; }
+
+/* ── Qualification Checklist ── */
+.checklist { list-style: none; margin: 12px 0; }
+.checklist li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.03);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+  user-select: none;
+}
+.checklist li:hover { background: rgba(255,255,255,0.05); }
+.checklist li.checked { background: rgba(34, 197, 94, 0.08); }
+.check-box {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--slate);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  font-size: 12px;
+}
+.checklist li.checked .check-box {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--bg);
+}
+.qual-count {
+  text-align: center;
+  font-size: 14px;
+  color: var(--white-60);
+  margin-top: 10px;
+}
+.qual-count .count { color: var(--primary); font-weight: 700; font-size: 18px; }
+
+/* ── Decision Fork ── */
+.fork-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+.fork-btn {
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.fork-qualified {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: var(--green);
+}
+.fork-qualified:hover { background: rgba(34, 197, 94, 0.2); }
+.fork-disqualify {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--red);
+}
+.fork-disqualify:hover { background: rgba(239, 68, 68, 0.2); }
+
+/* ── Exit Script (hidden) ── */
+.exit-script {
+  display: none;
+  margin-top: 12px;
+}
+.exit-script.show { display: block; }
+
+/* ── Tie-Down Branching ── */
+.tiedown-section {
+  background: rgba(139, 92, 246, 0.04);
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin: 12px 0;
+}
+.tiedown-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--primary);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.branch-btns {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0;
+}
+.branch-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: var(--white-60);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.branch-btn:hover { border-color: var(--primary); color: var(--primary); }
+.branch-btn.active { background: var(--primary-dim); border-color: var(--primary); color: var(--primary); }
+.branch-response {
+  display: none;
+  padding: 10px 14px;
+  background: rgba(139,92,246,0.06);
+  border-left: 2px solid var(--primary);
+  border-radius: 0 6px 6px 0;
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--white);
+}
+.branch-response.show { display: block; }
+
+/* ── Timeline ── */
+.timeline {
+  position: relative;
+  padding-left: 28px;
+  margin: 16px 0;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--slate);
+}
+.timeline-item {
+  position: relative;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.03);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.2s;
+  user-select: none;
+}
+.timeline-item:hover { background: rgba(255,255,255,0.05); }
+.timeline-item.checked-tl { background: rgba(34, 197, 94, 0.06); }
+.timeline-dot {
+  position: absolute;
+  left: -24px;
+  top: 16px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--slate);
+  border: 2px solid var(--bg-card);
+  transition: all 0.2s;
+}
+.timeline-item.checked-tl .timeline-dot { background: var(--green); }
+.timeline-when {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--primary);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.timeline-action {
+  font-size: 14px;
+  color: var(--white);
+  line-height: 1.5;
+}
+.timeline-script {
+  font-size: 13px;
+  color: var(--white-60);
+  margin-top: 6px;
+  font-style: italic;
+}
+
+/* ── Video Match Table ── */
+.video-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 13px;
+}
+.video-table th {
+  text-align: left;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.04);
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.video-table td {
+  padding: 10px 12px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  color: var(--white-60);
+}
+
+/* ── Objection Panel ── */
+.objection-overlay {
+  position: fixed;
+  top: 0;
+  right: -420px;
+  width: 400px;
+  max-width: 90vw;
+  height: 100vh;
+  background: hsla(250, 16%, 9%, 0.9);
+  backdrop-filter: blur(40px) saturate(150%);
+  -webkit-backdrop-filter: blur(40px) saturate(150%);
+  border-left: 1px solid rgba(255,255,255,0.08);
+  z-index: 1001;
+  transition: right 0.35s ease;
+  overflow-y: auto;
+  box-shadow: -10px 0 40px rgba(0,0,0,0.5);
+}
+.objection-overlay.open { right: 0; }
+.objection-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  background: var(--bg-card);
+  z-index: 2;
+}
+.objection-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+}
+.objection-close {
+  background: none;
+  border: none;
+  color: var(--white-40);
+  font-size: 22px;
+  cursor: pointer;
+}
+.objection-list { padding: 12px; }
+
+/* ── Backdrop ── */
+.backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+}
+.backdrop.show { display: block; }
+
+/* ── Connector Lines ── */
+.connector {
+  display: flex;
+  justify-content: center;
+  margin: -8px 0;
+  position: relative;
+  z-index: 1;
+}
+.connector-line {
+  width: 2px;
+  height: 24px;
+  background: var(--slate);
+}
+.connector-line.gold { background: var(--primary); }
+
+/* ── Discovery Questions ── */
+.discovery-q {
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.03);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  font-size: 15px;
+  color: var(--white);
+  border-left: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.discovery-q:hover { background: rgba(255,255,255,0.06); border-left-color: var(--primary); }
+.discovery-q.selected { background: rgba(139,92,246,0.08); border-left-color: var(--primary); }
+
+/* ── Print ── */
+@media print {
+  body { background: #fff; color: #000; }
+  .top-bar, #progress-bar, .next-btn, .btn-icon,
+  .objection-overlay, .backdrop, .phase-chevron,
+  .stats-banner, .connector { display: none !important; }
+  .phase-card { opacity: 1 !important; transform: none !important; break-inside: avoid; border: 1px solid #ccc; margin-bottom: 16px; }
+  .phase-body { max-height: none !important; }
+  .phase-card, .expandable, .script-block, .rules-box,
+  .tiedown-section, .timeline-item, .discovery-q { background: #f9f9f9 !important; }
+  .script-block { border-left-color: #333; }
+  .expandable-body { max-height: none !important; }
+  .phase-number { background: #333 !important; color: #fff !important; }
+  .phase-time, .section-label, .phase-meta, .daily-target-badge { color: #666 !important; background: none !important; }
+  .gold, .placeholder { color: #333 !important; }
+}
+
+/* ── Mobile ── */
+@media (max-width: 640px) {
+  .top-bar { padding: 10px 14px; }
+  .stats-mini { display: none; }
+  .stats-banner { flex-direction: column; gap: 8px; padding: 16px; }
+  .stat-arrow { display: none; }
+  .stats-banner .stat-item { min-width: auto; }
+  .main-container { padding: 70px 12px 40px; }
+  .phase-header { padding: 16px; }
+  .phase-content { padding: 0 16px 16px; }
+  .script-block { font-size: 15px; padding: 14px 16px; }
+  .fork-container { grid-template-columns: 1fr; }
+  .objection-overlay { width: 100vw; max-width: 100vw; right: -100vw; }
+}
+
+/* ── Keyboard focus ── */
+.phase-card:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<!-- Progress Bar -->
+<div id="progress-bar"><div id="progress-fill"></div></div>
+
+<!-- Top Bar -->
+<div class="top-bar">
+  <div class="top-bar-left">
+    <div class="top-bar-title">AGENCY OS SETTER</div>
+    <div class="phase-indicators">
+      <div class="phase-dot active" data-phase="1" title="Phase 1"></div>
+      <div class="phase-dot" data-phase="2" title="Phase 2"></div>
+      <div class="phase-dot" data-phase="3" title="Phase 3"></div>
+      <div class="phase-dot" data-phase="4" title="Phase 4"></div>
+      <div class="phase-dot" data-phase="5" title="Phase 5"></div>
+      <div class="phase-dot" data-phase="6" title="Phase 6"></div>
+    </div>
+  </div>
+  <div class="top-bar-right">
+    <div class="stats-mini">
+      <span><span class="num">50</span> dials</span>
+      <span><span class="num">10</span> convos</span>
+      <span><span class="num">3</span> qual</span>
+      <span><span class="num">2</span> booked</span>
+      <span><span class="num">1.5</span> show</span>
+    </div>
+    <button class="btn-icon" id="btn-objections" title="Objection Handling (O)">!</button>
+    <button class="btn-icon" id="btn-print" title="Print (P)">&#9113;</button>
+    <button class="btn-icon" id="btn-reset" title="Reset Call (R)">&#8634;</button>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-container">
+
+  <!-- Stats Banner -->
+  <div class="stats-banner">
+    <div class="daily-target-badge">50 / 50 / 50</div>
+    <div class="stat-item"><div class="stat-value">50</div><div class="stat-label">Dials</div></div>
+    <div class="stat-arrow">&rarr;</div>
+    <div class="stat-item"><div class="stat-value">10</div><div class="stat-label">Convos</div></div>
+    <div class="stat-arrow">&rarr;</div>
+    <div class="stat-item"><div class="stat-value">3</div><div class="stat-label">Qualified</div></div>
+    <div class="stat-arrow">&rarr;</div>
+    <div class="stat-item"><div class="stat-value">2</div><div class="stat-label">Booked</div></div>
+    <div class="stat-arrow">&rarr;</div>
+    <div class="stat-item"><div class="stat-value">80%</div><div class="stat-label">Show Rate</div></div>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase-card active" id="phase-1" tabindex="0">
+    <div class="phase-header" onclick="togglePhase(1)">
+      <div class="phase-header-left">
+        <div class="phase-number"><span>1</span></div>
+        <div>
+          <div class="phase-title">Pattern Interrupt</div>
+          <div class="phase-meta">Get 30 seconds of their time</div>
+        </div>
+      </div>
+      <div class="phase-header-right">
+        <div class="phase-time">10 sec</div>
+        <div class="phase-chevron">&#9660;</div>
+      </div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-content">
+        <div class="section-label">Primary Opener</div>
+        <div class="script-block">
+          "Hey <span class="placeholder">[Name]</span>, this is <span class="placeholder">[Your Name]</span> &mdash; I know this is out of the blue, do you have 30 seconds?"
+        </div>
+
+        <div class="section-label">If They Push Back</div>
+        <div class="expandable" onclick="toggleExpand(this)">
+          <div class="expandable-trigger">
+            <span>"Who is this?" / "What's this about?"</span>
+            <span class="arrow">&#9654;</span>
+          </div>
+          <div class="expandable-body">
+            <div class="expandable-content">
+              <div class="response">"Totally fair &mdash; I work with growth systems for founder-led businesses. I was looking at <span class="placeholder">[their company]</span> and had a quick question. Literally 30 seconds."</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="expandable" onclick="toggleExpand(this)">
+          <div class="expandable-trigger">
+            <span>"I'm busy"</span>
+            <span class="arrow">&#9654;</span>
+          </div>
+          <div class="expandable-body">
+            <div class="expandable-content">
+              <div class="response">"Totally get it. When's a better 2 minutes? I'll call you back then."</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="expandable" onclick="toggleExpand(this)">
+          <div class="expandable-trigger">
+            <span>"How'd you get my number?"</span>
+            <span class="arrow">&#9654;</span>
+          </div>
+          <div class="expandable-body">
+            <div class="expandable-content">
+              <div class="response">"Your business came up when I was researching <span class="placeholder">[their industry]</span> in <span class="placeholder">[their area]</span>. I'm not trying to waste your time &mdash; genuinely had a question about how you're handling growth. 30 seconds?"</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rules-box">
+          <ul>
+            <li><span class="rule-icon">&#10005;</span> Do NOT say your company name &mdash; it means nothing yet</li>
+            <li><span class="rule-icon">&#10005;</span> Do NOT pitch in the opener &mdash; you're asking for time</li>
+            <li><span class="rule-icon">&#10003;</span> Match their energy &mdash; relaxed = relaxed, direct = direct</li>
+          </ul>
+        </div>
+
+        <button class="next-btn" onclick="advancePhase(2)">They gave you 30 seconds &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="connector-line gold"></div></div>
+
+  <!-- PHASE 2 -->
+  <div class="phase-card" id="phase-2" tabindex="0">
+    <div class="phase-header" onclick="togglePhase(2)">
+      <div class="phase-header-left">
+        <div class="phase-number"><span>2</span></div>
+        <div>
+          <div class="phase-title">The Hook</div>
+          <div class="phase-meta">Make them curious enough to keep talking</div>
+        </div>
+      </div>
+      <div class="phase-header-right">
+        <div class="phase-time">15-20 sec</div>
+        <div class="phase-chevron">&#9660;</div>
+      </div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-content">
+        <div class="section-label">Primary Hook</div>
+        <div class="script-block">
+          "I was looking at <span class="placeholder">[Company]</span> &mdash; looks like you've built something solid. Quick question: is your growth right now more systematic, or is it more like... you're figuring it out as you go?"
+        </div>
+
+        <div class="section-label">Alternative Hooks</div>
+        <div class="expandable" onclick="toggleExpand(this)">
+          <div class="expandable-trigger">
+            <span>They're running ads</span>
+            <span class="arrow">&#9654;</span>
+          </div>
+          <div class="expandable-body">
+            <div class="expandable-content">
+              <div class="response">"I noticed you're running ads &mdash; are you happy with what you're getting back from that spend, or does it feel like you're kind of guessing?"</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="expandable" onclick="toggleExpand(this)">
+          <div class="expandable-trigger">
+            <span>Big following, no clear funnel</span>
+            <span class="arrow">&#9654;</span>
+          </div>
+          <div class="expandable-body">
+            <div class="expandable-content">
+              <div class="response">"You've got a solid following &mdash; are you actually converting that into revenue systematically, or is it more word-of-mouth right now?"</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="expandable" onclick="toggleExpand(this)">
+          <div class="expandable-trigger">
+            <span>Recently hired/fired an agency</span>
+            <span class="arrow">&#9654;</span>
+          </div>
+          <div class="expandable-body">
+            <div class="expandable-content">
+              <div class="response">"I saw you were working with <span class="placeholder">[agency/freelancer]</span>. Are you still with them, or are you looking for something different?"</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reminder-box">SHUT UP. Let them talk.</div>
+
+        <button class="next-btn" onclick="advancePhase(3)">They're talking &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="connector-line"></div></div>
+
+  <!-- PHASE 3 -->
+  <div class="phase-card" id="phase-3" tabindex="0">
+    <div class="phase-header" onclick="togglePhase(3)">
+      <div class="phase-header-left">
+        <div class="phase-number"><span>3</span></div>
+        <div>
+          <div class="phase-title">Dig Into Pain</div>
+          <div class="phase-meta">Diagnose. Qualify. Identify #1 pain.</div>
+        </div>
+      </div>
+      <div class="phase-header-right">
+        <div class="phase-time">60-90 sec</div>
+        <div class="phase-chevron">&#9660;</div>
+      </div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-content">
+        <div class="reminder-box">Listen 70%, Talk 30%. You are diagnosing, not pitching.</div>
+
+        <div class="section-label">Pick 2-3 Discovery Questions</div>
+        <div class="discovery-q" onclick="this.classList.toggle('selected')">"What does your customer acquisition look like right now &mdash; where do most of your clients come from?"</div>
+        <div class="discovery-q" onclick="this.classList.toggle('selected')">"Do you have a marketing team or person handling this, or is it on you?"</div>
+        <div class="discovery-q" onclick="this.classList.toggle('selected')">"What have you tried that hasn't worked?"</div>
+        <div class="discovery-q" onclick="this.classList.toggle('selected')">"What would it look like if this was actually dialed in? What would change for you?"</div>
+        <div class="discovery-q" onclick="this.classList.toggle('selected')">"What's the cost of NOT fixing this? Like, how much are you leaving on the table every month?"</div>
+
+        <div class="section-label">Qualification Checklist</div>
+        <ul class="checklist" id="qual-checklist">
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Revenue $1M+/year</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Has product-market fit</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Spending money on marketing</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Frustrated, wants to fix it</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Founder is decision maker</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Can invest $5K-$25K/mo</span></li>
+        </ul>
+        <div class="qual-count">Qualified: <span class="count" id="qual-count">0</span> / 6</div>
+
+        <div class="section-label">Recap Their Pain</div>
+        <div class="script-block">
+          "So it sounds like the main issue is <span class="placeholder">[X]</span>, and that's costing you roughly <span class="placeholder">[Y]</span> a month &mdash; is that right?"
+        </div>
+
+        <div class="fork-container">
+          <button class="fork-btn fork-qualified" onclick="advancePhase(4)">4+ checks = QUALIFIED &rarr;</button>
+          <button class="fork-btn fork-disqualify" onclick="showExitScript()">Not Qualified &mdash; Exit</button>
+        </div>
+
+        <div class="exit-script" id="exit-script">
+          <div class="script-block" style="border-left-color: var(--red);">
+            "Appreciate the time &mdash; honestly based on what you're telling me, I don't think this would be the right fit right now. But if things change, I'd love to reconnect."
+          </div>
+          <div class="rules-box">
+            <ul>
+              <li>Do NOT book bad leads. It destroys closer time and YOUR show rate.</li>
+              <li>Close rate on bad leads: 0%. Close rate on good leads: 40-60%.</li>
+            </ul>
+          </div>
+          <button class="next-btn exit-btn" onclick="resetCall()">End Call &mdash; Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="connector-line"></div></div>
+
+  <!-- PHASE 4 -->
+  <div class="phase-card" id="phase-4" tabindex="0">
+    <div class="phase-header" onclick="togglePhase(4)">
+      <div class="phase-header-left">
+        <div class="phase-number"><span>4</span></div>
+        <div>
+          <div class="phase-title">The Bridge</div>
+          <div class="phase-meta">Connect pain to the strategy call</div>
+        </div>
+      </div>
+      <div class="phase-header-right">
+        <div class="phase-time">15-20 sec</div>
+        <div class="phase-chevron">&#9660;</div>
+      </div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-content">
+        <div class="section-label">Primary Bridge</div>
+        <div class="script-block">
+          "Look, this is exactly the kind of thing we help with. We work with founder-led businesses in the <span class="placeholder">[their revenue range]</span> and build out the entire growth engine &mdash; not just run ads, but install the full system so it's predictable. I think it'd be worth a conversation. Not a pitch &mdash; just a strategy session to see if there's a fit."
+        </div>
+
+        <div class="section-label">Alternative Bridges</div>
+        <div class="expandable" onclick="toggleExpand(this)">
+          <div class="expandable-trigger">
+            <span>Case study bridge</span>
+            <span class="arrow">&#9654;</span>
+          </div>
+          <div class="expandable-body">
+            <div class="expandable-content">
+              <div class="response">"We've helped a few businesses in <span class="placeholder">[their space]</span> go from exactly what you're describing to a predictable pipeline. It might make sense to jump on a quick call with <span class="placeholder">[Closer Name]</span> to see if we can do the same."</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="expandable" onclick="toggleExpand(this)">
+          <div class="expandable-trigger">
+            <span>Systems problem bridge</span>
+            <span class="arrow">&#9654;</span>
+          </div>
+          <div class="expandable-body">
+            <div class="expandable-content">
+              <div class="response">"Honestly, what you're describing is a systems problem, not a marketing problem. That's what we solve. Would it make sense to get on a 30-minute call to dig into this properly?"</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rules-box">
+          <ul>
+            <li><span class="rule-icon">&#10005;</span> Do NOT explain the offer in detail &mdash; that's the closer's job</li>
+            <li><span class="rule-icon">&#10005;</span> Say "strategy session" or "conversation" &mdash; NEVER "sales call"</li>
+            <li><span class="rule-icon">&#10003;</span> Use a case study if you have one for their industry</li>
+          </ul>
+        </div>
+
+        <button class="next-btn" onclick="advancePhase(5)">They're interested &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="connector-line"></div></div>
+
+  <!-- PHASE 5 -->
+  <div class="phase-card" id="phase-5" tabindex="0">
+    <div class="phase-header" onclick="togglePhase(5)">
+      <div class="phase-header-left">
+        <div class="phase-number"><span>5</span></div>
+        <div>
+          <div class="phase-title">Book the Call</div>
+          <div class="phase-meta">Lock the time. Get tie-downs. Protect the show.</div>
+        </div>
+      </div>
+      <div class="phase-header-right">
+        <div class="phase-time">30-45 sec</div>
+        <div class="phase-chevron">&#9660;</div>
+      </div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-content">
+        <div class="section-label">Booking Script</div>
+        <div class="script-block">
+          "I've got time on <span class="placeholder">[Day]</span> at <span class="placeholder">[Time]</span> or <span class="placeholder">[Day]</span> at <span class="placeholder">[Time]</span> &mdash; which works better for you?"
+        </div>
+
+        <div class="section-label">After They Pick a Time</div>
+        <div class="script-block">
+          "Perfect. I'll send you a calendar link right now. A couple things &mdash; the call is with <span class="placeholder">[Closer Name]</span>, it's about 30 minutes. Before the call, I'll send you a short video that'll give you context on how we work so you get the most out of it. And <span class="placeholder">[Name]</span> &mdash; just make sure you're somewhere quiet with no distractions. Cool?"
+        </div>
+
+        <!-- Tie-Down 1 -->
+        <div class="tiedown-section">
+          <div class="tiedown-label">Tie-Down #1: Decision Maker (NON-NEGOTIABLE)</div>
+          <div class="script-block" style="font-size: 15px;">
+            "Quick question &mdash; if you liked what you heard on the call, is there anyone else who'd need to be involved in the decision? A business partner, COO, anyone?"
+          </div>
+          <div class="branch-btns">
+            <button class="branch-btn" onclick="showBranch(this, 'dm-yes')">Yes, someone else</button>
+            <button class="branch-btn" onclick="showBranch(this, 'dm-no')">No, just me</button>
+          </div>
+          <div class="branch-response" id="dm-yes">
+            <strong>Ask:</strong> "Can they be on the call too?"<br>
+            If they can't &rarr; <strong>Reschedule</strong> to when both can attend.
+          </div>
+          <div class="branch-response" id="dm-no">
+            "So just to confirm &mdash; if you wanted to move forward, you wouldn't need anyone else's sign-off?"
+          </div>
+        </div>
+
+        <!-- Tie-Down 2 -->
+        <div class="tiedown-section">
+          <div class="tiedown-label">Tie-Down #2: Financial (Use When Rapport is Strong)</div>
+          <div class="script-block" style="font-size: 15px;">
+            "Just so the call is valuable for everyone &mdash; our clients typically invest $5K-$25K a month depending on scope. Is that realistic for you if the fit is right?"
+          </div>
+          <div class="branch-btns">
+            <button class="branch-btn" onclick="showBranch(this, 'fin-yes')">Yes</button>
+            <button class="branch-btn" onclick="showBranch(this, 'fin-no')">No / Hesitation</button>
+          </div>
+          <div class="branch-response" id="fin-yes">
+            Great. Move on. The call is locked.
+          </div>
+          <div class="branch-response" id="fin-no">
+            "No pressure at all &mdash; I just want to make sure the call is worth your time. If budget is tight, maybe we reconnect in a couple months?"
+          </div>
+        </div>
+
+        <button class="next-btn" onclick="advancePhase(6)">Booked! &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="connector-line"></div></div>
+
+  <!-- PHASE 6 -->
+  <div class="phase-card" id="phase-6" tabindex="0">
+    <div class="phase-header" onclick="togglePhase(6)">
+      <div class="phase-header-left">
+        <div class="phase-number"><span>6</span></div>
+        <div>
+          <div class="phase-title">Protect the Show</div>
+          <div class="phase-meta">6-touchpoint follow-up system</div>
+        </div>
+      </div>
+      <div class="phase-header-right">
+        <div class="phase-time">After hang-up</div>
+        <div class="phase-chevron">&#9660;</div>
+      </div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-content">
+        <div class="reminder-box">Show rate target: 80%+. Booking is step 1. Getting them to SHOW UP is the actual job.</div>
+
+        <div class="section-label">6-Touchpoint Show Rate System</div>
+        <div class="timeline">
+          <div class="timeline-item" onclick="this.classList.toggle('checked-tl')">
+            <div class="timeline-dot"></div>
+            <div class="timeline-when">Within 5 minutes</div>
+            <div class="timeline-action">Send calendar invite with Zoom link</div>
+          </div>
+          <div class="timeline-item" onclick="this.classList.toggle('checked-tl')">
+            <div class="timeline-dot"></div>
+            <div class="timeline-when">Within 5 minutes</div>
+            <div class="timeline-action">Text confirmation</div>
+            <div class="timeline-script">"Hey [Name], [Your Name] here &mdash; just sent over the calendar link for [Day] at [Time]. Looking forward to it."</div>
+          </div>
+          <div class="timeline-item" onclick="this.classList.toggle('checked-tl')">
+            <div class="timeline-dot"></div>
+            <div class="timeline-when">Within 1 hour</div>
+            <div class="timeline-action">Send pre-call video matched to their pain point</div>
+            <div class="timeline-script">"Hey [Name], before your call with [Closer], this video is super relevant to what you mentioned about [their specific bottleneck]. Worth a watch."</div>
+          </div>
+          <div class="timeline-item" onclick="this.classList.toggle('checked-tl')">
+            <div class="timeline-dot"></div>
+            <div class="timeline-when">24 hours before</div>
+            <div class="timeline-action">Reminder text (call if no reply)</div>
+            <div class="timeline-script">"Hey [Name]! Quick reminder &mdash; you've got your call with [Closer] tomorrow at [Time]. Still good?"</div>
+          </div>
+          <div class="timeline-item" onclick="this.classList.toggle('checked-tl')">
+            <div class="timeline-dot"></div>
+            <div class="timeline-when">Morning of</div>
+            <div class="timeline-action">Two-text pattern</div>
+            <div class="timeline-script">Text 1: "[Name]!" &mdash; then 30 seconds later &mdash; Text 2: "It's [Your Name] from [Company]. We still good for [Time] today?"</div>
+          </div>
+          <div class="timeline-item" onclick="this.classList.toggle('checked-tl')">
+            <div class="timeline-dot"></div>
+            <div class="timeline-when">If no-show</div>
+            <div class="timeline-action">Call twice + voicemail + email</div>
+            <div class="timeline-script">Voicemail: "Hey [Name], [Your Name] here &mdash; we had you down for [Time] today. No worries if something came up. Shoot me a text and we'll get you rescheduled." Email subject: "^ bumping this"</div>
+          </div>
+        </div>
+
+        <div class="section-label">Pre-Call Video Selection</div>
+        <table class="video-table">
+          <thead>
+            <tr><th>Their Pain Point</th><th>Video to Send</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Ad spend bleeding, no ROI</td><td>Growth OS case study &mdash; ad optimization</td></tr>
+            <tr><td>No marketing system</td><td>Growth OS overview &mdash; full-stack engine</td></tr>
+            <tr><td>Hiring/firing agencies</td><td>Why agencies fail + operator model</td></tr>
+            <tr><td>Founder doing all marketing</td><td>Time-freedom case study</td></tr>
+            <tr><td>Unpredictable pipeline</td><td>Predictable growth framework</td></tr>
+          </tbody>
+        </table>
+
+        <button class="next-btn" onclick="resetCall()" style="background: var(--green); color: var(--bg);">Call Complete &mdash; Reset for Next Dial</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Objection Panel -->
+<div class="backdrop" id="backdrop" onclick="closeObjections()"></div>
+<div class="objection-overlay" id="objection-panel">
+  <div class="objection-header">
+    <h3>Objection Handling</h3>
+    <button class="objection-close" onclick="closeObjections()">&times;</button>
+  </div>
+  <div class="objection-list">
+
+    <div class="expandable" onclick="toggleExpand(this)">
+      <div class="expandable-trigger"><span>"I'm not interested."</span><span class="arrow">&#9654;</span></div>
+      <div class="expandable-body"><div class="expandable-content">
+        <div class="response">"Totally respect that. Out of curiosity &mdash; is that because growth is already dialed in, or is it more of a timing thing?"</div>
+        <p style="margin-top:8px; color:var(--white-40); font-size:13px;">If timing &rarr; "When's better to revisit?"<br>If dialed in &rarr; "Best of luck &mdash; keep me in mind."</p>
+      </div></div>
+    </div>
+
+    <div class="expandable" onclick="toggleExpand(this)">
+      <div class="expandable-trigger"><span>"Just send me an email."</span><span class="arrow">&#9654;</span></div>
+      <div class="expandable-body"><div class="expandable-content">
+        <div class="response">"Happy to &mdash; what's the best email? And just so I send something relevant, what's the biggest marketing challenge you're dealing with right now?"</div>
+        <p style="margin-top:8px; color:var(--white-40); font-size:13px;">If they answer the question, you're back in conversation.</p>
+      </div></div>
+    </div>
+
+    <div class="expandable" onclick="toggleExpand(this)">
+      <div class="expandable-trigger"><span>"We already have an agency."</span><span class="arrow">&#9654;</span></div>
+      <div class="expandable-body"><div class="expandable-content">
+        <div class="response">"Nice &mdash; are you happy with the results? I only ask because a lot of founders I talk to have a team but still feel like growth is unpredictable."</div>
+        <p style="margin-top:8px; color:var(--white-40); font-size:13px;">If unhappy &rarr; "What's not working?"<br>If happy &rarr; "Not trying to fix what's not broken."</p>
+      </div></div>
+    </div>
+
+    <div class="expandable" onclick="toggleExpand(this)">
+      <div class="expandable-trigger"><span>"What do you guys do exactly?"</span><span class="arrow">&#9654;</span></div>
+      <div class="expandable-body"><div class="expandable-content">
+        <div class="response">"Short version &mdash; we install a full growth operating system into founder-led businesses. Acquisition, conversion, retention &mdash; and we operate it for you. But honestly, the call is where we'd dig into whether it makes sense for you."</div>
+        <p style="margin-top:8px; color:var(--white-40); font-size:13px;">Bridge back to booking. Do NOT get pulled into a 10-min explanation.</p>
+      </div></div>
+    </div>
+
+    <div class="expandable" onclick="toggleExpand(this)">
+      <div class="expandable-trigger"><span>"I don't have time for a call."</span><span class="arrow">&#9654;</span></div>
+      <div class="expandable-body"><div class="expandable-content">
+        <div class="response">"Totally get it &mdash; you're busy, that's exactly why this might be worth it. The call is 30 min and it's specifically about getting your time back from marketing."</div>
+        <p style="margin-top:8px; color:var(--white-40); font-size:13px;">Offer a specific time: "What if we did [Day] at [early AM / lunch / end of day]?"</p>
+      </div></div>
+    </div>
+
+    <div class="expandable" onclick="toggleExpand(this)">
+      <div class="expandable-trigger"><span>"Is this a sales call?"</span><span class="arrow">&#9654;</span></div>
+      <div class="expandable-body"><div class="expandable-content">
+        <div class="response">"It's a strategy session &mdash; [Closer] looks at what you're doing now and gives honest feedback on where the gaps are. If there's a fit, great. If not, you walk away with clarity. No pressure either way."</div>
+        <p style="margin-top:8px; color:var(--white-40); font-size:13px;">Bridge to booking.</p>
+      </div></div>
+    </div>
+
+    <div class="expandable" onclick="toggleExpand(this)">
+      <div class="expandable-trigger"><span>"How much does it cost?"</span><span class="arrow">&#9654;</span></div>
+      <div class="expandable-body"><div class="expandable-content">
+        <div class="response">"It depends on scope &mdash; that's exactly what the strategy session is for. <span class="placeholder">[Closer Name]</span> will look at your situation, what you need, and give you a straight answer. No surprises."</div>
+        <p style="margin-top:8px; color:var(--white-40); font-size:13px;">Do NOT give pricing. That's the closer's job. Bridge to booking.</p>
+      </div></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function() {
+  let currentPhase = 1;
+  const totalPhases = 6;
+
+  // ── Phase Management ──
+  window.togglePhase = function(n) {
+    const card = document.getElementById('phase-' + n);
+    if (card.classList.contains('active')) {
+      // Don't collapse current phase
+      return;
+    }
+    setActivePhase(n);
+  };
+
+  function setActivePhase(n) {
+    currentPhase = n;
+    document.querySelectorAll('.phase-card').forEach(c => {
+      const phaseNum = parseInt(c.id.replace('phase-', ''));
+      c.classList.remove('active');
+      if (phaseNum < n) {
+        c.classList.add('completed');
+      }
+    });
+    const card = document.getElementById('phase-' + n);
+    card.classList.remove('completed');
+    card.classList.add('active');
+
+    // Update dots
+    document.querySelectorAll('.phase-dot').forEach(d => {
+      const dp = parseInt(d.dataset.phase);
+      d.classList.remove('active', 'completed');
+      if (dp === n) d.classList.add('active');
+      else if (dp < n) d.classList.add('completed');
+    });
+
+    // Update progress
+    const pct = ((n - 1) / (totalPhases - 1)) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+
+    // Update connectors
+    document.querySelectorAll('.connector-line').forEach((cl, i) => {
+      if (i < n - 1) cl.classList.add('gold');
+      else cl.classList.remove('gold');
+    });
+
+    // Scroll into view
+    setTimeout(() => {
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+
+  window.advancePhase = function(n) {
+    setActivePhase(n);
+  };
+
+  // ── Expandable Cards ──
+  window.toggleExpand = function(el) {
+    // Don't toggle if click was on a child expandable
+    el.classList.toggle('open');
+  };
+
+  // ── Checklist ──
+  window.toggleCheck = function(li) {
+    li.classList.toggle('checked');
+    if (li.classList.contains('checked')) {
+      li.querySelector('.check-box').innerHTML = '&#10003;';
+    } else {
+      li.querySelector('.check-box').innerHTML = '';
+    }
+    updateQualCount();
+  };
+
+  function updateQualCount() {
+    const count = document.querySelectorAll('#qual-checklist li.checked').length;
+    document.getElementById('qual-count').textContent = count;
+  }
+
+  // ── Exit Script ──
+  window.showExitScript = function() {
+    document.getElementById('exit-script').classList.add('show');
+    document.getElementById('exit-script').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
+  // ── Branch Buttons ──
+  window.showBranch = function(btn, id) {
+    const parent = btn.closest('.tiedown-section');
+    parent.querySelectorAll('.branch-btn').forEach(b => b.classList.remove('active'));
+    parent.querySelectorAll('.branch-response').forEach(r => r.classList.remove('show'));
+    btn.classList.add('active');
+    document.getElementById(id).classList.add('show');
+  };
+
+  // ── Objections Panel ──
+  window.closeObjections = function() {
+    document.getElementById('objection-panel').classList.remove('open');
+    document.getElementById('backdrop').classList.remove('show');
+  };
+
+  document.getElementById('btn-objections').addEventListener('click', function() {
+    document.getElementById('objection-panel').classList.add('open');
+    document.getElementById('backdrop').classList.add('show');
+  });
+
+  // ── Reset ──
+  window.resetCall = function() {
+    document.querySelectorAll('.phase-card').forEach(c => {
+      c.classList.remove('active', 'completed');
+    });
+    document.querySelectorAll('.expandable').forEach(e => e.classList.remove('open'));
+    document.querySelectorAll('.checklist li').forEach(li => {
+      li.classList.remove('checked');
+      li.querySelector('.check-box').innerHTML = '';
+    });
+    document.querySelectorAll('.discovery-q').forEach(q => q.classList.remove('selected'));
+    document.querySelectorAll('.branch-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.branch-response').forEach(r => r.classList.remove('show'));
+    document.querySelectorAll('.timeline-item').forEach(t => t.classList.remove('checked-tl'));
+    document.getElementById('exit-script').classList.remove('show');
+    document.getElementById('qual-count').textContent = '0';
+    setActivePhase(1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  document.getElementById('btn-reset').addEventListener('click', resetCall);
+
+  // ── Print ──
+  document.getElementById('btn-print').addEventListener('click', function() {
+    window.print();
+  });
+
+  // ── Phase Dot Click ──
+  document.querySelectorAll('.phase-dot').forEach(d => {
+    d.addEventListener('click', function() {
+      setActivePhase(parseInt(this.dataset.phase));
+    });
+  });
+
+  // ── Keyboard Navigation ──
+  document.addEventListener('keydown', function(e) {
+    // Skip if typing in an input
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    switch(e.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        e.preventDefault();
+        if (currentPhase < totalPhases) advancePhase(currentPhase + 1);
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        e.preventDefault();
+        if (currentPhase > 1) setActivePhase(currentPhase - 1);
+        break;
+      case 'o':
+      case 'O':
+        document.getElementById('btn-objections').click();
+        break;
+      case 'p':
+      case 'P':
+        window.print();
+        break;
+      case 'r':
+      case 'R':
+        resetCall();
+        break;
+      case 'Escape':
+        closeObjections();
+        break;
+      case '1': case '2': case '3': case '4': case '5': case '6':
+        setActivePhase(parseInt(e.key));
+        break;
+    }
+  });
+
+  // Initialize
+  setActivePhase(1);
+})();
+</script>
+</body>
+</html>

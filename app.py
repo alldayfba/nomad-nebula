@@ -475,6 +475,17 @@ def sourcing_history():
         return jsonify({"ok": False, "error": str(e)}), 500
 
 
+# ─── Unified Results API (Step 12: alias for /sourcing/history) ───────────────
+
+@app.route("/sourcing/api/results", methods=["GET"])
+def sourcing_api_results():
+    """Unified results endpoint — queries ALL sourcing modes including storefront.
+
+    Params: mode, verdict, min_roi, days (default 7), limit (default 100)
+    """
+    return sourcing_history()
+
+
 # ─── JSON API (service-to-service, used by SaaS scraper-service) ─────────────
 
 @app.route("/api/health", methods=["GET"])

@@ -390,6 +390,81 @@ def _compute_combined_score(velocity_data: dict) -> int:
     return min(100, max(0, round(score)))
 
 
+# ── IP Complaint Risk Detection (Step 18) ────────────────────────────────────
+
+
+def detect_ip_risk(fba_csv: list, days: int = 30) -> dict:
+    """Detect IP complaint risk from sudden drops in FBA seller count.
+
+    When sellers get IP complaints, they leave the listing fast. A sudden
+    drop in seller count is a strong signal of IP risk.
+
+    Args:
+        fba_csv: Keepa CSV array for index 34 (FBA seller count).
+        days: How many days back to analyze.
+
+    Returns:
+        dict with ip_risk ("high"/"medium"/"low"), details
+    """
+    if not fba_csv or len(fba_csv) < 4:
+        return {"ip_risk": "low", "reason": "insufficient_data"}
+
+    cutoff = time.time() - (days * 86400)
+    pairs = []
+    for i in range(0, len(fba_csv) - 1, 2):
+        ts_keepa = fba_csv[i]
+        count = fba_csv[i + 1]
+        if ts_keepa < 0:
+            continue
+        count = max(0, count)
+        unix_ts = keepa_ts_to_unix(ts_keepa)
+        if unix_ts >= cutoff:
+            pairs.append((unix_ts, count))
+
+    if len(pairs) < 3:
+        return {"ip_risk": "low", "reason": "insufficient_data"}
+
+    counts = [c for _, c in pairs]
+    peak_count = max(counts)
+
+    if peak_count < 2:
+        return {"ip_risk": "low", "reason": "too_few_sellers"}
+
+    # Check for sudden drops (any 7-day window with 50%+ drop)
+    for i in range(len(pairs)):
+        window_end_ts = pairs[i][0] + (7 * 86400)
+        later_counts = [c for ts, c in pairs if ts > pairs[i][0] and ts <= window_end_ts]
+        if later_counts:
+            min_later = min(later_counts)
+            if pairs[i][1] > 0:
+                drop_pct = (pairs[i][1] - min_later) / pairs[i][1] * 100
+                if drop_pct >= 50:
+                    return {
+                        "ip_risk": "high",
+                        "reason": f"Seller count dropped {drop_pct:.0f}% in 7 days ({pairs[i][1]} → {min_later})",
+                        "peak_sellers": peak_count,
+                        "drop_pct": round(drop_pct, 1),
+                    }
+
+    # Check for moderate drops (14-day window, 30%+ drop)
+    for i in range(len(pairs)):
+        window_end_ts = pairs[i][0] + (14 * 86400)
+        later_counts = [c for ts, c in pairs if ts > pairs[i][0] and ts <= window_end_ts]
+        if later_counts:
+            min_later = min(later_counts)
+            if pairs[i][1] > 0:
+                drop_pct = (pairs[i][1] - min_later) / pairs[i][1] * 100
+                if drop_pct >= 30:
+                    return {
+                        "ip_risk": "medium",
+                        "reason": f"Seller count dropped {drop_pct:.0f}% in 14 days ({pairs[i][1]} → {min_later})",
+                        "peak_sellers": peak_count,
+                        "drop_pct": round(drop_pct, 1),
+                    }
+
+    return {"ip_risk": "low", "reason": "stable_seller_count", "peak_sellers": peak_count}
+
+
 # ── Confidence Scoring (for catalog pipeline) ────────────────────────────────
 
 
@@ -422,12 +497,15 @@ def score_confidence(roi_pct: float, velocity_data: dict, bsr: int | None,
     else:
         roi_score = 5
 
-    # Velocity score (25%)
+    # Velocity score (25%) — missing data = neutral (50), not death sentence (0)
     vel_score = velocity_data.get("velocity_score", 0)
+    bsr_trend = velocity_data.get("bsr", {}).get("bsr_trend", "unknown") if isinstance(velocity_data.get("bsr"), dict) else velocity_data.get("bsr_trend", "unknown")
+    if vel_score == 0 and bsr_trend == "unknown":
+        vel_score = 50  # No data = neutral, not zero
 
-    # BSR score (20%)
+    # BSR score (20%) — missing BSR = neutral (50), not zero
     if not bsr or bsr <= 0:
-        bsr_score = 0
+        bsr_score = 50  # No BSR data = neutral assumption
     elif bsr < 50000:
         bsr_score = 100
     elif bsr < 100000:
@@ -439,9 +517,9 @@ def score_confidence(roi_pct: float, velocity_data: dict, bsr: int | None,
     else:
         bsr_score = 5
 
-    # Competition score (15%)
+    # Competition score (15%) — missing = neutral (50)
     if fba_count is None:
-        comp_score = 30
+        comp_score = 50  # No data = neutral, not penalized
     elif 3 <= fba_count <= 8:
         comp_score = 100
     elif fba_count == 1 or fba_count == 2:
@@ -466,12 +544,12 @@ def score_confidence(roi_pct: float, velocity_data: dict, bsr: int | None,
     )
     total = round(min(100, max(0, total)))
 
-    # Verdict
-    if total >= 70:
+    # Verdict — lowered thresholds for StartUpFBA-style inclusiveness
+    if total >= 65:
         verdict = "BUY"
-    elif total >= 50:
+    elif total >= 40:
         verdict = "MAYBE"
-    elif total >= 30:
+    elif total >= 20:
         verdict = "RESEARCH"
     else:
         verdict = "SKIP"

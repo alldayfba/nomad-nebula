@@ -16,6 +16,7 @@
 | **Alex Hormozi** | [@alexhormozi](https://youtube.com/@alexhormozi) (3M+) | [@hormozi](https://instagram.com/hormozi) (4.45M) | [@AlexHormozi](https://twitter.com/AlexHormozi) | [acquisition.com](https://acquisition.com) · Skool co-founder · [Podcast](https://open.spotify.com/show/6YNopzKDGDwf0auIpPTIID) |
 | **Johnny Mau** | [YouTube](https://youtube.com/@johnnymauu) | [@johnnyymau](https://instagram.com/johnnyymau) | [@JohnnyMauu](https://x.com/JohnnyMauu) | [htsyndicate.io](https://htsyndicate.io) · [TikTok @johnnymauu](https://tiktok.com/@johnnymauu) · [Skool: Paid In Full](https://skool.com/paid-in-full-9006) · [Skool: HT Syndicate](https://skool.com/highticketsyndicate) |
 | **Sabbo (AllDayFBA)** | [@alldayfba](https://youtube.com/@alldayfba) (2K) | [@allday.fba](https://instagram.com/allday.fba) | — | [alldayfba.com](https://alldayfba.com) · TikTok @allday.fba |
+| **Jace England** | [@jaceengland](https://youtube.com/@jaceengland) | [@jaceengland.ig](https://instagram.com/jaceengland.ig) · [@jace.england](https://instagram.com/jace.england) | [@JaceEngland1](https://x.com/JaceEngland1) | AGARDE Media LLC · [Substack](https://jaceengland.substack.com) · [Spotify: CLASS OF ONE](https://open.spotify.com/show/52O0LSnjTbn7iFMMWqyrA2) · [LinkedIn](https://linkedin.com/in/jace-england-45a574230/) |
 | **Ben Bader** | TBD | TBD | TBD | TBD |
 | **Kabrin Johal** | TBD | TBD | TBD | AI Drivers community |
 
@@ -35,6 +36,7 @@
 | Sabbo (AllDayFBA) | `bots/creators/sabbo-alldayfba-brain.md` | 2026-03-15 |
 | Ben Bader | `bots/creators/ben-bader-brain.md` | 2026-02-28 |
 | Kabrin Johal | `bots/creators/kabrin-brain.md` | 2026-03-19 |
+| Jace England | `bots/creators/jace-england-brain.md` | 2026-03-21 |
 
 ---
 

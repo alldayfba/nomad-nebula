@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rep Onboarding Flowchart | 247 Growth</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:hsl(250,18%,6%);--card:hsl(250,16%,9%);--card-hover:hsl(250,16%,11%);--gold:hsl(265,80%,55%);--gold-dim:hsl(265,40%,20%);--white:#F5F5F5;--muted:hsl(250,8%,62%);--green:hsl(142,71%,45%);--yellow:hsl(38,92%,50%);--red:hsl(0,72%,51%);--blue:hsl(217,91%,60%);--radius:14px;--shadow:0 4px 24px rgba(0,0,0,.45);--glow:0 0 30px -5px hsl(265 80% 55% / 0.12);--border:hsl(250,14%,15%)}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,'Inter','Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--white);line-height:1.6;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:24px 16px 80px}
+h1{font-size:1.75rem;font-weight:700;text-align:center;margin-bottom:4px}
+.subtitle{text-align:center;color:var(--muted);font-size:.9rem;margin-bottom:32px}
+.gold{color:var(--gold)}
+
+/* Tabs */
+.tab-bar{display:flex;gap:4px;background:hsla(250,16%,9%,0.85);backdrop-filter:blur(40px) saturate(150%);-webkit-backdrop-filter:blur(40px) saturate(150%);border:1px solid var(--border);border-radius:var(--radius);padding:4px;margin-bottom:32px}
+.tab-btn{flex:1;padding:12px 16px;border:none;background:transparent;color:var(--muted);font-size:.95rem;font-weight:600;border-radius:8px;cursor:pointer;transition:all .25s}
+.tab-btn.active{background:var(--gold);color:var(--bg)}
+.tab-content{display:none;animation:fadeIn .35s ease}
+.tab-content.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* Progress bar */
+.progress-wrapper{margin-bottom:28px}
+.progress-label{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+.progress-bar{height:8px;background:hsl(250 14% 15%);border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,hsl(265,80%,55%),hsl(265,90%,65%));border-radius:99px;transition:width .5s ease}
+
+/* Section headings */
+.section-title{font-size:1.2rem;font-weight:700;margin:28px 0 14px;padding-bottom:8px;border-bottom:2px solid hsl(265 80% 55% / 0.2);display:flex;align-items:center;gap:8px}
+.section-title .badge{font-size:.7rem;background:var(--gold);color:var(--bg);padding:2px 10px;border-radius:99px;font-weight:700}
+
+/* Checklist card */
+.check-card{background:hsla(250,16%,9%,0.85);backdrop-filter:blur(40px) saturate(150%);-webkit-backdrop-filter:blur(40px) saturate(150%);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:12px;box-shadow:var(--shadow);transition:all .2s}
+.check-card:hover{background:var(--card-hover);box-shadow:var(--glow)}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.check-item:last-child{border-bottom:none}
+.check-item input[type=checkbox]{appearance:none;width:20px;height:20px;min-width:20px;border:2px solid var(--muted);border-radius:5px;cursor:pointer;position:relative;top:2px;transition:all .2s}
+.check-item input[type=checkbox]:checked{background:var(--gold);border-color:var(--gold)}
+.check-item input[type=checkbox]:checked::after{content:'';position:absolute;left:5px;top:1px;width:6px;height:11px;border:solid var(--bg);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.check-item label{cursor:pointer;font-size:.92rem}
+.check-item label .sub{display:block;color:var(--muted);font-size:.8rem;margin-top:2px}
+
+/* Expandable */
+.expandable{cursor:pointer;user-select:none}
+.expandable .arrow{display:inline-block;transition:transform .25s;margin-right:4px;font-size:.75rem;color:var(--gold)}
+.expandable.open .arrow{transform:rotate(90deg)}
+.expand-body{display:none;padding:8px 0 0 32px;font-size:.88rem;color:var(--muted)}
+.expandable.open+.expand-body,.expandable.open~.expand-body{display:block}
+
+/* Day card */
+.day-card{background:hsla(250,16%,9%,0.85);backdrop-filter:blur(40px) saturate(150%);-webkit-backdrop-filter:blur(40px) saturate(150%);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:12px;box-shadow:var(--shadow);border-left:3px solid var(--gold)}
+.day-card h4{font-size:.95rem;font-weight:700;margin-bottom:10px;color:var(--gold)}
+.day-card .session{margin-bottom:10px}
+.day-card .session-label{font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px}
+.day-card .session-text{font-size:.9rem}
+
+/* Milestone gate */
+.milestone-gate{background:linear-gradient(135deg,hsl(265 80% 55% / 0.08),hsl(265 80% 55% / 0.02));border:1px solid hsl(265 80% 55% / 0.25);border-radius:var(--radius);padding:20px 24px;margin:20px 0;text-align:center}
+.milestone-gate h3{color:var(--gold);font-size:1rem;margin-bottom:10px}
+.milestone-gate .gate-q{font-size:.95rem;margin-bottom:14px}
+.gate-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.gate-btn{padding:10px 28px;border-radius:8px;border:none;font-weight:700;font-size:.9rem;cursor:pointer;transition:all .2s}
+.gate-btn.yes{background:var(--green);color:#000}
+.gate-btn.no{background:var(--red);color:#fff}
+.gate-result{margin-top:14px;padding:12px;border-radius:8px;font-size:.9rem;display:none}
+.gate-result.pass{display:block;background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.gate-result.fail{display:block;background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+
+/* KPI dashboard */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:14px}
+.kpi-card{background:hsla(250,16%,9%,0.85);backdrop-filter:blur(40px) saturate(150%);-webkit-backdrop-filter:blur(40px) saturate(150%);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center}
+.kpi-card .kpi-label{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.kpi-card .kpi-value{font-size:1.15rem;font-weight:700}
+.kpi-card .kpi-target{font-size:.78rem;color:var(--muted);margin-top:4px}
+.kpi-card .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+.dot.g{background:var(--green)}.dot.y{background:var(--yellow)}.dot.r{background:var(--red)}
+
+/* Celebration */
+@keyframes celebrate{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+.celebrate{animation:celebrate .5s ease 3;border-color:var(--green)!important}
+.confetti{position:fixed;pointer-events:none;z-index:9999}
+
+/* Responsive */
+@media(max-width:600px){
+  h1{font-size:1.3rem}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .container{padding:16px 12px 60px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Rep Onboarding <span class="gold">Flowchart</span></h1>
+  <p class="subtitle">247 Growth &mdash; Agency OS Sales Team</p>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="setter">Setter / Cold Caller</button>
+    <button class="tab-btn" data-tab="closer">Closer</button>
+  </div>
+
+  <!-- ========== SETTER TAB ========== -->
+  <div class="tab-content active" id="tab-setter">
+    <!-- Progress -->
+    <div class="progress-wrapper">
+      <div class="progress-label"><span>Onboarding Progress</span><span id="setter-pct">0%</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="setter-fill" style="width:0%"></div></div>
+    </div>
+
+    <!-- DAY 1 -->
+    <div class="section-title"><span class="badge">DAY 1</span> Setup &amp; Access</div>
+    <div class="check-card" id="setter-day1">
+      <div class="check-item"><input type="checkbox" data-role="setter" id="s1"><label for="s1">Google Workspace login + password changed<span class="sub">Log into [YourFirstName]@company.com. Change password immediately.</span></label></div>
+      <div class="check-item"><input type="checkbox" data-role="setter" id="s2"><label for="s2">Slack joined (laptop + phone, notifications on)<span class="sub">Channels: #sales-team, #eod-report-setters, #wins, #announcements</span></label></div>
+      <div class="check-item"><input type="checkbox" data-role="setter" id="s3"><label for="s3">CRM login (laptop + phone)<span class="sub">GHL / Close. Learn Smart Views, Lead Status, Lead Ownership, Opportunity tracking.</span></label></div>
+      <div class="check-item"><input type="checkbox" data-role="setter" id="s4"><label for="s4">Calendly / booking system access<span class="sub">Learn the round-robin link and individual closer links.</span></label></div>
+      <div class="check-item"><input type="checkbox" data-role="setter" id="s5"><label for="s5">Fathom account connected<span class="sub">Every call must be recorded. No exceptions.</span></label></div>
+      <div class="check-item"><input type="checkbox" data-role="setter" id="s6"><label for="s6">Phone number set up in CRM<span class="sub">U.S. number with common area code (315, 786, 213, etc.)</span></label></div>
+      <div class="check-item"><input type="checkbox" data-role="setter" id="s7"><label for="s7">Commission tracking sheet created<span class="sub">Copy the provided Google Sheet. Bookmark it. Update daily.</span></label></div>
+    </div>
+
+    <div class="check-card">
+      <div class="expandable" onclick="this.classList.toggle('open')"><span class="arrow">&#9654;</span> <strong>Loom Videos to Watch (Day 1)</strong></div>
+      <div class="expand-body">
+        <div class="check-item"><input type="checkbox" data-role="setter" id="s8"><label for="s8">CRM walkthrough</label></div>
+        <div class="check-item"><input type="checkbox" data-role="setter" id="s9"><label for="s9">Slack overview</label></div>
+        <div class="check-item"><input type="checkbox" data-role="setter" id="s10"><label for="s10">Booking process walkthrough</label></div>
+        <div class="check-item"><input type="checkbox" data-role="setter" id="s11"><label for="s11">EOD report walkthrough</label></div>
+        <div class="check-item"><input type="checkbox" data-role="setter" id="s12"><label for="s12">Commission tracking walkthrough</label></div>
+        <div class="check-item"><input type="checkbox" data-role="setter" id="s13"><label for="s13">5 recorded sales calls (listen, take notes)</label></div>
+      </div>
+    </div>
+
+    <!-- WEEK 1 -->
+    <div class="section-title"><span class="badge">WEEK 1</span> Training &mdash; Black Marker Method</div>
+
+    <div class="day-card">
+      <h4>Monday</h4>
+      <div class="session"><div class="session-label">Morning (2 hrs)</div><div class="session-text">Offer deep-dive. Why this product changes lives. Watch 5 recorded sales calls (take notes).</div></div>
+      <div class="session"><div class="session-label">Afternoon (2 hrs)</div><div class="session-text">Black Marker Method begins: Print 2 copies of the cold call script. Read aloud. Start blacking out words.</div></div>
+      <div class="check-item"><input type="checkbox" data-role="setter" id="sw1"><label for="sw1">Monday complete</label></div>
+    </div>
+    <div class="day-card">
+      <h4>Tuesday</h4>
+      <div class="session"><div class="session-label">Morning</div><div class="session-text">ICP training. Who are our buyers? What are they afraid of? Watch 5 more recorded calls.</div></div>
+      <div class="session"><div class="session-label">Afternoon</div><div class="session-text">Black Marker continues. Role-play Pattern Interrupt + Hook with manager.</div></div>
+      <div class="check-item"><input type="checkbox" data-role="setter" id="sw2"><label for="sw2">Tuesday complete</label></div>
+    </div>
+    <div class="day-card">
+      <h4>Wednesday</h4>
+      <div class="session"><div class="session-label">Morning</div><div class="session-text">Objection training: Learn all 7 objections + responses. Listen to calls where objections were handled well.</div></div>
+      <div class="session"><div class="session-label">Afternoon</div><div class="session-text">Black Marker continues. Role-play Dig Into Pain section. Practice discovery questions.</div></div>
+      <div class="check-item"><input type="checkbox" data-role="setter" id="sw3"><label for="sw3">Wednesday complete</label></div>
+    </div>
+    <div class="day-card">
+      <h4>Thursday</h4>
+      <div class="session"><div class="session-label">Morning</div><div class="session-text">Product knowledge deep-dive: Walk through the Growth OS, the 30-day install, the delivery model.</div></div>
+      <div class="session"><div class="session-label">Afternoon</div><div class="session-text">Black Marker continues. Role-play Bridge + Booking section. Practice tie-downs.</div></div>
+      <div class="check-item"><input type="checkbox" data-role="setter" id="sw4"><label for="sw4">Thursday complete</label></div>
+    </div>
+    <div class="day-card">
+      <h4>Friday</h4>
+      <div class="session"><div class="session-label">Morning</div><div class="session-text">Full mock cold call with manager. Manager plays the prospect (hard mode). Get feedback.</div></div>
+      <div class="session"><div class="session-label">Afternoon</div><div class="session-text">Black Marker continues. Role-play objection handling scenarios.</div></div>
+      <div class="check-item"><input type="checkbox" data-role="setter" id="sw5"><label for="sw5">Friday complete</label></div>
+    </div>
+
+    <!-- Milestone 1 -->
+    <div class="milestone-gate" id="setter-m1">
+      <h3>Milestone 1 Check &mdash; End of Week 1</h3>
+      <div class="gate-q">Can you recite the full 6-phase cold call script cold &mdash; no notes?</div>
+      <div class="gate-btns">
+        <button class="gate-btn yes" onclick="gatePass('setter-m1')">Yes &mdash; Passed</button>
+        <button class="gate-btn no" onclick="gateFail('setter-m1')">No &mdash; Not Ready</button>
+      </div>
+      <div class="gate-result" id="setter-m1-result"></div>
+    </div>
+
+    <!-- WEEK 2 -->
+    <div class="section-title"><span class="badge">WEEK 2</span> Live Calls</div>
+
+    <div class="day-card">
+      <h4>Monday</h4>
+      <div class="session-text">Shadow manager on 3-4 live calls. Take notes. Debrief after each call.</div>
+      <div class="check-item"><input type="checkbox" data-role="setter" id="sl1"><label for="sl1">Monday complete</label></div>
+    </div>
+    <div class="day-card">
+      <h4>Tuesday</h4>
+      <div class="session-text">Handle one section of the call (Pattern Interrupt or Hook). Manager takes over if needed.</div>
+      <div class="check-item"><input type="checkbox" data-role="setter" id="sl2"><label for="sl2">Tuesday complete</label></div>
+    </div>
+    <div class="day-card">
+      <h4>Wednesday</h4>
+      <div class="session-text">Full cold call with manager listening silently. Manager gives feedback after each call.</div>
+      <div class="check-item"><input type="checkbox" data-role="setter" id="sl3"><label for="sl3">Wednesday complete</label></div>
+    </div>
+    <div class="day-card">
+      <h4>Thursday</h4>
+      <div class="session-text">Solo calls begin (half list &mdash; 25 dials max). Manager reviews recordings same day.</div>
+      <div class="check-item"><input type="checkbox" data-role="setter" id="sl4"><label for="sl4">Thursday complete</label></div>
+    </div>
+    <div class="day-card">
+      <h4>Friday</h4>
+      <div class="session-text">Solo calls continue (half list). End-of-week performance review with manager.</div>
+      <div class="check-item"><input type="checkbox" data-role="setter" id="sl5"><label for="sl5">Friday complete</label></div>
+    </div>
+
+    <!-- Milestones 2 & 3 -->
+    <div class="milestone-gate" id="setter-m2">
+      <h3>Milestone 2 &mdash; Recap / Labeling</h3>
+      <div class="gate-q">Can you accurately recap a prospect's situation and label their pain into the correct problem bucket?</div>
+      <div class="gate-btns">
+        <button class="gate-btn yes" onclick="gatePass('setter-m2')">Yes</button>
+        <button class="gate-btn no" onclick="gateFail('setter-m2')">No</button>
+      </div>
+      <div class="gate-result" id="setter-m2-result"></div>
+    </div>
+    <div class="milestone-gate" id="setter-m3">
+      <h3>Milestone 3 &mdash; Objection Handling</h3>
+      <div class="gate-q">Can you handle the top 10 objections naturally without reading from a sheet?</div>
+      <div class="gate-btns">
+        <button class="gate-btn yes" onclick="gatePass('setter-m3')">Yes</button>
+        <button class="gate-btn no" onclick="gateFail('setter-m3')">No</button>
+      </div>
+      <div class="gate-result" id="setter-m3-result"></div>
+    </div>
+
+    <!-- KPI Dashboard -->
+    <div class="section-title">KPI Dashboard</div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">Dials / Day</div><div class="kpi-value"><span class="dot g"></span>50+</div><div class="kpi-target">Yellow: 30-49 | Red: &lt;30</div></div>
+      <div class="kpi-card"><div class="kpi-label">Qualified Convos</div><div class="kpi-value"><span class="dot g"></span>5+</div><div class="kpi-target">Yellow: 3-4 | Red: &lt;3</div></div>
+      <div class="kpi-card"><div class="kpi-label">Calls Booked</div><div class="kpi-value"><span class="dot g"></span>2+</div><div class="kpi-target">Yellow: 1 | Red: 0</div></div>
+      <div class="kpi-card"><div class="kpi-label">Show Rate</div><div class="kpi-value"><span class="dot g"></span>80%+</div><div class="kpi-target">Yellow: 65-79% | Red: &lt;65%</div></div>
+      <div class="kpi-card"><div class="kpi-label">Booking-to-Close</div><div class="kpi-value"><span class="dot g"></span>5%+</div><div class="kpi-target">Yellow: 3-4% | Red: &lt;3%</div></div>
+      <div class="kpi-card"><div class="kpi-label">EOD Report</div><div class="kpi-value"><span class="dot g"></span>By 4:30</div><div class="kpi-target">Yellow: Late | Red: Missing</div></div>
+    </div>
+  </div>
+
+  <!-- ========== CLOSER TAB ========== -->
+  <div class="tab-content" id="tab-closer">
+    <!-- Progress -->
+    <div class="progress-wrapper">
+      <div class="progress-label"><span>Onboarding Progress</span><span id="closer-pct">0%</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="closer-fill" style="width:0%"></div></div>
+    </div>
+
+    <!-- DAY 1 -->
+    <div class="section-title"><span class="badge">DAY 1</span> Setup &amp; Access</div>
+    <div class="check-card" id="closer-day1">
+      <div class="check-item"><input type="checkbox" data-role="closer" id="c1"><label for="c1">Google Workspace login + password changed</label></div>
+      <div class="check-item"><input type="checkbox" data-role="closer" id="c2"><label for="c2">Slack joined (laptop + phone, notifications on)<span class="sub">Channels: #sales-team, #eod-report-closers, #wins, #announcements, #handoffs</span></label></div>
+      <div class="check-item"><input type="checkbox" data-role="closer" id="c3"><label for="c3">CRM login (laptop + phone)<span class="sub">Learn Pipeline stages, Lead Status, Disposition codes, Setter notes.</span></label></div>
+      <div class="check-item"><input type="checkbox" data-role="closer" id="c4"><label for="c4">Zoom account set up + tested<span class="sub">Professional background. Good lighting. Camera on for every call.</span></label></div>
+      <div class="check-item"><input type="checkbox" data-role="closer" id="c5"><label for="c5">Calendly accepted + connected to Zoom &amp; Google Calendar<span class="sub">Confirm your link appears in round-robin rotation.</span></label></div>
+      <div class="check-item"><input type="checkbox" data-role="closer" id="c6"><label for="c6">Fathom account connected to Zoom<span class="sub">Start a test meeting to confirm auto-join. Every call recorded.</span></label></div>
+      <div class="check-item"><input type="checkbox" data-role="closer" id="c7"><label for="c7">Commission tracking sheet created</label></div>
+      <div class="check-item"><input type="checkbox" data-role="closer" id="c8"><label for="c8">Phone number set up in CRM</label></div>
+    </div>
+
+    <div class="check-card">
+      <div class="expandable" onclick="this.classList.toggle('open')"><span class="arrow">&#9654;</span> <strong>Loom Videos to Watch (Day 1)</strong></div>
+      <div class="expand-body">
+        <div class="check-item"><input type="checkbox" data-role="closer" id="c9"><label for="c9">CRM walkthrough (pipeline stages, dispositions, setter notes)</label></div>
+        <div class="check-item"><input type="checkbox" data-role="closer" id="c10"><label for="c10">Slack overview (handoff process, wins, setter comms)</label></div>
+        <div class="check-item"><input type="checkbox" data-role="closer" id="c11"><label for="c11">Zoom + Fathom setup walkthrough</label></div>
+        <div class="check-item"><input type="checkbox" data-role="closer" id="c12"><label for="c12">Calendly setup walkthrough</label></div>
+        <div class="check-item"><input type="checkbox" data-role="closer" id="c13"><label for="c13">Booking/handoff process walkthrough</label></div>
+        <div class="check-item"><input type="checkbox" data-role="closer" id="c14"><label for="c14">EOD report walkthrough</label></div>
+        <div class="check-item"><input type="checkbox" data-role="closer" id="c15"><label for="c15">Commission tracking walkthrough</label></div>
+        <div class="check-item"><input type="checkbox" data-role="closer" id="c16"><label for="c16">5 recorded closing calls (notes on structure, objections, tonality)</label></div>
+      </div>
+    </div>
+
+    <!-- WEEK 1 -->
+    <div class="section-title"><span class="badge">WEEK 1</span> Training &mdash; Black Marker Method</div>
+
+    <div class="day-card">
+      <h4>Monday</h4>
+      <div class="session"><div class="session-label">Morning</div><div class="session-text">Offer deep-dive. Why the Growth OS changes businesses. Watch 5 recorded closing calls (take notes on structure, tonality, objection handling).</div></div>
+      <div class="session"><div class="session-label">Afternoon</div><div class="session-text">Black Marker begins: Print 2 copies of closer script. Focus on Stages 1-4. Read aloud. Start blacking out.</div></div>
+      <div class="check-item"><input type="checkbox" data-role="closer" id="cw1"><label for="cw1">Monday complete</label></div>
+    </div>
+    <div class="day-card">
+      <h4>Tuesday</h4>
+      <div class="session"><div class="session-label">Morning</div><div class="session-text">ICP training. Who are our buyers? What are they afraid of? Watch 5 more calls.</div></div>
+      <div class="session"><div class="session-label">Afternoon</div><div class="session-text">Black Marker (Stages 1-4). Role-play Connecting + Situation Questions with manager.</div></div>
+      <div class="check-item"><input type="checkbox" data-role="closer" id="cw2"><label for="cw2">Tuesday complete</label></div>
+    </div>
+    <div class="day-card">
+      <h4>Wednesday</h4>
+      <div class="session"><div class="session-label">Morning</div><div class="session-text">Objection training: Study all 5 categories from Battle Cards. Listen to calls where objections were handled well.</div></div>
+      <div class="session"><div class="session-label">Afternoon</div><div class="session-text">Black Marker (Stages 5-7). Role-play Problem Awareness + Pre-Frame. Practice the Revealing Question.</div></div>
+      <div class="check-item"><input type="checkbox" data-role="closer" id="cw3"><label for="cw3">Wednesday complete</label></div>
+    </div>
+    <div class="day-card">
+      <h4>Thursday</h4>
+      <div class="session"><div class="session-label">Morning</div><div class="session-text">Product knowledge deep-dive. Walk through the Growth OS, 30-day install, operating rhythm, data layer. Walk through pitch deck.</div></div>
+      <div class="session"><div class="session-label">Afternoon</div><div class="session-text">Black Marker (Stages 7-8). Role-play Pitch + Price stages. Practice stating price and sitting in silence.</div></div>
+      <div class="check-item"><input type="checkbox" data-role="closer" id="cw4"><label for="cw4">Thursday complete</label></div>
+    </div>
+    <div class="day-card">
+      <h4>Friday</h4>
+      <div class="session"><div class="session-label">Morning</div><div class="session-text">Full mock strategy call with manager. Manager plays a skeptical $3M founder burned by 3 agencies. Get feedback.</div></div>
+      <div class="session"><div class="session-label">Afternoon</div><div class="session-text">Black Marker (Stage 9). Role-play objection handling. Manager throws 3 objections in a row.</div></div>
+      <div class="check-item"><input type="checkbox" data-role="closer" id="cw5"><label for="cw5">Friday complete</label></div>
+    </div>
+
+    <!-- Milestone 1 -->
+    <div class="milestone-gate" id="closer-m1">
+      <h3>Milestone 1 Check &mdash; End of Week 1</h3>
+      <div class="gate-q">Can you run through the full 9-stage structure cold &mdash; no notes &mdash; and handle random objections mid-script?</div>
+      <div class="gate-btns">
+        <button class="gate-btn yes" onclick="gatePass('closer-m1')">Yes &mdash; Passed</button>
+        <button class="gate-btn no" onclick="gateFail('closer-m1')">No &mdash; Not Ready</button>
+      </div>
+      <div class="gate-result" id="closer-m1-result"></div>
+    </div>
+
+    <!-- WEEK 2 -->
+    <div class="section-title"><span class="badge">WEEK 2</span> Live Calls</div>
+
+    <div class="day-card">
+      <h4>Monday</h4>
+      <div class="session-text">Shadow manager (or top closer) on 3-4 live strategy calls. Take notes. Debrief: What worked? What was the turning point?</div>
+      <div class="check-item"><input type="checkbox" data-role="closer" id="cl1"><label for="cl1">Monday complete</label></div>
+    </div>
+    <div class="day-card">
+      <h4>Tuesday</h4>
+      <div class="session-text">Shadow + handle one section (Connecting + Situation Questions). Manager takes over for the rest.</div>
+      <div class="check-item"><input type="checkbox" data-role="closer" id="cl2"><label for="cl2">Tuesday complete</label></div>
+    </div>
+    <div class="day-card">
+      <h4>Wednesday</h4>
+      <div class="session-text">Full call with manager listening silently. Focus: discovery depth, pre-frame execution, tonality shifts.</div>
+      <div class="check-item"><input type="checkbox" data-role="closer" id="cl3"><label for="cl3">Wednesday complete</label></div>
+    </div>
+    <div class="day-card">
+      <h4>Thursday</h4>
+      <div class="session-text">Solo calls begin (half calendar &mdash; 3 calls max). Manager reviews Fathom recordings same day.</div>
+      <div class="check-item"><input type="checkbox" data-role="closer" id="cl4"><label for="cl4">Thursday complete</label></div>
+    </div>
+    <div class="day-card">
+      <h4>Friday</h4>
+      <div class="session-text">Solo calls (half calendar). End-of-week review. Review every call from the week.</div>
+      <div class="check-item"><input type="checkbox" data-role="closer" id="cl5"><label for="cl5">Friday complete</label></div>
+    </div>
+
+    <!-- Milestones 2 & 3 -->
+    <div class="milestone-gate" id="closer-m2">
+      <h3>Milestone 2 &mdash; Recap / Labeling</h3>
+      <div class="gate-q">Can you accurately recap a prospect's situation and label their pain into the correct problem bucket?</div>
+      <div class="gate-btns">
+        <button class="gate-btn yes" onclick="gatePass('closer-m2')">Yes</button>
+        <button class="gate-btn no" onclick="gateFail('closer-m2')">No</button>
+      </div>
+      <div class="gate-result" id="closer-m2-result"></div>
+    </div>
+    <div class="milestone-gate" id="closer-m3">
+      <h3>Milestone 3 &mdash; Objection Handling</h3>
+      <div class="gate-q">Can you handle all 5 objection categories naturally using the 7-step framework?</div>
+      <div class="gate-btns">
+        <button class="gate-btn yes" onclick="gatePass('closer-m3')">Yes</button>
+        <button class="gate-btn no" onclick="gateFail('closer-m3')">No</button>
+      </div>
+      <div class="gate-result" id="closer-m3-result"></div>
+    </div>
+
+    <!-- KPI Dashboard -->
+    <div class="section-title">KPI Dashboard</div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">Close Rate</div><div class="kpi-value"><span class="dot g"></span>35%+</div><div class="kpi-target">Yellow: 25-34% | Red: &lt;25%</div></div>
+      <div class="kpi-card"><div class="kpi-label">Calls / Day</div><div class="kpi-value"><span class="dot g"></span>4-6</div><div class="kpi-target">Yellow: 3 | Red: &lt;3</div></div>
+      <div class="kpi-card"><div class="kpi-label">Cash / Call</div><div class="kpi-value"><span class="dot g"></span>$3K+</div><div class="kpi-target">Yellow: $1K-$3K | Red: &lt;$1K</div></div>
+      <div class="kpi-card"><div class="kpi-label">Calendar Util</div><div class="kpi-value"><span class="dot g"></span>70-75%</div><div class="kpi-target">Yellow: 60-69% | Red: &lt;60%</div></div>
+      <div class="kpi-card"><div class="kpi-label">Follow-Up Close</div><div class="kpi-value"><span class="dot g"></span>15%+</div><div class="kpi-target">Yellow: 10-14% | Red: &lt;10%</div></div>
+      <div class="kpi-card"><div class="kpi-label">EOD Report</div><div class="kpi-value"><span class="dot g"></span>By 6:30</div><div class="kpi-target">Yellow: Late | Red: Missing</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+// LocalStorage persistence
+const STORAGE_KEY='rep-onboarding-state';
+function loadState(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{}}catch(e){return{}}}
+function saveState(st){localStorage.setItem(STORAGE_KEY,JSON.stringify(st))}
+
+const state=loadState();
+document.querySelectorAll('input[type=checkbox][data-role]').forEach(cb=>{
+  if(state[cb.id])cb.checked=true;
+  cb.addEventListener('change',()=>{
+    state[cb.id]=cb.checked;
+    saveState(state);
+    updateProgress();
+  });
+});
+
+function updateProgress(){
+  ['setter','closer'].forEach(role=>{
+    const all=document.querySelectorAll('#tab-'+role+' input[type=checkbox][data-role]');
+    const checked=[...all].filter(c=>c.checked).length;
+    const pct=all.length?Math.round(checked/all.length*100):0;
+    document.getElementById(role+'-pct').textContent=pct+'%';
+    document.getElementById(role+'-fill').style.width=pct+'%';
+  });
+}
+updateProgress();
+
+// Milestone gates
+const gateState=loadState();
+function gatePass(id){
+  const el=document.getElementById(id+'-result');
+  if(id.endsWith('m3')){
+    el.className='gate-result pass';
+    el.innerHTML='<strong>ALL MILESTONES PASSED!</strong> GRADUATED -- Full calendar. Outstanding work.';
+    document.getElementById(id).classList.add('celebrate');
+  } else {
+    el.className='gate-result pass';
+    el.textContent='Passed! Advance to the next phase.';
+  }
+  gateState[id]='pass';saveState(gateState);
+}
+function gateFail(id){
+  const el=document.getElementById(id+'-result');
+  el.className='gate-result fail';
+  if(id.endsWith('m1')){
+    el.textContent='Not ready. Reassess fit -- if you cannot pass Milestone 1 in 2-3 days, this may not be the right role.';
+  } else {
+    el.textContent='Not passed. Remedial training required. One more attempt, then exit conversation.';
+  }
+  gateState[id]='fail';saveState(gateState);
+}
+
+// Restore gate states
+['setter-m1','setter-m2','setter-m3','closer-m1','closer-m2','closer-m3'].forEach(id=>{
+  if(gateState[id]==='pass')gatePass(id);
+  else if(gateState[id]==='fail')gateFail(id);
+});
+</script>
+</body>
+</html>
