@@ -2459,6 +2459,12 @@ Examples:
                            help="Coupon to apply (e.g., '20%% off')")
     p_catalog.add_argument("--limit-scrape", type=int, default=0,
                            help="Max products to scrape (0=unlimited)")
+    p_catalog.add_argument("--deep-verify", type=int, default=0,
+                           help="Deep verify top N with Keepa offers (21 tokens each)")
+    p_catalog.add_argument("--no-verify-links", action="store_true",
+                           help="Skip buy link verification")
+    p_catalog.add_argument("--no-coupon", action="store_true",
+                           help="Skip coupon auto-discovery")
 
     # Global flags (apply to all modes)
     parser.add_argument("--export", choices=["sheets"], default=None,
@@ -2572,6 +2578,9 @@ Examples:
             coupon=args.coupon,
             limit_scrape=args.limit_scrape,
             resume=getattr(args, "resume", False),
+            deep_verify=getattr(args, "deep_verify", 0),
+            verify_links=not getattr(args, "no_verify_links", False),
+            no_coupon=getattr(args, "no_coupon", False),
         )
         # Catalog has its own output — convert to source.py result format
         results = output.get("products", [])

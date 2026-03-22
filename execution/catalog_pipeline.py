@@ -37,12 +37,35 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from dotenv import load_dotenv
 load_dotenv(Path(__file__).parent.parent / ".env")
 
-from execution.catalog_scraper import scrape_catalog
+import requests
+
+from execution.catalog_scraper import scrape_catalog, CATALOG_DIR
 from execution.velocity_analyzer import analyze_velocity, score_confidence
 from execution.calculate_fba_profitability import calculate_product_profitability
 from execution.batch_keepa_analyzer import (
     batch_upc_lookup, check_tokens, pick_best_match, extract_keepa_data,
 )
+
+# Optional imports for enhanced features (graceful fallback if missing)
+try:
+    from execution.coupon_scraper import get_best_coupon as _get_best_coupon
+except ImportError:
+    _get_best_coupon = None
+
+try:
+    from execution.scrape_rakuten import get_cashback_rate as _get_cashback_rate
+except ImportError:
+    _get_cashback_rate = None
+
+try:
+    from execution.student_ungated_brands import is_student_ungated as _is_ungated
+except ImportError:
+    _is_ungated = None
+
+try:
+    from execution.catalog_diff import diff_catalogs, find_previous_catalog, print_diff_summary
+except ImportError:
+    diff_catalogs = None
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
@@ -322,6 +345,221 @@ def analyze_matches(matched: list[dict], min_roi: float = 30.0,
     return results
 
 
+# ── Stage 4b: Deep Verify Top N ──────────────────────────────────────────
+
+
+def deep_verify_top(results: list[dict], n: int = 20) -> tuple[list[dict], int]:
+    """Re-fetch top N products with Keepa offers=20 for real velocity data.
+
+    Costs 21 tokens per product. Replaces cheap BSR estimates with actual
+    stockCSV velocity and real seller counts. Re-scores confidence.
+
+    Returns (updated_results, tokens_used)
+    """
+    if n <= 0 or not results:
+        return results, 0
+
+    try:
+        from execution.keepa_client import KeepaClient
+        client = KeepaClient()
+    except Exception as e:
+        print(f"[deep-verify] KeepaClient init failed: {e}", file=sys.stderr)
+        return results, 0
+
+    top_n = results[:n]
+    rest = results[n:]
+    tokens_used = 0
+
+    print(f"[deep-verify] Deep verifying top {len(top_n)} products (21 tokens each)...", file=sys.stderr)
+
+    for i, r in enumerate(top_n):
+        asin = r.get("asin", "")
+        if not asin:
+            continue
+
+        try:
+            product_data = client.get_product(asin, offers=20, stats=180)
+            if not product_data:
+                continue
+            tokens_used += 21
+
+            # Re-run velocity with deep mode (uses stockCSV)
+            velocity = analyze_velocity(product_data, mode="deep")
+
+            # Update BSR if we got real data
+            real_bsr = product_data.get("salesRankCurrent")
+            if real_bsr and real_bsr > 0:
+                r["sales_rank"] = real_bsr
+
+            # Update seller count
+            stats = product_data.get("stats", {}) or {}
+            current = stats.get("current", [])
+            if current and len(current) > 34 and current[34] and current[34] >= 0:
+                r["fba_seller_count"] = current[34]
+
+            # Re-score confidence with real data
+            roi = r.get("profitability", {}).get("roi_percent", 0)
+            confidence = score_confidence(
+                roi_pct=roi,
+                velocity_data=velocity,
+                bsr=r.get("sales_rank"),
+                fba_count=r.get("fba_seller_count"),
+            )
+
+            r["velocity"] = {
+                "score": velocity["velocity_score"],
+                "monthly_est": velocity.get("monthly_sales_estimate"),
+                "bsr_trend": velocity.get("bsr", {}).get("bsr_trend", "unknown"),
+                "mode": "deep",
+            }
+            r["confidence"] = confidence
+            r["deep_verified"] = True
+
+            print(
+                f"[deep-verify] {i+1}/{len(top_n)} {asin}: "
+                f"score {confidence['score']} ({confidence['verdict']}), "
+                f"BSR={r.get('sales_rank', 'N/A')}, "
+                f"FBA={r.get('fba_seller_count', 'N/A')}",
+                file=sys.stderr,
+            )
+
+        except Exception as e:
+            print(f"[deep-verify] Error on {asin}: {e}", file=sys.stderr)
+
+        time.sleep(3)  # Rate limit
+
+    # Re-sort all results by confidence score
+    all_results = top_n + rest
+    all_results.sort(key=lambda x: x.get("confidence", {}).get("score", 0), reverse=True)
+
+    print(f"[deep-verify] Complete: {tokens_used} tokens used", file=sys.stderr)
+    return all_results, tokens_used
+
+
+# ── Stage 4c: Buy Link Verification ─────────────────────────────────────
+
+
+OOS_SIGNALS = [
+    "out of stock", "sold out", "unavailable", "not available",
+    "coming soon", "notify me", "currently unavailable",
+]
+
+
+def verify_buy_links(results: list[dict]) -> list[dict]:
+    """HTTP check each retailer buy link — confirm page loads and product available.
+
+    Removes dead links from results. Adds link_verified field.
+    """
+    if not results:
+        return results
+
+    headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
+    verified = []
+    dead = 0
+
+    print(f"[verify-links] Checking {len(results)} buy links...", file=sys.stderr)
+
+    for r in results:
+        url = r.get("retailer_url", "")
+        if not url:
+            r["link_verified"] = False
+            verified.append(r)
+            continue
+
+        try:
+            resp = requests.get(url, headers=headers, timeout=10)
+            if resp.status_code == 200:
+                html_lower = resp.text.lower()
+                is_oos = any(sig in html_lower for sig in OOS_SIGNALS)
+                r["link_verified"] = not is_oos
+                if is_oos:
+                    dead += 1
+                    continue  # Skip OOS products
+            else:
+                r["link_verified"] = False
+                dead += 1
+                continue
+        except Exception:
+            r["link_verified"] = False
+            dead += 1
+            continue
+
+        verified.append(r)
+        time.sleep(0.5)
+
+    print(f"[verify-links] {len(verified)} verified, {dead} dead/OOS removed", file=sys.stderr)
+    return verified
+
+
+# ── Stage 4d: Ungating Check ────────────────────────────────────────────
+
+
+def check_ungating(results: list[dict]) -> list[dict]:
+    """Flag products whose brand is not in the student ungated brands list.
+
+    Doesn't remove them — just adds ungated field and lowers confidence.
+    """
+    if _is_ungated is None:
+        return results  # Feature not available
+
+    gated_count = 0
+    for r in results:
+        brand = r.get("brand", "")
+        if brand and _is_ungated(brand):
+            r["ungated"] = True
+        else:
+            r["ungated"] = False
+            r["gating_warning"] = f"Brand '{brand}' may be gated — verify before purchasing"
+            # Lower confidence by 10 points
+            conf = r.get("confidence", {})
+            if conf.get("score"):
+                conf["score"] = max(0, conf["score"] - 10)
+                # Recalc verdict
+                s = conf["score"]
+                conf["verdict"] = "BUY" if s >= 70 else "MAYBE" if s >= 50 else "RESEARCH" if s >= 30 else "SKIP"
+            gated_count += 1
+
+    if gated_count:
+        print(f"[ungating] {gated_count} products may be brand-gated (flagged, not removed)", file=sys.stderr)
+
+    return results
+
+
+# ── Coupon + Cashback Helpers ────────────────────────────────────────────
+
+
+def auto_discover_coupon(domain: str) -> str | None:
+    """Try to find an active coupon for the retailer via coupon_scraper."""
+    if _get_best_coupon is None:
+        return None
+
+    try:
+        retailer_name = domain.replace(".com", "").replace(".org", "").replace("www.", "")
+        coupon = _get_best_coupon(retailer_name)
+        if coupon:
+            desc = coupon.get("description", "")
+            code = coupon.get("code", "")
+            print(f"[coupon] Auto-discovered: {desc} (code: {code or 'auto-apply'})", file=sys.stderr)
+            return desc
+    except Exception as e:
+        print(f"[coupon] Auto-discovery failed: {e}", file=sys.stderr)
+
+    return None
+
+
+def get_cashback_for_domain(domain: str) -> float:
+    """Get Rakuten cashback rate for a domain."""
+    if _get_cashback_rate is None:
+        return 0.0
+    try:
+        rate = _get_cashback_rate(domain)
+        if rate > 0:
+            print(f"[cashback] {domain}: {rate*100:.1f}% Rakuten cashback", file=sys.stderr)
+        return rate
+    except Exception:
+        return 0.0
+
+
 # ── Stage 5: Output ──────────────────────────────────────────────────────────
 
 
@@ -422,6 +660,9 @@ def run_pipeline(
     coupon: str | None = None,
     limit_scrape: int = 0,
     resume: bool = False,
+    deep_verify: int = 0,
+    verify_links: bool = True,
+    no_coupon: bool = False,
 ) -> dict:
     """Run the full catalog sourcing pipeline.
 
@@ -438,11 +679,18 @@ def run_pipeline(
     print(f"CATALOG SOURCING PIPELINE: {domain}", file=sys.stderr)
     print(f"{'='*60}\n", file=sys.stderr)
 
+    # ── Stage 0: Auto-discover coupon + cashback ──────────────────────────
+    cashback_rate = get_cashback_for_domain(domain)
+    if not coupon and not no_coupon:
+        auto_coupon = auto_discover_coupon(domain)
+        if auto_coupon:
+            coupon = auto_coupon
+
     # ── Stage 1: Scrape ─────────────────────────────────────────────────
     print("[STAGE 1] Scraping retailer catalog...", file=sys.stderr)
+    catalog_path_for_diff = str(CATALOG_DIR / f"{domain}_{date_str}.json") if hasattr(CATALOG_DIR, 'exists') else None
     catalog = scrape_catalog(url, limit=limit_scrape, resume=resume)
     if isinstance(catalog, dict):
-        # detect_only mode returned a dict
         return catalog
 
     total_scraped = len(catalog)
@@ -452,9 +700,37 @@ def run_pipeline(
         print("[pipeline] No products found. Check the URL and try again.", file=sys.stderr)
         return format_output([], domain, 0, 0, 0)
 
+    # ── Stage 1b: Catalog Diff (compare to previous scrape) ────────────
+    CATALOG_DIR.mkdir(parents=True, exist_ok=True)
+    catalog_path = str(CATALOG_DIR / f"{domain}_{date_str}.json")
+    if diff_catalogs is not None:
+        prev = find_previous_catalog(domain, catalog_path)
+        if prev:
+            print("[STAGE 1b] Comparing to previous catalog...", file=sys.stderr)
+            diff = diff_catalogs(prev, catalog_path)
+            print_diff_summary(diff)
+            # Tag new products and price drops
+            new_upcs = {p.get("upc") for p in diff.get("new_products", []) if p.get("upc")}
+            drop_map = {p.get("upc"): p.get("_price_drop_pct", 0) for p in diff.get("price_drops", []) if p.get("upc")}
+            for p in catalog:
+                upc = p.get("upc")
+                if upc in new_upcs:
+                    p["is_new"] = True
+                if upc in drop_map:
+                    p["price_drop_pct"] = drop_map[upc]
+            print("", file=sys.stderr)
+
     # ── Stage 2: Pre-filter ─────────────────────────────────────────────
     print("[STAGE 2] Pre-filtering candidates...", file=sys.stderr)
     filtered = prefilter(catalog, min_price=min_price, max_price=max_price, coupon=coupon)
+
+    # Apply cashback to effective price
+    if cashback_rate > 0:
+        for p in filtered:
+            price = p.get("price_after_coupon", p.get("price", 0))
+            p["cashback_savings"] = round(price * cashback_rate, 2)
+            p["effective_price"] = round(price * (1 - cashback_rate), 2)
+
     total_filtered = len(filtered)
     print(
         f"[STAGE 2] Complete: {total_filtered} candidates "
@@ -491,6 +767,24 @@ def run_pipeline(
     print("[STAGE 4] Analyzing profitability + velocity...", file=sys.stderr)
     analyzed = analyze_matches(matched, min_roi=min_roi, min_profit=min_profit, max_bsr=max_bsr)
     print(f"[STAGE 4] Complete: {len(analyzed)} profitable products\n", file=sys.stderr)
+
+    # ── Stage 4b: Deep Verify top N ─────────────────────────────────────
+    deep_tokens = 0
+    if deep_verify > 0 and analyzed:
+        print(f"[STAGE 4b] Deep verifying top {deep_verify} products...", file=sys.stderr)
+        analyzed, deep_tokens = deep_verify_top(analyzed, n=deep_verify)
+        tokens_used += deep_tokens
+        print(f"[STAGE 4b] Complete: {deep_tokens} extra tokens used\n", file=sys.stderr)
+
+    # ── Stage 4c: Buy Link Verification ─────────────────────────────────
+    if verify_links and analyzed:
+        print("[STAGE 4c] Verifying buy links...", file=sys.stderr)
+        analyzed = verify_buy_links(analyzed)
+        print("", file=sys.stderr)
+
+    # ── Stage 4d: Ungating Check ────────────────────────────────────────
+    if analyzed:
+        analyzed = check_ungating(analyzed)
 
     # ── Stage 5: Output ─────────────────────────────────────────────────
     print("[STAGE 5] Formatting output...", file=sys.stderr)
@@ -547,6 +841,9 @@ def main():
     parser.add_argument("--coupon", type=str, default=None, help="Coupon to apply (e.g., '20%% off')")
     parser.add_argument("--limit-scrape", type=int, default=0, help="Max products to scrape (0=unlimited)")
     parser.add_argument("--resume", action="store_true", help="Resume from last checkpoint")
+    parser.add_argument("--deep-verify", type=int, default=0, help="Deep verify top N with Keepa offers (21 tokens each)")
+    parser.add_argument("--no-verify-links", action="store_true", help="Skip buy link verification")
+    parser.add_argument("--no-coupon", action="store_true", help="Skip coupon auto-discovery")
     parser.add_argument("--json", action="store_true", help="Output full JSON to stdout")
     args = parser.parse_args()
 
@@ -561,6 +858,9 @@ def main():
         coupon=args.coupon,
         limit_scrape=args.limit_scrape,
         resume=args.resume,
+        deep_verify=args.deep_verify,
+        verify_links=not args.no_verify_links,
+        no_coupon=args.no_coupon,
     )
 
     if args.json:
