@@ -2440,6 +2440,26 @@ Examples:
     p_reverse.add_argument("--min-profit", type=float, default=3.00,
                            help="Minimum profit per unit (default: $3.00)")
 
+    # ── Catalog mode (full retailer dump — StartUpFBA workflow) ────────
+    p_catalog = sub.add_parser("catalog", help="Scrape entire retailer catalog → filter → match → score")
+    p_catalog.add_argument("retailer_url", help="Retailer URL (e.g., https://www.shopwss.com)")
+    p_catalog.add_argument("--max-tokens", type=int, default=3000,
+                           help="Max Keepa tokens to spend (default: 3000)")
+    p_catalog.add_argument("--min-roi", type=float, default=30.0,
+                           help="Min ROI %% (default: 30)")
+    p_catalog.add_argument("--min-profit", type=float, default=3.0,
+                           help="Min profit per unit (default: $3)")
+    p_catalog.add_argument("--max-bsr", type=int, default=200000,
+                           help="Max BSR (default: 200000)")
+    p_catalog.add_argument("--min-price", type=float, default=5.0,
+                           help="Min retail price filter (default: $5)")
+    p_catalog.add_argument("--max-price", type=float, default=60.0,
+                           help="Max retail price filter (default: $60)")
+    p_catalog.add_argument("--coupon", type=str, default=None,
+                           help="Coupon to apply (e.g., '20%% off')")
+    p_catalog.add_argument("--limit-scrape", type=int, default=0,
+                           help="Max products to scrape (0=unlimited)")
+
     # Global flags (apply to all modes)
     parser.add_argument("--export", choices=["sheets"], default=None,
                         help="Export results to Google Sheets after scan")
@@ -2538,6 +2558,24 @@ Examples:
                               reverse_source=args.reverse_source,
                               retailers=[r.strip().lower() for r in args.retailers.split(",")])
         mode_name = f"Finder: drop>{args.min_drop}%"
+
+    elif args.mode == "catalog":
+        from catalog_pipeline import run_pipeline as _run_catalog
+        output = _run_catalog(
+            url=args.retailer_url,
+            max_tokens=args.max_tokens,
+            min_roi=args.min_roi,
+            min_profit=args.min_profit,
+            max_bsr=args.max_bsr,
+            min_price=args.min_price,
+            max_price=args.max_price,
+            coupon=args.coupon,
+            limit_scrape=args.limit_scrape,
+            resume=getattr(args, "resume", False),
+        )
+        # Catalog has its own output — convert to source.py result format
+        results = output.get("products", [])
+        mode_name = f"Catalog: {args.retailer_url}"
 
     elif args.mode == "reverse":
         from mode_reverse import run_reverse_search, load_asins_from_file

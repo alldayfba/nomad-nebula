@@ -537,6 +537,8 @@ def api_sourcing():
         cli_args.append(data["category"])
     if mode == "url" and data.get("url"):
         cli_args.extend(["--url", data["url"]])
+    if mode == "catalog" and data.get("retailer_url"):
+        cli_args.append(data["retailer_url"])
 
     # Named args
     arg_map = {
@@ -547,6 +549,8 @@ def api_sourcing():
         "a2a_type": "--type", "min_discount": "--min-discount",
         "price_range": "--price-range", "category_id": "--category",
         "min_roi": "--min-roi", "max_products": "--max-products",
+        "max_tokens": "--max-tokens", "coupon": "--coupon",
+        "limit_scrape": "--limit-scrape",
     }
     for key, flag in arg_map.items():
         val = data.get(key)
