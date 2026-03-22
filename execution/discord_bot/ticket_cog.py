@@ -1,5 +1,7 @@
 """Ticket Cog — /ticket, /close-ticket, /ticket-add, /tickets-list + transcript listener."""
 
+from __future__ import annotations
+
 import os
 from datetime import datetime
 
@@ -110,13 +112,22 @@ class TicketCog(commands.Cog):
                 )
 
         # Create the channel
-        safe_name = user.display_name.lower().replace(" ", "-")[:20]
-        channel = await guild.create_text_channel(
-            name=f"ticket-{safe_name}",
-            category=ticket_category,
-            overwrites=overwrites,
-            reason=f"Support ticket by {user.display_name}: {subject}",
-        )
+        import re as _re
+        safe_name = _re.sub(r'[^a-z0-9-]', '', user.display_name.lower().replace(" ", "-"))[:20] or "user"
+        try:
+            channel = await guild.create_text_channel(
+                name=f"ticket-{safe_name}",
+                category=ticket_category,
+                overwrites=overwrites,
+                reason=f"Support ticket: {subject[:50]}",
+            )
+        except discord.HTTPException:
+            # Fallback: create without category if category is invalid
+            channel = await guild.create_text_channel(
+                name=f"ticket-{safe_name}",
+                overwrites=overwrites,
+                reason=f"Support ticket: {subject[:50]}",
+            )
 
         # Save to DB
         ticket_num = self.db.create_ticket(

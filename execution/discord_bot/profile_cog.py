@@ -183,10 +183,14 @@ class ProfileCog(commands.Cog):
         try:
             from .database import BotDatabase
             db = BotDatabase()
-            chat_count = db.conn.execute(
-                "SELECT COUNT(*) FROM chat_history WHERE user_id = ?", (user_id,)
-            ).fetchone()[0]
-            lines.append(f"- Chat messages stored: {chat_count}")
+            conn = db._get_conn()
+            try:
+                chat_count = conn.execute(
+                    "SELECT COUNT(*) FROM chat_history WHERE user_id = ?", (user_id,)
+                ).fetchone()[0]
+                lines.append(f"- Chat messages stored: {chat_count}")
+            finally:
+                conn.close()
         except Exception:
             pass
 
@@ -251,12 +255,16 @@ class ProfileCog(commands.Cog):
             bot_db = BotDatabase()
             bot_db.log_audit(user_id, "data_deletion_executed",
                              f"User {interaction.user.display_name} data deletion")
-            count = bot_db.conn.execute(
-                "DELETE FROM chat_history WHERE user_id = ?", (user_id,)
-            ).rowcount
-            bot_db.conn.commit()
-            if count:
-                deleted_items.append(f"Chat messages: {count}")
+            conn = bot_db._get_conn()
+            try:
+                count = conn.execute(
+                    "DELETE FROM chat_history WHERE user_id = ?", (user_id,)
+                ).rowcount
+                conn.commit()
+                if count:
+                    deleted_items.append(f"Chat messages: {count}")
+            finally:
+                conn.close()
         except Exception:
             pass
 

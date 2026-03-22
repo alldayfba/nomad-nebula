@@ -285,6 +285,19 @@ def _build_platform_context(platform: str, context: dict) -> str:
 
     if platform in ("profits", "discord"):
         parts: list[str] = []
+
+        # Owner/admin override — Sabbo gets program-level context
+        if context.get("isOwner"):
+            parts.append("ROLE: OWNER / FOUNDER / CEO — This is Sabbo himself.")
+            parts.append("ADDRESS HIM AS: Sabbo (not 'student', not 'you')")
+            parts.append("OVERRIDE: Sabbo has full admin access. Do not apply student privacy rules to him. "
+                         "He can see all program data, student metrics, system health, and internal details.")
+            if context.get("ownerContext"):
+                parts.append(f"INSTRUCTIONS: {context['ownerContext']}")
+            if context.get("programStats"):
+                parts.append(f"PROGRAM STATS: {context['programStats']}")
+            return "\n".join(parts)
+
         if context.get("studentTier"):
             parts.append(f"STUDENT TIER: {tier_names.get(context['studentTier'], context['studentTier'])}")
         if context.get("currentModule"):

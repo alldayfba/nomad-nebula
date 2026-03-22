@@ -70,6 +70,43 @@ class StudentLearningEngine:
                 parts.append(f"- {h['topic'].replace('_', ' ').title()} ({h['question_count']} questions)")
         return "\n".join(parts) if parts else ""
 
+    def get_user_history(self, user_id: str, limit: int = 10) -> List[Dict]:
+        """Get a student's past interactions for context continuity."""
+        rows = self.conn.execute(
+            "SELECT question, answer, topic, created_at FROM interactions "
+            "WHERE user_id = ? ORDER BY created_at DESC LIMIT ?",
+            (str(user_id), limit)
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+    def get_program_insights(self) -> str:
+        """Synthesize what's been learned from ALL student interactions."""
+        parts = []
+        total = self.conn.execute("SELECT COUNT(*) FROM interactions").fetchone()[0]
+        unique = self.conn.execute("SELECT COUNT(DISTINCT user_id) FROM interactions").fetchone()[0]
+        parts.append(f"Nova has handled {total} questions from {unique} students.")
+
+        # Top struggle topics
+        hot = self.conn.execute(
+            "SELECT topic, question_count FROM topic_patterns ORDER BY question_count DESC LIMIT 8"
+        ).fetchall()
+        if hot:
+            parts.append("\nMost common topics students ask about:")
+            for h in hot:
+                parts.append(f"  - {h['topic'].replace('_', ' ').title()}: {h['question_count']} questions")
+
+        # Recent questions (last 24h) for trend detection
+        recent = self.conn.execute(
+            "SELECT topic, COUNT(*) as cnt FROM interactions "
+            "WHERE created_at >= datetime('now', '-1 day') GROUP BY topic ORDER BY cnt DESC LIMIT 5"
+        ).fetchall()
+        if recent:
+            parts.append("\nToday's hot topics:")
+            for r in recent:
+                parts.append(f"  - {r['topic'].replace('_', ' ').title()}: {r['cnt']} questions today")
+
+        return "\n".join(parts)
+
     def get_stats(self) -> Dict:
         total = self.conn.execute("SELECT COUNT(*) FROM interactions").fetchone()[0]
         unique_users = self.conn.execute("SELECT COUNT(DISTINCT user_id) FROM interactions").fetchone()[0]

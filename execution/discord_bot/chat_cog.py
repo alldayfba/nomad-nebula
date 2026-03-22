@@ -8,7 +8,7 @@ from pathlib import Path
 
 import discord
 from discord import app_commands
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from .database import BotDatabase
 from .knowledge import (
@@ -16,7 +16,10 @@ from .knowledge import (
     get_relevant_knowledge,
     track_question,
 )
-from nova_core.knowledge import maybe_auto_generate_faq
+try:
+    from nova_core.knowledge import maybe_auto_generate_faq
+except ImportError:
+    maybe_auto_generate_faq = None
 from .security import (
     RateLimiter,
     filter_output,
@@ -234,11 +237,18 @@ def _split_message(text, max_len=1900):
 class ChatCog(commands.Cog):
     """Handles /ask command and DM conversations with Claude API."""
 
+    # Channel names created by Nova for /ask questions
+    NOVA_CHANNEL_PREFIX = "nova-"
+    NOVA_CATEGORY_NAME = "Nova Chats"
+    AUTO_CLOSE_HOURS = 24
+
     def __init__(self, bot):
         self.bot = bot
         self.db = BotDatabase()
         self.rate_limiter = RateLimiter()
         self.base_system_prompt = build_system_prompt()
+        self.admin_role_id = os.getenv("DISCORD_ADMIN_ROLE_ID", "")
+        self._nova_category_id = None  # Cached category channel ID
 
         # Check for CLI proxy first (uses Max plan, no API credits needed)
         proxy_url = os.getenv("CLAUDE_PROXY_URL", "")
@@ -246,6 +256,8 @@ class ChatCog(commands.Cog):
 
         self.claude_proxy = None
         self.claude_api = None
+        self.saas_chat_url = os.getenv("SAAS_CHAT_URL", "https://247profits.org/api/nova/chat")
+        self.saas_chat_secret = os.getenv("NOVA_API_SECRET", "")
         if AsyncAnthropic and proxy_url:
             self.claude_proxy = AsyncAnthropic(api_key="proxy", base_url=proxy_url)
         if AsyncAnthropic and api_key:
@@ -321,7 +333,8 @@ class ChatCog(commands.Cog):
             cluster_id, frequency = track_question(self.db, str(user_id), sanitized)
             faq_entries = get_relevant_knowledge(self.db, sanitized, limit=3)
             knowledge_block = build_knowledge_block(faq_entries)
-            maybe_auto_generate_faq(cluster_id, frequency)
+            if maybe_auto_generate_faq:
+                maybe_auto_generate_faq(cluster_id, frequency)
         except Exception as _kb_err:
             print(f"[chat-cog] Knowledge system error (non-fatal): {_kb_err}", file=sys.stderr)
 
@@ -333,21 +346,124 @@ class ChatCog(commands.Cog):
             except Exception:
                 pass
 
-        # ── Student context injection ────────────────────────────────────
-        # Look up this Discord user in students.db for personalized responses
+        # ── Student/Admin context injection ─────────────────────────────
+        # Check if this is the owner/admin (Sabbo)
+        OWNER_DISCORD_ID = "333610222146813957"
+        is_owner = str(user_id) == OWNER_DISCORD_ID
+
         student_ctx = _get_student_context(user_id)
-        if student_ctx:
-            # Build per-user prompt with student context via nova_core
+        if student_ctx or is_owner:
             from nova_core.prompts import build_prompt
-            system_prompt = build_prompt("discord", faq_entries=faq_entries, platform_context={
-                "studentTier": student_ctx.get("studentTier"),
-                "currentMilestone": student_ctx.get("currentMilestone"),
-                "healthScore": student_ctx.get("healthScore"),
-                "riskLevel": student_ctx.get("riskLevel"),
-                "milestones": student_ctx.get("milestones", []),
-                "lastMood": student_ctx.get("lastMood"),
-                "lastBlockers": student_ctx.get("lastBlockers"),
-            })
+            platform_context = {}
+            if student_ctx:
+                platform_context = {
+                    "studentTier": student_ctx.get("studentTier"),
+                    "currentMilestone": student_ctx.get("currentMilestone"),
+                    "healthScore": student_ctx.get("healthScore"),
+                    "riskLevel": student_ctx.get("riskLevel"),
+                    "milestones": student_ctx.get("milestones", []),
+                    "lastMood": student_ctx.get("lastMood"),
+                    "lastBlockers": student_ctx.get("lastBlockers"),
+                }
+
+            if is_owner:
+                platform_context["isOwner"] = True
+                platform_context["ownerContext"] = (
+                    "This user is **Sabbo** — the founder and owner of 24/7 Profits, AllDayFBA, "
+                    "and your creator. He has full admin override on everything. "
+                    "When he asks 'how am I doing', report on the overall program: "
+                    "student count, health scores, at-risk students, recent wins, Discord engagement, "
+                    "system status. Pull from all available data — students.db, SaaS, engagement signals. "
+                    "Address him directly as Sabbo. He is not a student — he is the CEO."
+                )
+                # Fetch real student data from Supabase via Nova API
+                try:
+                    import requests as _req
+                    nova_secret = os.getenv("NOVA_API_SECRET", "")
+                    nova_headers = {"X-Nova-Secret": nova_secret}
+                    base_url = "http://127.0.0.1:5050"
+
+                    # Get newest students with full onboarding data from Supabase
+                    # Fall back to local students.db which now has imported onboarding CSV data
+                    resp = _req.get(f"{base_url}/nova/students?sort=newest&limit=20", headers=nova_headers, timeout=10)
+                    saas_has_data = resp.ok and len(resp.json().get("students", [])) > 0 and any(s.get("goals") for s in resp.json().get("students", []))
+
+                    if not saas_has_data:
+                        # Use local students.db (has imported onboarding form CSV data)
+                        import sqlite3 as _sq
+                        _students_db = Path(__file__).parent.parent.parent / ".tmp" / "coaching" / "students.db"
+                        if _students_db.exists():
+                            sconn = _sq.connect(str(_students_db), timeout=5)
+                            sconn.row_factory = _sq.Row
+                            total = sconn.execute("SELECT COUNT(*) FROM students WHERE status='active'").fetchone()[0]
+
+                            newest = sconn.execute(
+                                "SELECT name, start_date, goals, struggles, capital_to_invest, age, location, "
+                                "amazon_status, has_selleramp, has_keepa, has_llc, health_score, current_milestone "
+                                "FROM students WHERE status='active' ORDER BY start_date DESC LIMIT 20"
+                            ).fetchall()
+
+                            roster_lines = []
+                            for s in newest:
+                                line = f"  - **{s['name']}** (joined {s['start_date']}"
+                                if s['age']: line += f", age {s['age']}"
+                                if s['location']: line += f", {s['location'][:40]}"
+                                if s['goals']: line += f", goals: {s['goals'][:80]}"
+                                if s['struggles']: line += f", struggles: {s['struggles'][:80]}"
+                                if s['capital_to_invest']: line += f", capital: {s['capital_to_invest']}"
+                                if s['amazon_status']: line += f", amazon: {s['amazon_status'][:40]}"
+                                tools = []
+                                if s['has_selleramp'] == '1': tools.append('SellerAMP')
+                                if s['has_keepa'] == '1': tools.append('Keepa')
+                                if s['has_llc'] == '1': tools.append('LLC')
+                                if tools: line += f", has: {', '.join(tools)}"
+                                line += f", health: {s['health_score']}, milestone: {s['current_milestone'] or 'enrolled'})"
+                                roster_lines.append(line)
+
+                            sconn.close()
+                            stats_block = f"Total active students: {total}."
+                            if roster_lines:
+                                stats_block += "\n\nSTUDENT ROSTER (from onboarding form responses):\n" + "\n".join(roster_lines)
+                            platform_context["programStats"] = stats_block
+
+                    elif resp.ok:
+                        data = resp.json()
+                        students = data.get("students", [])
+                        total = data.get("count", 0)
+
+                        roster_lines = []
+                        for s in students:
+                            line = f"  - **{s['name']}** (joined {s.get('joined', '?')}"
+                            if s.get('experience_level'):
+                                line += f", experience: {s['experience_level']}"
+                            if s.get('capital_available'):
+                                line += f", capital: ${s['capital_available']}"
+                            if s.get('goals'):
+                                line += f", goals: {s['goals'][:100]}"
+                            if s.get('struggles'):
+                                line += f", struggles: {s['struggles'][:100]}"
+                            if s.get('onboarding_completed'):
+                                line += ", onboarding: complete"
+                            else:
+                                line += f", onboarding step: {s.get('onboarding_step', 0)}"
+                            if s.get('milestones'):
+                                line += f", milestones: {', '.join(s['milestones'][:5])}"
+                            if s.get('last_active'):
+                                line += f", last active: {s['last_active']}"
+                            line += ")"
+                            roster_lines.append(line)
+
+                        stats_block = f"Total students in SaaS: {total}."
+                        if roster_lines:
+                            stats_block += "\n\nSTUDENT ROSTER (from 247profits.org — real onboarding data):\n" + "\n".join(roster_lines)
+
+                        platform_context["programStats"] = stats_block
+                    else:
+                        platform_context["programStats"] = "Could not fetch student data from SaaS."
+                except Exception as _e:
+                    platform_context["programStats"] = f"Error fetching students: {_e}"
+
+            system_prompt = build_prompt("discord", faq_entries=faq_entries, platform_context=platform_context)
         else:
             system_prompt = self.base_system_prompt
 
@@ -360,8 +476,26 @@ class ChatCog(commands.Cog):
         wrapped_input = wrap_user_input(sanitized)
 
         # Inject recent channel conversation for context (so Nova knows what was discussed)
+        # Live context = last 200 messages. For older history, pull a compressed summary from DB.
         if channel_context:
-            wrapped_input = f"<recent_channel_messages>\n{channel_context}\n</recent_channel_messages>\n\n{wrapped_input}"
+            # Check if there's older history in the DB beyond what's in live context
+            older_history = self.db.get_chat_history(str(user_id), str(channel_id), limit=500)
+            if len(older_history) > len(history):
+                # Summarize the older messages that aren't in the live 200
+                old_msgs = older_history[len(history):]
+                old_summary_lines = []
+                for m in old_msgs[-20:]:  # last 20 older messages as summary
+                    role = "Student" if m["role"] == "user" else "Nova"
+                    old_summary_lines.append(f"[{role}]: {m['content'][:150]}")
+                if old_summary_lines:
+                    channel_context = (
+                        "--- EARLIER CONVERSATION HISTORY (summarized) ---\n"
+                        + "\n".join(old_summary_lines)
+                        + "\n--- RECENT MESSAGES ---\n"
+                        + channel_context
+                    )
+
+            wrapped_input = f"<channel_conversation>\n{channel_context}\n</channel_conversation>\n\n{wrapped_input}"
 
         if knowledge_block and not student_ctx:
             # Only prepend knowledge block if not already in the prompt via build_prompt
@@ -385,78 +519,108 @@ class ChatCog(commands.Cog):
             except Exception:
                 pass
 
+        # ── Learning engine: user history + program insights ──────────
+        if _learning:
+            try:
+                # Inject this user's past Nova conversations for continuity
+                user_history = _learning.get_user_history(str(user_id), limit=5)
+                if user_history:
+                    hist_lines = []
+                    for h in reversed(user_history):  # oldest first
+                        hist_lines.append(f"Q: {h['question'][:150]}")
+                        hist_lines.append(f"A: {h['answer'][:200]}")
+                    wrapped_input = (
+                        f"<prior_conversations>\nThis student's recent past questions with Nova:\n"
+                        + "\n".join(hist_lines)
+                        + "\n</prior_conversations>\n\n"
+                        + wrapped_input
+                    )
+
+                # For owner/admin: inject program-wide learning insights
+                if is_owner:
+                    insights = _learning.get_program_insights()
+                    if insights:
+                        wrapped_input = (
+                            f"<program_insights>\n{insights}\n</program_insights>\n\n"
+                            + wrapped_input
+                        )
+            except Exception:
+                pass
+
         messages.append({"role": "user", "content": wrapped_input})
 
-        # Call Claude with timeout + proxy fallback
+        # Call Claude: 1) Local proxy → 2) SaaS proxy (Vercel) → 3) API key
         _call_start = _time_mod.time()
-        try:
-            import asyncio
-            # Pick client: use proxy unless it's marked down
-            client = self.claude
-            if _proxy_health.is_down and self.claude_api:
-                client = self.claude_api
-            elif self.claude_proxy:
-                client = self.claude_proxy
+        import asyncio
+        client = self.claude
+        if _proxy_health.is_down and self.claude_api:
+            client = self.claude_api
+        elif self.claude_proxy:
+            client = self.claude_proxy
 
-            if not client:
-                await respond_func("Chat is temporarily unavailable. Please try again later.")
-                return
+        if not client and not self.saas_chat_url:
+            await respond_func("Chat is temporarily unavailable. Please try again later.")
+            return
 
-            coro = client.messages.create(
-                model=self.model,
-                max_tokens=1800,
-                system=system_prompt,
-                messages=messages,
-            )
-            response = await asyncio.wait_for(coro, timeout=25.0)
+        reply = None
+        tokens_in = 0
+        tokens_out = 0
 
-            reply = response.content[0].text
-            tokens_in = response.usage.input_tokens
-            tokens_out = response.usage.output_tokens
-            _proxy_health.record_success()
-            _error_tracker.record_success(_time_mod.time() - _call_start)
+        # Attempt 1: Local Claude CLI proxy (free via Max plan)
+        if client:
+            try:
+                coro = client.messages.create(
+                    model=self.model, max_tokens=1800,
+                    system=system_prompt, messages=messages,
+                )
+                response = await asyncio.wait_for(coro, timeout=45.0)
+                reply = response.content[0].text
+                tokens_in = response.usage.input_tokens
+                tokens_out = response.usage.output_tokens
+                _proxy_health.record_success()
+                _error_tracker.record_success(_time_mod.time() - _call_start)
+            except Exception as e1:
+                _proxy_health.record_failure()
+                print(f"[chat-cog] Proxy failed: {e1}", file=sys.stderr)
 
-        except asyncio.TimeoutError:
-            _proxy_health.record_failure()
-            _error_tracker.record_timeout()
-            # Retry once with API fallback if available
-            if self.claude_api and client != self.claude_api:
-                try:
-                    coro2 = self.claude_api.messages.create(
-                        model=self.model, max_tokens=1800,
-                        system=system_prompt, messages=messages,
-                    )
-                    response = await asyncio.wait_for(coro2, timeout=25.0)
-                    reply = response.content[0].text
-                    tokens_in = response.usage.input_tokens
-                    tokens_out = response.usage.output_tokens
-                except Exception:
-                    await respond_func("Nova is taking too long — try again in a moment.")
-                    return
-            else:
-                await respond_func("Nova is taking too long — try again in a moment.")
-                return
-        except Exception as e:
-            _proxy_health.record_failure()
-            _error_tracker.record_error()
-            self.db.log_audit(str(user_id), "api_error", str(e)[:500])
-            # Try API fallback
-            if self.claude_api and client != self.claude_api:
-                try:
-                    coro3 = self.claude_api.messages.create(
-                        model=self.model, max_tokens=1800,
-                        system=system_prompt, messages=messages,
-                    )
-                    response = await asyncio.wait_for(coro3, timeout=25.0)
-                    reply = response.content[0].text
-                    tokens_in = response.usage.input_tokens
-                    tokens_out = response.usage.output_tokens
-                except Exception:
-                    await respond_func("Something went wrong. Please try again in a moment.")
-                    return
-            else:
-                await respond_func("Something went wrong. Please try again in a moment.")
-                return
+        # Attempt 2: SaaS proxy on Vercel (routes through tunnel → Max plan)
+        if reply is None and self.saas_chat_url:
+            try:
+                import aiohttp
+                async with aiohttp.ClientSession() as session:
+                    async with session.post(
+                        self.saas_chat_url,
+                        json={"model": self.model, "max_tokens": 1800, "system": system_prompt, "messages": messages},
+                        headers={"X-Nova-Secret": self.saas_chat_secret, "Content-Type": "application/json"},
+                        timeout=aiohttp.ClientTimeout(total=50),
+                    ) as resp:
+                        if resp.status == 200:
+                            data = await resp.json()
+                            if data.get("content") and len(data["content"]) > 0:
+                                reply = data["content"][0].get("text", "")
+                                tokens_in = data.get("usage", {}).get("input_tokens", 0)
+                                tokens_out = data.get("usage", {}).get("output_tokens", 0)
+                                _error_tracker.record_success(_time_mod.time() - _call_start)
+            except Exception as e2:
+                print(f"[chat-cog] SaaS proxy failed: {e2}", file=sys.stderr)
+
+        # Attempt 3: Direct API key (costs money, last resort)
+        if reply is None and self.claude_api:
+            try:
+                coro3 = self.claude_api.messages.create(
+                    model=self.model, max_tokens=1800,
+                    system=system_prompt, messages=messages,
+                )
+                response = await asyncio.wait_for(coro3, timeout=45.0)
+                reply = response.content[0].text
+                tokens_in = response.usage.input_tokens
+                tokens_out = response.usage.output_tokens
+            except Exception as e3:
+                self.db.log_audit(str(user_id), "api_error", str(e3)[:500])
+
+        if reply is None:
+            await respond_func("Nova is temporarily unavailable. Please try again in a moment.")
+            return
 
         # Layer 4: Output filtering
         filtered_reply, leak_detected = filter_output(reply)
@@ -504,105 +668,291 @@ class ChatCog(commands.Cog):
                 except Exception:
                     pass  # Reaction perms may be missing
 
-    # ── /ask Slash Command ────────────────────────────────────────────────────
+    # ── Nova Channel Management ──────────────────────────────────────────────
+
+    async def _get_or_create_nova_category(self, guild):
+        """Get or create the 'Nova Chats' category channel."""
+        if self._nova_category_id:
+            cat = guild.get_channel(self._nova_category_id)
+            if cat:
+                return cat
+
+        # Look for existing category
+        for cat in guild.categories:
+            if cat.name.lower() == self.NOVA_CATEGORY_NAME.lower():
+                self._nova_category_id = cat.id
+                return cat
+
+        # Create it — only admin + bot can see the category by default
+        overwrites = {
+            guild.default_role: discord.PermissionOverwrite(read_messages=False),
+            guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_channels=True),
+        }
+        admin_rid = int(self.admin_role_id) if self.admin_role_id else 0
+        if admin_rid:
+            admin_role = guild.get_role(admin_rid)
+            if admin_role:
+                overwrites[admin_role] = discord.PermissionOverwrite(
+                    read_messages=True, send_messages=True, manage_channels=True
+                )
+
+        cat = await guild.create_category(self.NOVA_CATEGORY_NAME, overwrites=overwrites)
+        self._nova_category_id = cat.id
+        return cat
+
+    async def _get_or_create_nova_channel(self, guild, user):
+        """Get existing Nova channel for user, or create a new private one."""
+        safe_name = f"{self.NOVA_CHANNEL_PREFIX}{user.display_name.lower().replace(' ', '-')[:20]}"
+
+        # Check for existing open channel for this user
+        category = await self._get_or_create_nova_category(guild)
+        for ch in category.text_channels:
+            if ch.topic and str(user.id) in ch.topic:
+                return ch, False  # Existing channel
+
+        # Create new private channel
+        overwrites = {
+            guild.default_role: discord.PermissionOverwrite(read_messages=False),
+            user: discord.PermissionOverwrite(read_messages=True, send_messages=True),
+            guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_channels=True),
+        }
+        admin_rid = int(self.admin_role_id) if self.admin_role_id else 0
+        if admin_rid:
+            admin_role = guild.get_role(admin_rid)
+            if admin_role:
+                overwrites[admin_role] = discord.PermissionOverwrite(
+                    read_messages=True, send_messages=True, manage_channels=True
+                )
+
+        channel = await guild.create_text_channel(
+            name=safe_name,
+            category=category,
+            overwrites=overwrites,
+            topic=f"Nova chat for {user.display_name} (uid:{user.id}) — auto-closes after {self.AUTO_CLOSE_HOURS}h inactivity",
+        )
+
+        # Welcome embed
+        embed = discord.Embed(
+            title=f"Hey {user.display_name}!",
+            description=(
+                "This is your private Nova chat. Ask me anything about Amazon FBA, sourcing, or ecommerce.\n\n"
+                "Just type your questions here — no need for `/ask`. I'll respond to every message.\n\n"
+                f"This channel auto-closes after {self.AUTO_CLOSE_HOURS} hours of inactivity."
+            ),
+            color=discord.Color.blue(),
+        )
+        embed.set_footer(text="Nova — 24/7 Profits AI Coach")
+        await channel.send(embed=embed)
+
+        return channel, True  # New channel
+
+    def cog_load(self):
+        self._auto_close_channels.start()
+
+    def cog_unload(self):
+        self._auto_close_channels.cancel()
+
+    @tasks.loop(minutes=30)
+    async def _auto_close_channels(self):
+        """Auto-close Nova chat channels after 24h of inactivity."""
+        for guild in self.bot.guilds:
+            try:
+                category = None
+                for cat in guild.categories:
+                    if cat.name.lower() == self.NOVA_CATEGORY_NAME.lower():
+                        category = cat
+                        break
+                if not category:
+                    continue
+
+                for channel in category.text_channels:
+                    if not channel.name.startswith(self.NOVA_CHANNEL_PREFIX):
+                        continue
+
+                    # Check last message time
+                    last_msg = None
+                    async for msg in channel.history(limit=1):
+                        last_msg = msg
+
+                    if not last_msg:
+                        continue
+
+                    age_hours = (datetime.utcnow() - last_msg.created_at.replace(tzinfo=None)).total_seconds() / 3600
+                    if age_hours >= self.AUTO_CLOSE_HOURS:
+                        try:
+                            # Send closing notice
+                            await channel.send(
+                                embed=discord.Embed(
+                                    title="Chat Closed",
+                                    description="This chat has been closed due to inactivity. Use `/ask` anytime to start a new one!",
+                                    color=discord.Color.greyple(),
+                                )
+                            )
+                            import asyncio
+                            await asyncio.sleep(5)
+                            await channel.delete(reason=f"Nova auto-close: {self.AUTO_CLOSE_HOURS}h inactivity")
+                        except Exception:
+                            pass
+            except Exception:
+                pass
+
+    @_auto_close_channels.before_loop
+    async def _before_auto_close(self):
+        await self.bot.wait_until_ready()
 
     @staticmethod
-    async def _fetch_channel_context(channel, limit=20) -> str:
-        """Fetch recent messages from the channel for conversational context.
+    async def _fetch_channel_context(channel, limit=200) -> str:
+        """Fetch channel messages for conversational context.
 
-        Captures what was being discussed so Nova can reference it.
+        200 messages covers a full day of active 1-on-1 coaching.
+        Keeps prompt under ~15K tokens to avoid timeouts.
         """
         try:
             messages = []
             async for msg in channel.history(limit=limit):
-                if msg.author.bot:
-                    # Include bot messages but mark them
-                    messages.append(f"[{msg.author.display_name}]: {msg.content[:300]}")
-                else:
-                    messages.append(f"[{msg.author.display_name}]: {msg.content[:300]}")
-            messages.reverse()  # Oldest first
+                prefix = "[Nova]" if msg.author.bot else f"[{msg.author.display_name}]"
+                content = msg.content[:300] if msg.content else ""
+                if content:
+                    messages.append(f"{prefix}: {content}")
+            messages.reverse()
             return "\n".join(messages) if messages else ""
         except Exception:
             return ""
 
+    # ── /ask Slash Command ────────────────────────────────────────────────────
+
+    def _is_admin(self, member: discord.Member) -> bool:
+        """Check if a guild member has the admin role."""
+        if not self.admin_role_id:
+            return False
+        admin_rid = int(self.admin_role_id)
+        return any(r.id == admin_rid for r in member.roles)
+
     @app_commands.command(name="ask", description="Ask about Amazon FBA, ecommerce, or marketing")
     @app_commands.describe(question="Your question")
     async def ask(self, interaction: discord.Interaction, question: str):
-        await interaction.response.defer(thinking=True)
+        await interaction.response.defer(ephemeral=True)
 
-        # Fetch recent channel messages for context BEFORE creating thread
-        channel_context = await self._fetch_channel_context(interaction.channel)
+        guild = interaction.guild
+        if not guild:
+            await interaction.followup.send("This command only works in a server.", ephemeral=True)
+            return
 
-        # Create a thread for this conversation
-        thread = None
-        try:
-            thread_name = question[:80].strip() or "Nova Chat"
-            msg = await interaction.followup.send(f"**{interaction.user.display_name}** asked: {question[:200]}")
-            thread = await msg.create_thread(name=thread_name, auto_archive_duration=1440)
-        except Exception:
-            pass
+        # If admin is using /ask inside an existing nova-* channel, respond inline
+        is_admin = isinstance(interaction.user, discord.Member) and self._is_admin(interaction.user)
+        current_channel = interaction.channel
+        in_nova_channel = (
+            current_channel
+            and hasattr(current_channel, 'name')
+            and current_channel.name.startswith(self.NOVA_CHANNEL_PREFIX)
+            and hasattr(current_channel, 'category')
+            and current_channel.category
+            and current_channel.category.name.lower() == self.NOVA_CATEGORY_NAME.lower()
+        )
 
-        if thread:
-            # Respond inside the thread — student can continue naturally
+        if is_admin and in_nova_channel:
+            # Admin is viewing a student's Nova channel — respond inline
+            channel = current_channel
+
+            await channel.send(f"**{interaction.user.display_name} (admin):** {question}")
+
+            await interaction.followup.send("Answering in this channel.", ephemeral=True)
+
             async def respond(text):
-                return await thread.send(text)
+                return await channel.send(text)
 
+            # Fetch recent channel context so Nova knows the conversation
+            channel_context = await self._fetch_channel_context(channel)
+
+            async with channel.typing():
+                await self._handle_question(
+                    user_id=interaction.user.id,
+                    channel_id=channel.id,
+                    question=question,
+                    respond_func=respond,
+                    user_name=interaction.user.display_name,
+                    channel_context=channel_context,
+                )
+            return
+
+        # Default: get or create private Nova channel for this user
+        channel, is_new = await self._get_or_create_nova_channel(guild, interaction.user)
+
+        # Send the question in the channel
+        await channel.send(f"**{interaction.user.display_name}:** {question}")
+
+        # Notify user where to find their chat
+        await interaction.followup.send(
+            f"Head to {channel.mention} — I'm answering there!",
+            ephemeral=True,
+        )
+
+        # Respond in the private channel
+        async def respond(text):
+            return await channel.send(text)
+
+        async with channel.typing():
             await self._handle_question(
                 user_id=interaction.user.id,
-                channel_id=thread.id,  # Thread ID = conversation ID
+                channel_id=channel.id,
                 question=question,
                 respond_func=respond,
                 user_name=interaction.user.display_name,
-                channel_context=channel_context,
-            )
-        else:
-            # Fallback: respond directly (thread creation failed)
-            async def respond_direct(text):
-                return await interaction.followup.send(text)
-
-            await self._handle_question(
-                user_id=interaction.user.id,
-                channel_id=interaction.channel_id,
-                question=question,
-                respond_func=respond_direct,
-                user_name=interaction.user.display_name,
-                channel_context=channel_context,
+                channel_context="",
             )
 
-    # ── Thread Follow-Up Listener ──────────────────────────────────────────
-    # When a student sends a message in a Nova thread, auto-respond.
-    # Bot NEVER initiates — only responds when the student writes in the thread.
+    # ── Private Channel Follow-Up Listener ─────────────────────────────────
+    # When a student sends a message in their Nova channel, auto-respond.
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        """Auto-respond to follow-up messages in Nova threads."""
-        # Ignore bots (including self)
+        """Auto-respond in Nova channels + respond to @Nova mentions in any channel."""
         if message.author.bot:
             return
-
-        # Only respond in threads
-        if not isinstance(message.channel, discord.Thread):
+        if not message.guild:
             return
 
-        # Only respond in threads created by this bot
-        # Check if the thread's parent message was from this bot
-        try:
-            if message.channel.owner_id != self.bot.user.id:
-                return
-        except Exception:
-            return
+        # Detect context
+        is_nova_channel = (
+            message.channel.name.startswith(self.NOVA_CHANNEL_PREFIX)
+            and message.channel.category
+            and message.channel.category.name.lower() == self.NOVA_CATEGORY_NAME.lower()
+        )
+        bot_mentioned = self.bot.user in message.mentions if message.mentions else False
+        content_lower = message.content.lower().strip()
+        nova_prefix = content_lower.startswith("nova,") or content_lower.startswith("nova ")
+        nova_invoked = bot_mentioned or nova_prefix
 
-        # Process the follow-up question
+        if not is_nova_channel and not nova_invoked:
+            return  # Not a Nova channel and Nova wasn't called — ignore
+
+        is_admin = isinstance(message.author, discord.Member) and self._is_admin(message.author)
+
+        # In Nova channels: channel owner gets auto-response, everyone else needs @Nova
+        # Outside Nova channels: everyone needs @Nova
+        if is_nova_channel:
+            topic = message.channel.topic or ""
+            is_channel_owner = f"uid:{message.author.id}" in topic
+            if not is_channel_owner and not nova_invoked:
+                return  # Not the owner and didn't invoke Nova
+        else:
+            if not nova_invoked:
+                return  # Outside Nova channel, must invoke
+
+        # Fetch full channel conversation so Nova has complete context
+        channel_context = await self._fetch_channel_context(message.channel)
+
         async def respond(text):
             return await message.channel.send(text)
 
         async with message.channel.typing():
             await self._handle_question(
                 user_id=message.author.id,
-                channel_id=message.channel.id,  # Thread ID = same conversation
+                channel_id=message.channel.id,
                 question=message.content,
                 respond_func=respond,
                 user_name=message.author.display_name,
+                channel_context=channel_context,
             )
 
     # ── Feedback Reaction Listener ────────────────────────────────────────────

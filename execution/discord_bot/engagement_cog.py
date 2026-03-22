@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 import sqlite3
-from datetime import datetime
+from datetime import datetime, time as dtime
 from pathlib import Path
 
 import discord
@@ -32,12 +32,10 @@ class EngagementCog(commands.Cog):
     def _is_admin(self, interaction: discord.Interaction) -> bool:
         return any(r.id == self.admin_role_id for r in interaction.user.roles)
 
-    @tasks.loop(hours=24)
+    @tasks.loop(time=dtime(hour=14, minute=0))  # 14:00 UTC = ~9-10 AM EST
     async def _daily_check(self):
-        """Daily 9 AM: check for at-risk students and post to team channel."""
+        """Daily 9 AM EST: check for at-risk students and post to team channel."""
         now = datetime.now()
-        if now.hour < 9 or now.hour > 10:
-            return  # Only run in the 9 AM window
         if now.weekday() >= 5:
             return  # Skip weekends
 
@@ -78,30 +76,37 @@ class EngagementCog(commands.Cog):
     async def _before_daily(self):
         await self.bot.wait_until_ready()
 
-    @tasks.loop(hours=168)  # Weekly
+    @tasks.loop(time=dtime(hour=22, minute=0))  # 22:00 UTC = ~5 PM EST
     async def _weekly_wins(self):
         """Friday: post weekly wins digest to #wins channel."""
         now = datetime.now()
         if now.weekday() != 4:  # Friday only
             return
 
-        # Get wins from the bot's database (from /win command)
+        # Get wins from engagement_signals in students.db
         try:
-            from .database import BotDatabase
-            db = BotDatabase()
-            # Recent wins from audit log
-            conn = db.conn
+            if not STUDENTS_DB.exists():
+                return
+            conn = sqlite3.connect(str(STUDENTS_DB), timeout=5)
+            conn.row_factory = sqlite3.Row
             wins = conn.execute(
-                "SELECT details FROM audit_log WHERE action = 'win_shared' "
-                "AND timestamp > datetime('now', '-7 days') ORDER BY timestamp DESC LIMIT 10"
+                "SELECT s.name, es.signal_type, es.notes, es.date "
+                "FROM engagement_signals es JOIN students s ON s.id = es.student_id "
+                "WHERE es.signal_type IN ('first_sale', 'profitable_product', 'revenue_milestone', 'listing_live', 'other') "
+                "AND es.date >= date('now', '-7 days') ORDER BY es.date DESC LIMIT 10"
             ).fetchall()
 
             if not wins:
+                conn.close()
                 return
 
             lines = ["**Weekly Wins Digest**\n"]
             for w in wins:
-                lines.append(f"- {w[0][:200]}")
+                win_type = (w["signal_type"] or "win").replace("_", " ").title()
+                name = w["name"]
+                notes = (w["notes"] or "")[:200]
+                lines.append(f"- **{name}** — {win_type}" + (f": {notes}" if notes else ""))
+            conn.close()
 
             for guild in self.bot.guilds:
                 for channel in guild.text_channels:

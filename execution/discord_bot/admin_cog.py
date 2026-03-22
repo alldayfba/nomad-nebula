@@ -1,5 +1,7 @@
 """Admin Cog — /bot-status, /set-model, /blacklist, /faq-*, /top-questions, /bot-insights."""
 
+from __future__ import annotations
+
 import os
 from datetime import datetime
 
@@ -249,21 +251,29 @@ class AdminCog(commands.Cog):
 
         # FAQ stats
         try:
-            total_faq = self.db.conn.execute("SELECT COUNT(*) FROM faq_entries WHERE approved = 1").fetchone()[0]
-            pending_faq = self.db.conn.execute("SELECT COUNT(*) FROM faq_entries WHERE approved = 0").fetchone()[0]
-            lines.append(f"\n**FAQ:**")
-            lines.append(f"- Approved: {total_faq}")
-            lines.append(f"- Pending: {pending_faq}")
+            conn = self.db._get_conn()
+            try:
+                total_faq = conn.execute("SELECT COUNT(*) FROM knowledge_base WHERE approved = 1").fetchone()[0]
+                pending_faq = conn.execute("SELECT COUNT(*) FROM knowledge_base WHERE approved = 0").fetchone()[0]
+                lines.append(f"\n**FAQ:**")
+                lines.append(f"- Approved: {total_faq}")
+                lines.append(f"- Pending: {pending_faq}")
+            finally:
+                conn.close()
         except Exception:
             pass
 
         # Ticket stats
         try:
-            open_tickets = self.db.conn.execute("SELECT COUNT(*) FROM tickets WHERE status = 'open'").fetchone()[0]
-            total_tickets = self.db.conn.execute("SELECT COUNT(*) FROM tickets").fetchone()[0]
-            lines.append(f"\n**Tickets:**")
-            lines.append(f"- Open: {open_tickets}")
-            lines.append(f"- Total: {total_tickets}")
+            conn = self.db._get_conn()
+            try:
+                open_tickets = conn.execute("SELECT COUNT(*) FROM tickets WHERE status = 'open'").fetchone()[0]
+                total_tickets = conn.execute("SELECT COUNT(*) FROM tickets").fetchone()[0]
+                lines.append(f"\n**Tickets:**")
+                lines.append(f"- Open: {open_tickets}")
+                lines.append(f"- Total: {total_tickets}")
+            finally:
+                conn.close()
         except Exception:
             pass
 

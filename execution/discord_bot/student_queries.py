@@ -24,7 +24,9 @@ class StudentQueryRouter:
         intents = []
 
         if any(kw in q for kw in ["my progress", "where am i", "my milestones", "my status",
-                                   "what have i done", "how far", "my journey"]):
+                                   "what have i done", "how far", "my journey",
+                                   "how am i doing", "how am i", "how's it going",
+                                   "my performance", "doing well", "check in"]):
             intents.append("my_progress")
 
         if any(kw in q for kw in ["what's next", "next step", "what should i do",
@@ -87,7 +89,7 @@ class StudentQueryRouter:
 
                 # Get recent check-ins
                 checkins = conn.execute(
-                    "SELECT date, mood, wins, blockers, action_items FROM check_ins "
+                    "SELECT date, mood, actions, blockers FROM check_ins "
                     "WHERE student_id = ? ORDER BY date DESC LIMIT 3",
                     (result["id"],)
                 ).fetchall()
@@ -126,10 +128,10 @@ class StudentQueryRouter:
             lines.append("\n**Recent check-ins:**")
             for c in checkins:
                 mood = c.get("mood", "")
-                wins = c.get("wins", "")
+                actions = c.get("actions", "")
                 blockers = c.get("blockers", "")
                 lines.append(f"- {c.get('date', '')} | Mood: {mood}" +
-                             (f" | Wins: {wins[:80]}" if wins else "") +
+                             (f" | Actions: {actions[:80]}" if actions else "") +
                              (f" | Blockers: {blockers[:80]}" if blockers else ""))
 
         # Enrich with SaaS data if available

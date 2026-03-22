@@ -1957,6 +1957,288 @@ def nova_digest():
     return jsonify(digest)
 
 
+# ── Nova Cross-Platform Sync API ─────────────────────────────────────────────
+
+_DISCORD_BOT_DB = str(Path(__file__).parent / ".tmp" / "discord" / "discord_bot.db")
+_STUDENT_LEARNING_DB = str(Path(__file__).parent / ".tmp" / "discord" / "nova_student_learning.db")
+_COACHING_DB = str(Path(__file__).parent / ".tmp" / "coaching" / "students.db")
+
+
+@app.route("/nova/faq", methods=["GET"])
+def nova_faq():
+    """Return all approved FAQ entries from the Discord knowledge base."""
+    auth_err = _nova_auth()
+    if auth_err:
+        return auth_err
+
+    import sqlite3 as _sq
+    try:
+        conn = _sq.connect(_DISCORD_BOT_DB, timeout=5)
+        conn.row_factory = _sq.Row
+        rows = conn.execute(
+            "SELECT id, question, answer, source, upvotes, downvotes "
+            "FROM knowledge_base WHERE approved = 1 ORDER BY upvotes DESC, id ASC"
+        ).fetchall()
+        conn.close()
+        entries = [
+            {
+                "id": r["id"],
+                "question": r["question"],
+                "answer": r["answer"],
+                "source": r["source"],
+                "upvotes": r["upvotes"],
+                "downvotes": r["downvotes"],
+            }
+            for r in rows
+        ]
+        return jsonify({"entries": entries, "count": len(entries)})
+    except Exception as e:
+        return jsonify({"error": str(e), "entries": [], "count": 0}), 500
+
+
+@app.route("/nova/log", methods=["POST"])
+def nova_log():
+    """Log a SaaS conversation turn into the learning engine for Discord cross-ref."""
+    auth_err = _nova_auth()
+    if auth_err:
+        return auth_err
+
+    data = request.get_json() or {}
+    user_id = data.get("user_id", "")
+    question = data.get("question", "")
+    answer = data.get("answer", "")
+    platform = data.get("platform", "profits")
+    email = data.get("email", "")
+
+    if not question:
+        return jsonify({"ok": False, "error": "question is required"}), 400
+
+    import sqlite3 as _sq
+
+    # Resolve student name from email via coaching students.db
+    user_name = email or user_id
+    if email:
+        try:
+            sconn = _sq.connect(_COACHING_DB, timeout=5)
+            row = sconn.execute(
+                "SELECT name FROM students WHERE email = ? LIMIT 1", (email,)
+            ).fetchone()
+            sconn.close()
+            if row:
+                user_name = row[0]
+        except Exception:
+            pass
+
+    # Extract topic keywords
+    from nova_core.knowledge import extract_keywords, detect_category
+    topic = detect_category(question)
+    keywords = extract_keywords(question)
+
+    try:
+        conn = _sq.connect(_STUDENT_LEARNING_DB, timeout=5)
+        conn.execute(
+            "INSERT INTO interactions (user_id, user_name, question, answer, topic, tokens_in, tokens_out, created_at) "
+            "VALUES (?, ?, ?, ?, ?, 0, 0, datetime('now'))",
+            (user_id, user_name, question[:2000], answer[:4000], topic),
+        )
+        # Update topic_patterns
+        existing = conn.execute(
+            "SELECT id, question_count, sample_questions FROM topic_patterns WHERE topic = ?",
+            (topic,),
+        ).fetchone()
+        if existing:
+            count = (existing[1] or 0) + 1
+            samples = existing[2] or ""
+            # Keep last 5 sample questions
+            sample_list = [s for s in samples.split("|||") if s][-4:]
+            sample_list.append(question[:200])
+            conn.execute(
+                "UPDATE topic_patterns SET question_count = ?, last_asked = datetime('now'), sample_questions = ? WHERE id = ?",
+                (count, "|||".join(sample_list), existing[0]),
+            )
+        else:
+            conn.execute(
+                "INSERT INTO topic_patterns (topic, question_count, last_asked, sample_questions) VALUES (?, 1, datetime('now'), ?)",
+                (topic, question[:200]),
+            )
+        conn.commit()
+        conn.close()
+        return jsonify({"ok": True})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@app.route("/nova/recent-activity", methods=["GET"])
+def nova_recent_activity():
+    """Return recent Discord/SaaS activity for a student by email."""
+    auth_err = _nova_auth()
+    if auth_err:
+        return auth_err
+
+    email = request.args.get("email", "").strip()
+    if not email:
+        return jsonify({"error": "email parameter required"}), 400
+
+    import sqlite3 as _sq
+
+    # Find user_id(s) for this email in coaching DB
+    user_ids = []
+    try:
+        sconn = _sq.connect(_COACHING_DB, timeout=5)
+        rows = sconn.execute(
+            "SELECT discord_user_id FROM students WHERE email = ? AND discord_user_id IS NOT NULL",
+            (email,),
+        ).fetchall()
+        sconn.close()
+        user_ids = [r[0] for r in rows if r[0]]
+    except Exception:
+        pass
+
+    # Also check learning DB by email-as-user_id (SaaS logs use supabase UUID or email)
+    result = {
+        "discord_topics": [],
+        "discord_last_question": "",
+        "discord_interactions": 0,
+        "saas_topics": [],
+        "saas_interactions": 0,
+    }
+
+    try:
+        conn = _sq.connect(_STUDENT_LEARNING_DB, timeout=5)
+
+        # Build user_id match set (discord IDs + email + supabase UUID patterns)
+        id_placeholders = ",".join("?" for _ in user_ids) if user_ids else "'__none__'"
+        id_params = list(user_ids)
+
+        # Get interactions by discord user_ids
+        if user_ids:
+            discord_rows = conn.execute(
+                f"SELECT question, topic, created_at FROM interactions "
+                f"WHERE user_id IN ({id_placeholders}) ORDER BY created_at DESC LIMIT 20",
+                id_params,
+            ).fetchall()
+        else:
+            discord_rows = []
+
+        # Get interactions logged from SaaS (user_name = email)
+        saas_rows = conn.execute(
+            "SELECT question, topic, created_at FROM interactions "
+            "WHERE user_name = ? OR user_id = ? ORDER BY created_at DESC LIMIT 20",
+            (email, email),
+        ).fetchall()
+
+        conn.close()
+
+        # Process discord interactions
+        discord_topics = set()
+        for r in discord_rows:
+            if r[1]:
+                discord_topics.add(r[1])
+        result["discord_topics"] = list(discord_topics)
+        result["discord_interactions"] = len(discord_rows)
+        if discord_rows:
+            result["discord_last_question"] = discord_rows[0][0][:200] if discord_rows[0][0] else ""
+
+        # Process SaaS interactions
+        saas_topics = set()
+        for r in saas_rows:
+            if r[1]:
+                saas_topics.add(r[1])
+        result["saas_topics"] = list(saas_topics)
+        result["saas_interactions"] = len(saas_rows)
+
+    except Exception:
+        pass
+
+    return jsonify(result)
+
+
+@app.route("/nova/students", methods=["GET"])
+def nova_students():
+    """Return real student data from Supabase for owner/admin queries.
+
+    Query params:
+        limit (int): max students to return (default 20)
+        sort (str): 'newest', 'at_risk', 'top' (default 'newest')
+        name (str): search by name (partial match)
+    """
+    auth_err = _nova_auth()
+    if auth_err:
+        return auth_err
+
+    import requests as _req
+
+    supabase_url = os.environ.get("PROFITS_SUPABASE_URL", "")
+    supabase_key = os.environ.get("PROFITS_SUPABASE_KEY", "")
+
+    if not supabase_url or not supabase_key:
+        return jsonify({"error": "Supabase not configured", "students": []}), 500
+
+    headers = {
+        "apikey": supabase_key,
+        "Authorization": f"Bearer {supabase_key}",
+        "Content-Type": "application/json",
+    }
+
+    limit = min(int(request.args.get("limit", 20)), 50)
+    sort = request.args.get("sort", "newest")
+    name_filter = request.args.get("name", "").strip()
+
+    try:
+        # Fetch users with student role
+        users_url = f"{supabase_url}/rest/v1/users?select=id,email,full_name,student_tier,plan,subscription_status,created_at,last_signed_in,avatar_url&role=eq.student&order=created_at.desc&limit={limit}"
+        if name_filter:
+            users_url += f"&full_name=ilike.%25{name_filter}%25"
+        users_resp = _req.get(users_url, headers=headers, timeout=10)
+        users = users_resp.json() if users_resp.ok else []
+
+        if not users:
+            return jsonify({"students": [], "count": 0})
+
+        user_ids = [u["id"] for u in users]
+
+        # Fetch student_profiles for these users
+        profiles_url = f"{supabase_url}/rest/v1/student_profiles?select=user_id,struggles,experience_level,capital_available,preferred_schedule,detailed_goals,onboarding_completed,onboarding_step,location,bio&user_id=in.({','.join(user_ids)})"
+        profiles_resp = _req.get(profiles_url, headers=headers, timeout=10)
+        profiles = {p["user_id"]: p for p in (profiles_resp.json() if profiles_resp.ok else [])}
+
+        # Fetch milestones
+        milestones_url = f"{supabase_url}/rest/v1/academy_milestones?select=user_id,milestone&user_id=in.({','.join(user_ids)})"
+        milestones_resp = _req.get(milestones_url, headers=headers, timeout=10)
+        milestones_by_user = {}
+        for m in (milestones_resp.json() if milestones_resp.ok else []):
+            milestones_by_user.setdefault(m["user_id"], []).append(m["milestone"])
+
+        # Build response
+        students = []
+        for u in users:
+            uid = u["id"]
+            profile = profiles.get(uid, {})
+            student = {
+                "name": u.get("full_name") or u.get("email", "").split("@")[0],
+                "email": u.get("email"),
+                "tier": u.get("student_tier") or u.get("plan"),
+                "joined": u.get("created_at", "")[:10],
+                "last_active": u.get("last_signed_in", "")[:10] if u.get("last_signed_in") else "never",
+                "subscription": u.get("subscription_status"),
+                "onboarding_completed": profile.get("onboarding_completed", False),
+                "onboarding_step": profile.get("onboarding_step", 0),
+                "experience_level": profile.get("experience_level"),
+                "capital_available": profile.get("capital_available"),
+                "struggles": profile.get("struggles"),
+                "goals": profile.get("detailed_goals"),
+                "location": profile.get("location"),
+                "schedule": profile.get("preferred_schedule"),
+                "milestones": milestones_by_user.get(uid, []),
+            }
+            students.append(student)
+
+        return jsonify({"students": students, "count": len(students)})
+
+    except Exception as e:
+        return jsonify({"error": str(e), "students": []}), 500
+
+
 if __name__ == "__main__":
     cleanup_old_results()
     app.run(debug=True, port=5050)
