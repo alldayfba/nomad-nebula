@@ -331,7 +331,7 @@ class ChatCog(commands.Cog):
         self.model = os.getenv("DISCORD_CHAT_MODEL", "claude-haiku-4-5-20251001")
 
     async def _handle_question(self, user_id, channel_id, question, respond_func,
-                               user_name="", channel_context=""):
+                               user_name="", channel_context="", image_urls=None):
         """Core logic shared by /ask and DM handler.
 
         Args:
@@ -341,6 +341,7 @@ class ChatCog(commands.Cog):
             respond_func: async callable(text) to send response chunks
             user_name: Display name for logging
             channel_context: Recent channel messages for conversational context
+            image_urls: List of image URLs from Discord attachments for vision analysis
         """
         # Layer 0: Input length guard
         if len(question) > 4000:
@@ -539,6 +540,15 @@ class ChatCog(commands.Cog):
         # Wrap user input in boundary tags (injection defense)
         wrapped_input = wrap_user_input(sanitized)
 
+        # Build multimodal content if images are attached
+        _image_blocks = []
+        if image_urls:
+            for img_url in image_urls[:4]:  # Max 4 images per message
+                _image_blocks.append({
+                    "type": "image",
+                    "source": {"type": "url", "url": img_url},
+                })
+
         # Inject recent channel conversation for context (so Nova knows what was discussed)
         # Live context = last 200 messages. For older history, pull a compressed summary from DB.
         if channel_context:
@@ -611,7 +621,12 @@ class ChatCog(commands.Cog):
             except Exception:
                 pass
 
-        messages.append({"role": "user", "content": wrapped_input})
+        # If images attached, build multimodal content blocks
+        if _image_blocks:
+            user_content = _image_blocks + [{"type": "text", "text": wrapped_input}]
+            messages.append({"role": "user", "content": user_content})
+        else:
+            messages.append({"role": "user", "content": wrapped_input})
 
         # Call Claude: 1) Local proxy → 2) SaaS proxy (Vercel) → 3) API key
         _call_start = _time_mod.time()
@@ -1061,14 +1076,25 @@ class ChatCog(commands.Cog):
         async def respond(text):
             return await message.channel.send(text)
 
+        # Extract image URLs from attachments for vision analysis
+        image_urls = []
+        for att in message.attachments:
+            if att.content_type and att.content_type.startswith('image/'):
+                image_urls.append(att.url)
+
+        question_text = message.content or ""
+        if not question_text and image_urls:
+            question_text = "What do you see in this image? Analyze it in the context of Amazon FBA."
+
         async with message.channel.typing():
             await self._handle_question(
                 user_id=message.author.id,
                 channel_id=message.channel.id,
-                question=message.content,
+                question=question_text,
                 respond_func=respond,
                 user_name=message.author.display_name,
                 channel_context=channel_context,
+                image_urls=image_urls if image_urls else None,
             )
 
     # ── Feedback Reaction Listener ────────────────────────────────────────────
