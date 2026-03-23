@@ -1710,10 +1710,27 @@ def mode_deals(source="all", min_drop=15, count=30, min_profit=1.50,
                 print(f"  [{i+1}] {title[:50]} — ${amz_price:.2f} "
                       f"({deal.get('delta_percent', 0):.0f}% drop)", file=sys.stderr)
 
-                # Search retailers for this product
+                # Extract UPC from Keepa deal data if available
+                deal_upc = None
+                upc_list = deal.get("upcList") or deal.get("eanList") or []
+                if upc_list and isinstance(upc_list, list):
+                    deal_upc = upc_list[0] if upc_list else None
+
+                # Extract seller count + Amazon-on-listing from deal stats
+                deal_current = deal.get("current", [])
+                deal_fba_sellers = None
+                deal_amazon_on = None
+                if deal_current and isinstance(deal_current, list):
+                    if len(deal_current) > 34 and deal_current[34] and deal_current[34] >= 0:
+                        deal_fba_sellers = deal_current[34]
+                    if len(deal_current) > 0 and deal_current[0] and deal_current[0] > 0:
+                        deal_amazon_on = True
+
+                # Search retailers — UPC first, then title fallback
                 query = _shorten_query(title)
                 for retailer in retailers:
-                    retail_results = search_retailer(retailer, query, max_results=3)
+                    retail_results = search_retailer(retailer, query, max_results=3,
+                                                     upc=deal_upc)
                     for r in retail_results:
                         if r["retail_price"] >= amz_price:
                             continue
@@ -1723,9 +1740,16 @@ def mode_deals(source="all", min_drop=15, count=30, min_profit=1.50,
                         if est_profit < min_profit:
                             continue
 
+                        # Reject weak title matches (only brand overlap)
+                        match_conf = r.get("match_confidence", 0)
+                        if match_conf < 0.40 and r.get("match_method") != "upc":
+                            continue
+
                         r_buy_url = r.get("source_url") or r.get("buy_url", "")
                         all_results.append({
                             "name": r["name"],
+                            "retail_title": r.get("name", ""),
+                            "amazon_title": title,
                             "asin": asin,
                             "retailer": r.get("retailer", ""),
                             "retail_price": r["retail_price"],
@@ -1737,6 +1761,10 @@ def mode_deals(source="all", min_drop=15, count=30, min_profit=1.50,
                             "category": deal.get("category", ""),
                             "brand": "",
                             "auto_ungated": False,
+                            "match_confidence": match_conf,
+                            "match_method": r.get("match_method", "title"),
+                            "fba_seller_count": deal_fba_sellers,
+                            "amazon_on_listing": deal_amazon_on,
                             "profitability": {
                                 "verdict": "MAYBE",
                                 "profit_per_unit": round(est_profit, 2),

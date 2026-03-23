@@ -8,7 +8,7 @@
 
 | Creator | YouTube | Instagram | X/Twitter | Other |
 |---|---|---|---|---|
-| **Nik Setting** | [@niksetting](https://youtube.com/@niksetting) | [@niksetting](https://instagram.com/niksetting) (146K) · [@growacquisition](https://instagram.com/growacquisition) (20K) | [@niksetting](https://x.com/niksetting) | [niksetting.com](https://niksetting.com) · [Skool AI](https://skool.com/grow-acquisition-ai-7093) |
+| **Nik Setting** | [@niksetting](https://youtube.com/@niksetting) · [@mrniksetting](https://youtube.com/@mrniksetting) (2nd) | [@niksetting](https://instagram.com/niksetting) (146K) · [@growacquisition](https://instagram.com/growacquisition) (20K) | [@niksetting](https://x.com/niksetting) | [niksetting.com](https://niksetting.com) · [Skool AI](https://skool.com/grow-acquisition-ai-7093) |
 | **Tim Luong** | [@TimothyLuong_](https://youtube.com/@TimothyLuong_) | [@timothyluong](https://instagram.com/timothyluong) (19K) | [@timothyluong](https://x.com/timothyluong) | [Substack](https://timothyluong.substack.com) · [LinkedIn](https://linkedin.com/in/timothyluong) · [TikTok @timothyluong_](https://tiktok.com/@timothyluong_) |
 | **Pierre Khoury** | [@Pierre.Khoury](https://youtube.com/@Pierre.Khoury) (~30K subs) | [@pierree](https://instagram.com/pierree) (~37K) | [@PierreKhouryyy](https://x.com/pierrekhouryyy) | [Whop](https://whop.com/discover/pierre-khoury-llc/) · [TikTok @pierre.khoury](https://tiktok.com/@pierre.khoury) |
 | **Jeremy Haynes** | Active channel (link via X bio) | [@jeremy](https://instagram.com/jeremy) (126K) | [@TheJeremyHaynes](https://x.com/TheJeremyHaynes) | [jeremyhaynes.com](https://jeremyhaynes.com) · [megalodonmarketing.net](https://megalodonmarketing.net) · [dmmguide.com](https://dmmguide.com) |

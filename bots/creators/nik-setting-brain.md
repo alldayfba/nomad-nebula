@@ -1,4 +1,4 @@
-<!-- Last Updated: 2026-03-18 -->
+<!-- Last Updated: 2026-03-23 -->
 <!-- Sources: YouTube, Instagram, X, Podcasts, Website -->
 # Nik Setting -- Creator Intelligence Report
 > Synthesized from 22 YouTube video transcripts (~162K words) + 14 Mr. Nik Setting secondary channel transcripts (~25K words)
@@ -1107,6 +1107,38 @@ In the Million Pound Mentor interview, Nik discussed plans for building a future
 - **Secondary channel handle added** to Social Handles table: @mr.niksetting / @MrNikSetting
 - **Key insight:** Main channel = tactical (how to run ads, funnels). Secondary = philosophical (why things work, mental models). Main converts. Secondary builds the BRAND. Together = dual-channel trust architecture.
 - **Key insight:** 33-44% of paying customers came from people copying Nik's named frameworks (Myro Videos, Story Sequences, Profile Funnel). Naming concepts = owning the market.
+
+### 2026-03-23 Update: Setter Hiring Operating System (Mr. Nik Setting)
+- **Video:** "it took me only 10 hours to hire a setter with this system" (@mrniksetting, ~29 min)
+- **Context:** Follow-up to "I fired my setter" video — shows full replacement pipeline
+
+**8-Step Setter Hiring & Onboarding System:**
+1. **Application funnel** — 347 apps via TypeForm. Key filter questions: "Why GA specifically?", current/desired monthly earnings, Loom video, proof of track record. **Filters for loyalty over skill.**
+2. **Vetting** — COO screens apps → qualified candidates into group live roleplay call (1.5 hrs)
+3. **Head-to-head trial** — Top 2 compete for 1 week. Only metric: who booked more qualified appointments. No soft factors until official hire.
+4. **Onboarding** — 2-3 hour internal module course (recorded by COO, not Nik). Covers GA-specific conversational flow, tone, frameworks.
+5. **Expectation setting** — 3x/week team meetings first month. 2x/week with Nik + COO first 2 weeks. Weekly shadow sessions + feedback roleplays.
+6. **Month 1 report** — KPI review, revenue attribution, tracking accuracy.
+7. **Month 2 goal-setting** — Reverse-engineered goals. No clear goals = lose setter within 2 months.
+8. **SOPs from everyone** — Every team member builds 3 SOPs/week. Replacement always has the playbook.
+
+**DM Conversational Flow (8 stages):**
+1. Profile Research → 2. Personalized Opener → 3. Problem ID → 4. Situational Deep Dive → 5. Constraint Qualification → 6. Support Level Routing → 7. Recommendation/Positioning → 8. Book the Call
+
+**Key DM Psychology Techniques:**
+- **Assumption openers:** Don't say "thanks for reaching out." Instead: "Solid testimonials, credibility shouldn't be the problem. Are you currently struggling with traffic?" — makes them feel seen instantly.
+- **Emotion-first reading:** Before responding, forget the question. Read the emotion (shame, unclarity, fear). Respond to the emotion, not the words.
+- **Predicted next outcome:** Match their realistic next milestone. $5-10K/mo seller → say "it'll take a long time to hit $50K/mo at this pace." Don't overshoot to $200K (sounds delusional).
+- **One-word reframe:** "a bunch of information" = your course is shit. "a bunch of valuable information" = your course is good AND you need more. One word changes everything.
+- **Support level routing:** ONE offer, different access levels. Prevents audience confusion. Personalized approach at scale via CRM segmentation.
+- **"Business audit" positioning:** First call framed as "business audit + game plan" — not a sales call. Provides the one thing prospects lack: clarity.
+
+**Talent Acquisition Philosophy:**
+- Don't use setter hiring websites — find someone with a pool of setters or build a brand to attract them organically
+- Accept that your business stage determines the talent level you attract — start somewhere, improve over time
+- GA maintains a weekly setter group session to keep a pool available for clients
+
+**Content Strategy Note:** This is the "behind-the-scenes OS reveal" format on the secondary channel. Lower production, longer form, raw screen shares. Builds deep trust with agency owner ICP who want to see actual machinery.
 
 ---
 

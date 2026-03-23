@@ -50,3 +50,4 @@ clients/
 execution/remotion/
 service_account.json
 .vercel
+.tmp/financial-audit/

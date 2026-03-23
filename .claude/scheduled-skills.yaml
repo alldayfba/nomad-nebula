@@ -12,6 +12,12 @@ schedules:
     expensive: true
     description: Daily CEO briefing with competitor intel and KPIs
 
+  - skill: creator-video-scan
+    cron: "17 7 * * *"          # 7:17 AM daily
+    script: execution/creator_video_scanner.py
+    auto_run: true
+    description: Scan tracked creators for new YouTube videos, transcribe and analyze
+
   # Weekly
   - skill: competitor-intel
     cron: "0 7 * * 1"          # 7 AM Mondays

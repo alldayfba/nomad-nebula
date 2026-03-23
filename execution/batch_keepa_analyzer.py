@@ -217,6 +217,32 @@ def extract_keepa_data(product: dict, price: float) -> dict:
                 last_unix = 1293840000 + (last_ts_keepa * 60)
                 price_age_days = round((_time.time() - last_unix) / 86400, 1)
 
+    # Price history for stability checks (avg30, avg90 from stats)
+    avg30 = stats.get("avg30", [])
+    avg90 = stats.get("avg90", [])
+
+    # Extract average prices at different windows (same index priority as current)
+    avg30_price = None
+    avg90_price = None
+    for idx in [0, 10, 18, 1]:  # Amazon, FBA, BuyBox, New3P
+        if avg30_price is None and avg30 and len(avg30) > idx and avg30[idx] and avg30[idx] > 0:
+            avg30_price = avg30[idx] / 100.0
+        if avg90_price is None and avg90 and len(avg90) > idx and avg90[idx] and avg90[idx] > 0:
+            avg90_price = avg90[idx] / 100.0
+
+    # Price stability analysis
+    price_stability = {}
+    if price and price > 0:
+        if avg90_price and avg90_price > 0:
+            spike_pct = ((price - avg90_price) / avg90_price) * 100
+            price_stability["vs_90d_avg"] = round(spike_pct, 1)
+            price_stability["avg_90d"] = round(avg90_price, 2)
+            price_stability["is_spike"] = spike_pct > 20  # >20% above 90d avg = spike
+        if avg30_price and avg30_price > 0:
+            price_stability["avg_30d"] = round(avg30_price, 2)
+            change_30d = ((price - avg30_price) / avg30_price) * 100
+            price_stability["vs_30d_avg"] = round(change_30d, 1)
+
     return {
         "asin": product.get("asin", ""),
         "title": product.get("title", ""),
@@ -229,6 +255,9 @@ def extract_keepa_data(product: dict, price: float) -> dict:
         "amazon_on_listing": amazon_on_listing,
         "weight_lbs": weight_lbs,
         "price_age_days": price_age_days,
+        "price_stability": price_stability,
+        "avg30_price": avg30_price,
+        "avg90_price": avg90_price,
         "product_url": f"https://www.amazon.com/dp/{product.get('asin', '')}",
         "match_confidence": 0.92,
         "match_method": "keepa_batch_upc",

@@ -736,6 +736,141 @@ def _load_checkpoint(path: str) -> dict | None:
         return None
 
 
+# ── Playwright Direct Scrape (for JS-rendered stores) ────────────────────────
+
+
+def _scrape_with_playwright_direct(base_url: str, limit: int = 0,
+                                    delay: float = 2.0) -> list[dict]:
+    """Scrape products directly from a JS-rendered page using Playwright.
+
+    Works on stores like Best Buy, CVS, Dick's, Kohl's, GameStop, Walmart, Target
+    that render product listings via JavaScript (no sitemap/JSON-LD available).
+
+    Strategy: Load page → scroll to load products → extract from rendered HTML.
+    Looks for JSON-LD in rendered page, product cards with data attributes,
+    and common e-commerce patterns.
+    """
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        print("[catalog] Playwright not installed — pip install playwright && playwright install chromium", file=sys.stderr)
+        return []
+
+    products = []
+    print(f"[catalog] Playwright direct scrape: {base_url}", file=sys.stderr)
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context(user_agent=USER_AGENT)
+        page = context.new_page()
+
+        try:
+            page.goto(base_url, wait_until="domcontentloaded", timeout=30000)
+            time.sleep(3)  # Let JS render
+
+            # Scroll down to trigger lazy loading (3 scroll cycles)
+            for scroll in range(3):
+                page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                time.sleep(2)
+
+            html = page.content()
+
+            # Method 1: Extract JSON-LD from rendered page
+            jsonld_products = []
+            jsonld_pattern = re.compile(
+                r'<script[^>]*type=["\']application/ld\+json["\'][^>]*>(.*?)</script>',
+                re.DOTALL | re.IGNORECASE,
+            )
+            for match in jsonld_pattern.finditer(html):
+                try:
+                    data = json.loads(match.group(1))
+                    if isinstance(data, dict) and "@graph" in data:
+                        for item in data["@graph"]:
+                            if item.get("@type") == "Product":
+                                extracted = _extract_jsonld_product(match.group(1).replace(json.dumps(data), json.dumps(item)), base_url)
+                                if extracted:
+                                    jsonld_products.append(extracted)
+                    elif isinstance(data, list):
+                        for item in data:
+                            if isinstance(item, dict) and item.get("@type") == "Product":
+                                extracted = _extract_jsonld_product(json.dumps(item), base_url)
+                                if extracted:
+                                    jsonld_products.append(extracted)
+                except (json.JSONDecodeError, TypeError):
+                    continue
+
+            if jsonld_products:
+                products.extend(jsonld_products)
+                print(f"[catalog] Playwright JSON-LD: {len(jsonld_products)} products", file=sys.stderr)
+
+            # Method 2: Extract product links from rendered page, then visit each
+            if not products:
+                from bs4 import BeautifulSoup
+                soup = BeautifulSoup(html, "html.parser")
+
+                # Find product links (common patterns across retailers)
+                product_links = set()
+                for a_tag in soup.find_all("a", href=True):
+                    href = a_tag["href"]
+                    # Common product URL patterns
+                    if any(pattern in href for pattern in ["/p/", "/product/", "/dp/", "/ip/", "/items/"]):
+                        if href.startswith("/"):
+                            from urllib.parse import urljoin
+                            href = urljoin(base_url, href)
+                        if href.startswith("http"):
+                            product_links.add(href)
+
+                if product_links:
+                    print(f"[catalog] Found {len(product_links)} product links on page", file=sys.stderr)
+                    max_visit = min(len(product_links), limit if limit > 0 else 200)
+
+                    for idx, url in enumerate(list(product_links)[:max_visit]):
+                        try:
+                            page.goto(url, wait_until="domcontentloaded", timeout=20000)
+                            time.sleep(1.5)
+                            product_html = page.content()
+                            extracted = _extract_jsonld_product(product_html, url)
+                            if extracted:
+                                products.append(extracted)
+                        except Exception:
+                            continue
+
+                        if (idx + 1) % 20 == 0:
+                            print(f"[catalog] Playwright progress: {idx+1}/{max_visit}, {len(products)} extracted", file=sys.stderr)
+
+            # Method 3: Extract from data attributes / structured markup
+            if not products:
+                from bs4 import BeautifulSoup
+                soup = BeautifulSoup(html, "html.parser")
+
+                for el in soup.find_all(attrs={"data-upc": True}):
+                    upc = _clean_upc(el.get("data-upc", ""))
+                    if upc:
+                        title = el.get("data-name") or el.get("data-title") or el.get_text(strip=True)[:100]
+                        price_str = el.get("data-price") or el.get("data-sale-price") or "0"
+                        try:
+                            price = float(re.sub(r"[^\d.]", "", price_str))
+                        except ValueError:
+                            price = 0
+                        if title and price > 0:
+                            products.append({
+                                "title": title, "variant_title": "", "upc": upc,
+                                "sku": el.get("data-sku", ""), "price": price,
+                                "compare_at_price": 0, "available": True,
+                                "product_url": base_url, "image_url": "",
+                                "brand": el.get("data-brand", ""), "category": "",
+                                "variant_id": None, "extraction_method": "playwright_data_attr",
+                            })
+
+        except Exception as e:
+            print(f"[catalog] Playwright error: {e}", file=sys.stderr)
+        finally:
+            browser.close()
+
+    print(f"[catalog] Playwright direct: {len(products)} products extracted", file=sys.stderr)
+    return products
+
+
 # ── Main Scrape Function ─────────────────────────────────────────────────────
 
 
@@ -813,11 +948,18 @@ def scrape_catalog(base_url: str, limit: int = 0, delay: float = 0,
             checkpoint_path=checkpoint_path, resume_from=resume_from,
         )
     else:
-        print(f"[catalog] Unsupported method: {method}. Try sitemap_jsonld as fallback.", file=sys.stderr)
+        # Try sitemap first, then Playwright direct scrape
+        print(f"[catalog] Method '{method}' — trying sitemap fallback, then Playwright...", file=sys.stderr)
         new_products = scrape_sitemap_jsonld(
             base_url, limit=limit, delay=delay,
             checkpoint_path=checkpoint_path, resume_from=resume_from,
         )
+        # If sitemap got nothing, try Playwright direct page scrape
+        if not new_products:
+            print(f"[catalog] Sitemap failed — trying Playwright direct scrape...", file=sys.stderr)
+            new_products = _scrape_with_playwright_direct(
+                base_url, limit=limit, delay=delay,
+            )
 
     # Merge with existing (resume)
     all_products = existing_products + new_products

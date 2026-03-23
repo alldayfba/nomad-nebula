@@ -222,6 +222,30 @@ def verify_single(result: dict, strict: bool = True) -> dict:
             result["verdict"] = "MAYBE"
             result["verdict_note"] = f"Capped: ROI {roi:.0f}% suspiciously high — verify pack sizes"
 
+    # ── Check 8b: Price ratio pack mismatch (NEW) ────────────────────────
+    # If Amazon is 3x+ more expensive than retail buy price and pack counts
+    # can't be confirmed from both titles, it's almost certainly a pack mismatch
+    if buy_price > 0 and amazon_price > 0 and amazon_price / buy_price >= 3.0:
+        price_ratio = amazon_price / buy_price
+        retail_has_pack = bool(re.search(r'\d+\s*(?:pack|count|ct|pk)\b', retail_title.lower())) if retail_title else False
+        amazon_has_pack = bool(re.search(r'\d+\s*(?:pack|count|ct|pk)\b', amazon_title.lower())) if amazon_title else False
+        if not (retail_has_pack and amazon_has_pack):
+            issues.append(f"Price ratio {price_ratio:.1f}x with unconfirmed pack sizes — likely mismatch")
+            verified = False
+            result["verdict"] = "SKIP"
+            result["verdict_note"] = f"Rejected: ${buy_price:.2f} retail vs ${amazon_price:.2f} Amazon ({price_ratio:.0f}x ratio) — pack mismatch"
+
+    # ── Check 8c: Buy link must be product page, not category (NEW) ──────
+    if source_url:
+        bad_patterns = ["/productlist/", "/browse/", "/sale-event/",
+                        "?q=", "/search/", "Brands=yes", "/c/"]
+        product_patterns = ["/p/", "/product/", "/dp/", "/ip/", "/A-", "ID=prod"]
+        is_category = any(pat in source_url for pat in bad_patterns)
+        is_product = any(pat in source_url for pat in product_patterns)
+        if is_category and not is_product:
+            issues.append(f"Buy link is a category page, not a product: {source_url[:80]}")
+            verified = False
+
     # ── Check 9: Pack size cross-check ───────────────────────────────────
     if retail_title and amazon_title:
         retail_pack = _extract_pack_quantity(retail_title)
@@ -233,6 +257,30 @@ def verify_single(result: dict, strict: bool = True) -> dict:
             if verdict in ("BUY", "MAYBE"):
                 result["verdict"] = "RESEARCH"
                 result["verdict_note"] = f"Pack mismatch detected ({retail_pack} vs {amazon_pack}) — verify before buying"
+
+    # ── Check 9b: Price stability (NEW) ────────────────────────────────
+    # If current Amazon price is >20% above 90-day average, it's a spike
+    price_stability = result.get("price_stability", {})
+    avg90 = price_stability.get("avg_90d") or result.get("avg90_price")
+    if avg90 and avg90 > 0 and amazon_price > 0:
+        spike_pct = ((amazon_price - avg90) / avg90) * 100
+        if spike_pct > 20:
+            warnings.append(f"PRICE SPIKE: current ${amazon_price:.2f} is {spike_pct:.0f}% above 90-day avg ${avg90:.2f} — may revert")
+            if verdict == "BUY":
+                result["verdict"] = "MAYBE"
+                result["verdict_note"] = f"Price spike detected ({spike_pct:.0f}% above 90d avg)"
+
+    # ── Check 9c: Price sensitivity (NEW) ────────────────────────────────
+    # Would this still be profitable if Amazon price drops 15%?
+    if amazon_price > 0 and buy_price > 0:
+        stressed_price = amazon_price * 0.85
+        stressed_fees = stressed_price * 0.15 + 5.0  # rough fee estimate
+        stressed_profit = stressed_price - buy_price - stressed_fees
+        if stressed_profit <= 0:
+            warnings.append(f"THIN MARGIN: unprofitable if Amazon price drops 15% (to ${stressed_price:.2f})")
+            if verdict == "BUY":
+                result["verdict"] = "MAYBE"
+                result["verdict_note"] = "Thin margin — vulnerable to price drop"
 
     # ── Check 10: Title similarity ───────────────────────────────────────
     if retail_title and amazon_title and not is_no_link_mode:
