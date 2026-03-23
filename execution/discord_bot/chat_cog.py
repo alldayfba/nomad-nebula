@@ -703,15 +703,17 @@ class ChatCog(commands.Cog):
             except Exception:
                 return "Search unavailable."
 
-        async def _call_with_tools(api_client, msgs, max_loops=3):
+        async def _call_with_tools(api_client, msgs, has_images=False, max_loops=3):
             """Call Claude with web_search tool support, handling tool_use responses."""
             current_msgs = list(msgs)
+            # Skip tools when images are present to avoid compatibility issues
+            use_tools = [] if has_images else [web_search_tool]
             for _ in range(max_loops):
-                coro = api_client.messages.create(
-                    model=self.model, max_tokens=1800,
-                    system=system_prompt, messages=current_msgs,
-                    tools=[web_search_tool],
-                )
+                kwargs = dict(model=self.model, max_tokens=1800,
+                              system=system_prompt, messages=current_msgs)
+                if use_tools:
+                    kwargs["tools"] = use_tools
+                coro = api_client.messages.create(**kwargs)
                 response = await asyncio.wait_for(coro, timeout=45.0)
 
                 # Check for tool use
@@ -733,7 +735,7 @@ class ChatCog(commands.Cog):
         # Attempt 1: Local Claude CLI proxy (free via Max plan)
         if client:
             try:
-                result = await _call_with_tools(client, messages)
+                result = await _call_with_tools(client, messages, has_images=bool(_image_blocks))
                 reply, tokens_in, tokens_out = result[0], result[1], result[2]
                 _proxy_health.record_success()
                 _error_tracker.record_success(_time_mod.time() - _call_start)
@@ -765,7 +767,7 @@ class ChatCog(commands.Cog):
         # Attempt 3: Direct API key (costs money, last resort)
         if reply is None and self.claude_api:
             try:
-                result3 = await _call_with_tools(self.claude_api, messages)
+                result3 = await _call_with_tools(self.claude_api, messages, has_images=bool(_image_blocks))
                 reply, tokens_in, tokens_out = result3[0], result3[1], result3[2]
             except Exception as e3:
                 self.db.log_audit(str(user_id), "api_error", str(e3)[:500])
@@ -1097,15 +1099,37 @@ class ChatCog(commands.Cog):
         async def respond(text):
             return await message.channel.send(text)
 
-        # Extract image URLs from attachments for vision analysis
+        # Extract image URLs from attachments + embeds + replied-to message
         image_urls = []
+        # 1. Current message attachments
         for att in message.attachments:
             if att.content_type and att.content_type.startswith('image/'):
                 image_urls.append(att.url)
+        # 2. Embedded images (e.g. pasted links that Discord auto-embeds)
+        for embed in message.embeds:
+            if embed.image and embed.image.url:
+                image_urls.append(embed.image.url)
+            if embed.thumbnail and embed.thumbnail.url:
+                image_urls.append(embed.thumbnail.url)
+        # 3. If replying to a message, grab its images too
+        if message.reference and message.reference.message_id:
+            try:
+                ref_msg = await message.channel.fetch_message(message.reference.message_id)
+                for att in ref_msg.attachments:
+                    if att.content_type and att.content_type.startswith('image/'):
+                        image_urls.append(att.url)
+                for embed in ref_msg.embeds:
+                    if embed.image and embed.image.url:
+                        image_urls.append(embed.image.url)
+            except Exception:
+                pass
 
         question_text = message.content or ""
         if not question_text and image_urls:
             question_text = "What do you see in this image? Analyze it in the context of Amazon FBA."
+
+        if image_urls:
+            print(f"[chat-cog] Processing {len(image_urls)} image(s) from {message.author.display_name}", file=sys.stderr)
 
         async with message.channel.typing():
             await self._handle_question(
