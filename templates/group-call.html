@@ -10,17 +10,19 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg: #0a0a0a;
-            --surface: #111111;
-            --surface-2: #1a1a1a;
-            --accent: #ff4d4d;
-            --accent-glow: rgba(255, 77, 77, 0.3);
+            --bg: #0b0a10;
+            --surface: #12111a;
+            --surface-2: #1a1825;
+            --accent: #a855f7;
+            --accent-light: #c084fc;
+            --accent-glow: rgba(168, 85, 247, 0.3);
             --text: #f5f5f5;
-            --text-muted: #888;
+            --text-muted: #9ca3af;
             --text-dim: #555;
             --gold: #f0c040;
             --green: #34d399;
             --blue: #60a5fa;
+            --pink: #f472b6;
         }
 
         body {
@@ -32,11 +34,7 @@
             width: 100vw;
         }
 
-        .presentation {
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-        }
+        .presentation { width: 100vw; height: 100vh; position: relative; }
 
         .slide {
             position: absolute;
@@ -55,540 +53,200 @@
             text-align: center;
         }
 
-        .slide.active {
-            opacity: 1;
-            transform: translateX(0);
-            pointer-events: auto;
-        }
+        .slide.active { opacity: 1; transform: translateX(0); pointer-events: auto; }
+        .slide.exit { opacity: 0; transform: translateX(-60px); }
 
-        .slide.exit {
-            opacity: 0;
-            transform: translateX(-60px);
-        }
-
-        /* Progress bar */
         .progress-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent), var(--gold));
-            transition: width 0.4s ease;
-            z-index: 100;
+            position: fixed; top: 0; left: 0; height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--pink), var(--gold));
+            transition: width 0.4s ease; z-index: 100;
         }
 
-        /* Navigation */
         .nav {
-            position: fixed;
-            bottom: 30px;
-            right: 40px;
-            display: flex;
-            gap: 12px;
-            z-index: 100;
+            position: fixed; bottom: 30px; right: 40px;
+            display: flex; gap: 12px; z-index: 100;
         }
 
         .nav button {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.15);
-            background: rgba(255,255,255,0.05);
-            color: var(--text);
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.2s;
-            backdrop-filter: blur(10px);
+            width: 44px; height: 44px; border-radius: 50%;
+            border: 1px solid rgba(168,85,247,0.3);
+            background: rgba(168,85,247,0.08);
+            color: var(--text); font-size: 18px; cursor: pointer;
+            transition: all 0.2s; backdrop-filter: blur(10px);
         }
-
-        .nav button:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: var(--accent);
-        }
+        .nav button:hover { background: rgba(168,85,247,0.2); border-color: var(--accent); }
 
         .slide-counter {
-            position: fixed;
-            bottom: 38px;
-            left: 40px;
-            font-size: 13px;
-            color: var(--text-dim);
-            font-weight: 500;
-            letter-spacing: 1px;
-            z-index: 100;
+            position: fixed; bottom: 38px; left: 40px;
+            font-size: 13px; color: var(--text-dim);
+            font-weight: 500; letter-spacing: 1px; z-index: 100;
         }
 
-        /* Brand */
         .brand-mark {
-            position: fixed;
-            top: 24px;
-            left: 40px;
-            font-size: 14px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            color: var(--text-muted);
-            z-index: 100;
+            position: fixed; top: 24px; left: 40px;
+            font-size: 14px; font-weight: 700; letter-spacing: 2px;
+            color: var(--text-muted); z-index: 100;
         }
+        .brand-mark span { color: var(--accent); }
 
-        .brand-mark span {
-            color: var(--accent);
-        }
+        h1 { font-size: clamp(36px, 5vw, 72px); font-weight: 900; line-height: 1.05; letter-spacing: -2px; margin-bottom: 20px; }
+        h2 { font-size: clamp(28px, 3.5vw, 52px); font-weight: 800; line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 16px; }
+        h3 { font-size: clamp(20px, 2.5vw, 36px); font-weight: 700; line-height: 1.2; letter-spacing: -0.5px; margin-bottom: 12px; }
 
-        /* Typography */
-        h1 {
-            font-size: clamp(36px, 5vw, 72px);
-            font-weight: 900;
-            line-height: 1.05;
-            letter-spacing: -2px;
-            margin-bottom: 20px;
-        }
-
-        h2 {
-            font-size: clamp(28px, 3.5vw, 52px);
-            font-weight: 800;
-            line-height: 1.1;
-            letter-spacing: -1.5px;
-            margin-bottom: 16px;
-        }
-
-        h3 {
-            font-size: clamp(20px, 2.5vw, 36px);
-            font-weight: 700;
-            line-height: 1.2;
-            letter-spacing: -0.5px;
-            margin-bottom: 12px;
-        }
-
-        .subtitle {
-            font-size: clamp(16px, 1.8vw, 24px);
-            color: var(--text-muted);
-            font-weight: 400;
-            line-height: 1.5;
-            max-width: 700px;
-        }
+        .subtitle { font-size: clamp(16px, 1.8vw, 24px); color: var(--text-muted); font-weight: 400; line-height: 1.5; max-width: 700px; }
 
         .accent { color: var(--accent); }
         .gold { color: var(--gold); }
         .green { color: var(--green); }
         .blue { color: var(--blue); }
+        .pink { color: var(--pink); }
 
         .highlight {
-            background: linear-gradient(135deg, var(--accent), #ff8080);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            background: linear-gradient(135deg, var(--accent), var(--pink));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
 
-        /* Cards grid */
         .cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            width: 100%;
-            max-width: 1100px;
-            margin-top: 30px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px; width: 100%; max-width: 1100px; margin-top: 30px;
         }
 
         .card {
-            background: var(--surface);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 16px;
-            padding: 28px;
-            text-align: left;
-            transition: all 0.3s;
+            background: var(--surface); border: 1px solid rgba(168,85,247,0.08);
+            border-radius: 16px; padding: 28px; text-align: left; transition: all 0.3s;
         }
+        .card:hover { border-color: rgba(168,85,247,0.3); transform: translateY(-2px); }
+        .card-icon { font-size: 32px; margin-bottom: 14px; }
+        .card h4 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .card p { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
 
-        .card:hover {
-            border-color: rgba(255,77,77,0.3);
-            transform: translateY(-2px);
-        }
+        .stats { display: flex; gap: 40px; margin-top: 30px; flex-wrap: wrap; justify-content: center; }
+        .stat { text-align: center; }
+        .stat-number { font-size: clamp(36px, 4vw, 64px); font-weight: 900; letter-spacing: -2px; }
+        .stat-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; }
 
-        .card-icon {
-            font-size: 32px;
-            margin-bottom: 14px;
-        }
-
-        .card h4 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .card p {
-            font-size: 14px;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
-        /* Stats row */
-        .stats {
-            display: flex;
-            gap: 40px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .stat {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: clamp(36px, 4vw, 64px);
-            font-weight: 900;
-            letter-spacing: -2px;
-        }
-
-        .stat-label {
-            font-size: 13px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-top: 4px;
-        }
-
-        /* Lists */
-        .feature-list {
-            list-style: none;
-            text-align: left;
-            max-width: 700px;
-            margin-top: 24px;
-        }
-
+        .feature-list { list-style: none; text-align: left; max-width: 700px; margin-top: 24px; }
         .feature-list li {
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: clamp(15px, 1.5vw, 20px);
-            display: flex;
-            align-items: center;
-            gap: 14px;
+            padding: 12px 0; border-bottom: 1px solid rgba(168,85,247,0.06);
+            font-size: clamp(15px, 1.5vw, 20px); display: flex; align-items: center; gap: 14px;
         }
-
         .feature-list li:last-child { border-bottom: none; }
 
         .check {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: rgba(52, 211, 153, 0.15);
-            color: var(--green);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            flex-shrink: 0;
+            width: 24px; height: 24px; border-radius: 50%;
+            background: rgba(168, 85, 247, 0.15); color: var(--accent);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; flex-shrink: 0;
         }
 
-        /* Section label */
         .section-label {
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 20px;
+            font-size: 12px; font-weight: 600; letter-spacing: 3px;
+            text-transform: uppercase; color: var(--accent); margin-bottom: 20px;
         }
 
-        /* Comparison table */
-        .comparison {
-            width: 100%;
-            max-width: 900px;
-            margin-top: 24px;
-        }
+        .comparison { width: 100%; max-width: 900px; margin-top: 24px; }
+        .comparison-row { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+        .comparison-row.header { margin-bottom: 8px; }
+        .comparison-row.header div { font-weight: 700; font-size: 16px; padding: 12px 20px; }
+        .comp-old, .comp-new { padding: 14px 20px; font-size: 15px; text-align: left; }
+        .comp-old { background: rgba(244,114,182,0.05); border-left: 3px solid rgba(244,114,182,0.3); color: var(--text-muted); }
+        .comp-new { background: rgba(168,85,247,0.05); border-left: 3px solid rgba(168,85,247,0.4); color: var(--text); }
 
-        .comparison-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2px;
-        }
-
-        .comparison-row.header {
-            margin-bottom: 8px;
-        }
-
-        .comparison-row.header div {
-            font-weight: 700;
-            font-size: 16px;
-            padding: 12px 20px;
-        }
-
-        .comp-old, .comp-new {
-            padding: 14px 20px;
-            font-size: 15px;
-            text-align: left;
-        }
-
-        .comp-old {
-            background: rgba(255,77,77,0.05);
-            border-left: 3px solid rgba(255,77,77,0.3);
-            color: var(--text-muted);
-        }
-
-        .comp-new {
-            background: rgba(52,211,153,0.05);
-            border-left: 3px solid rgba(52,211,153,0.3);
-            color: var(--text);
-        }
-
-        /* Offer box */
         .offer-box {
-            background: linear-gradient(135deg, rgba(255,77,77,0.08), rgba(240,192,64,0.08));
-            border: 1px solid rgba(255,77,77,0.2);
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 700px;
-            margin-top: 24px;
+            background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(244,114,182,0.08));
+            border: 1px solid rgba(168,85,247,0.2);
+            border-radius: 20px; padding: 40px; max-width: 700px; margin-top: 24px;
         }
 
-        .offer-price {
-            font-size: clamp(40px, 5vw, 72px);
-            font-weight: 900;
-            letter-spacing: -2px;
-        }
+        .offer-price { font-size: clamp(40px, 5vw, 72px); font-weight: 900; letter-spacing: -2px; }
+        .offer-price .per { font-size: 0.4em; color: var(--text-muted); font-weight: 400; }
 
-        .offer-price .per {
-            font-size: 0.4em;
-            color: var(--text-muted);
-            font-weight: 400;
-        }
+        .offer-features { list-style: none; margin-top: 20px; text-align: left; }
+        .offer-features li { padding: 8px 0; font-size: 16px; display: flex; gap: 10px; }
 
-        .offer-features {
-            list-style: none;
-            margin-top: 20px;
-            text-align: left;
-        }
+        .glow-orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.12; pointer-events: none; }
+        .glow-purple { background: var(--accent); width: 400px; height: 400px; }
+        .glow-pink { background: var(--pink); width: 300px; height: 300px; }
+        .glow-gold { background: var(--gold); width: 300px; height: 300px; }
 
-        .offer-features li {
-            padding: 8px 0;
-            font-size: 16px;
-            display: flex;
-            gap: 10px;
+        .code-block {
+            background: #0d0b14; border: 1px solid rgba(168,85,247,0.12);
+            border-radius: 12px; padding: 24px 28px; text-align: left;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 14px; line-height: 1.8; max-width: 800px; width: 100%; margin-top: 20px;
+            overflow-x: auto;
         }
+        .code-block .comment { color: #6a737d; }
+        .code-block .keyword { color: var(--accent-light); }
+        .code-block .string { color: #a5d6ff; }
+        .code-block .func { color: var(--pink); }
+        .code-block .prompt { color: var(--green); }
+        .code-block .yaml-key { color: var(--accent); }
+        .code-block .yaml-val { color: var(--green); }
 
-        /* Glow effects */
-        .glow-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.15;
-            pointer-events: none;
+        .flow {
+            display: flex; align-items: center; gap: 16px; margin-top: 30px;
+            flex-wrap: wrap; justify-content: center;
         }
-
-        .glow-red {
-            background: var(--accent);
-            width: 400px;
-            height: 400px;
+        .flow-box {
+            background: var(--surface); border: 1px solid rgba(168,85,247,0.12);
+            border-radius: 12px; padding: 18px 24px; font-size: 15px; font-weight: 600;
         }
+        .flow-arrow { font-size: 24px; color: var(--accent); }
 
-        .glow-gold {
-            background: var(--gold);
-            width: 300px;
-            height: 300px;
+        .steps {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 24px; width: 100%; max-width: 1000px; margin-top: 30px;
         }
-
-        /* Timeline */
-        .timeline {
-            text-align: left;
-            max-width: 600px;
-            margin-top: 24px;
+        .step {
+            background: var(--surface); border-radius: 16px; padding: 28px;
+            text-align: left; border: 1px solid rgba(168,85,247,0.06);
         }
+        .step-num { font-size: 48px; font-weight: 900; color: var(--accent); opacity: 0.3; line-height: 1; margin-bottom: 12px; }
+        .step h4 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+        .step p { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
 
-        .timeline-item {
-            display: flex;
-            gap: 20px;
-            padding: 16px 0;
-            border-left: 2px solid rgba(255,255,255,0.08);
-            padding-left: 24px;
-            position: relative;
+        .two-col {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
+            width: 100%; max-width: 1100px; text-align: left; margin-top: 20px;
         }
+        .two-col .col { padding: 10px; }
 
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -6px;
-            top: 22px;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--accent);
+        .quote {
+            font-size: clamp(20px, 2.5vw, 32px); font-style: italic;
+            color: var(--text); max-width: 800px; line-height: 1.4;
+            position: relative; padding: 0 40px;
         }
+        .quote::before { content: '\201C'; position: absolute; left: 0; top: -10px; font-size: 60px; color: var(--accent); font-style: normal; }
+        .quote-author { margin-top: 16px; font-size: 14px; color: var(--text-muted); font-style: normal; }
 
-        .timeline-item .time {
-            font-size: 13px;
-            color: var(--accent);
-            font-weight: 600;
-            min-width: 80px;
-        }
-
-        .timeline-item .desc {
-            font-size: 16px;
-        }
-
-        /* CTA button */
         .cta-btn {
-            display: inline-block;
-            margin-top: 28px;
-            padding: 16px 40px;
-            background: linear-gradient(135deg, var(--accent), #ff7070);
-            color: white;
-            font-weight: 700;
-            font-size: 16px;
-            border-radius: 12px;
-            text-decoration: none;
-            letter-spacing: 0.5px;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
+            display: inline-block; margin-top: 28px; padding: 16px 40px;
+            background: linear-gradient(135deg, var(--accent), var(--pink));
+            color: white; font-weight: 700; font-size: 16px; border-radius: 12px;
+            text-decoration: none; letter-spacing: 0.5px; transition: all 0.3s;
+            border: none; cursor: pointer;
         }
+        .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--accent-glow); }
 
-        .cta-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px var(--accent-glow);
-        }
-
-        /* Fade-in animations for slide content */
-        .slide.active .fade-up {
-            animation: fadeUp 0.6s ease forwards;
-        }
-
+        .slide.active .fade-up { animation: fadeUp 0.6s ease forwards; }
         .slide.active .fade-up:nth-child(1) { animation-delay: 0.1s; }
         .slide.active .fade-up:nth-child(2) { animation-delay: 0.2s; }
         .slide.active .fade-up:nth-child(3) { animation-delay: 0.3s; }
         .slide.active .fade-up:nth-child(4) { animation-delay: 0.4s; }
         .slide.active .fade-up:nth-child(5) { animation-delay: 0.5s; }
+        .fade-up { opacity: 0; transform: translateY(20px); }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 
-        .fade-up {
-            opacity: 0;
-            transform: translateY(20px);
+        /* Badge / pill */
+        .pill {
+            display: inline-block; padding: 6px 16px; border-radius: 20px;
+            font-size: 12px; font-weight: 600; letter-spacing: 1px;
+            text-transform: uppercase; margin-bottom: 16px;
         }
-
-        @keyframes fadeUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Two column layout */
-        .two-col {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            width: 100%;
-            max-width: 1100px;
-            text-align: left;
-            margin-top: 20px;
-        }
-
-        .two-col .col { padding: 10px; }
-
-        /* Quote */
-        .quote {
-            font-size: clamp(20px, 2.5vw, 32px);
-            font-style: italic;
-            color: var(--text);
-            max-width: 800px;
-            line-height: 1.4;
-            position: relative;
-            padding: 0 40px;
-        }
-
-        .quote::before {
-            content: '\201C';
-            position: absolute;
-            left: 0;
-            top: -10px;
-            font-size: 60px;
-            color: var(--accent);
-            font-style: normal;
-        }
-
-        .quote-author {
-            margin-top: 16px;
-            font-size: 14px;
-            color: var(--text-muted);
-            font-style: normal;
-        }
-
-        /* Numbered steps */
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            width: 100%;
-            max-width: 1000px;
-            margin-top: 30px;
-        }
-
-        .step {
-            background: var(--surface);
-            border-radius: 16px;
-            padding: 28px;
-            text-align: left;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .step-num {
-            font-size: 48px;
-            font-weight: 900;
-            color: var(--accent);
-            opacity: 0.3;
-            line-height: 1;
-            margin-bottom: 12px;
-        }
-
-        .step h4 {
-            font-size: 17px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .step p {
-            font-size: 14px;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
-        /* Code block */
-        .code-block {
-            background: #0d1117;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            padding: 24px 28px;
-            text-align: left;
-            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-            font-size: 14px;
-            line-height: 1.8;
-            max-width: 800px;
-            width: 100%;
-            margin-top: 20px;
-            overflow-x: auto;
-        }
-
-        .code-block .comment { color: #6a737d; }
-        .code-block .keyword { color: #ff7b72; }
-        .code-block .string { color: #a5d6ff; }
-        .code-block .func { color: #d2a8ff; }
-        .code-block .prompt { color: var(--green); }
-
-        /* Diagram / flow */
-        .flow {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .flow-box {
-            background: var(--surface);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            padding: 18px 24px;
-            font-size: 15px;
-            font-weight: 600;
-        }
-
-        .flow-arrow {
-            font-size: 24px;
-            color: var(--accent);
-        }
+        .pill-purple { background: rgba(168,85,247,0.15); color: var(--accent); border: 1px solid rgba(168,85,247,0.3); }
+        .pill-gold { background: rgba(240,192,64,0.15); color: var(--gold); border: 1px solid rgba(240,192,64,0.3); }
+        .pill-green { background: rgba(52,211,153,0.15); color: var(--green); border: 1px solid rgba(52,211,153,0.3); }
 
         @media (max-width: 768px) {
             .slide { padding: 40px 24px; }
@@ -608,145 +266,156 @@
 <body>
     <div class="brand-mark">ALL<span>DAY</span>FBA</div>
     <div class="progress-bar" id="progressBar"></div>
-    <div class="slide-counter" id="slideCounter">01 / 28</div>
+    <div class="slide-counter" id="slideCounter">01 / 35</div>
 
     <div class="presentation" id="presentation">
 
-        <!-- ===== SECTION 1: INTRO ===== -->
-
-        <!-- SLIDE 1: Title -->
+        <!-- ===== SLIDE 1: TITLE ===== -->
         <div class="slide active">
-            <div class="glow-orb glow-red" style="top: 20%; left: 60%;"></div>
-            <div class="glow-orb glow-gold" style="bottom: 20%; left: 20%;"></div>
+            <div class="glow-orb glow-purple" style="top: 20%; left: 60%;"></div>
+            <div class="glow-orb glow-pink" style="bottom: 20%; left: 20%;"></div>
             <div class="section-label fade-up">GROUP CALL &mdash; MARCH 2026</div>
             <h1 class="fade-up">AI + <span class="highlight">Amazon FBA</span></h1>
-            <p class="subtitle fade-up">How to use AI to find products, automate sourcing,<br>and build your Amazon business 10x faster.</p>
+            <p class="subtitle fade-up">The complete breakdown on how AI works, how to use it,<br>and how it's going to change the way you sell on Amazon.</p>
         </div>
 
-        <!-- SLIDE 2: Agenda -->
+        <!-- ===== SLIDE 2: AGENDA ===== -->
         <div class="slide">
             <div class="section-label fade-up">TODAY'S CALL</div>
             <h2 class="fade-up">What We're Covering</h2>
             <ul class="feature-list fade-up">
-                <li><span class="check">1</span> <span>What AI actually is &mdash; and why it matters for Amazon sellers</span></li>
-                <li><span class="check">2</span> <span>Claude Code &amp; OpenClaw &mdash; what they are, how they work</span></li>
-                <li><span class="check">3</span> <span>Directives, SOPs, and AI agents &mdash; the system behind it all</span></li>
-                <li><span class="check">4</span> <span>Live demos &mdash; AI sourcing, Nova bot, your platform</span></li>
-                <li><span class="check">5</span> <span>How YOU can start using this &mdash; and what's coming next</span></li>
+                <li><span class="check">1</span> <span>AI 101 &mdash; what it is, how it works, the tools that matter</span></li>
+                <li><span class="check">2</span> <span>Claude Code &amp; OpenClaw &mdash; deep dive with real examples</span></li>
+                <li><span class="check">3</span> <span>The DOE Framework &mdash; how to make AI actually work for you</span></li>
+                <li><span class="check">4</span> <span>CLAUDE.md, Directives, Skills &mdash; the building blocks</span></li>
+                <li><span class="check">5</span> <span>AI for Amazon &mdash; sourcing, brands, ads, websites, daily ops</span></li>
+                <li><span class="check">6</span> <span>What's coming next &mdash; and how to go deeper</span></li>
             </ul>
         </div>
 
-        <!-- SLIDE 3: Why This Matters -->
-        <div class="slide">
-            <div class="glow-orb glow-red" style="top: 30%; right: 10%;"></div>
-            <div class="section-label fade-up">THE REALITY</div>
-            <h2 class="fade-up">AI Is Not <span class="accent">Coming.</span> It's Here.</h2>
-            <p class="subtitle fade-up">The sellers who learn to use AI will outpace everyone else. Not in 5 years &mdash; right now. This is the biggest shift in e-commerce since FBA itself.</p>
-            <div class="stats fade-up">
-                <div class="stat">
-                    <div class="stat-number accent">300+</div>
-                    <div class="stat-label">Retailers Our AI Scans</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number gold">24/7</div>
-                    <div class="stat-label">Automated Sourcing</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number green">10x</div>
-                    <div class="stat-label">Faster Product Research</div>
-                </div>
-            </div>
-        </div>
+        <!-- ===== SECTION: AI 101 ===== -->
 
-        <!-- ===== SECTION 2: WHAT IS AI (EDUCATIONAL) ===== -->
-
-        <!-- SLIDE 4: AI Explained Simply -->
+        <!-- SLIDE 3: What Is AI -->
         <div class="slide">
+            <div class="glow-orb glow-purple" style="top: 30%; right: 10%;"></div>
             <div class="section-label fade-up">AI 101</div>
-            <h2 class="fade-up">What Is <span class="gold">AI</span>, Really?</h2>
-            <p class="subtitle fade-up">Forget the hype. Here's what you actually need to know.</p>
+            <h2 class="fade-up">What Is <span class="accent">AI</span>, Really?</h2>
+            <p class="subtitle fade-up">Let's cut through the noise. Here's what you need to know.</p>
             <div class="cards fade-up">
                 <div class="card">
                     <div class="card-icon">&#129504;</div>
                     <h4>LLMs (Large Language Models)</h4>
-                    <p>ChatGPT, Claude, Gemini &mdash; these are AI models that understand and generate text. Think of them as extremely smart assistants that can read, write, and reason.</p>
+                    <p>ChatGPT, Claude, Gemini &mdash; AI models that understand and generate text. Think of them as extremely smart assistants that can read, write, reason, and follow instructions.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">&#128172;</div>
-                    <h4>Regular Chat vs. AI Agents</h4>
-                    <p>Regular chat = you ask a question, it answers. AI agents = you give it a task and it goes and DOES it. Opens websites, scrapes data, writes files, runs code.</p>
+                    <h4>Chat vs. Agents</h4>
+                    <p><strong>Chat</strong> = you ask a question, it answers. <strong>Agents</strong> = you give it a task and it <em>goes and does it</em>. Opens websites, scrapes data, writes files, builds apps. Big difference.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">&#9889;</div>
-                    <h4>Why It Matters for Amazon</h4>
-                    <p>AI can scan hundreds of retailers, calculate profitability, analyze competition, and find products &mdash; all while you sleep. That's the game changer.</p>
+                    <h4>Why This Matters for You</h4>
+                    <p>AI can scan hundreds of retailers, calculate profitability, build your brand website, write your ads, and answer your questions &mdash; all while you sleep.</p>
                 </div>
             </div>
         </div>
 
-        <!-- SLIDE 5: ChatGPT vs Claude Code -->
+        <!-- SLIDE 4: The Tools That Matter -->
         <div class="slide">
-            <div class="section-label fade-up">KNOW THE DIFFERENCE</div>
-            <h2 class="fade-up">ChatGPT Chat vs. <span class="highlight">Claude Code</span></h2>
+            <div class="section-label fade-up">THE TOOLS</div>
+            <h2 class="fade-up">The AI Tools That <span class="highlight">Actually Matter</span></h2>
+            <div class="cards fade-up">
+                <div class="card">
+                    <div class="card-icon">&#128187;</div>
+                    <h4>Claude Code</h4>
+                    <p>Anthropic's AI coding agent. Runs in your terminal. Has full access to your computer &mdash; files, scripts, browser, everything. This is the workhorse.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#129302;</div>
+                    <h4>OpenClaw</h4>
+                    <p>An always-on AI agent that runs 24/7 on a separate machine. You text it on Telegram and it does the work. Self-improving over time.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#127760;</div>
+                    <h4>Perplexity / Co-Work</h4>
+                    <p>For quick tasks: research, stats, follow-ups, routine work. Does 90% of the job in 30 minutes that would take hours manually.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#128170;</div>
+                    <h4>Claude Max ($200/mo)</h4>
+                    <p>One subscription that gives you Claude Code + everything. It's a $200/mo superhuman employee that works unlimited hours.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: Claude Code Deep Dive -->
+        <div class="slide">
+            <div class="section-label fade-up">DEEP DIVE</div>
+            <h2 class="fade-up">What Is <span class="accent">Claude Code</span>?</h2>
+            <p class="subtitle fade-up">It runs in your terminal (the command line) and has full access to your computer. You talk to it in plain English, and it executes.</p>
+            <div class="code-block fade-up">
+                <span class="comment"># You type a command in plain English:</span><br>
+                <span class="prompt">$</span> <span class="string">"Find all clearance items on Target.com under $20<br>&nbsp;&nbsp;that sell for 3x on Amazon"</span><br><br>
+                <span class="comment"># Claude Code then:</span><br>
+                <span class="comment"># 1. Opens a headless browser (invisible Chrome)</span><br>
+                <span class="comment"># 2. Navigates to Target's clearance section</span><br>
+                <span class="comment"># 3. Scrapes every product + price</span><br>
+                <span class="comment"># 4. Cross-references each item on Amazon</span><br>
+                <span class="comment"># 5. Calculates ROI, FBA fees, and net profit</span><br>
+                <span class="comment"># 6. Returns a ranked list of profitable products</span><br><br>
+                <span class="keyword">Result:</span> <span class="func">12 products found</span> &mdash; avg ROI: 145%
+            </div>
+        </div>
+
+        <!-- SLIDE 6: ChatGPT vs Claude Code -->
+        <div class="slide">
+            <div class="section-label fade-up">THE DIFFERENCE</div>
+            <h2 class="fade-up">Regular Chat vs. <span class="accent">Claude Code</span></h2>
             <div class="comparison fade-up">
                 <div class="comparison-row header">
-                    <div class="comp-old">&#128172; Regular AI Chat</div>
+                    <div class="comp-old">&#128172; ChatGPT / Regular Chat</div>
                     <div class="comp-new">&#128187; Claude Code</div>
                 </div>
                 <div class="comparison-row">
                     <div class="comp-old">Answers questions in a chat window</div>
-                    <div class="comp-new">Runs directly on your computer's terminal</div>
+                    <div class="comp-new">Runs directly on your computer</div>
                 </div>
                 <div class="comparison-row">
-                    <div class="comp-old">Forgets everything after the conversation</div>
-                    <div class="comp-new">Has persistent memory across sessions</div>
+                    <div class="comp-old">Forgets everything next conversation</div>
+                    <div class="comp-new">Persistent memory across all sessions</div>
                 </div>
                 <div class="comparison-row">
                     <div class="comp-old">Can only read/write text in the chat</div>
-                    <div class="comp-new">Can create files, run scripts, browse the web</div>
+                    <div class="comp-new">Creates files, runs scripts, opens browsers</div>
                 </div>
                 <div class="comparison-row">
-                    <div class="comp-old">You do all the work, it just advises</div>
-                    <div class="comp-new">It does the work &mdash; you approve and guide</div>
+                    <div class="comp-old">You do the work, it advises</div>
+                    <div class="comp-new">It does the work, you approve</div>
                 </div>
                 <div class="comparison-row">
-                    <div class="comp-old">Limited to one conversation at a time</div>
-                    <div class="comp-new">Can run multiple agents simultaneously</div>
+                    <div class="comp-old">One conversation at a time</div>
+                    <div class="comp-new">Runs multiple agents in parallel</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comp-old">No access to your files or tools</div>
+                    <div class="comp-new">Full access to your entire system</div>
                 </div>
             </div>
         </div>
 
-        <!-- SLIDE 6: What Is Claude Code -->
+        <!-- SLIDE 7: OpenClaw -->
         <div class="slide">
-            <div class="section-label fade-up">DEEP DIVE</div>
-            <h2 class="fade-up">What Is <span class="accent">Claude Code</span>?</h2>
-            <p class="subtitle fade-up">Claude Code is Anthropic's AI coding agent. It runs in your terminal and has full access to your computer &mdash; files, scripts, browser, everything.</p>
-            <div class="code-block fade-up">
-                <span class="comment"># You type a command in plain English:</span><br>
-                <span class="prompt">$</span> <span class="string">"Find all clearance items on Target.com under $20 that sell for 3x on Amazon"</span><br><br>
-                <span class="comment"># Claude Code then:</span><br>
-                <span class="comment"># 1. Opens a headless browser</span><br>
-                <span class="comment"># 2. Scrapes Target's clearance section</span><br>
-                <span class="comment"># 3. Cross-references each item on Amazon</span><br>
-                <span class="comment"># 4. Calculates ROI, fees, and profit</span><br>
-                <span class="comment"># 5. Returns a ranked list of profitable products</span><br><br>
-                <span class="keyword">Result:</span> <span class="func">12 products found</span> &mdash; avg ROI: 145%, avg profit: $8.40/unit
-            </div>
-        </div>
-
-        <!-- SLIDE 7: What Is OpenClaw -->
-        <div class="slide">
-            <div class="glow-orb glow-gold" style="top: 15%; right: 15%;"></div>
-            <div class="section-label fade-up">NEXT LEVEL</div>
-            <h2 class="fade-up">What Is <span class="gold">OpenClaw</span>?</h2>
-            <p class="subtitle fade-up">If Claude Code is a skilled employee you work with &mdash; OpenClaw is that same employee, except it works <strong>24/7 without you being there.</strong></p>
+            <div class="glow-orb glow-pink" style="top: 15%; right: 15%;"></div>
+            <div class="section-label fade-up">ALWAYS ON</div>
+            <h2 class="fade-up">What Is <span class="pink">OpenClaw</span>?</h2>
+            <p class="subtitle fade-up">If Claude Code is an employee you sit with &mdash; OpenClaw is that employee running <strong>24/7 without you there.</strong></p>
             <div class="two-col fade-up">
                 <div class="col">
                     <h3 style="font-size: 20px; margin-bottom: 16px;">Claude Code</h3>
                     <ul class="feature-list" style="margin-top: 0;">
                         <li><span class="check">&#10003;</span> You sit at the computer with it</li>
-                        <li><span class="check">&#10003;</span> You give it tasks, it executes</li>
-                        <li><span class="check">&#10003;</span> Great for building and one-off tasks</li>
+                        <li><span class="check">&#10003;</span> Give tasks, review output, iterate</li>
+                        <li><span class="check">&#10003;</span> Best for building + complex tasks</li>
                         <li><span class="check">&#10003;</span> Runs when your laptop is open</li>
                     </ul>
                 </div>
@@ -754,210 +423,337 @@
                     <h3 style="font-size: 20px; margin-bottom: 16px;">OpenClaw</h3>
                     <ul class="feature-list" style="margin-top: 0;">
                         <li><span class="check">&#10003;</span> Runs on a separate machine 24/7</li>
-                        <li><span class="check">&#10003;</span> You text it on Telegram</li>
-                        <li><span class="check">&#10003;</span> Self-improving &mdash; learns over time</li>
-                        <li><span class="check">&#10003;</span> Can run while you sleep</li>
+                        <li><span class="check">&#10003;</span> You text it on Telegram like a team member</li>
+                        <li><span class="check">&#10003;</span> Self-improving &mdash; learns from every task</li>
+                        <li><span class="check">&#10003;</span> Wakes you up with reports at 8 AM</li>
                     </ul>
                 </div>
             </div>
         </div>
 
-        <!-- ===== SECTION 3: HOW IT WORKS (EDUCATIONAL) ===== -->
+        <!-- ===== SECTION: THE DOE FRAMEWORK ===== -->
 
-        <!-- SLIDE 8: Directives Explained -->
+        <!-- SLIDE 8: DOE Overview -->
         <div class="slide">
-            <div class="section-label fade-up">THE SECRET SAUCE</div>
-            <h2 class="fade-up">What Are <span class="accent">Directives</span>?</h2>
-            <p class="subtitle fade-up">Directives are SOPs (Standard Operating Procedures) written in plain English that tell the AI exactly what to do. Think of them as training manuals for your AI employee.</p>
+            <div class="glow-orb glow-purple" style="bottom: 20%; left: 20%;"></div>
+            <div class="section-label fade-up">THE FRAMEWORK</div>
+            <h2 class="fade-up">The <span class="highlight">DOE Framework</span></h2>
+            <p class="subtitle fade-up">Directive &mdash; Orchestration &mdash; Execution. This is how you make AI actually reliable. Without this, AI makes mistakes that compound.</p>
+            <div class="steps fade-up">
+                <div class="step">
+                    <div class="step-num">D</div>
+                    <h4>Directive</h4>
+                    <p>Plain English SOPs that tell the AI <em>what to do</em>. Step-by-step instructions, like you'd give a new employee. Written in Markdown files.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">O</div>
+                    <h4>Orchestration</h4>
+                    <p>The AI brain. It reads the directive, makes decisions, picks the right tools, handles errors. This is Claude &mdash; the intelligent glue.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">E</div>
+                    <h4>Execution</h4>
+                    <p>Deterministic scripts that do the actual work. Scraping, calculating, API calls. Reliable. Testable. Fast. No guessing.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 9: Why DOE Matters -->
+        <div class="slide">
+            <div class="section-label fade-up">WHY IT MATTERS</div>
+            <h2 class="fade-up">Why Can't AI Just <span class="accent">Do Everything</span> Itself?</h2>
+            <p class="subtitle fade-up">Because errors compound. If AI is 90% accurate on each step...</p>
+            <div class="stats fade-up">
+                <div class="stat">
+                    <div class="stat-number" style="color: var(--green);">90%</div>
+                    <div class="stat-label">1 Step</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" style="color: var(--gold);">73%</div>
+                    <div class="stat-label">3 Steps</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" style="color: var(--pink);">59%</div>
+                    <div class="stat-label">5 Steps</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number accent">35%</div>
+                    <div class="stat-label">10 Steps</div>
+                </div>
+            </div>
+            <p class="subtitle fade-up" style="margin-top: 24px;">The fix: push the reliable work into <strong>deterministic scripts</strong> and let AI focus on <strong>decision-making</strong>. That's DOE.</p>
+        </div>
+
+        <!-- SLIDE 10: CLAUDE.md Explained -->
+        <div class="slide">
+            <div class="section-label fade-up">BUILDING BLOCK #1</div>
+            <h2 class="fade-up">What Is <span class="accent">CLAUDE.md</span>?</h2>
+            <p class="subtitle fade-up">It's your AI's operating manual. A file that loads automatically every time Claude Code starts. It tells the AI who you are, what your project is, and how to work.</p>
             <div class="code-block fade-up">
-                <span class="comment"># Example: amazon-sourcing-sop.md</span><br><br>
-                <span class="keyword">Goal:</span> Find profitable products to sell on Amazon<br>
+                <span class="comment"># CLAUDE.md &mdash; Your AI's Instruction Manual</span><br><br>
+                <span class="yaml-key">Project:</span> <span class="yaml-val">My Amazon FBA Business</span><br>
+                <span class="yaml-key">Stack:</span> <span class="yaml-val">Python, Playwright, Keepa API</span><br>
+                <span class="yaml-key">Rules:</span><br>
+                <span class="yaml-val">&nbsp;&nbsp;- Always check existing scripts before writing new ones</span><br>
+                <span class="yaml-val">&nbsp;&nbsp;- Products must have ROI > 30% to qualify</span><br>
+                <span class="yaml-val">&nbsp;&nbsp;- Never spend Keepa tokens without checking free sources first</span><br>
+                <span class="yaml-val">&nbsp;&nbsp;- Update the sourcing SOP when you learn something new</span><br><br>
+                <span class="comment"># Without this file, AI starts every session with ZERO context.</span><br>
+                <span class="comment"># With it, AI remembers everything &mdash; forever.</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 11: Directives / SOPs -->
+        <div class="slide">
+            <div class="section-label fade-up">BUILDING BLOCK #2</div>
+            <h2 class="fade-up">What Are <span class="gold">Directives</span>?</h2>
+            <p class="subtitle fade-up">Directives are SOPs (Standard Operating Procedures) written in Markdown. They tell the AI exactly what to do, step by step. The better your SOPs, the better your AI output.</p>
+            <div class="code-block fade-up">
+                <span class="comment"># directives/amazon-sourcing-sop.md</span><br><br>
+                <span class="keyword">Goal:</span> Find profitable products to sell on Amazon FBA<br>
                 <span class="keyword">Step 1:</span> Scrape the retailer's clearance section<br>
                 <span class="keyword">Step 2:</span> For each product, search Amazon for a match<br>
                 <span class="keyword">Step 3:</span> Calculate FBA fees, shipping, and net profit<br>
                 <span class="keyword">Step 4:</span> Only keep products with ROI &gt; 30%<br>
                 <span class="keyword">Step 5:</span> Check BSR &mdash; must be under 200,000<br>
-                <span class="keyword">Step 6:</span> Output a ranked list with buy links<br><br>
-                <span class="comment"># The AI reads this and follows it step by step.</span><br>
-                <span class="comment"># Better SOPs = better AI output. Always.</span>
+                <span class="keyword">Step 6:</span> Output a ranked list with buy links + margin<br><br>
+                <span class="comment"># The AI reads this before every sourcing run.</span><br>
+                <span class="comment"># When something breaks, update the SOP. System gets smarter.</span>
             </div>
         </div>
 
-        <!-- SLIDE 9: 3-Layer System -->
+        <!-- SLIDE 12: Skills / Slash Commands -->
         <div class="slide">
-            <div class="section-label fade-up">THE ARCHITECTURE</div>
-            <h2 class="fade-up">How The <span class="green">Whole System</span> Works</h2>
-            <p class="subtitle fade-up">Three layers working together. This is how the best AI operators in the world run their businesses.</p>
-            <div class="steps fade-up">
-                <div class="step">
-                    <div class="step-num">01</div>
-                    <h4>Directives (SOPs)</h4>
-                    <p>Plain English instructions. "Here's what to do, here's how to do it, here's what good looks like." The AI reads these before every task.</p>
-                </div>
-                <div class="step">
-                    <div class="step-num">02</div>
-                    <h4>AI Brain (Orchestration)</h4>
-                    <p>The AI reads the directive, makes decisions, and calls the right tools in the right order. It handles errors and asks questions when stuck.</p>
-                </div>
-                <div class="step">
-                    <div class="step-num">03</div>
-                    <h4>Scripts (Execution)</h4>
-                    <p>Python scripts that do the actual work &mdash; scraping websites, calculating profits, checking Amazon data. Reliable, fast, repeatable.</p>
-                </div>
+            <div class="section-label fade-up">BUILDING BLOCK #3</div>
+            <h2 class="fade-up">What Are <span class="blue">Skills</span> (Slash Commands)?</h2>
+            <p class="subtitle fade-up">Skills are shortcuts that connect a trigger phrase to a directive and a script. Type one command, and the entire pipeline runs automatically.</p>
+            <div class="code-block fade-up">
+                <span class="comment"># Skill file with YAML frontmatter:</span><br><br>
+                <span class="yaml-key">---</span><br>
+                <span class="yaml-key">name:</span> <span class="yaml-val">source-products</span><br>
+                <span class="yaml-key">description:</span> <span class="yaml-val">AI-powered Amazon product sourcing</span><br>
+                <span class="yaml-key">trigger:</span> <span class="yaml-val">"find products", "source", "scan clearance"</span><br>
+                <span class="yaml-key">tools:</span> <span class="yaml-val">[Bash, Read, Write, Glob, Grep]</span><br>
+                <span class="yaml-key">---</span><br><br>
+                <span class="comment"># Type "/source-products" and the AI:</span><br>
+                <span class="comment"># 1. Reads the sourcing SOP (directive)</span><br>
+                <span class="comment"># 2. Runs the sourcing script (execution)</span><br>
+                <span class="comment"># 3. Returns profitable products</span><br>
+                <span class="comment"># One command. Entire pipeline. Done.</span>
             </div>
         </div>
 
-        <!-- SLIDE 10: Flow Diagram -->
-        <div class="slide">
-            <div class="section-label fade-up">IN PRACTICE</div>
-            <h2 class="fade-up">How a <span class="blue">Sourcing Run</span> Actually Works</h2>
-            <p class="subtitle fade-up">From "find me products" to a ranked list of profitable items &mdash; here's the flow:</p>
-            <div class="flow fade-up">
-                <div class="flow-box">You say:<br><strong>"Find Jellycat products"</strong></div>
-                <div class="flow-arrow">&#8594;</div>
-                <div class="flow-box">AI reads the<br><strong>sourcing SOP</strong></div>
-                <div class="flow-arrow">&#8594;</div>
-                <div class="flow-box">Script scrapes<br><strong>300+ retailers</strong></div>
-                <div class="flow-arrow">&#8594;</div>
-                <div class="flow-box">Checks Amazon<br><strong>price + BSR</strong></div>
-                <div class="flow-arrow">&#8594;</div>
-                <div class="flow-box">Returns<br><strong>profitable picks</strong></div>
-            </div>
-            <p class="subtitle fade-up" style="margin-top: 30px; font-size: 16px;">Total time: <strong class="green">5-10 minutes</strong>. Manual research: <strong class="accent">3-4 hours</strong>.</p>
-        </div>
-
-        <!-- SLIDE 11: AI Agents Explained -->
-        <div class="slide">
-            <div class="section-label fade-up">AGENTS</div>
-            <h2 class="fade-up">What Are <span class="gold">AI Agents</span>?</h2>
-            <p class="subtitle fade-up">An AI agent is an AI that has a specific role, specific tools, and a specific job &mdash; like a virtual employee on your team.</p>
-            <div class="cards fade-up">
-                <div class="card">
-                    <div class="card-icon">&#128269;</div>
-                    <h4>Sourcing Agent</h4>
-                    <p>Its only job: find profitable products. Scans retailers, checks Amazon, calculates margins. Runs 24/7.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">&#129302;</div>
-                    <h4>Nova (Mentor Agent)</h4>
-                    <p>Trained on all my content. Answers your Amazon questions instantly in Discord or on the platform. Available 24/7.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">&#128200;</div>
-                    <h4>Analytics Agent</h4>
-                    <p>Tracks your progress, monitors your health score, flags when you're stuck, and suggests next steps.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- SLIDE 12: Self-Improving -->
+        <!-- SLIDE 13: Self-Annealing -->
         <div class="slide">
             <div class="section-label fade-up">KEY CONCEPT</div>
-            <h2 class="fade-up">The AI Gets <span class="highlight">Better Over Time</span></h2>
-            <p class="subtitle fade-up">Unlike a regular tool, AI agents <em>self-improve</em>. Every error becomes a lesson. Every correction makes it smarter.</p>
+            <h2 class="fade-up">Self-Annealing: The AI <span class="highlight">Gets Smarter</span></h2>
+            <p class="subtitle fade-up">When something breaks, the AI doesn't just fix it &mdash; it updates its own instructions so the same mistake never happens again.</p>
             <div class="steps fade-up">
                 <div class="step">
-                    <div class="step-num">&#9888;</div>
+                    <div class="step-num">1</div>
                     <h4>Something Breaks</h4>
-                    <p>A retailer changes their website layout. The scraper fails on Walmart clearance.</p>
+                    <p>Walmart changes their website layout. The clearance scraper returns empty results.</p>
                 </div>
                 <div class="step">
-                    <div class="step-num">&#128736;</div>
-                    <h4>AI Fixes Itself</h4>
-                    <p>The system detects the error, reads the new page structure, updates the scraper code, and tests it.</p>
+                    <div class="step-num">2</div>
+                    <h4>AI Fixes the Script</h4>
+                    <p>Detects the error, reads the new page, updates the scraping code, tests it, confirms it works.</p>
                 </div>
                 <div class="step">
-                    <div class="step-num">&#128218;</div>
-                    <h4>Updates Its Own SOP</h4>
-                    <p>The AI writes "Walmart changed layout on 3/20" into the directive so it never makes the same mistake again.</p>
+                    <div class="step-num">3</div>
+                    <h4>Updates the SOP</h4>
+                    <p>Writes "Walmart layout changed 3/20 &mdash; new selectors" into the directive. Never breaks on this again.</p>
                 </div>
             </div>
-            <p class="subtitle fade-up" style="margin-top: 20px; font-size: 16px;">This is called <strong class="accent">self-annealing</strong> &mdash; the system heals and hardens itself automatically.</p>
+            <p class="subtitle fade-up" style="margin-top: 20px;">Every error makes the system <strong class="accent">stronger</strong>. That's the DOE advantage.</p>
         </div>
 
-        <!-- ===== SECTION 4: WHAT YOU HAVE ACCESS TO ===== -->
-
-        <!-- SLIDE 13: Your Tools -->
+        <!-- SLIDE 14: The 5 Principles -->
         <div class="slide">
-            <div class="glow-orb glow-red" style="bottom: 20%; left: 15%;"></div>
-            <div class="section-label fade-up">YOUR ARSENAL</div>
-            <h2 class="fade-up">What You Already <span class="green">Have Access To</span></h2>
-            <p class="subtitle fade-up">All of this is live on 247profits.org right now. Let me show you.</p>
-            <div class="stats fade-up">
-                <div class="stat">
-                    <div class="stat-number gold">23</div>
-                    <div class="stat-label">Sourcing Tools</div>
+            <div class="section-label fade-up">THE MINDSET</div>
+            <h2 class="fade-up">5 Rules for Using AI <span class="accent">Effectively</span></h2>
+            <ul class="feature-list fade-up">
+                <li><span class="check">1</span> <span><strong>Speed over perfection.</strong> Don't spend 30 hours setting up when 30 minutes gets you 90% there.</span></li>
+                <li><span class="check">2</span> <span><strong>Markdown files are the new prompts.</strong> Great SOPs beat great prompting every time.</span></li>
+                <li><span class="check">3</span> <span><strong>Automate the mundane, do the work yourself.</strong> Use AI for research and grunt work. You handle quality control.</span></li>
+                <li><span class="check">4</span> <span><strong>AI is pay-to-play.</strong> $200/mo for Claude Max is a superhuman employee. Don't cheap out on tools that multiply your time.</span></li>
+                <li><span class="check">5</span> <span><strong>Your job is to approve and monitor.</strong> Build systems where you review output and click approve. Stop doing everything manually.</span></li>
+            </ul>
+        </div>
+
+        <!-- ===== SECTION: AI FOR YOUR AMAZON BUSINESS ===== -->
+
+        <!-- SLIDE 15: The Big Picture -->
+        <div class="slide">
+            <div class="glow-orb glow-purple" style="top: 20%; left: 15%;"></div>
+            <div class="section-label fade-up">AI FOR YOUR BUSINESS</div>
+            <h2 class="fade-up">6 Ways AI Changes <span class="highlight">Your Daily Life</span></h2>
+            <p class="subtitle fade-up">This isn't theory. These are real systems running right now.</p>
+        </div>
+
+        <!-- SLIDE 16: AI for Sourcing -->
+        <div class="slide">
+            <div class="pill pill-purple fade-up">USE CASE #1</div>
+            <h2 class="fade-up">AI-Powered <span class="accent">Sourcing</span></h2>
+            <p class="subtitle fade-up">8 sourcing modes that scan 300+ retailers automatically.</p>
+            <div class="cards fade-up" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="card">
+                    <h4>&#128269; Brand Search</h4>
+                    <p>Type a brand. AI scans 300+ retailers for every product.</p>
                 </div>
-                <div class="stat">
-                    <div class="stat-number accent">300+</div>
-                    <div class="stat-label">Retailers</div>
+                <div class="card">
+                    <h4>&#128200; Clearance Scan</h4>
+                    <p>Auto-scans clearance at Walmart, Target, CVS, 85+ more.</p>
                 </div>
-                <div class="stat">
-                    <div class="stat-number green">24/7</div>
-                    <div class="stat-label">Nova AI Mentor</div>
+                <div class="card">
+                    <h4>&#129302; Product Finder</h4>
+                    <p>Describe what you want. AI finds and ranks by ROI.</p>
                 </div>
-                <div class="stat">
-                    <div class="stat-number blue">8</div>
-                    <div class="stat-label">Sourcing Modes</div>
+                <div class="card">
+                    <h4>&#128176; Catalog Dump</h4>
+                    <p>Scrape an entire retailer. Thousands of products analyzed.</p>
+                </div>
+            </div>
+            <p class="subtitle fade-up" style="margin-top: 16px; font-size: 15px;">Plus: reverse sourcing, OOS finder, A2A flips, category search, and gift card stacking (908 retailers).</p>
+        </div>
+
+        <!-- SLIDE 17: AI for Brand Building -->
+        <div class="slide">
+            <div class="pill pill-purple fade-up">USE CASE #2</div>
+            <h2 class="fade-up">AI Builds Your <span class="gold">Brand Website</span></h2>
+            <p class="subtitle fade-up">Need a website for your Amazon brand? Claude Code builds it from scratch &mdash; design, code, deploy. One command.</p>
+            <div class="flow fade-up">
+                <div class="flow-box">You say:<br><strong>"Build a website<br>for my brand"</strong></div>
+                <div class="flow-arrow">&#8594;</div>
+                <div class="flow-box">AI designs the<br><strong>layout + pages</strong></div>
+                <div class="flow-arrow">&#8594;</div>
+                <div class="flow-box">Writes all the<br><strong>code + content</strong></div>
+                <div class="flow-arrow">&#8594;</div>
+                <div class="flow-box">Deploys to<br><strong>a live URL</strong></div>
+            </div>
+            <ul class="feature-list fade-up" style="margin-top: 20px;">
+                <li><span class="check">&#10003;</span> Professional landing pages for your Amazon brand</li>
+                <li><span class="check">&#10003;</span> Product showcase pages with images and descriptions</li>
+                <li><span class="check">&#10003;</span> Mobile responsive, fast, SEO-optimized</li>
+                <li><span class="check">&#10003;</span> Deployed to a live URL in minutes, not weeks</li>
+            </ul>
+        </div>
+
+        <!-- SLIDE 18: AI for Ads -->
+        <div class="slide">
+            <div class="pill pill-purple fade-up">USE CASE #3</div>
+            <h2 class="fade-up">AI Writes Your <span class="pink">Ads</span></h2>
+            <p class="subtitle fade-up">Trained on proven ad frameworks. It writes hooks, scripts, headlines, and creative briefs &mdash; then monitors what's working.</p>
+            <div class="two-col fade-up">
+                <div class="col">
+                    <h3 style="font-size: 18px; margin-bottom: 12px;">What AI Creates</h3>
+                    <ul class="feature-list" style="margin-top: 0;">
+                        <li><span class="check">&#10003;</span> Ad copy (headlines, body, CTAs)</li>
+                        <li><span class="check">&#10003;</span> Video ad scripts (hook frameworks)</li>
+                        <li><span class="check">&#10003;</span> VSL scripts (video sales letters)</li>
+                        <li><span class="check">&#10003;</span> A/B test variations</li>
+                    </ul>
+                </div>
+                <div class="col">
+                    <h3 style="font-size: 18px; margin-bottom: 12px;">What AI Monitors</h3>
+                    <ul class="feature-list" style="margin-top: 0;">
+                        <li><span class="check">&#10003;</span> Competitor ad library scraping</li>
+                        <li><span class="check">&#10003;</span> What hooks are trending</li>
+                        <li><span class="check">&#10003;</span> Creative fatigue detection</li>
+                        <li><span class="check">&#10003;</span> Morning briefing with ad insights</li>
+                    </ul>
                 </div>
             </div>
         </div>
 
-        <!-- SLIDE 14: Sourcing Suite -->
+        <!-- SLIDE 19: AI for Content -->
         <div class="slide">
-            <div class="section-label fade-up">AI-POWERED SOURCING</div>
-            <h2 class="fade-up"><span class="accent">8 Sourcing Modes</span> Built For You</h2>
+            <div class="pill pill-purple fade-up">USE CASE #4</div>
+            <h2 class="fade-up">AI For <span class="blue">Content &amp; Video</span></h2>
+            <p class="subtitle fade-up">Generate content ideas, batch scripts, and even edit videos programmatically.</p>
             <div class="cards fade-up">
                 <div class="card">
-                    <div class="card-icon">&#128269;</div>
-                    <h4>Brand Search</h4>
-                    <p>Type a brand name &mdash; AI scans 300+ retailers, finds every product, and calculates Amazon profitability.</p>
+                    <div class="card-icon">&#127909;</div>
+                    <h4>Video Editing</h4>
+                    <p>Auto-captions, color grading, reframing for Reels/Shorts &mdash; all done by AI using FFmpeg under the hood.</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">&#128200;</div>
-                    <h4>Clearance Scanner</h4>
-                    <p>Automatically scans clearance sections at Walmart, Target, CVS, and 85+ more retailers for hidden margin.</p>
+                    <div class="card-icon">&#128221;</div>
+                    <h4>Content Batching</h4>
+                    <p>Give it a topic. It generates 10-20 content ideas with hooks, scripts, and posting schedules.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#127911;</div>
+                    <h4>YouTube Research</h4>
+                    <p>Paste a YouTube URL. AI extracts key takeaways, action items, and summarizes the entire video.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 20: AI for Daily Ops -->
+        <div class="slide">
+            <div class="pill pill-purple fade-up">USE CASE #5</div>
+            <h2 class="fade-up">AI For <span class="green">Daily Operations</span></h2>
+            <p class="subtitle fade-up">The stuff that eats your time every day &mdash; AI handles it.</p>
+            <ul class="feature-list fade-up">
+                <li><span class="check">&#10003;</span> <span><strong>Morning briefing</strong> &mdash; AI sends you a daily report at 8 AM with priorities, metrics, and what to focus on</span></li>
+                <li><span class="check">&#10003;</span> <span><strong>Email &amp; outreach</strong> &mdash; AI drafts personalized emails, follow-ups, and sequences</span></li>
+                <li><span class="check">&#10003;</span> <span><strong>Research</strong> &mdash; ask any question about Amazon, suppliers, competitors &mdash; instant, sourced answers</span></li>
+                <li><span class="check">&#10003;</span> <span><strong>Data analysis</strong> &mdash; "What were my best-selling products last month?" Instant breakdown</span></li>
+                <li><span class="check">&#10003;</span> <span><strong>Task automation</strong> &mdash; repetitive tasks like checking inventory, updating prices, tracking shipments</span></li>
+            </ul>
+        </div>
+
+        <!-- SLIDE 21: AI Mentor (Nova) -->
+        <div class="slide">
+            <div class="pill pill-purple fade-up">USE CASE #6</div>
+            <h2 class="fade-up">Your 24/7 <span class="highlight">AI Amazon Mentor</span></h2>
+            <p class="subtitle fade-up">Nova is trained on everything I teach. It's like having me on speed dial, 24/7, instantly.</p>
+            <ul class="feature-list fade-up">
+                <li><span class="check">&#10003;</span> <span>Trained on <strong>88 YouTube videos</strong>, <strong>271 Reels</strong>, and hundreds of real Q&As</span></li>
+                <li><span class="check">&#10003;</span> <span>Available in <strong>Discord</strong> and on <strong>247profits.org</strong></span></li>
+                <li><span class="check">&#10003;</span> <span>Can <strong>see images</strong> &mdash; screenshot a product listing, get instant feedback</span></li>
+                <li><span class="check">&#10003;</span> <span>Searches the web for real-time answers</span></li>
+                <li><span class="check">&#10003;</span> <span>Self-improving &mdash; gets smarter every day</span></li>
+                <li><span class="check">&#10003;</span> <span>No extra cost &mdash; included in your program</span></li>
+            </ul>
+        </div>
+
+        <!-- ===== SECTION: WHAT YOU HAVE ===== -->
+
+        <!-- SLIDE 22: Platform Overview -->
+        <div class="slide">
+            <div class="glow-orb glow-pink" style="bottom: 20%; right: 15%;"></div>
+            <div class="section-label fade-up">YOUR PLATFORM</div>
+            <h2 class="fade-up"><span class="highlight">247profits.org</span></h2>
+            <p class="subtitle fade-up">Everything in one place. Redesigned with a premium Apple-inspired interface.</p>
+            <div class="cards fade-up">
+                <div class="card">
+                    <div class="card-icon">&#127891;</div>
+                    <h4>Courses &amp; Modules</h4>
+                    <p>Full curriculum with video lessons, progress tracking, and milestone completion.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#128269;</div>
+                    <h4>23 Sourcing Tools</h4>
+                    <p>Brand search, clearance scan, product finder, reverse sourcing &mdash; all in-browser.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">&#129302;</div>
-                    <h4>AI Product Finder</h4>
-                    <p>Tell it what you want. AI searches, filters, and ranks products by ROI. Image previews + gift card stacking.</p>
+                    <h4>Nova AI Chat</h4>
+                    <p>Ask anything. Get answers based on my exact frameworks and strategies.</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">&#128176;</div>
-                    <h4>+ 5 More Modes</h4>
-                    <p>Category search, reverse sourcing, OOS finder, A2A flips, and full catalog dumps. Every angle covered.</p>
+                    <div class="card-icon">&#127942;</div>
+                    <h4>Gamified Roadmap</h4>
+                    <p>10-milestone path. Track progress, earn points, see how far you've come.</p>
                 </div>
             </div>
         </div>
 
-        <!-- SLIDE 15: How Sourcing Saves You Money -->
+        <!-- SLIDE 23: Gift Card Stacking -->
         <div class="slide">
-            <div class="section-label fade-up">SMART SOURCING</div>
-            <h2 class="fade-up">Zero-Cost <span class="gold">Product Discovery</span></h2>
-            <p class="subtitle fade-up">Our system is designed so the initial search costs you nothing. You only pay for deep verification on products that are already promising.</p>
-            <div class="steps fade-up">
-                <div class="step">
-                    <div class="step-num">$0</div>
-                    <h4>Step 1: Free Scan</h4>
-                    <p>AI scrapes 300+ retailer websites for products and prices. No API cost. No tokens. Completely free.</p>
-                </div>
-                <div class="step">
-                    <div class="step-num">~1&cent;</div>
-                    <h4>Step 2: Quick Check</h4>
-                    <p>Top matches get verified on Amazon &mdash; confirms the product exists, checks the price, verifies demand.</p>
-                </div>
-                <div class="step">
-                    <div class="step-num">~21&cent;</div>
-                    <h4>Step 3: Deep Verify</h4>
-                    <p>Only for serious candidates. Full BSR history, seller count trends, offer data. You choose which products go here.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- SLIDE 16: Gift Card Stacking -->
-        <div class="slide">
-            <div class="section-label fade-up">PRO TIP</div>
+            <div class="section-label fade-up">PRO FEATURE</div>
             <h2 class="fade-up">Gift Card <span class="green">Stacking</span></h2>
             <p class="subtitle fade-up">Every product automatically checks if you can buy discounted gift cards for that retailer &mdash; boosting your margin even further.</p>
             <div class="offer-box fade-up">
@@ -966,64 +762,18 @@
                     <li>&#128722; Buy price: <strong>$12.00</strong> (clearance)</li>
                     <li>&#128176; Amazon sells for: <strong>$34.99</strong></li>
                     <li>&#128200; Base ROI: <strong class="green">89%</strong> after FBA fees</li>
-                    <li>&#127873; Walmart gift card discount: <strong class="gold">8% off</strong> via CardBear</li>
+                    <li>&#127873; Gift card discount: <strong class="gold">8% off</strong> via CardBear</li>
                     <li>&#128640; ROI with gift card: <strong class="gold">105%</strong></li>
                 </ul>
-                <p style="margin-top: 16px; color: var(--text-muted); font-size: 14px;">We scan 908 retailers for gift card discounts. This is done automatically on every product.</p>
+                <p style="margin-top: 12px; color: var(--text-muted); font-size: 14px;">We check 908 retailers for gift card discounts. Automatically applied to every result.</p>
             </div>
         </div>
 
-        <!-- SLIDE 17: Nova AI -->
+        <!-- SLIDE 24: Old vs New -->
         <div class="slide">
-            <div class="glow-orb glow-gold" style="top: 20%; left: 20%;"></div>
-            <div class="section-label fade-up">MEET NOVA</div>
-            <h2 class="fade-up">Your 24/7 <span class="highlight">AI Amazon Mentor</span></h2>
-            <p class="subtitle fade-up">Nova is trained on everything I teach &mdash; 88 YouTube videos, 271 Reels, and hundreds of real student Q&As. It knows my frameworks.</p>
-            <ul class="feature-list fade-up">
-                <li><span class="check">&#10003;</span> <span>Ask anything about Amazon FBA &mdash; get an instant, informed answer</span></li>
-                <li><span class="check">&#10003;</span> <span>Available in <strong>Discord</strong> and on <strong>247profits.org</strong></span></li>
-                <li><span class="check">&#10003;</span> <span>Can <strong>see and analyze images</strong> &mdash; drop a product screenshot, get feedback</span></li>
-                <li><span class="check">&#10003;</span> <span>Searches the web for real-time answers when needed</span></li>
-                <li><span class="check">&#10003;</span> <span>Self-improving &mdash; learns from every conversation</span></li>
-                <li><span class="check">&#10003;</span> <span>No extra cost &mdash; included in your program</span></li>
-            </ul>
-        </div>
-
-        <!-- SLIDE 18: Platform Tour -->
-        <div class="slide">
-            <div class="section-label fade-up">YOUR PLATFORM</div>
-            <h2 class="fade-up"><span class="blue">247profits.org</span> &mdash; Everything In One Place</h2>
-            <div class="cards fade-up">
-                <div class="card">
-                    <div class="card-icon">&#127891;</div>
-                    <h4>Courses &amp; Modules</h4>
-                    <p>Full curriculum with video lessons, progress tracking, and milestone completion. Learn at your pace.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">&#128269;</div>
-                    <h4>Sourcing Suite</h4>
-                    <p>All 23 sourcing tools right in your browser. Brand search, clearance scan, product finder &mdash; no software to install.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">&#129302;</div>
-                    <h4>Nova AI Chat</h4>
-                    <p>Ask questions and get answers trained on my exact frameworks and strategies. Like having me on speed dial.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">&#127942;</div>
-                    <h4>Gamified Roadmap</h4>
-                    <p>10-milestone visual path from zero to $10K/mo. Track your progress, earn points, see how far you've come.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== SECTION 5: OLD WAY vs AI WAY ===== -->
-
-        <!-- SLIDE 19: The Shift -->
-        <div class="slide">
-            <div class="glow-orb glow-red" style="top: 10%; right: 20%;"></div>
+            <div class="glow-orb glow-purple" style="top: 10%; right: 20%;"></div>
             <div class="section-label fade-up">THE SHIFT</div>
-            <h2 class="fade-up">Old Amazon vs. <span class="highlight">AI Amazon</span></h2>
+            <h2 class="fade-up">Without AI vs. <span class="highlight">With AI</span></h2>
             <div class="comparison fade-up">
                 <div class="comparison-row header">
                     <div class="comp-old">&#128308; Without AI</div>
@@ -1038,41 +788,49 @@
                     <div class="comp-new">Exact ROI calculated with FBA fees</div>
                 </div>
                 <div class="comparison-row">
-                    <div class="comp-old">Driving to stores, scanning barcodes</div>
-                    <div class="comp-new">Online clearance scanner runs 24/7</div>
+                    <div class="comp-old">Paying a developer for a brand website</div>
+                    <div class="comp-new">AI builds and deploys it in minutes</div>
                 </div>
                 <div class="comparison-row">
-                    <div class="comp-old">One retailer at a time</div>
-                    <div class="comp-new">300+ retailers scanned simultaneously</div>
+                    <div class="comp-old">Writing ad copy from scratch</div>
+                    <div class="comp-new">AI generates variations based on proven frameworks</div>
                 </div>
                 <div class="comparison-row">
-                    <div class="comp-old">Waiting hours for Discord answers</div>
-                    <div class="comp-new">Nova answers instantly, any time</div>
+                    <div class="comp-old">Waiting hours for answers in Discord</div>
+                    <div class="comp-new">Nova answers instantly, 24/7</div>
                 </div>
                 <div class="comparison-row">
                     <div class="comp-old">No idea if you're on track</div>
-                    <div class="comp-new">Health score + milestone tracking</div>
+                    <div class="comp-new">AI tracks your progress and nudges you</div>
                 </div>
             </div>
         </div>
 
-        <!-- SLIDE 20: The Opportunity -->
+        <!-- SLIDE 25: Why You're Early -->
         <div class="slide">
-            <div class="section-label fade-up">THE WINDOW</div>
+            <div class="section-label fade-up">YOUR EDGE</div>
             <h2 class="fade-up">Why You're <span class="accent">Early</span></h2>
-            <p class="subtitle fade-up">Most Amazon sellers are still doing everything manually. Most Amazon coaches don't have this technology. You have access to something nobody else does.</p>
-            <ul class="feature-list fade-up">
-                <li><span class="check">&#10003;</span> <span>AI finds the products &mdash; you validate and buy</span></li>
-                <li><span class="check">&#10003;</span> <span>AI calculates the numbers &mdash; you make the decision</span></li>
-                <li><span class="check">&#10003;</span> <span>AI monitors your progress &mdash; you stay on track</span></li>
-                <li><span class="check">&#10003;</span> <span>AI mentors you 24/7 &mdash; you're never stuck alone</span></li>
-            </ul>
-            <p class="subtitle fade-up" style="margin-top: 24px; font-size: 18px;"><strong>The question isn't whether AI will change Amazon selling.<br>It's whether you'll be ahead of it or behind it.</strong></p>
+            <p class="subtitle fade-up">Most Amazon sellers are still doing everything manually. Most coaches don't have this technology. You're in the room where this is happening.</p>
+            <div class="stats fade-up" style="margin-top: 30px;">
+                <div class="stat">
+                    <div class="stat-number accent">300+</div>
+                    <div class="stat-label">Retailers Scanned</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number gold">23</div>
+                    <div class="stat-label">AI Sourcing Tools</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number green">908</div>
+                    <div class="stat-label">Gift Card Retailers</div>
+                </div>
+            </div>
+            <p class="subtitle fade-up" style="margin-top: 24px; font-size: 18px;"><strong>The question isn't whether AI changes Amazon selling.<br>It's whether you're ahead of it or behind it.</strong></p>
         </div>
 
-        <!-- ===== SECTION 6: WHAT'S COMING ===== -->
+        <!-- ===== SECTION: ROADMAP ===== -->
 
-        <!-- SLIDE 21: Roadmap -->
+        <!-- SLIDE 26: What's Coming -->
         <div class="slide">
             <div class="section-label fade-up">COMING SOON</div>
             <h2 class="fade-up">What's <span class="blue">Next</span></h2>
@@ -1080,164 +838,196 @@
                 <div class="card">
                     <div class="card-icon">&#128230;</div>
                     <h4>Weekly Sourcing Drops</h4>
-                    <p>Every Monday: a curated list of profitable products delivered to you. AI-vetted, margin-verified, ready to buy.</p>
+                    <p>Curated profitable products delivered every Monday. AI-vetted, margin-verified, ready to buy.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">&#128101;</div>
                     <h4>Accountability Pods</h4>
-                    <p>Small groups of 4-5 students at your level. Weekly check-ins. Peer support. Nobody falls behind.</p>
+                    <p>Small groups at your level. Weekly check-ins. Peer support. Nobody falls behind.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">&#127942;</div>
                     <h4>Milestone Rewards</h4>
-                    <p>Hit your first sale, first $1K, first $5K &mdash; get recognized, earn badges, unlock perks and bonuses.</p>
+                    <p>Hit milestones, earn recognition. First sale, first $1K, first $5K &mdash; badges and perks.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">&#128202;</div>
-                    <h4>Amazon SP-API</h4>
-                    <p>Connect your Seller Central directly. Real-time inventory, sales velocity, and PPC data &mdash; all in your dashboard.</p>
+                    <h4>SP-API Integration</h4>
+                    <p>Connect Seller Central. Real-time inventory, sales velocity, PPC data in your dashboard.</p>
                 </div>
             </div>
         </div>
 
-        <!-- ===== SECTION 7: THE OFFER (MID-TICKET UPSELL) ===== -->
+        <!-- ===== SECTION: THE OFFER ===== -->
 
-        <!-- SLIDE 22: Transition -->
+        <!-- SLIDE 27: Transition -->
         <div class="slide">
-            <div class="glow-orb glow-gold" style="top: 30%; left: 40%;"></div>
-            <div class="section-label fade-up">GOING DEEPER</div>
-            <h2 class="fade-up">Want the <span class="highlight">Full AI Toolkit</span>?</h2>
-            <p class="subtitle fade-up">Everything I just showed you &mdash; the sourcing suite, Nova, the platform &mdash; you already have access to. But I've built something extra for students who want to go deeper with AI.</p>
+            <div class="glow-orb glow-purple" style="top: 30%; left: 40%;"></div>
+            <div class="glow-orb glow-pink" style="bottom: 20%; right: 30%;"></div>
+            <div class="section-label fade-up">GO DEEPER</div>
+            <h2 class="fade-up">Want the Full <span class="highlight">AI Infrastructure</span>?</h2>
+            <p class="subtitle fade-up">Everything I showed you today &mdash; the sourcing, the platform, Nova &mdash; you already have. But for students who want to go all-in on AI, I built something new.</p>
         </div>
 
-        <!-- SLIDE 23: AI Sourcing Pro -->
+        <!-- SLIDE 28: The Offer -->
         <div class="slide">
-            <div class="section-label fade-up">NEW ADD-ON</div>
-            <h2 class="fade-up">AI Sourcing <span class="gold">Pro</span></h2>
-            <p class="subtitle fade-up">Everything in your current tools &mdash; plus advanced AI features that do the heavy lifting for you.</p>
+            <div class="section-label fade-up">NEW</div>
+            <h2 class="fade-up">AllDayFBA <span class="highlight">AI Inner Circle</span></h2>
+            <p class="subtitle fade-up">Lifetime access to every AI tool and system I build &mdash; plus dedicated AI coaching to integrate it into your business.</p>
             <div class="two-col fade-up">
                 <div class="col">
-                    <h3 style="font-size: 20px; margin-bottom: 16px;">What's Included</h3>
+                    <h3 style="font-size: 18px; margin-bottom: 12px;">&#128274; Lifetime AI Access</h3>
                     <ul class="feature-list" style="margin-top: 0;">
-                        <li><span class="check">&#10003;</span> Weekly curated sourcing drops (Monday AM)</li>
-                        <li><span class="check">&#10003;</span> Priority access to new sourcing modes</li>
+                        <li><span class="check">&#10003;</span> Unlimited AI sourcing scans (all 8 modes)</li>
+                        <li><span class="check">&#10003;</span> Weekly sourcing drops (first picks)</li>
                         <li><span class="check">&#10003;</span> Gift card stacking on every product</li>
-                        <li><span class="check">&#10003;</span> Unlimited AI sourcing scans</li>
-                        <li><span class="check">&#10003;</span> Saved scan history &amp; alerts</li>
+                        <li><span class="check">&#10003;</span> Every new AI tool we build &mdash; forever</li>
+                        <li><span class="check">&#10003;</span> Priority access to new features</li>
                     </ul>
                 </div>
                 <div class="col">
-                    <h3 style="font-size: 20px; margin-bottom: 16px;">What It Replaces</h3>
+                    <h3 style="font-size: 18px; margin-bottom: 12px;">&#9889; AI Coaching + Setup</h3>
                     <ul class="feature-list" style="margin-top: 0;">
-                        <li><span class="check">&#10003;</span> No more 3-hour manual sourcing sessions</li>
-                        <li><span class="check">&#10003;</span> No more guessing on profitability</li>
-                        <li><span class="check">&#10003;</span> No more missing clearance deals</li>
-                        <li><span class="check">&#10003;</span> No more paying for separate tools</li>
-                        <li><span class="check">&#10003;</span> No more waiting for product ideas</li>
+                        <li><span class="check">&#10003;</span> Help setting up your own AI infrastructure</li>
+                        <li><span class="check">&#10003;</span> AI builds your brand website</li>
+                        <li><span class="check">&#10003;</span> AI writes your ad copy and creatives</li>
+                        <li><span class="check">&#10003;</span> Dedicated AI-focused group calls</li>
+                        <li><span class="check">&#10003;</span> Inner Circle Discord channel</li>
                     </ul>
                 </div>
             </div>
         </div>
 
-        <!-- SLIDE 24: Pricing -->
+        <!-- SLIDE 29: Pricing -->
         <div class="slide">
-            <div class="glow-orb glow-red" style="top: 30%; left: 50%;"></div>
+            <div class="glow-orb glow-purple" style="top: 30%; left: 50%;"></div>
             <div class="section-label fade-up">THE INVESTMENT</div>
-            <h2 class="fade-up">Simple. <span class="green">Affordable.</span> Powerful.</h2>
+            <h2 class="fade-up">One Price. <span class="gold">Lifetime Access.</span></h2>
             <div class="cards fade-up" style="grid-template-columns: 1fr 1fr; max-width: 800px;">
-                <div class="card" style="border-color: rgba(255,255,255,0.1);">
-                    <div class="card-icon">&#128269;</div>
-                    <h4>AI Sourcing Pro</h4>
-                    <div class="offer-price" style="font-size: 40px; margin: 12px 0;"><span class="green">$97</span><span class="per">/mo</span></div>
+                <div class="card" style="border-color: rgba(168,85,247,0.3); background: linear-gradient(135deg, rgba(168,85,247,0.06), rgba(244,114,182,0.06));">
+                    <div class="pill pill-purple" style="margin-bottom: 12px;">RECOMMENDED</div>
+                    <h4>AI Inner Circle</h4>
+                    <div class="offer-price" style="font-size: 48px; margin: 12px 0;"><span class="accent">$499</span><span class="per"> one-time</span></div>
                     <ul class="offer-features">
-                        <li>&#10003; Unlimited AI sourcing scans</li>
+                        <li>&#10003; Lifetime access to all AI tools</li>
+                        <li>&#10003; Unlimited sourcing scans</li>
                         <li>&#10003; Weekly sourcing drops</li>
-                        <li>&#10003; Gift card stacking</li>
-                        <li>&#10003; Priority new features</li>
-                        <li>&#10003; Scan history &amp; alerts</li>
+                        <li>&#10003; AI website + ad creation</li>
+                        <li>&#10003; AI setup coaching</li>
+                        <li>&#10003; AI-specific group calls</li>
+                        <li>&#10003; Inner Circle channel</li>
+                        <li>&#10003; Every future AI feature &mdash; free</li>
                     </ul>
                 </div>
-                <div class="card" style="border-color: rgba(240,192,64,0.3); background: linear-gradient(135deg, rgba(240,192,64,0.05), rgba(255,77,77,0.05));">
-                    <div class="card-icon">&#128081;</div>
-                    <h4>AI Sourcing Pro + Coaching</h4>
-                    <div class="offer-price" style="font-size: 40px; margin: 12px 0;"><span class="gold">$197</span><span class="per">/mo</span></div>
+                <div class="card" style="border-color: rgba(255,255,255,0.08);">
+                    <div class="pill pill-green" style="margin-bottom: 12px;">ALTERNATIVE</div>
+                    <h4>AI Sourcing Subscription</h4>
+                    <div class="offer-price" style="font-size: 48px; margin: 12px 0;"><span class="green">$97</span><span class="per">/mo</span></div>
                     <ul class="offer-features">
-                        <li>&#10003; Everything in Pro</li>
-                        <li>&#10003; Monthly 1-on-1 sourcing call</li>
-                        <li>&#10003; Accountability pod placement</li>
-                        <li>&#10003; Advanced AI training sessions</li>
-                        <li>&#10003; Direct DM access for sourcing Qs</li>
+                        <li>&#10003; AI sourcing tools access</li>
+                        <li>&#10003; Monthly scan credits</li>
+                        <li>&#10003; Gift card stacking</li>
+                        <li>&#10003; Basic product alerts</li>
+                        <li style="color: var(--text-dim);">&#10007; No coaching or setup help</li>
+                        <li style="color: var(--text-dim);">&#10007; No website/ad creation</li>
+                        <li style="color: var(--text-dim);">&#10007; No Inner Circle access</li>
+                        <li style="color: var(--text-dim);">&#10007; Recurring cost</li>
                     </ul>
                 </div>
             </div>
-            <p class="subtitle fade-up" style="margin-top: 20px; font-size: 15px; color: var(--text-dim);">Cancel anytime. No contracts. The tools pay for themselves with one good find.</p>
         </div>
 
-        <!-- SLIDE 25: ROI Math -->
+        <!-- SLIDE 30: ROI Math -->
         <div class="slide">
             <div class="section-label fade-up">THE MATH</div>
             <h2 class="fade-up">One Good Product <span class="accent">Pays For It</span></h2>
             <div class="offer-box fade-up">
                 <div class="stats" style="margin-top: 0;">
                     <div class="stat">
-                        <div class="stat-number green">$97</div>
-                        <div class="stat-label">Monthly Cost</div>
+                        <div class="stat-number accent">$499</div>
+                        <div class="stat-label">One-Time Cost</div>
                     </div>
                     <div class="stat">
                         <div class="stat-number gold">$8-15</div>
-                        <div class="stat-label">Avg Profit Per Unit</div>
+                        <div class="stat-label">Avg Profit/Unit</div>
                     </div>
                     <div class="stat">
-                        <div class="stat-number accent">7-12</div>
+                        <div class="stat-number green">34-62</div>
                         <div class="stat-label">Units to Break Even</div>
                     </div>
                 </div>
-                <p style="margin-top: 24px; font-size: 17px; text-align: center;">Find <strong>one product</strong> that sells 10 units/month at $10 profit &mdash; that's <strong class="green">$100/mo profit</strong> from a single find. The AI finds you dozens per week.</p>
+                <p style="margin-top: 24px; font-size: 17px; text-align: center;">Find <strong>one product</strong> that sells 30 units/month at $10 profit &mdash; you've paid for the <strong>lifetime access</strong> in month one. The AI finds you dozens of products per week.</p>
             </div>
         </div>
 
-        <!-- SLIDE 26: Referral -->
+        <!-- SLIDE 31: What You Get Summary -->
+        <div class="slide">
+            <div class="section-label fade-up">EVERYTHING INCLUDED</div>
+            <h2 class="fade-up">The <span class="highlight">$499 Package</span></h2>
+            <ul class="feature-list fade-up">
+                <li><span class="check">&#10003;</span> <span><strong>Lifetime AI sourcing</strong> &mdash; all 8 modes, 300+ retailers, unlimited scans</span></li>
+                <li><span class="check">&#10003;</span> <span><strong>Weekly sourcing drops</strong> &mdash; curated profitable products every Monday</span></li>
+                <li><span class="check">&#10003;</span> <span><strong>Gift card stacking</strong> &mdash; 908 retailers, auto-applied to every product</span></li>
+                <li><span class="check">&#10003;</span> <span><strong>AI website builder</strong> &mdash; we build your brand website with AI</span></li>
+                <li><span class="check">&#10003;</span> <span><strong>AI ad creation</strong> &mdash; hooks, scripts, creative briefs generated for you</span></li>
+                <li><span class="check">&#10003;</span> <span><strong>AI infrastructure setup</strong> &mdash; we help you integrate AI into your workflow</span></li>
+                <li><span class="check">&#10003;</span> <span><strong>AI-focused group calls</strong> &mdash; dedicated calls just for AI strategies</span></li>
+                <li><span class="check">&#10003;</span> <span><strong>Every future AI tool</strong> &mdash; anything we build, you get it. Forever.</span></li>
+            </ul>
+        </div>
+
+        <!-- SLIDE 32: Referral -->
         <div class="slide">
             <div class="section-label fade-up">BONUS</div>
             <h2 class="fade-up">Refer &amp; <span class="green">Earn</span></h2>
             <div class="offer-box fade-up">
                 <h3 style="margin-bottom: 16px;">10% Referral Commission</h3>
-                <p class="subtitle" style="font-size: 18px; max-width: 100%;">Know someone who should be in this program? Send them our way. When they enroll, you get <strong class="green">10% of the sale</strong> &mdash; cash in your pocket.</p>
+                <p class="subtitle" style="font-size: 18px; max-width: 100%;">Know someone who should be in this program? Send them our way. When they enroll, you get <strong class="green">10% of the sale</strong>.</p>
                 <ul class="offer-features" style="margin-top: 20px;">
                     <li>&#10003; $300&ndash;$1,000 per referral depending on program</li>
                     <li>&#10003; No cap on referrals</li>
-                    <li>&#10003; Paid out within 30 days of enrollment</li>
+                    <li>&#10003; Paid within 30 days</li>
                 </ul>
             </div>
         </div>
 
-        <!-- SLIDE 27: CTA -->
+        <!-- SLIDE 33: CTA -->
         <div class="slide">
-            <div class="glow-orb glow-red" style="top: 20%; right: 30%;"></div>
+            <div class="glow-orb glow-purple" style="top: 20%; right: 30%;"></div>
             <div class="section-label fade-up">NEXT STEPS</div>
-            <h2 class="fade-up">Ready to <span class="highlight">Level Up</span>?</h2>
-            <p class="subtitle fade-up" style="font-size: 20px;">DM me <strong>"AI PRO"</strong> and I'll get you set up today.</p>
-            <div class="stats fade-up" style="margin-top: 30px;">
+            <h2 class="fade-up">Ready to Go <span class="highlight">All-In on AI</span>?</h2>
+            <p class="subtitle fade-up" style="font-size: 22px; margin-bottom: 30px;">DM me <strong>"AI"</strong> and I'll get you set up.</p>
+            <div class="stats fade-up">
                 <div class="stat">
-                    <div class="stat-number green">$97</div>
-                    <div class="stat-label">AI Sourcing Pro</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number gold">$197</div>
-                    <div class="stat-label">Pro + Coaching</div>
+                    <div class="stat-number accent">$499</div>
+                    <div class="stat-label">Lifetime &mdash; One Time</div>
                 </div>
             </div>
-            <p class="subtitle fade-up" style="margin-top: 30px;">One product covers it. The AI finds dozens per week.<br>The only question is &mdash; do you want to source faster or keep doing it the old way?</p>
+            <p class="subtitle fade-up" style="margin-top: 30px;">One product covers it. You get every AI tool we ever build.<br>The only question is &mdash; manual or AI?</p>
         </div>
 
-        <!-- SLIDE 28: Q&A -->
+        <!-- SLIDE 34: Recap -->
         <div class="slide">
-            <div class="glow-orb glow-red" style="top: 30%; left: 40%;"></div>
-            <div class="glow-orb glow-gold" style="bottom: 20%; right: 30%;"></div>
+            <div class="section-label fade-up">RECAP</div>
+            <h2 class="fade-up">What You Learned <span class="accent">Today</span></h2>
+            <ul class="feature-list fade-up">
+                <li><span class="check">&#10003;</span> <span>AI agents vs regular chat &mdash; and why it matters</span></li>
+                <li><span class="check">&#10003;</span> <span>Claude Code + OpenClaw &mdash; how they work together</span></li>
+                <li><span class="check">&#10003;</span> <span>The DOE Framework &mdash; Directive, Orchestration, Execution</span></li>
+                <li><span class="check">&#10003;</span> <span>CLAUDE.md, Directives, Skills &mdash; the building blocks</span></li>
+                <li><span class="check">&#10003;</span> <span>6 use cases: sourcing, websites, ads, content, daily ops, AI mentor</span></li>
+                <li><span class="check">&#10003;</span> <span>You're early. Nobody else in the Amazon space has this.</span></li>
+            </ul>
+        </div>
+
+        <!-- SLIDE 35: Q&A -->
+        <div class="slide">
+            <div class="glow-orb glow-purple" style="top: 30%; left: 40%;"></div>
+            <div class="glow-orb glow-pink" style="bottom: 20%; right: 30%;"></div>
             <div class="section-label fade-up">OPEN FLOOR</div>
             <h1 class="fade-up">Questions?</h1>
-            <p class="subtitle fade-up" style="margin-top: 20px; font-size: 20px;">Ask about the AI tools, the platform, sourcing, anything.<br>I'm here to make sure you win.</p>
-            <p class="fade-up" style="margin-top: 40px; font-size: 14px; color: var(--text-dim);">DM "AI PRO" to get started &bull; 247profits.org &bull; @alldayfba</p>
+            <p class="subtitle fade-up" style="margin-top: 20px; font-size: 20px;">Ask about AI, the tools, sourcing, anything.<br>I'm here to help you win.</p>
+            <p class="fade-up" style="margin-top: 40px; font-size: 14px; color: var(--text-dim);">DM "AI" to join the Inner Circle &bull; 247profits.org &bull; @alldayfba</p>
         </div>
 
     </div>
@@ -1265,26 +1055,19 @@
                 });
                 if (i < current) s.classList.add('exit');
             });
-
             slides[current].classList.add('active');
             setTimeout(() => {
                 slides[current].querySelectorAll('.fade-up').forEach((el, i) => {
                     el.style.animation = `fadeUp 0.6s ease ${0.1 + i * 0.1}s forwards`;
                 });
             }, 50);
-
             const pct = ((current + 1) / total) * 100;
             progressBar.style.width = pct + '%';
             slideCounter.textContent = String(current + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
         }
 
-        function nextSlide() {
-            if (current < total - 1) { current++; updateSlide(); }
-        }
-
-        function prevSlide() {
-            if (current > 0) { current--; updateSlide(); }
-        }
+        function nextSlide() { if (current < total - 1) { current++; updateSlide(); } }
+        function prevSlide() { if (current > 0) { current--; updateSlide(); } }
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
