@@ -544,6 +544,52 @@
             line-height: 1.5;
         }
 
+        /* Code block */
+        .code-block {
+            background: #0d1117;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 24px 28px;
+            text-align: left;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            max-width: 800px;
+            width: 100%;
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        .code-block .comment { color: #6a737d; }
+        .code-block .keyword { color: #ff7b72; }
+        .code-block .string { color: #a5d6ff; }
+        .code-block .func { color: #d2a8ff; }
+        .code-block .prompt { color: var(--green); }
+
+        /* Diagram / flow */
+        .flow {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .flow-box {
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 18px 24px;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .flow-arrow {
+            font-size: 24px;
+            color: var(--accent);
+        }
+
         @media (max-width: 768px) {
             .slide { padding: 40px 24px; }
             .cards { grid-template-columns: 1fr; }
@@ -554,512 +600,644 @@
             .nav { bottom: 16px; right: 16px; }
             .slide-counter { bottom: 22px; left: 16px; }
             .brand-mark { top: 16px; left: 16px; }
+            .flow { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); }
         }
     </style>
 </head>
 <body>
     <div class="brand-mark">ALL<span>DAY</span>FBA</div>
     <div class="progress-bar" id="progressBar"></div>
-    <div class="slide-counter" id="slideCounter">01 / 24</div>
+    <div class="slide-counter" id="slideCounter">01 / 28</div>
 
     <div class="presentation" id="presentation">
 
+        <!-- ===== SECTION 1: INTRO ===== -->
+
         <!-- SLIDE 1: Title -->
-        <div class="slide active" data-section="intro">
+        <div class="slide active">
             <div class="glow-orb glow-red" style="top: 20%; left: 60%;"></div>
             <div class="glow-orb glow-gold" style="bottom: 20%; left: 20%;"></div>
             <div class="section-label fade-up">GROUP CALL &mdash; MARCH 2026</div>
-            <h1 class="fade-up">The <span class="highlight">AI Amazon</span><br>Revolution</h1>
-            <p class="subtitle fade-up">How we're building the most advanced AI-powered<br>Amazon FBA system in the game &mdash; and why you're early.</p>
+            <h1 class="fade-up">AI + <span class="highlight">Amazon FBA</span></h1>
+            <p class="subtitle fade-up">How to use AI to find products, automate sourcing,<br>and build your Amazon business 10x faster.</p>
         </div>
 
         <!-- SLIDE 2: Agenda -->
-        <div class="slide" data-section="intro">
-            <div class="section-label fade-up">TODAY'S AGENDA</div>
+        <div class="slide">
+            <div class="section-label fade-up">TODAY'S CALL</div>
             <h2 class="fade-up">What We're Covering</h2>
             <ul class="feature-list fade-up">
-                <li><span class="check">1</span> <span>The AI landscape &mdash; what changed in 2026</span></li>
-                <li><span class="check">2</span> <span>Our AI infrastructure &mdash; what we built for you</span></li>
-                <li><span class="check">3</span> <span>Live demos &mdash; Nova, Sourcing Suite, 247profits</span></li>
-                <li><span class="check">4</span> <span>The "AI Amazon" positioning &mdash; your unfair advantage</span></li>
-                <li><span class="check">5</span> <span>What's coming next &mdash; and how to go deeper</span></li>
+                <li><span class="check">1</span> <span>What AI actually is &mdash; and why it matters for Amazon sellers</span></li>
+                <li><span class="check">2</span> <span>Claude Code &amp; OpenClaw &mdash; what they are, how they work</span></li>
+                <li><span class="check">3</span> <span>Directives, SOPs, and AI agents &mdash; the system behind it all</span></li>
+                <li><span class="check">4</span> <span>Live demos &mdash; AI sourcing, Nova bot, your platform</span></li>
+                <li><span class="check">5</span> <span>How YOU can start using this &mdash; and what's coming next</span></li>
             </ul>
         </div>
 
-        <!-- SLIDE 3: The AI Moment -->
-        <div class="slide" data-section="ai-revolution">
+        <!-- SLIDE 3: Why This Matters -->
+        <div class="slide">
             <div class="glow-orb glow-red" style="top: 30%; right: 10%;"></div>
-            <div class="section-label fade-up">THE AI REVOLUTION</div>
-            <h2 class="fade-up">We Are in an <span class="accent">Industrial Revolution</span></h2>
-            <p class="subtitle fade-up">AI isn't coming. It's here. And the gap between sellers who use it and those who don't is about to become unclosable.</p>
+            <div class="section-label fade-up">THE REALITY</div>
+            <h2 class="fade-up">AI Is Not <span class="accent">Coming.</span> It's Here.</h2>
+            <p class="subtitle fade-up">The sellers who learn to use AI will outpace everyone else. Not in 5 years &mdash; right now. This is the biggest shift in e-commerce since FBA itself.</p>
             <div class="stats fade-up">
                 <div class="stat">
-                    <div class="stat-number accent">90%</div>
-                    <div class="stat-label">Fulfillment Automated</div>
+                    <div class="stat-number accent">300+</div>
+                    <div class="stat-label">Retailers Our AI Scans</div>
                 </div>
                 <div class="stat">
                     <div class="stat-number gold">24/7</div>
-                    <div class="stat-label">AI Agents Running</div>
+                    <div class="stat-label">Automated Sourcing</div>
                 </div>
                 <div class="stat">
                     <div class="stat-number green">10x</div>
-                    <div class="stat-label">Output Speed</div>
+                    <div class="stat-label">Faster Product Research</div>
                 </div>
             </div>
         </div>
 
-        <!-- SLIDE 4: Kabrin Quote -->
-        <div class="slide" data-section="ai-revolution">
-            <div class="section-label fade-up">FROM THE TRENCHES</div>
-            <div class="quote fade-up">
-                My sole purpose and job on a day-to-day perspective now is purely quality control. 90% of my fulfillment is done from AI.
-                <div class="quote-author">&mdash; Kabrin Johal, Growth Operator ($200K+/mo target)</div>
+        <!-- ===== SECTION 2: WHAT IS AI (EDUCATIONAL) ===== -->
+
+        <!-- SLIDE 4: AI Explained Simply -->
+        <div class="slide">
+            <div class="section-label fade-up">AI 101</div>
+            <h2 class="fade-up">What Is <span class="gold">AI</span>, Really?</h2>
+            <p class="subtitle fade-up">Forget the hype. Here's what you actually need to know.</p>
+            <div class="cards fade-up">
+                <div class="card">
+                    <div class="card-icon">&#129504;</div>
+                    <h4>LLMs (Large Language Models)</h4>
+                    <p>ChatGPT, Claude, Gemini &mdash; these are AI models that understand and generate text. Think of them as extremely smart assistants that can read, write, and reason.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#128172;</div>
+                    <h4>Regular Chat vs. AI Agents</h4>
+                    <p>Regular chat = you ask a question, it answers. AI agents = you give it a task and it goes and DOES it. Opens websites, scrapes data, writes files, runs code.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#9889;</div>
+                    <h4>Why It Matters for Amazon</h4>
+                    <p>AI can scan hundreds of retailers, calculate profitability, analyze competition, and find products &mdash; all while you sleep. That's the game changer.</p>
+                </div>
             </div>
-            <p class="subtitle fade-up" style="margin-top: 30px;">This isn't theory. This is what the top operators are doing <em>right now</em>.</p>
         </div>
 
-        <!-- SLIDE 5: 3-Layer Architecture -->
-        <div class="slide" data-section="ai-revolution">
-            <div class="section-label fade-up">THE SYSTEM</div>
-            <h2 class="fade-up">3-Layer AI Architecture</h2>
-            <p class="subtitle fade-up">Same framework Kabrin uses. Same framework we built for you.</p>
+        <!-- SLIDE 5: ChatGPT vs Claude Code -->
+        <div class="slide">
+            <div class="section-label fade-up">KNOW THE DIFFERENCE</div>
+            <h2 class="fade-up">ChatGPT Chat vs. <span class="highlight">Claude Code</span></h2>
+            <div class="comparison fade-up">
+                <div class="comparison-row header">
+                    <div class="comp-old">&#128172; Regular AI Chat</div>
+                    <div class="comp-new">&#128187; Claude Code</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comp-old">Answers questions in a chat window</div>
+                    <div class="comp-new">Runs directly on your computer's terminal</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comp-old">Forgets everything after the conversation</div>
+                    <div class="comp-new">Has persistent memory across sessions</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comp-old">Can only read/write text in the chat</div>
+                    <div class="comp-new">Can create files, run scripts, browse the web</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comp-old">You do all the work, it just advises</div>
+                    <div class="comp-new">It does the work &mdash; you approve and guide</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comp-old">Limited to one conversation at a time</div>
+                    <div class="comp-new">Can run multiple agents simultaneously</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: What Is Claude Code -->
+        <div class="slide">
+            <div class="section-label fade-up">DEEP DIVE</div>
+            <h2 class="fade-up">What Is <span class="accent">Claude Code</span>?</h2>
+            <p class="subtitle fade-up">Claude Code is Anthropic's AI coding agent. It runs in your terminal and has full access to your computer &mdash; files, scripts, browser, everything.</p>
+            <div class="code-block fade-up">
+                <span class="comment"># You type a command in plain English:</span><br>
+                <span class="prompt">$</span> <span class="string">"Find all clearance items on Target.com under $20 that sell for 3x on Amazon"</span><br><br>
+                <span class="comment"># Claude Code then:</span><br>
+                <span class="comment"># 1. Opens a headless browser</span><br>
+                <span class="comment"># 2. Scrapes Target's clearance section</span><br>
+                <span class="comment"># 3. Cross-references each item on Amazon</span><br>
+                <span class="comment"># 4. Calculates ROI, fees, and profit</span><br>
+                <span class="comment"># 5. Returns a ranked list of profitable products</span><br><br>
+                <span class="keyword">Result:</span> <span class="func">12 products found</span> &mdash; avg ROI: 145%, avg profit: $8.40/unit
+            </div>
+        </div>
+
+        <!-- SLIDE 7: What Is OpenClaw -->
+        <div class="slide">
+            <div class="glow-orb glow-gold" style="top: 15%; right: 15%;"></div>
+            <div class="section-label fade-up">NEXT LEVEL</div>
+            <h2 class="fade-up">What Is <span class="gold">OpenClaw</span>?</h2>
+            <p class="subtitle fade-up">If Claude Code is a skilled employee you work with &mdash; OpenClaw is that same employee, except it works <strong>24/7 without you being there.</strong></p>
+            <div class="two-col fade-up">
+                <div class="col">
+                    <h3 style="font-size: 20px; margin-bottom: 16px;">Claude Code</h3>
+                    <ul class="feature-list" style="margin-top: 0;">
+                        <li><span class="check">&#10003;</span> You sit at the computer with it</li>
+                        <li><span class="check">&#10003;</span> You give it tasks, it executes</li>
+                        <li><span class="check">&#10003;</span> Great for building and one-off tasks</li>
+                        <li><span class="check">&#10003;</span> Runs when your laptop is open</li>
+                    </ul>
+                </div>
+                <div class="col">
+                    <h3 style="font-size: 20px; margin-bottom: 16px;">OpenClaw</h3>
+                    <ul class="feature-list" style="margin-top: 0;">
+                        <li><span class="check">&#10003;</span> Runs on a separate machine 24/7</li>
+                        <li><span class="check">&#10003;</span> You text it on Telegram</li>
+                        <li><span class="check">&#10003;</span> Self-improving &mdash; learns over time</li>
+                        <li><span class="check">&#10003;</span> Can run while you sleep</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SECTION 3: HOW IT WORKS (EDUCATIONAL) ===== -->
+
+        <!-- SLIDE 8: Directives Explained -->
+        <div class="slide">
+            <div class="section-label fade-up">THE SECRET SAUCE</div>
+            <h2 class="fade-up">What Are <span class="accent">Directives</span>?</h2>
+            <p class="subtitle fade-up">Directives are SOPs (Standard Operating Procedures) written in plain English that tell the AI exactly what to do. Think of them as training manuals for your AI employee.</p>
+            <div class="code-block fade-up">
+                <span class="comment"># Example: amazon-sourcing-sop.md</span><br><br>
+                <span class="keyword">Goal:</span> Find profitable products to sell on Amazon<br>
+                <span class="keyword">Step 1:</span> Scrape the retailer's clearance section<br>
+                <span class="keyword">Step 2:</span> For each product, search Amazon for a match<br>
+                <span class="keyword">Step 3:</span> Calculate FBA fees, shipping, and net profit<br>
+                <span class="keyword">Step 4:</span> Only keep products with ROI &gt; 30%<br>
+                <span class="keyword">Step 5:</span> Check BSR &mdash; must be under 200,000<br>
+                <span class="keyword">Step 6:</span> Output a ranked list with buy links<br><br>
+                <span class="comment"># The AI reads this and follows it step by step.</span><br>
+                <span class="comment"># Better SOPs = better AI output. Always.</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 9: 3-Layer System -->
+        <div class="slide">
+            <div class="section-label fade-up">THE ARCHITECTURE</div>
+            <h2 class="fade-up">How The <span class="green">Whole System</span> Works</h2>
+            <p class="subtitle fade-up">Three layers working together. This is how the best AI operators in the world run their businesses.</p>
             <div class="steps fade-up">
                 <div class="step">
                     <div class="step-num">01</div>
-                    <h4>Directives</h4>
-                    <p>SOPs written in plain English. The "what to do." 37+ living documents that tell the AI exactly how to execute.</p>
+                    <h4>Directives (SOPs)</h4>
+                    <p>Plain English instructions. "Here's what to do, here's how to do it, here's what good looks like." The AI reads these before every task.</p>
                 </div>
                 <div class="step">
                     <div class="step-num">02</div>
-                    <h4>Orchestration</h4>
-                    <p>AI makes decisions. Routes tasks, handles errors, asks questions. The "brain" layer &mdash; Claude, GPT, Gemini.</p>
+                    <h4>AI Brain (Orchestration)</h4>
+                    <p>The AI reads the directive, makes decisions, and calls the right tools in the right order. It handles errors and asks questions when stuck.</p>
                 </div>
                 <div class="step">
                     <div class="step-num">03</div>
-                    <h4>Execution</h4>
-                    <p>Deterministic Python scripts. 97+ tools that scrape, calculate, analyze, and deliver. Reliable. Testable. Fast.</p>
+                    <h4>Scripts (Execution)</h4>
+                    <p>Python scripts that do the actual work &mdash; scraping websites, calculating profits, checking Amazon data. Reliable, fast, repeatable.</p>
                 </div>
             </div>
         </div>
 
-        <!-- SLIDE 6: What Kabrin Taught Us -->
-        <div class="slide" data-section="ai-revolution">
-            <div class="section-label fade-up">KABRIN'S PLAYBOOK</div>
-            <h2 class="fade-up">Key Lessons from Kabrin's <span class="accent">AI Drivers</span> Calls</h2>
-            <ul class="feature-list fade-up">
-                <li><span class="check">&#10003;</span> <span>Treat AI like an <strong>employee</strong> &mdash; onboard it for 1-2 weeks</span></li>
-                <li><span class="check">&#10003;</span> <span>CEO bot orchestrates <strong>specialized agents</strong> (ads, content, outreach)</span></li>
-                <li><span class="check">&#10003;</span> <span>Brand voice extraction &mdash; scrape YT/IG/LinkedIn automatically</span></li>
-                <li><span class="check">&#10003;</span> <span>Morning briefings at <strong>8 AM</strong> &mdash; competitor research done overnight</span></li>
-                <li><span class="check">&#10003;</span> <span>Self-improving system &mdash; it gets <strong>better</strong> the more you use it</span></li>
-                <li><span class="check">&#10003;</span> <span>You still need the <strong>skills</strong> to know good vs. bad output</span></li>
-            </ul>
+        <!-- SLIDE 10: Flow Diagram -->
+        <div class="slide">
+            <div class="section-label fade-up">IN PRACTICE</div>
+            <h2 class="fade-up">How a <span class="blue">Sourcing Run</span> Actually Works</h2>
+            <p class="subtitle fade-up">From "find me products" to a ranked list of profitable items &mdash; here's the flow:</p>
+            <div class="flow fade-up">
+                <div class="flow-box">You say:<br><strong>"Find Jellycat products"</strong></div>
+                <div class="flow-arrow">&#8594;</div>
+                <div class="flow-box">AI reads the<br><strong>sourcing SOP</strong></div>
+                <div class="flow-arrow">&#8594;</div>
+                <div class="flow-box">Script scrapes<br><strong>300+ retailers</strong></div>
+                <div class="flow-arrow">&#8594;</div>
+                <div class="flow-box">Checks Amazon<br><strong>price + BSR</strong></div>
+                <div class="flow-arrow">&#8594;</div>
+                <div class="flow-box">Returns<br><strong>profitable picks</strong></div>
+            </div>
+            <p class="subtitle fade-up" style="margin-top: 30px; font-size: 16px;">Total time: <strong class="green">5-10 minutes</strong>. Manual research: <strong class="accent">3-4 hours</strong>.</p>
         </div>
 
-        <!-- SLIDE 7: What We Built - Overview -->
-        <div class="slide" data-section="what-we-built">
-            <div class="glow-orb glow-gold" style="top: 15%; left: 15%;"></div>
-            <div class="section-label fade-up">WHAT WE BUILT FOR YOU</div>
-            <h2 class="fade-up">Your AI <span class="gold">Arsenal</span></h2>
-            <p class="subtitle fade-up">Everything built in the last 2 weeks. All running. All for you.</p>
+        <!-- SLIDE 11: AI Agents Explained -->
+        <div class="slide">
+            <div class="section-label fade-up">AGENTS</div>
+            <h2 class="fade-up">What Are <span class="gold">AI Agents</span>?</h2>
+            <p class="subtitle fade-up">An AI agent is an AI that has a specific role, specific tools, and a specific job &mdash; like a virtual employee on your team.</p>
+            <div class="cards fade-up">
+                <div class="card">
+                    <div class="card-icon">&#128269;</div>
+                    <h4>Sourcing Agent</h4>
+                    <p>Its only job: find profitable products. Scans retailers, checks Amazon, calculates margins. Runs 24/7.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#129302;</div>
+                    <h4>Nova (Mentor Agent)</h4>
+                    <p>Trained on all my content. Answers your Amazon questions instantly in Discord or on the platform. Available 24/7.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#128200;</div>
+                    <h4>Analytics Agent</h4>
+                    <p>Tracks your progress, monitors your health score, flags when you're stuck, and suggests next steps.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 12: Self-Improving -->
+        <div class="slide">
+            <div class="section-label fade-up">KEY CONCEPT</div>
+            <h2 class="fade-up">The AI Gets <span class="highlight">Better Over Time</span></h2>
+            <p class="subtitle fade-up">Unlike a regular tool, AI agents <em>self-improve</em>. Every error becomes a lesson. Every correction makes it smarter.</p>
+            <div class="steps fade-up">
+                <div class="step">
+                    <div class="step-num">&#9888;</div>
+                    <h4>Something Breaks</h4>
+                    <p>A retailer changes their website layout. The scraper fails on Walmart clearance.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">&#128736;</div>
+                    <h4>AI Fixes Itself</h4>
+                    <p>The system detects the error, reads the new page structure, updates the scraper code, and tests it.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">&#128218;</div>
+                    <h4>Updates Its Own SOP</h4>
+                    <p>The AI writes "Walmart changed layout on 3/20" into the directive so it never makes the same mistake again.</p>
+                </div>
+            </div>
+            <p class="subtitle fade-up" style="margin-top: 20px; font-size: 16px;">This is called <strong class="accent">self-annealing</strong> &mdash; the system heals and hardens itself automatically.</p>
+        </div>
+
+        <!-- ===== SECTION 4: WHAT YOU HAVE ACCESS TO ===== -->
+
+        <!-- SLIDE 13: Your Tools -->
+        <div class="slide">
+            <div class="glow-orb glow-red" style="bottom: 20%; left: 15%;"></div>
+            <div class="section-label fade-up">YOUR ARSENAL</div>
+            <h2 class="fade-up">What You Already <span class="green">Have Access To</span></h2>
+            <p class="subtitle fade-up">All of this is live on 247profits.org right now. Let me show you.</p>
             <div class="stats fade-up">
                 <div class="stat">
-                    <div class="stat-number gold">97+</div>
-                    <div class="stat-label">AI Scripts</div>
+                    <div class="stat-number gold">23</div>
+                    <div class="stat-label">Sourcing Tools</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-number accent">37</div>
-                    <div class="stat-label">SOPs</div>
+                    <div class="stat-number accent">300+</div>
+                    <div class="stat-label">Retailers</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-number green">300+</div>
-                    <div class="stat-label">Retailers Scraped</div>
+                    <div class="stat-number green">24/7</div>
+                    <div class="stat-label">Nova AI Mentor</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-number blue">10</div>
-                    <div class="stat-label">AI Agents</div>
+                    <div class="stat-number blue">8</div>
+                    <div class="stat-label">Sourcing Modes</div>
                 </div>
             </div>
         </div>
 
-        <!-- SLIDE 8: Nova AI Bot -->
-        <div class="slide" data-section="what-we-built">
-            <div class="section-label fade-up">MEET NOVA</div>
-            <h2 class="fade-up">Your 24/7 <span class="highlight">AI Mentor</span></h2>
-            <div class="two-col fade-up">
-                <div class="col">
-                    <h3 style="font-size: 22px;">Discord Bot</h3>
-                    <ul class="feature-list" style="margin-top: 12px;">
-                        <li><span class="check">&#10003;</span> Answers Amazon questions instantly</li>
-                        <li><span class="check">&#10003;</span> Trained on 88 YouTube videos</li>
-                        <li><span class="check">&#10003;</span> 271 Instagram Reels analyzed</li>
-                        <li><span class="check">&#10003;</span> 37 FAQ entries from real Q&A</li>
-                        <li><span class="check">&#10003;</span> Can see and analyze images</li>
-                        <li><span class="check">&#10003;</span> Searches the web for answers</li>
-                    </ul>
-                </div>
-                <div class="col">
-                    <h3 style="font-size: 22px;">SaaS Chat</h3>
-                    <ul class="feature-list" style="margin-top: 12px;">
-                        <li><span class="check">&#10003;</span> Same brain on 247profits.org</li>
-                        <li><span class="check">&#10003;</span> Synced knowledge base</li>
-                        <li><span class="check">&#10003;</span> Self-improving &mdash; learns from you</li>
-                        <li><span class="check">&#10003;</span> References Sabbo's frameworks first</li>
-                        <li><span class="check">&#10003;</span> Available 24/7, zero wait time</li>
-                        <li><span class="check">&#10003;</span> Zero extra cost to you</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- SLIDE 9: Sourcing Suite -->
-        <div class="slide" data-section="what-we-built">
+        <!-- SLIDE 14: Sourcing Suite -->
+        <div class="slide">
             <div class="section-label fade-up">AI-POWERED SOURCING</div>
-            <h2 class="fade-up"><span class="green">8 Sourcing Modes</span> &mdash; 300+ Retailers</h2>
+            <h2 class="fade-up"><span class="accent">8 Sourcing Modes</span> Built For You</h2>
             <div class="cards fade-up">
                 <div class="card">
                     <div class="card-icon">&#128269;</div>
                     <h4>Brand Search</h4>
-                    <p>Enter a brand name. AI scans 300+ retailers, finds every product, checks Amazon profitability.</p>
+                    <p>Type a brand name &mdash; AI scans 300+ retailers, finds every product, and calculates Amazon profitability.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">&#128200;</div>
                     <h4>Clearance Scanner</h4>
-                    <p>Auto-scans clearance sections at Walmart, Target, CVS, and 85+ more. Finds hidden margin.</p>
+                    <p>Automatically scans clearance sections at Walmart, Target, CVS, and 85+ more retailers for hidden margin.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">&#129302;</div>
                     <h4>AI Product Finder</h4>
-                    <p>Tell it what you want. AI searches, filters, and ranks products by ROI. NEW: image previews + gift card stacking.</p>
+                    <p>Tell it what you want. AI searches, filters, and ranks products by ROI. Image previews + gift card stacking.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">&#128176;</div>
-                    <h4>Catalog Dump</h4>
-                    <p>Scrape an entire retailer's catalog. Thousands of products analyzed for arbitrage in minutes.</p>
+                    <h4>+ 5 More Modes</h4>
+                    <p>Category search, reverse sourcing, OOS finder, A2A flips, and full catalog dumps. Every angle covered.</p>
                 </div>
             </div>
         </div>
 
-        <!-- SLIDE 10: Sourcing Zero-Token -->
-        <div class="slide" data-section="what-we-built">
-            <div class="section-label fade-up">THE SECRET SAUCE</div>
-            <h2 class="fade-up">Zero-Token-First <span class="accent">Sourcing</span></h2>
-            <p class="subtitle fade-up">We built a 3-tier system that minimizes cost while maximizing finds.</p>
+        <!-- SLIDE 15: How Sourcing Saves You Money -->
+        <div class="slide">
+            <div class="section-label fade-up">SMART SOURCING</div>
+            <h2 class="fade-up">Zero-Cost <span class="gold">Product Discovery</span></h2>
+            <p class="subtitle fade-up">Our system is designed so the initial search costs you nothing. You only pay for deep verification on products that are already promising.</p>
             <div class="steps fade-up">
                 <div class="step">
                     <div class="step-num">$0</div>
-                    <h4>Tier 1: Free Scrape</h4>
-                    <p>Scrape 300+ retailers via headless browser. Find products, prices, availability. Zero API cost.</p>
+                    <h4>Step 1: Free Scan</h4>
+                    <p>AI scrapes 300+ retailer websites for products and prices. No API cost. No tokens. Completely free.</p>
                 </div>
                 <div class="step">
-                    <div class="step-num">$0.01</div>
-                    <h4>Tier 2: Quick Verify</h4>
-                    <p>Top candidates verified on Amazon via Keepa. ~1 token per product. Confirms demand + competition.</p>
+                    <div class="step-num">~1&cent;</div>
+                    <h4>Step 2: Quick Check</h4>
+                    <p>Top matches get verified on Amazon &mdash; confirms the product exists, checks the price, verifies demand.</p>
                 </div>
                 <div class="step">
-                    <div class="step-num">$0.21</div>
-                    <h4>Tier 3: Deep Dive</h4>
-                    <p>Full offers data, BSR history, seller count trends. Only for serious candidates. ~21 tokens.</p>
+                    <div class="step-num">~21&cent;</div>
+                    <h4>Step 3: Deep Verify</h4>
+                    <p>Only for serious candidates. Full BSR history, seller count trends, offer data. You choose which products go here.</p>
                 </div>
             </div>
         </div>
 
-        <!-- SLIDE 11: 247profits Platform -->
-        <div class="slide" data-section="what-we-built">
-            <div class="glow-orb glow-red" style="bottom: 20%; right: 15%;"></div>
+        <!-- SLIDE 16: Gift Card Stacking -->
+        <div class="slide">
+            <div class="section-label fade-up">PRO TIP</div>
+            <h2 class="fade-up">Gift Card <span class="green">Stacking</span></h2>
+            <p class="subtitle fade-up">Every product automatically checks if you can buy discounted gift cards for that retailer &mdash; boosting your margin even further.</p>
+            <div class="offer-box fade-up">
+                <h3 style="margin-bottom: 16px; font-size: 22px;">Example: Walmart Clearance Item</h3>
+                <ul class="offer-features" style="margin-top: 16px;">
+                    <li>&#128722; Buy price: <strong>$12.00</strong> (clearance)</li>
+                    <li>&#128176; Amazon sells for: <strong>$34.99</strong></li>
+                    <li>&#128200; Base ROI: <strong class="green">89%</strong> after FBA fees</li>
+                    <li>&#127873; Walmart gift card discount: <strong class="gold">8% off</strong> via CardBear</li>
+                    <li>&#128640; ROI with gift card: <strong class="gold">105%</strong></li>
+                </ul>
+                <p style="margin-top: 16px; color: var(--text-muted); font-size: 14px;">We scan 908 retailers for gift card discounts. This is done automatically on every product.</p>
+            </div>
+        </div>
+
+        <!-- SLIDE 17: Nova AI -->
+        <div class="slide">
+            <div class="glow-orb glow-gold" style="top: 20%; left: 20%;"></div>
+            <div class="section-label fade-up">MEET NOVA</div>
+            <h2 class="fade-up">Your 24/7 <span class="highlight">AI Amazon Mentor</span></h2>
+            <p class="subtitle fade-up">Nova is trained on everything I teach &mdash; 88 YouTube videos, 271 Reels, and hundreds of real student Q&As. It knows my frameworks.</p>
+            <ul class="feature-list fade-up">
+                <li><span class="check">&#10003;</span> <span>Ask anything about Amazon FBA &mdash; get an instant, informed answer</span></li>
+                <li><span class="check">&#10003;</span> <span>Available in <strong>Discord</strong> and on <strong>247profits.org</strong></span></li>
+                <li><span class="check">&#10003;</span> <span>Can <strong>see and analyze images</strong> &mdash; drop a product screenshot, get feedback</span></li>
+                <li><span class="check">&#10003;</span> <span>Searches the web for real-time answers when needed</span></li>
+                <li><span class="check">&#10003;</span> <span>Self-improving &mdash; learns from every conversation</span></li>
+                <li><span class="check">&#10003;</span> <span>No extra cost &mdash; included in your program</span></li>
+            </ul>
+        </div>
+
+        <!-- SLIDE 18: Platform Tour -->
+        <div class="slide">
             <div class="section-label fade-up">YOUR PLATFORM</div>
-            <h2 class="fade-up"><span class="highlight">247profits.org</span> &mdash; Complete Redesign</h2>
-            <p class="subtitle fade-up">Apple/iOS inspired dark mode. Premium feel. Built for serious sellers.</p>
+            <h2 class="fade-up"><span class="blue">247profits.org</span> &mdash; Everything In One Place</h2>
             <div class="cards fade-up">
                 <div class="card">
                     <div class="card-icon">&#127891;</div>
-                    <h4>LMS + Courses</h4>
-                    <p>Video lessons, module tracking, progress milestones. Your full curriculum in one place.</p>
+                    <h4>Courses &amp; Modules</h4>
+                    <p>Full curriculum with video lessons, progress tracking, and milestone completion. Learn at your pace.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#128269;</div>
+                    <h4>Sourcing Suite</h4>
+                    <p>All 23 sourcing tools right in your browser. Brand search, clearance scan, product finder &mdash; no software to install.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">&#129302;</div>
                     <h4>Nova AI Chat</h4>
-                    <p>Ask anything about Amazon FBA. Get instant answers trained on Sabbo's frameworks.</p>
+                    <p>Ask questions and get answers trained on my exact frameworks and strategies. Like having me on speed dial.</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">&#128200;</div>
-                    <h4>Sourcing Tools</h4>
-                    <p>12-tab sourcing suite. Brand search, clearance scan, product finder, ASIN lookup &mdash; all in-browser.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">&#128170;</div>
-                    <h4>Progress Dashboard</h4>
-                    <p>Track your milestones, see your health score, earn rewards as you level up.</p>
+                    <div class="card-icon">&#127942;</div>
+                    <h4>Gamified Roadmap</h4>
+                    <p>10-milestone visual path from zero to $10K/mo. Track your progress, earn points, see how far you've come.</p>
                 </div>
             </div>
         </div>
 
-        <!-- SLIDE 12: Student Success System -->
-        <div class="slide" data-section="what-we-built">
-            <div class="section-label fade-up">BEHIND THE SCENES</div>
-            <h2 class="fade-up">AI <span class="green">Student Success</span> System</h2>
-            <p class="subtitle fade-up">We built an entire system to make sure you succeed. Here's what's watching your back:</p>
-            <ul class="feature-list fade-up">
-                <li><span class="check">&#10003;</span> <span><strong>Health Monitor</strong> &mdash; AI scores your engagement, progress, and risk level daily</span></li>
-                <li><span class="check">&#10003;</span> <span><strong>Auto Check-ins</strong> &mdash; proactive outreach when you go quiet or get stuck</span></li>
-                <li><span class="check">&#10003;</span> <span><strong>Milestone Rewards</strong> &mdash; hit targets, earn recognition (186 pending!)</span></li>
-                <li><span class="check">&#10003;</span> <span><strong>Accountability Pods</strong> &mdash; grouped with students at your level</span></li>
-                <li><span class="check">&#10003;</span> <span><strong>Sourcing Drops</strong> &mdash; weekly profitable products delivered to you</span></li>
-            </ul>
-        </div>
+        <!-- ===== SECTION 5: OLD WAY vs AI WAY ===== -->
 
-        <!-- SLIDE 13: CEO Command Center -->
-        <div class="slide" data-section="what-we-built">
-            <div class="section-label fade-up">OPERATOR MODE</div>
-            <h2 class="fade-up">The <span class="gold">CEO Command Center</span></h2>
-            <p class="subtitle fade-up">How I run the entire business from one screen.</p>
-            <div class="cards fade-up">
-                <div class="card">
-                    <div class="card-icon">&#9728;&#65039;</div>
-                    <h4>Morning Briefing</h4>
-                    <p>AI-generated daily brief at 8 AM. Pipeline, metrics, priorities, competitor moves. All automated.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">&#128202;</div>
-                    <h4>Pipeline Analytics</h4>
-                    <p>Real-time funnel: leads &rarr; calls &rarr; shows &rarr; closes. Spot bottlenecks instantly.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">&#129302;</div>
-                    <h4>10 AI Agents</h4>
-                    <p>Ads, content, outreach, sourcing, CSM, video editing, competitor intel. All specialized. All autonomous.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- SLIDE 14: The Old Way vs New Way -->
-        <div class="slide" data-section="ai-amazon">
-            <div class="glow-orb glow-gold" style="top: 10%; right: 20%;"></div>
+        <!-- SLIDE 19: The Shift -->
+        <div class="slide">
+            <div class="glow-orb glow-red" style="top: 10%; right: 20%;"></div>
             <div class="section-label fade-up">THE SHIFT</div>
             <h2 class="fade-up">Old Amazon vs. <span class="highlight">AI Amazon</span></h2>
             <div class="comparison fade-up">
                 <div class="comparison-row header">
-                    <div class="comp-old">&#128308; THE OLD WAY</div>
-                    <div class="comp-new">&#128994; AI AMAZON</div>
+                    <div class="comp-old">&#128308; Without AI</div>
+                    <div class="comp-new">&#128994; With AI</div>
                 </div>
                 <div class="comparison-row">
-                    <div class="comp-old">Manual product research (hours)</div>
+                    <div class="comp-old">Manual product research (3-4 hours)</div>
                     <div class="comp-new">AI scans 300+ retailers in minutes</div>
                 </div>
                 <div class="comparison-row">
-                    <div class="comp-old">Guessing at profitability</div>
-                    <div class="comp-new">Keepa + FBA calculator = exact margins</div>
+                    <div class="comp-old">Guessing if a product is profitable</div>
+                    <div class="comp-new">Exact ROI calculated with FBA fees</div>
                 </div>
                 <div class="comparison-row">
-                    <div class="comp-old">Checking clearance aisles manually</div>
-                    <div class="comp-new">Automated clearance scanner (24/7)</div>
+                    <div class="comp-old">Driving to stores, scanning barcodes</div>
+                    <div class="comp-new">Online clearance scanner runs 24/7</div>
                 </div>
                 <div class="comparison-row">
-                    <div class="comp-old">One brand at a time</div>
-                    <div class="comp-new">Catalog dump: entire retailer in one run</div>
+                    <div class="comp-old">One retailer at a time</div>
+                    <div class="comp-new">300+ retailers scanned simultaneously</div>
                 </div>
                 <div class="comparison-row">
-                    <div class="comp-old">Waiting for answers in Discord</div>
-                    <div class="comp-new">Nova AI responds instantly, 24/7</div>
+                    <div class="comp-old">Waiting hours for Discord answers</div>
+                    <div class="comp-new">Nova answers instantly, any time</div>
                 </div>
                 <div class="comparison-row">
-                    <div class="comp-old">No accountability system</div>
-                    <div class="comp-new">AI health monitor + pods + rewards</div>
+                    <div class="comp-old">No idea if you're on track</div>
+                    <div class="comp-new">Health score + milestone tracking</div>
                 </div>
             </div>
         </div>
 
-        <!-- SLIDE 15: Ben Bader Quote -->
-        <div class="slide" data-section="ai-amazon">
-            <div class="section-label fade-up">THE POSITIONING</div>
-            <div class="quote fade-up">
-                Everybody and their mother is an Amazon FBA guru. You need a new mechanism. Position it as the new big thing you have to start right now &mdash; or you'll miss it.
-                <div class="quote-author">&mdash; Ben Bader ($160K/mo, all organic)</div>
-            </div>
-            <h3 class="fade-up" style="margin-top: 40px;">That mechanism? <span class="highlight" style="font-size: 1.2em;">AI Amazon FBA.</span></h3>
-        </div>
-
-        <!-- SLIDE 16: Your Unfair Advantage -->
-        <div class="slide" data-section="ai-amazon">
-            <div class="section-label fade-up">YOUR EDGE</div>
+        <!-- SLIDE 20: The Opportunity -->
+        <div class="slide">
+            <div class="section-label fade-up">THE WINDOW</div>
             <h2 class="fade-up">Why You're <span class="accent">Early</span></h2>
-            <p class="subtitle fade-up">Nobody else in the Amazon space has this infrastructure. Here's your window.</p>
+            <p class="subtitle fade-up">Most Amazon sellers are still doing everything manually. Most Amazon coaches don't have this technology. You have access to something nobody else does.</p>
             <ul class="feature-list fade-up">
-                <li><span class="check">&#10003;</span> <span>AI finds the products &mdash; you just validate and buy</span></li>
-                <li><span class="check">&#10003;</span> <span>AI analyzes competition &mdash; BSR, seller count, price history</span></li>
-                <li><span class="check">&#10003;</span> <span>AI optimizes listings &mdash; keywords, images, descriptions</span></li>
-                <li><span class="check">&#10003;</span> <span>AI monitors your health score &mdash; proactive support before you're stuck</span></li>
-                <li><span class="check">&#10003;</span> <span>AI mentors you 24/7 &mdash; Nova knows everything I teach</span></li>
+                <li><span class="check">&#10003;</span> <span>AI finds the products &mdash; you validate and buy</span></li>
+                <li><span class="check">&#10003;</span> <span>AI calculates the numbers &mdash; you make the decision</span></li>
+                <li><span class="check">&#10003;</span> <span>AI monitors your progress &mdash; you stay on track</span></li>
+                <li><span class="check">&#10003;</span> <span>AI mentors you 24/7 &mdash; you're never stuck alone</span></li>
             </ul>
-            <p class="subtitle fade-up" style="margin-top: 20px; font-size: 18px;"><strong>The question isn't if AI will change Amazon selling. It's whether you'll be ahead of it or behind it.</strong></p>
+            <p class="subtitle fade-up" style="margin-top: 24px; font-size: 18px;"><strong>The question isn't whether AI will change Amazon selling.<br>It's whether you'll be ahead of it or behind it.</strong></p>
         </div>
 
-        <!-- SLIDE 17: Social Proof / Numbers -->
-        <div class="slide" data-section="proof">
-            <div class="glow-orb glow-red" style="top: 40%; left: 10%;"></div>
-            <div class="section-label fade-up">THE PROOF</div>
-            <h2 class="fade-up">By The <span class="gold">Numbers</span></h2>
-            <div class="stats fade-up">
-                <div class="stat">
-                    <div class="stat-number accent">95</div>
-                    <div class="stat-label">Students Loaded</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number gold">1,498</div>
-                    <div class="stat-label">Testimonials Extracted</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number green">908</div>
-                    <div class="stat-label">Retailers Scraped</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number blue">44K</div>
-                    <div class="stat-label">Discord Messages Analyzed</div>
-                </div>
-            </div>
-            <p class="subtitle fade-up" style="margin-top: 30px;">We didn't just build tools. We built a <strong>system</strong> that compounds.</p>
-        </div>
+        <!-- ===== SECTION 6: WHAT'S COMING ===== -->
 
-        <!-- SLIDE 18: What's Coming Next -->
-        <div class="slide" data-section="roadmap">
-            <div class="section-label fade-up">WHAT'S NEXT</div>
-            <h2 class="fade-up">The <span class="blue">Roadmap</span></h2>
+        <!-- SLIDE 21: Roadmap -->
+        <div class="slide">
+            <div class="section-label fade-up">COMING SOON</div>
+            <h2 class="fade-up">What's <span class="blue">Next</span></h2>
             <div class="cards fade-up">
                 <div class="card">
                     <div class="card-icon">&#128230;</div>
                     <h4>Weekly Sourcing Drops</h4>
-                    <p>Curated profitable products delivered to your inbox every Monday. AI-vetted, margin-verified.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">&#127942;</div>
-                    <h4>Milestone Rewards</h4>
-                    <p>Hit your first sale, first $1K, first $5K &mdash; get recognized, earn badges, unlock perks.</p>
+                    <p>Every Monday: a curated list of profitable products delivered to you. AI-vetted, margin-verified, ready to buy.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">&#128101;</div>
                     <h4>Accountability Pods</h4>
-                    <p>Small groups at your level. Weekly check-ins. Peer support. Nobody falls through the cracks.</p>
+                    <p>Small groups of 4-5 students at your level. Weekly check-ins. Peer support. Nobody falls behind.</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">&#128640;</div>
-                    <h4>SP-API Integration</h4>
-                    <p>Direct Amazon Seller data. Real-time inventory, sales velocity, PPC metrics &mdash; all in your dashboard.</p>
+                    <div class="card-icon">&#127942;</div>
+                    <h4>Milestone Rewards</h4>
+                    <p>Hit your first sale, first $1K, first $5K &mdash; get recognized, earn badges, unlock perks and bonuses.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#128202;</div>
+                    <h4>Amazon SP-API</h4>
+                    <p>Connect your Seller Central directly. Real-time inventory, sales velocity, and PPC data &mdash; all in your dashboard.</p>
                 </div>
             </div>
         </div>
 
-        <!-- SLIDE 19: Inner Circle Intro -->
-        <div class="slide" data-section="offer">
-            <div class="glow-orb glow-red" style="top: 20%; right: 20%;"></div>
-            <div class="glow-orb glow-gold" style="bottom: 30%; left: 30%;"></div>
-            <div class="section-label fade-up">LEVEL UP</div>
-            <h2 class="fade-up">Introducing the <span class="highlight">Inner Circle</span></h2>
-            <p class="subtitle fade-up">For students who want to go deeper, move faster, and get direct access to the AI infrastructure that runs my business.</p>
+        <!-- ===== SECTION 7: THE OFFER (MID-TICKET UPSELL) ===== -->
+
+        <!-- SLIDE 22: Transition -->
+        <div class="slide">
+            <div class="glow-orb glow-gold" style="top: 30%; left: 40%;"></div>
+            <div class="section-label fade-up">GOING DEEPER</div>
+            <h2 class="fade-up">Want the <span class="highlight">Full AI Toolkit</span>?</h2>
+            <p class="subtitle fade-up">Everything I just showed you &mdash; the sourcing suite, Nova, the platform &mdash; you already have access to. But I've built something extra for students who want to go deeper with AI.</p>
         </div>
 
-        <!-- SLIDE 20: Inner Circle Details -->
-        <div class="slide" data-section="offer">
-            <div class="section-label fade-up">INNER CIRCLE</div>
-            <h2 class="fade-up">What You Get</h2>
+        <!-- SLIDE 23: AI Sourcing Pro -->
+        <div class="slide">
+            <div class="section-label fade-up">NEW ADD-ON</div>
+            <h2 class="fade-up">AI Sourcing <span class="gold">Pro</span></h2>
+            <p class="subtitle fade-up">Everything in your current tools &mdash; plus advanced AI features that do the heavy lifting for you.</p>
             <div class="two-col fade-up">
                 <div class="col">
-                    <h3 style="font-size: 20px; margin-bottom: 16px;">&#128274; Exclusive Access</h3>
+                    <h3 style="font-size: 20px; margin-bottom: 16px;">What's Included</h3>
                     <ul class="feature-list" style="margin-top: 0;">
-                        <li><span class="check">&#10003;</span> Priority sourcing drops (first picks)</li>
-                        <li><span class="check">&#10003;</span> Monthly 1-on-1 with Sabbo</li>
-                        <li><span class="check">&#10003;</span> Inner Circle Discord channel</li>
-                        <li><span class="check">&#10003;</span> AI tools deep-dive sessions</li>
-                        <li><span class="check">&#10003;</span> Advanced sourcing strategies</li>
+                        <li><span class="check">&#10003;</span> Weekly curated sourcing drops (Monday AM)</li>
+                        <li><span class="check">&#10003;</span> Priority access to new sourcing modes</li>
+                        <li><span class="check">&#10003;</span> Gift card stacking on every product</li>
+                        <li><span class="check">&#10003;</span> Unlimited AI sourcing scans</li>
+                        <li><span class="check">&#10003;</span> Saved scan history &amp; alerts</li>
                     </ul>
                 </div>
                 <div class="col">
-                    <h3 style="font-size: 20px; margin-bottom: 16px;">&#9889; Operator Perks</h3>
+                    <h3 style="font-size: 20px; margin-bottom: 16px;">What It Replaces</h3>
                     <ul class="feature-list" style="margin-top: 0;">
-                        <li><span class="check">&#10003;</span> Custom AI agent setup (your business)</li>
-                        <li><span class="check">&#10003;</span> Behind-the-scenes system access</li>
-                        <li><span class="check">&#10003;</span> Early access to new tools</li>
-                        <li><span class="check">&#10003;</span> Supplier network + contacts</li>
-                        <li><span class="check">&#10003;</span> Accountability pod leader track</li>
+                        <li><span class="check">&#10003;</span> No more 3-hour manual sourcing sessions</li>
+                        <li><span class="check">&#10003;</span> No more guessing on profitability</li>
+                        <li><span class="check">&#10003;</span> No more missing clearance deals</li>
+                        <li><span class="check">&#10003;</span> No more paying for separate tools</li>
+                        <li><span class="check">&#10003;</span> No more waiting for product ideas</li>
                     </ul>
                 </div>
             </div>
         </div>
 
-        <!-- SLIDE 21: Pricing -->
-        <div class="slide" data-section="offer">
+        <!-- SLIDE 24: Pricing -->
+        <div class="slide">
             <div class="glow-orb glow-red" style="top: 30%; left: 50%;"></div>
             <div class="section-label fade-up">THE INVESTMENT</div>
-            <h2 class="fade-up">Two Ways to <span class="gold">Go Deeper</span></h2>
+            <h2 class="fade-up">Simple. <span class="green">Affordable.</span> Powerful.</h2>
             <div class="cards fade-up" style="grid-template-columns: 1fr 1fr; max-width: 800px;">
-                <div class="card" style="border-color: rgba(255,77,77,0.2);">
-                    <div class="card-icon">&#128293;</div>
-                    <h4>Continuation</h4>
-                    <div class="offer-price" style="font-size: 36px; margin: 12px 0;">$597<span class="per">/mo</span></div>
+                <div class="card" style="border-color: rgba(255,255,255,0.1);">
+                    <div class="card-icon">&#128269;</div>
+                    <h4>AI Sourcing Pro</h4>
+                    <div class="offer-price" style="font-size: 40px; margin: 12px 0;"><span class="green">$97</span><span class="per">/mo</span></div>
                     <ul class="offer-features">
-                        <li>&#10003; Ongoing group calls</li>
-                        <li>&#10003; All platform access</li>
-                        <li>&#10003; Nova AI + sourcing tools</li>
+                        <li>&#10003; Unlimited AI sourcing scans</li>
                         <li>&#10003; Weekly sourcing drops</li>
-                        <li>&#10003; Community access</li>
+                        <li>&#10003; Gift card stacking</li>
+                        <li>&#10003; Priority new features</li>
+                        <li>&#10003; Scan history &amp; alerts</li>
                     </ul>
                 </div>
                 <div class="card" style="border-color: rgba(240,192,64,0.3); background: linear-gradient(135deg, rgba(240,192,64,0.05), rgba(255,77,77,0.05));">
                     <div class="card-icon">&#128081;</div>
-                    <h4>Inner Circle</h4>
-                    <div class="offer-price" style="font-size: 36px; margin: 12px 0;"><span class="gold">$2,500</span><span class="per">/mo</span></div>
+                    <h4>AI Sourcing Pro + Coaching</h4>
+                    <div class="offer-price" style="font-size: 40px; margin: 12px 0;"><span class="gold">$197</span><span class="per">/mo</span></div>
                     <ul class="offer-features">
-                        <li>&#10003; Everything in Continuation</li>
-                        <li>&#10003; Monthly 1-on-1 coaching</li>
-                        <li>&#10003; Priority sourcing drops</li>
-                        <li>&#10003; Custom AI agent setup</li>
-                        <li>&#10003; Inner Circle channel</li>
-                        <li>&#10003; Supplier network access</li>
+                        <li>&#10003; Everything in Pro</li>
+                        <li>&#10003; Monthly 1-on-1 sourcing call</li>
+                        <li>&#10003; Accountability pod placement</li>
+                        <li>&#10003; Advanced AI training sessions</li>
+                        <li>&#10003; Direct DM access for sourcing Qs</li>
                     </ul>
                 </div>
             </div>
+            <p class="subtitle fade-up" style="margin-top: 20px; font-size: 15px; color: var(--text-dim);">Cancel anytime. No contracts. The tools pay for themselves with one good find.</p>
         </div>
 
-        <!-- SLIDE 22: Scarcity -->
-        <div class="slide" data-section="offer">
-            <div class="section-label fade-up">LIMITED</div>
-            <h2 class="fade-up"><span class="accent">5 Spots</span> for Inner Circle</h2>
-            <p class="subtitle fade-up">I'm keeping this tight. 5 students max. If you're on this call and you're serious &mdash; DM me right now.</p>
-            <div class="stats fade-up" style="margin-top: 40px;">
-                <div class="stat">
-                    <div class="stat-number accent">5</div>
-                    <div class="stat-label">Spots Available</div>
+        <!-- SLIDE 25: ROI Math -->
+        <div class="slide">
+            <div class="section-label fade-up">THE MATH</div>
+            <h2 class="fade-up">One Good Product <span class="accent">Pays For It</span></h2>
+            <div class="offer-box fade-up">
+                <div class="stats" style="margin-top: 0;">
+                    <div class="stat">
+                        <div class="stat-number green">$97</div>
+                        <div class="stat-label">Monthly Cost</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number gold">$8-15</div>
+                        <div class="stat-label">Avg Profit Per Unit</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number accent">7-12</div>
+                        <div class="stat-label">Units to Break Even</div>
+                    </div>
                 </div>
-                <div class="stat">
-                    <div class="stat-number gold">$0</div>
-                    <div class="stat-label">Today's Deposit</div>
-                </div>
+                <p style="margin-top: 24px; font-size: 17px; text-align: center;">Find <strong>one product</strong> that sells 10 units/month at $10 profit &mdash; that's <strong class="green">$100/mo profit</strong> from a single find. The AI finds you dozens per week.</p>
             </div>
-            <p class="subtitle fade-up" style="margin-top: 20px;">DM "INNER CIRCLE" to lock your spot. We'll hop on a quick call this week.</p>
         </div>
 
-        <!-- SLIDE 23: Referral -->
-        <div class="slide" data-section="offer">
+        <!-- SLIDE 26: Referral -->
+        <div class="slide">
             <div class="section-label fade-up">BONUS</div>
             <h2 class="fade-up">Refer &amp; <span class="green">Earn</span></h2>
             <div class="offer-box fade-up">
                 <h3 style="margin-bottom: 16px;">10% Referral Commission</h3>
-                <p class="subtitle" style="font-size: 18px; max-width: 100%;">Know someone who should be in this program? Send them our way. If they enroll, you get <strong class="green">10% of the sale</strong> &mdash; cash in your pocket.</p>
+                <p class="subtitle" style="font-size: 18px; max-width: 100%;">Know someone who should be in this program? Send them our way. When they enroll, you get <strong class="green">10% of the sale</strong> &mdash; cash in your pocket.</p>
                 <ul class="offer-features" style="margin-top: 20px;">
-                    <li>&#10003; $300-$1,000 per referral depending on program</li>
+                    <li>&#10003; $300&ndash;$1,000 per referral depending on program</li>
                     <li>&#10003; No cap on referrals</li>
                     <li>&#10003; Paid out within 30 days of enrollment</li>
                 </ul>
             </div>
         </div>
 
-        <!-- SLIDE 24: Close -->
-        <div class="slide" data-section="close">
+        <!-- SLIDE 27: CTA -->
+        <div class="slide">
+            <div class="glow-orb glow-red" style="top: 20%; right: 30%;"></div>
+            <div class="section-label fade-up">NEXT STEPS</div>
+            <h2 class="fade-up">Ready to <span class="highlight">Level Up</span>?</h2>
+            <p class="subtitle fade-up" style="font-size: 20px;">DM me <strong>"AI PRO"</strong> and I'll get you set up today.</p>
+            <div class="stats fade-up" style="margin-top: 30px;">
+                <div class="stat">
+                    <div class="stat-number green">$97</div>
+                    <div class="stat-label">AI Sourcing Pro</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number gold">$197</div>
+                    <div class="stat-label">Pro + Coaching</div>
+                </div>
+            </div>
+            <p class="subtitle fade-up" style="margin-top: 30px;">One product covers it. The AI finds dozens per week.<br>The only question is &mdash; do you want to source faster or keep doing it the old way?</p>
+        </div>
+
+        <!-- SLIDE 28: Q&A -->
+        <div class="slide">
             <div class="glow-orb glow-red" style="top: 30%; left: 40%;"></div>
             <div class="glow-orb glow-gold" style="bottom: 20%; right: 30%;"></div>
-            <div class="section-label fade-up">LET'S GO</div>
+            <div class="section-label fade-up">OPEN FLOOR</div>
             <h1 class="fade-up">Questions?</h1>
-            <p class="subtitle fade-up" style="margin-top: 20px; font-size: 20px;">The AI revolution is here. You're already in the room.<br>Now it's about <strong>how deep you want to go.</strong></p>
-            <p class="fade-up" style="margin-top: 40px; font-size: 14px; color: var(--text-dim);">DM "INNER CIRCLE" &bull; 247profits.org &bull; @alldayfba</p>
+            <p class="subtitle fade-up" style="margin-top: 20px; font-size: 20px;">Ask about the AI tools, the platform, sourcing, anything.<br>I'm here to make sure you win.</p>
+            <p class="fade-up" style="margin-top: 40px; font-size: 14px; color: var(--text-dim);">DM "AI PRO" to get started &bull; 247profits.org &bull; @alldayfba</p>
         </div>
 
     </div>
@@ -1080,7 +1258,6 @@
         function updateSlide() {
             slides.forEach((s, i) => {
                 s.classList.remove('active', 'exit');
-                // Reset animations
                 s.querySelectorAll('.fade-up').forEach(el => {
                     el.style.opacity = '0';
                     el.style.transform = 'translateY(20px)';
@@ -1090,7 +1267,6 @@
             });
 
             slides[current].classList.add('active');
-            // Trigger animations
             setTimeout(() => {
                 slides[current].querySelectorAll('.fade-up').forEach((el, i) => {
                     el.style.animation = `fadeUp 0.6s ease ${0.1 + i * 0.1}s forwards`;
@@ -1110,7 +1286,6 @@
             if (current > 0) { current--; updateSlide(); }
         }
 
-        // Keyboard nav
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
             if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
@@ -1118,7 +1293,6 @@
             if (e.key === 'End') { current = total - 1; updateSlide(); }
         });
 
-        // Touch support
         let touchStartX = 0;
         document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
         document.addEventListener('touchend', (e) => {
@@ -1126,7 +1300,6 @@
             if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
         });
 
-        // Initialize
         updateSlide();
     </script>
 </body>
