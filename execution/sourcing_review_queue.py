@@ -92,6 +92,12 @@ def _ensure_tables(conn: sqlite3.Connection) -> None:
         CREATE INDEX IF NOT EXISTS idx_rq_status ON review_queue(status);
         CREATE INDEX IF NOT EXISTS idx_rq_asin ON review_queue(asin);
     """)
+    # Add image_url column if missing (migration for existing DBs)
+    try:
+        conn.execute("ALTER TABLE review_queue ADD COLUMN image_url TEXT")
+        conn.commit()
+    except Exception:
+        pass  # Column already exists
     conn.commit()
 
 
@@ -147,12 +153,20 @@ def ingest_file(conn: sqlite3.Connection, filepath: str, source: str = "unknown"
         source_price = prof.get("source_price") or product.get("source_price")
         source_url = prof.get("buy_url") or product.get("buy_url") or product.get("source_url", "")
 
+        # Extract image URL from scan data
+        image_url = (
+            product.get("image_url") or product.get("image")
+            or prof.get("image") or product.get("img_url") or ""
+        )
+        if isinstance(image_url, list):
+            image_url = image_url[0] if image_url else ""
+
         conn.execute("""
             INSERT INTO review_queue
                 (name, asin, amazon_url, amazon_price, source_price, source_url,
                  bsr, category, roi_percent, profit, fba_seller_count,
-                 amazon_on_listing, verdict, source_scanner, source_file, raw_json)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 amazon_on_listing, verdict, source_scanner, source_file, raw_json, image_url)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             product.get("name", "Unknown"),
             asin,
@@ -170,6 +184,7 @@ def ingest_file(conn: sqlite3.Connection, filepath: str, source: str = "unknown"
             source,
             str(p.name),
             json.dumps(product),
+            image_url,
         ))
         ingested += 1
 
@@ -359,17 +374,36 @@ def _extract_retailer_from_url(url: str) -> str:
 
 
 def _get_product_image(product: dict) -> str | None:
-    """Get a product image URL. Try raw_json first, then Amazon fallback."""
-    # Check if the scan result stored an image URL
+    """Get a product image URL from scan data."""
+    # Check top-level product dict first
+    for key in ("image_url", "image", "img_url", "thumbnail", "amazon_image"):
+        val = product.get(key)
+        if val:
+            if isinstance(val, list):
+                return val[0] if val else None
+            return val
+
+    # Check raw_json (full scan result stored as JSON string)
     raw = product.get("raw_json")
     if raw:
         try:
             data = json.loads(raw) if isinstance(raw, str) else raw
+            # Check top level
             for key in ("image_url", "image", "img_url", "thumbnail", "amazon_image"):
-                if data.get(key):
-                    return data[key]
+                val = data.get(key)
+                if val:
+                    if isinstance(val, list):
+                        return val[0] if val else None
+                    return val
+            # Check nested profitability dict (Keepa results)
+            prof = data.get("profitability", {})
+            if prof.get("image"):
+                return prof["image"]
         except Exception:
             pass
+
+    # Keepa image format — if we have a keepa image ID
+    # Format: https://m.media-amazon.com/images/I/{imageId}._SL200_.jpg
     return None
 
 
@@ -446,9 +480,9 @@ def format_discord_embed(product: dict) -> dict:
         "timestamp": datetime.utcnow().isoformat(),
     }
 
-    # Try to get a real product image
-    img_url = _get_product_image(product)
-    if img_url:
+    # Try to get a real product image — check DB column first, then raw_json
+    img_url = product.get("image_url") or _get_product_image(product)
+    if img_url and isinstance(img_url, str) and img_url.startswith("http"):
         embed["thumbnail"] = {"url": img_url}
 
     return embed
