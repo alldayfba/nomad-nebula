@@ -102,37 +102,23 @@ def _extract_retailer_json(html):
     CardBear embeds all retailer data as a JavaScript array in the page.
     Each entry has: label, url, imgurl, discount.
     """
-    # Try to find the JSON array containing retailer objects
-    # Pattern: array of objects with "label" key
-    patterns = [
-        r'var\s+\w+\s*=\s*(\[\s*\{[^;]*?"label"[^;]*?\])\s*;',
-        r'(\[\s*\{\s*"label"\s*:.*?\}\s*\])',
-        r"(\[\s*\{\s*'label'\s*:.*?\}\s*\])",
-    ]
+    # Extract individual retailer objects using regex
+    # Each entry: {"label":"Name", "url":"...", "imgurl":"...", "discount":"X% off"}
+    pattern = r'\{\s*"label"\s*:\s*"([^"]*?)"\s*,\s*"url"\s*:\s*"([^"]*?)"\s*,\s*"imgurl"\s*:\s*"([^"]*?)"\s*,\s*"discount"\s*:\s*"([^"]*?)"\s*\}'
+    matches = re.findall(pattern, html)
+    if matches:
+        return [
+            {"label": m[0], "url": m[1], "imgurl": m[2], "discount": m[3]}
+            for m in matches
+        ]
 
-    for pattern in patterns:
-        match = re.search(pattern, html, re.DOTALL)
-        if match:
-            try:
-                # Clean up potential JS issues (single quotes → double quotes)
-                raw = match.group(1)
-                raw = raw.replace("'", '"')
-                return json.loads(raw)
-            except json.JSONDecodeError:
-                continue
-
-    # Fallback: look for any large JSON array in script tags
-    from bs4 import BeautifulSoup
-    soup = BeautifulSoup(html, "html.parser")
-    for script in soup.find_all("script"):
-        text = script.string or ""
-        if '"label"' in text and '"discount"' in text:
-            match = re.search(r'(\[.*\])', text, re.DOTALL)
-            if match:
-                try:
-                    return json.loads(match.group(1))
-                except json.JSONDecodeError:
-                    continue
+    # Fallback: try to find a full JSON array
+    array_match = re.search(r'\[\s*\{[^{]*?"label".*?\}\s*\]', html, re.DOTALL)
+    if array_match:
+        try:
+            return json.loads(array_match.group(0))
+        except json.JSONDecodeError:
+            pass
 
     return None
 
