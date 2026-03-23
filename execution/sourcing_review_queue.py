@@ -318,34 +318,55 @@ def reject_products(conn: sqlite3.Connection, ids: list[int], reason: str = "") 
 # ── Discord Send ─────────────────────────────────────────────────────────────
 
 
-def format_discord_message(product: dict) -> str:
-    """Format a single product as a Discord message."""
+def format_discord_embed(product: dict) -> dict:
+    """Format a single product as a Discord embed."""
     roi_str = f"{product['roi_percent']:.0f}%" if product.get('roi_percent') else "N/A"
     profit_str = f"${product['profit']:.2f}" if product.get('profit') else "N/A"
     amz = f"${product['amazon_price']:.2f}" if product.get('amazon_price') else "?"
     src = f"${product['source_price']:.2f}" if product.get('source_price') else "?"
     bsr_str = f"{product['bsr']:,}" if product.get('bsr') else "N/A"
+    asin = product.get('asin', '?')
 
-    msg = f"""🤖 **AI Powered Product Find**
+    # Calculate margin
+    margin = "N/A"
+    if product.get('profit') and product.get('amazon_price') and product['amazon_price'] > 0:
+        margin = f"{(product['profit'] / product['amazon_price'] * 100):.1f}%"
 
-**{product['name'][:100]}**
+    sellers = product.get('fba_seller_count', '?')
+    amz_on = "Yes" if product.get('amazon_on_listing') else "No"
 
-**ASIN:** `{product.get('asin', '?')}`
-**BSR:** {bsr_str} in {product.get('category', 'Unknown')}
-**Source Price:** {src} → **Amazon Price:** {amz}
-**Profit:** {profit_str} | **ROI:** {roi_str}
-**FBA Sellers:** {product.get('fba_seller_count', '?')} | **Amazon on listing:** {'Yes' if product.get('amazon_on_listing') else 'No'}
-
-**Amazon:** <https://www.amazon.com/dp/{product.get('asin', '')}>"""
-
+    notes_parts = []
+    notes_parts.append(f"FBA Sellers: {sellers} | Amazon on listing: {amz_on}")
     if product.get('source_url'):
-        msg += f"\n**Buy Link:** <{product['source_url']}>"
+        notes_parts.append(f"[Buy Link]({product['source_url']})")
 
-    return msg
+    embed = {
+        "title": "🤖 AI Powered Product Find",
+        "color": 0xBF5AF2,
+        "fields": [
+            {"name": "🏷 Product", "value": product.get('name', 'Unknown')[:100], "inline": False},
+            {"name": "🛒 Buy Price", "value": src, "inline": True},
+            {"name": "💰 Sell Price", "value": amz, "inline": True},
+            {"name": "📈 Profit", "value": profit_str, "inline": True},
+            {"name": "🧮 Profit Margin", "value": margin, "inline": True},
+            {"name": "📊 ROI", "value": roi_str, "inline": True},
+            {"name": "📦 ASIN", "value": f"[{asin}](https://www.amazon.com/dp/{asin})", "inline": True},
+            {"name": "📉 BSR", "value": f"{bsr_str} in {product.get('category', 'Unknown')}", "inline": True},
+            {"name": "🎟️ Coupons", "value": product.get('coupon', 'None'), "inline": True},
+            {"name": "📝 Notes", "value": "\n".join(notes_parts) if notes_parts else "—", "inline": False},
+        ],
+        "footer": {"text": "24/7 Profits AI Sourcing"},
+        "timestamp": datetime.utcnow().isoformat(),
+    }
+
+    if asin and asin != '?':
+        embed["thumbnail"] = {"url": f"https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN={asin}&Format=_SL250_&ID=AsinImage&ServiceVersion=20070822"}
+
+    return embed
 
 
 def send_to_discord(conn: sqlite3.Connection, channel_id: str, dry_run: bool = False) -> int:
-    """Send all approved products to Discord channel."""
+    """Send all approved products to Discord channel as embeds."""
     if not requests:
         print("[ERROR] requests package not installed")
         return 0
@@ -365,40 +386,25 @@ def send_to_discord(conn: sqlite3.Connection, channel_id: str, dry_run: bool = F
 
     products = [dict(r) for r in rows]
 
-    # Send header
-    header = f"🤖 **AI Powered Product Find** — {len(products)} products | {datetime.now().strftime('%B %d, %Y')}\n{'─' * 40}"
-
     if dry_run:
-        print(f"\n[DRY RUN] Would send to channel {channel_id}:\n")
-        print(header)
+        print(f"\n[DRY RUN] Would send {len(products)} products to channel {channel_id}")
         for p in products:
-            print(f"\n{format_discord_message(p)}")
-            print("─" * 40)
+            embed = format_discord_embed(p)
+            print(f"\n  {embed['fields'][0]['value']} — ROI: {embed['fields'][4]['value']}")
         return len(products)
 
-    headers = {
+    headers_dict = {
         "Authorization": f"Bot {token}",
         "Content-Type": "application/json",
     }
     url = f"https://discord.com/api/v10/channels/{channel_id}/messages"
 
     sent = 0
-
-    # Send header
-    resp = requests.post(url, headers=headers, json={"content": header}, timeout=15)
-    if resp.status_code not in (200, 201):
-        print(f"[ERROR] Failed to send header: {resp.status_code} {resp.text[:200]}")
-        return 0
-
     import time
+
     for p in products:
-        msg = format_discord_message(p)
-
-        # Discord 2000 char limit
-        if len(msg) > 1990:
-            msg = msg[:1990] + "..."
-
-        resp = requests.post(url, headers=headers, json={"content": msg}, timeout=15)
+        embed = format_discord_embed(p)
+        resp = requests.post(url, headers=headers_dict, json={"embeds": [embed]}, timeout=15)
         if resp.status_code in (200, 201):
             conn.execute(
                 "UPDATE review_queue SET status = 'sent', sent_at = ? WHERE id = ?",
