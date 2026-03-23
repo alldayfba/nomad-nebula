@@ -733,15 +733,16 @@ class ChatCog(commands.Cog):
             return ("I had trouble searching. Let me answer based on what I know.", 0, 0)
 
         # Attempt 1: Local Claude CLI proxy (free via Max plan)
+        # Proxy now supports vision — saves images as temp files, uses Read tool
         if client:
             try:
-                result = await _call_with_tools(client, messages, has_images=bool(_image_blocks))
+                result = await _call_with_tools(client, messages, has_images=False)
                 reply, tokens_in, tokens_out = result[0], result[1], result[2]
                 _proxy_health.record_success()
                 _error_tracker.record_success(_time_mod.time() - _call_start)
             except Exception as e1:
                 _proxy_health.record_failure()
-                print(f"[chat-cog] Proxy failed: {e1}", file=sys.stderr)
+                print(f"[chat-cog] Proxy failed: {e1}")
 
         # Attempt 2: SaaS proxy on Vercel (routes through tunnel → Max plan)
         if reply is None and self.saas_chat_url:
