@@ -771,6 +771,11 @@ def _parse_proposal_file(filepath):
     return info
 
 
+@app.route("/group-call")
+def group_call():
+    return render_template("group-call.html")
+
+
 @app.route("/dashboard")
 def dashboard():
     return render_template("dashboard.html")

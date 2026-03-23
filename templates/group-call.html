@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Amazon Masterclass | AllDayFBA</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0a0a0a;
+            --surface: #111111;
+            --surface-2: #1a1a1a;
+            --accent: #ff4d4d;
+            --accent-glow: rgba(255, 77, 77, 0.3);
+            --text: #f5f5f5;
+            --text-muted: #888;
+            --text-dim: #555;
+            --gold: #f0c040;
+            --green: #34d399;
+            --blue: #60a5fa;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 80px;
+            opacity: 0;
+            transform: translateX(60px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            text-align: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        .slide.exit {
+            opacity: 0;
+            transform: translateX(-60px);
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--gold));
+            transition: width 0.4s ease;
+            z-index: 100;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            bottom: 30px;
+            right: 40px;
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .nav button {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: var(--text);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav button:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--accent);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 38px;
+            left: 40px;
+            font-size: 13px;
+            color: var(--text-dim);
+            font-weight: 500;
+            letter-spacing: 1px;
+            z-index: 100;
+        }
+
+        /* Brand */
+        .brand-mark {
+            position: fixed;
+            top: 24px;
+            left: 40px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .brand-mark span {
+            color: var(--accent);
+        }
+
+        /* Typography */
+        h1 {
+            font-size: clamp(36px, 5vw, 72px);
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: clamp(28px, 3.5vw, 52px);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -1.5px;
+            margin-bottom: 16px;
+        }
+
+        h3 {
+            font-size: clamp(20px, 2.5vw, 36px);
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            font-size: clamp(16px, 1.8vw, 24px);
+            color: var(--text-muted);
+            font-weight: 400;
+            line-height: 1.5;
+            max-width: 700px;
+        }
+
+        .accent { color: var(--accent); }
+        .gold { color: var(--gold); }
+        .green { color: var(--green); }
+        .blue { color: var(--blue); }
+
+        .highlight {
+            background: linear-gradient(135deg, var(--accent), #ff8080);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Cards grid */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1100px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 28px;
+            text-align: left;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            border-color: rgba(255,77,77,0.3);
+            transform: translateY(-2px);
+        }
+
+        .card-icon {
+            font-size: 32px;
+            margin-bottom: 14px;
+        }
+
+        .card h4 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Stats row */
+        .stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: clamp(36px, 4vw, 64px);
+            font-weight: 900;
+            letter-spacing: -2px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 4px;
+        }
+
+        /* Lists */
+        .feature-list {
+            list-style: none;
+            text-align: left;
+            max-width: 700px;
+            margin-top: 24px;
+        }
+
+        .feature-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: clamp(15px, 1.5vw, 20px);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .feature-list li:last-child { border-bottom: none; }
+
+        .check {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(52, 211, 153, 0.15);
+            color: var(--green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        /* Section label */
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+
+        /* Comparison table */
+        .comparison {
+            width: 100%;
+            max-width: 900px;
+            margin-top: 24px;
+        }
+
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px;
+        }
+
+        .comparison-row.header {
+            margin-bottom: 8px;
+        }
+
+        .comparison-row.header div {
+            font-weight: 700;
+            font-size: 16px;
+            padding: 12px 20px;
+        }
+
+        .comp-old, .comp-new {
+            padding: 14px 20px;
+            font-size: 15px;
+            text-align: left;
+        }
+
+        .comp-old {
+            background: rgba(255,77,77,0.05);
+            border-left: 3px solid rgba(255,77,77,0.3);
+            color: var(--text-muted);
+        }
+
+        .comp-new {
+            background: rgba(52,211,153,0.05);
+            border-left: 3px solid rgba(52,211,153,0.3);
+            color: var(--text);
+        }
+
+        /* Offer box */
+        .offer-box {
+            background: linear-gradient(135deg, rgba(255,77,77,0.08), rgba(240,192,64,0.08));
+            border: 1px solid rgba(255,77,77,0.2);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 700px;
+            margin-top: 24px;
+        }
+
+        .offer-price {
+            font-size: clamp(40px, 5vw, 72px);
+            font-weight: 900;
+            letter-spacing: -2px;
+        }
+
+        .offer-price .per {
+            font-size: 0.4em;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .offer-features {
+            list-style: none;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .offer-features li {
+            padding: 8px 0;
+            font-size: 16px;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Glow effects */
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .glow-red {
+            background: var(--accent);
+            width: 400px;
+            height: 400px;
+        }
+
+        .glow-gold {
+            background: var(--gold);
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Timeline */
+        .timeline {
+            text-align: left;
+            max-width: 600px;
+            margin-top: 24px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 20px;
+            padding: 16px 0;
+            border-left: 2px solid rgba(255,255,255,0.08);
+            padding-left: 24px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 22px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .timeline-item .time {
+            font-size: 13px;
+            color: var(--accent);
+            font-weight: 600;
+            min-width: 80px;
+        }
+
+        .timeline-item .desc {
+            font-size: 16px;
+        }
+
+        /* CTA button */
+        .cta-btn {
+            display: inline-block;
+            margin-top: 28px;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, var(--accent), #ff7070);
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            border-radius: 12px;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        /* Fade-in animations for slide content */
+        .slide.active .fade-up {
+            animation: fadeUp 0.6s ease forwards;
+        }
+
+        .slide.active .fade-up:nth-child(1) { animation-delay: 0.1s; }
+        .slide.active .fade-up:nth-child(2) { animation-delay: 0.2s; }
+        .slide.active .fade-up:nth-child(3) { animation-delay: 0.3s; }
+        .slide.active .fade-up:nth-child(4) { animation-delay: 0.4s; }
+        .slide.active .fade-up:nth-child(5) { animation-delay: 0.5s; }
+
+        .fade-up {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Two column layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            width: 100%;
+            max-width: 1100px;
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .two-col .col { padding: 10px; }
+
+        /* Quote */
+        .quote {
+            font-size: clamp(20px, 2.5vw, 32px);
+            font-style: italic;
+            color: var(--text);
+            max-width: 800px;
+            line-height: 1.4;
+            position: relative;
+            padding: 0 40px;
+        }
+
+        .quote::before {
+            content: '\201C';
+            position: absolute;
+            left: 0;
+            top: -10px;
+            font-size: 60px;
+            color: var(--accent);
+            font-style: normal;
+        }
+
+        .quote-author {
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--text-muted);
+            font-style: normal;
+        }
+
+        /* Numbered steps */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 30px;
+        }
+
+        .step {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 28px;
+            text-align: left;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .step-num {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--accent);
+            opacity: 0.3;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .step h4 {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .step p {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .slide { padding: 40px 24px; }
+            .cards { grid-template-columns: 1fr; }
+            .stats { gap: 24px; }
+            .two-col { grid-template-columns: 1fr; }
+            .steps { grid-template-columns: 1fr; }
+            .comparison-row { grid-template-columns: 1fr; }
+            .nav { bottom: 16px; right: 16px; }
+            .slide-counter { bottom: 22px; left: 16px; }
+            .brand-mark { top: 16px; left: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="brand-mark">ALL<span>DAY</span>FBA</div>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="slide-counter" id="slideCounter">01 / 24</div>
+
+    <div class="presentation" id="presentation">
+
+        <!-- SLIDE 1: Title -->
+        <div class="slide active" data-section="intro">
+            <div class="glow-orb glow-red" style="top: 20%; left: 60%;"></div>
+            <div class="glow-orb glow-gold" style="bottom: 20%; left: 20%;"></div>
+            <div class="section-label fade-up">GROUP CALL &mdash; MARCH 2026</div>
+            <h1 class="fade-up">The <span class="highlight">AI Amazon</span><br>Revolution</h1>
+            <p class="subtitle fade-up">How we're building the most advanced AI-powered<br>Amazon FBA system in the game &mdash; and why you're early.</p>
+        </div>
+
+        <!-- SLIDE 2: Agenda -->
+        <div class="slide" data-section="intro">
+            <div class="section-label fade-up">TODAY'S AGENDA</div>
+            <h2 class="fade-up">What We're Covering</h2>
+            <ul class="feature-list fade-up">
+                <li><span class="check">1</span> <span>The AI landscape &mdash; what changed in 2026</span></li>
+                <li><span class="check">2</span> <span>Our AI infrastructure &mdash; what we built for you</span></li>
+                <li><span class="check">3</span> <span>Live demos &mdash; Nova, Sourcing Suite, 247profits</span></li>
+                <li><span class="check">4</span> <span>The "AI Amazon" positioning &mdash; your unfair advantage</span></li>
+                <li><span class="check">5</span> <span>What's coming next &mdash; and how to go deeper</span></li>
+            </ul>
+        </div>
+
+        <!-- SLIDE 3: The AI Moment -->
+        <div class="slide" data-section="ai-revolution">
+            <div class="glow-orb glow-red" style="top: 30%; right: 10%;"></div>
+            <div class="section-label fade-up">THE AI REVOLUTION</div>
+            <h2 class="fade-up">We Are in an <span class="accent">Industrial Revolution</span></h2>
+            <p class="subtitle fade-up">AI isn't coming. It's here. And the gap between sellers who use it and those who don't is about to become unclosable.</p>
+            <div class="stats fade-up">
+                <div class="stat">
+                    <div class="stat-number accent">90%</div>
+                    <div class="stat-label">Fulfillment Automated</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number gold">24/7</div>
+                    <div class="stat-label">AI Agents Running</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number green">10x</div>
+                    <div class="stat-label">Output Speed</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: Kabrin Quote -->
+        <div class="slide" data-section="ai-revolution">
+            <div class="section-label fade-up">FROM THE TRENCHES</div>
+            <div class="quote fade-up">
+                My sole purpose and job on a day-to-day perspective now is purely quality control. 90% of my fulfillment is done from AI.
+                <div class="quote-author">&mdash; Kabrin Johal, Growth Operator ($200K+/mo target)</div>
+            </div>
+            <p class="subtitle fade-up" style="margin-top: 30px;">This isn't theory. This is what the top operators are doing <em>right now</em>.</p>
+        </div>
+
+        <!-- SLIDE 5: 3-Layer Architecture -->
+        <div class="slide" data-section="ai-revolution">
+            <div class="section-label fade-up">THE SYSTEM</div>
+            <h2 class="fade-up">3-Layer AI Architecture</h2>
+            <p class="subtitle fade-up">Same framework Kabrin uses. Same framework we built for you.</p>
+            <div class="steps fade-up">
+                <div class="step">
+                    <div class="step-num">01</div>
+                    <h4>Directives</h4>
+                    <p>SOPs written in plain English. The "what to do." 37+ living documents that tell the AI exactly how to execute.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">02</div>
+                    <h4>Orchestration</h4>
+                    <p>AI makes decisions. Routes tasks, handles errors, asks questions. The "brain" layer &mdash; Claude, GPT, Gemini.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">03</div>
+                    <h4>Execution</h4>
+                    <p>Deterministic Python scripts. 97+ tools that scrape, calculate, analyze, and deliver. Reliable. Testable. Fast.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: What Kabrin Taught Us -->
+        <div class="slide" data-section="ai-revolution">
+            <div class="section-label fade-up">KABRIN'S PLAYBOOK</div>
+            <h2 class="fade-up">Key Lessons from Kabrin's <span class="accent">AI Drivers</span> Calls</h2>
+            <ul class="feature-list fade-up">
+                <li><span class="check">&#10003;</span> <span>Treat AI like an <strong>employee</strong> &mdash; onboard it for 1-2 weeks</span></li>
+                <li><span class="check">&#10003;</span> <span>CEO bot orchestrates <strong>specialized agents</strong> (ads, content, outreach)</span></li>
+                <li><span class="check">&#10003;</span> <span>Brand voice extraction &mdash; scrape YT/IG/LinkedIn automatically</span></li>
+                <li><span class="check">&#10003;</span> <span>Morning briefings at <strong>8 AM</strong> &mdash; competitor research done overnight</span></li>
+                <li><span class="check">&#10003;</span> <span>Self-improving system &mdash; it gets <strong>better</strong> the more you use it</span></li>
+                <li><span class="check">&#10003;</span> <span>You still need the <strong>skills</strong> to know good vs. bad output</span></li>
+            </ul>
+        </div>
+
+        <!-- SLIDE 7: What We Built - Overview -->
+        <div class="slide" data-section="what-we-built">
+            <div class="glow-orb glow-gold" style="top: 15%; left: 15%;"></div>
+            <div class="section-label fade-up">WHAT WE BUILT FOR YOU</div>
+            <h2 class="fade-up">Your AI <span class="gold">Arsenal</span></h2>
+            <p class="subtitle fade-up">Everything built in the last 2 weeks. All running. All for you.</p>
+            <div class="stats fade-up">
+                <div class="stat">
+                    <div class="stat-number gold">97+</div>
+                    <div class="stat-label">AI Scripts</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number accent">37</div>
+                    <div class="stat-label">SOPs</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number green">300+</div>
+                    <div class="stat-label">Retailers Scraped</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number blue">10</div>
+                    <div class="stat-label">AI Agents</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: Nova AI Bot -->
+        <div class="slide" data-section="what-we-built">
+            <div class="section-label fade-up">MEET NOVA</div>
+            <h2 class="fade-up">Your 24/7 <span class="highlight">AI Mentor</span></h2>
+            <div class="two-col fade-up">
+                <div class="col">
+                    <h3 style="font-size: 22px;">Discord Bot</h3>
+                    <ul class="feature-list" style="margin-top: 12px;">
+                        <li><span class="check">&#10003;</span> Answers Amazon questions instantly</li>
+                        <li><span class="check">&#10003;</span> Trained on 88 YouTube videos</li>
+                        <li><span class="check">&#10003;</span> 271 Instagram Reels analyzed</li>
+                        <li><span class="check">&#10003;</span> 37 FAQ entries from real Q&A</li>
+                        <li><span class="check">&#10003;</span> Can see and analyze images</li>
+                        <li><span class="check">&#10003;</span> Searches the web for answers</li>
+                    </ul>
+                </div>
+                <div class="col">
+                    <h3 style="font-size: 22px;">SaaS Chat</h3>
+                    <ul class="feature-list" style="margin-top: 12px;">
+                        <li><span class="check">&#10003;</span> Same brain on 247profits.org</li>
+                        <li><span class="check">&#10003;</span> Synced knowledge base</li>
+                        <li><span class="check">&#10003;</span> Self-improving &mdash; learns from you</li>
+                        <li><span class="check">&#10003;</span> References Sabbo's frameworks first</li>
+                        <li><span class="check">&#10003;</span> Available 24/7, zero wait time</li>
+                        <li><span class="check">&#10003;</span> Zero extra cost to you</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 9: Sourcing Suite -->
+        <div class="slide" data-section="what-we-built">
+            <div class="section-label fade-up">AI-POWERED SOURCING</div>
+            <h2 class="fade-up"><span class="green">8 Sourcing Modes</span> &mdash; 300+ Retailers</h2>
+            <div class="cards fade-up">
+                <div class="card">
+                    <div class="card-icon">&#128269;</div>
+                    <h4>Brand Search</h4>
+                    <p>Enter a brand name. AI scans 300+ retailers, finds every product, checks Amazon profitability.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#128200;</div>
+                    <h4>Clearance Scanner</h4>
+                    <p>Auto-scans clearance sections at Walmart, Target, CVS, and 85+ more. Finds hidden margin.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#129302;</div>
+                    <h4>AI Product Finder</h4>
+                    <p>Tell it what you want. AI searches, filters, and ranks products by ROI. NEW: image previews + gift card stacking.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#128176;</div>
+                    <h4>Catalog Dump</h4>
+                    <p>Scrape an entire retailer's catalog. Thousands of products analyzed for arbitrage in minutes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 10: Sourcing Zero-Token -->
+        <div class="slide" data-section="what-we-built">
+            <div class="section-label fade-up">THE SECRET SAUCE</div>
+            <h2 class="fade-up">Zero-Token-First <span class="accent">Sourcing</span></h2>
+            <p class="subtitle fade-up">We built a 3-tier system that minimizes cost while maximizing finds.</p>
+            <div class="steps fade-up">
+                <div class="step">
+                    <div class="step-num">$0</div>
+                    <h4>Tier 1: Free Scrape</h4>
+                    <p>Scrape 300+ retailers via headless browser. Find products, prices, availability. Zero API cost.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">$0.01</div>
+                    <h4>Tier 2: Quick Verify</h4>
+                    <p>Top candidates verified on Amazon via Keepa. ~1 token per product. Confirms demand + competition.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">$0.21</div>
+                    <h4>Tier 3: Deep Dive</h4>
+                    <p>Full offers data, BSR history, seller count trends. Only for serious candidates. ~21 tokens.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 11: 247profits Platform -->
+        <div class="slide" data-section="what-we-built">
+            <div class="glow-orb glow-red" style="bottom: 20%; right: 15%;"></div>
+            <div class="section-label fade-up">YOUR PLATFORM</div>
+            <h2 class="fade-up"><span class="highlight">247profits.org</span> &mdash; Complete Redesign</h2>
+            <p class="subtitle fade-up">Apple/iOS inspired dark mode. Premium feel. Built for serious sellers.</p>
+            <div class="cards fade-up">
+                <div class="card">
+                    <div class="card-icon">&#127891;</div>
+                    <h4>LMS + Courses</h4>
+                    <p>Video lessons, module tracking, progress milestones. Your full curriculum in one place.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#129302;</div>
+                    <h4>Nova AI Chat</h4>
+                    <p>Ask anything about Amazon FBA. Get instant answers trained on Sabbo's frameworks.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#128200;</div>
+                    <h4>Sourcing Tools</h4>
+                    <p>12-tab sourcing suite. Brand search, clearance scan, product finder, ASIN lookup &mdash; all in-browser.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#128170;</div>
+                    <h4>Progress Dashboard</h4>
+                    <p>Track your milestones, see your health score, earn rewards as you level up.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 12: Student Success System -->
+        <div class="slide" data-section="what-we-built">
+            <div class="section-label fade-up">BEHIND THE SCENES</div>
+            <h2 class="fade-up">AI <span class="green">Student Success</span> System</h2>
+            <p class="subtitle fade-up">We built an entire system to make sure you succeed. Here's what's watching your back:</p>
+            <ul class="feature-list fade-up">
+                <li><span class="check">&#10003;</span> <span><strong>Health Monitor</strong> &mdash; AI scores your engagement, progress, and risk level daily</span></li>
+                <li><span class="check">&#10003;</span> <span><strong>Auto Check-ins</strong> &mdash; proactive outreach when you go quiet or get stuck</span></li>
+                <li><span class="check">&#10003;</span> <span><strong>Milestone Rewards</strong> &mdash; hit targets, earn recognition (186 pending!)</span></li>
+                <li><span class="check">&#10003;</span> <span><strong>Accountability Pods</strong> &mdash; grouped with students at your level</span></li>
+                <li><span class="check">&#10003;</span> <span><strong>Sourcing Drops</strong> &mdash; weekly profitable products delivered to you</span></li>
+            </ul>
+        </div>
+
+        <!-- SLIDE 13: CEO Command Center -->
+        <div class="slide" data-section="what-we-built">
+            <div class="section-label fade-up">OPERATOR MODE</div>
+            <h2 class="fade-up">The <span class="gold">CEO Command Center</span></h2>
+            <p class="subtitle fade-up">How I run the entire business from one screen.</p>
+            <div class="cards fade-up">
+                <div class="card">
+                    <div class="card-icon">&#9728;&#65039;</div>
+                    <h4>Morning Briefing</h4>
+                    <p>AI-generated daily brief at 8 AM. Pipeline, metrics, priorities, competitor moves. All automated.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#128202;</div>
+                    <h4>Pipeline Analytics</h4>
+                    <p>Real-time funnel: leads &rarr; calls &rarr; shows &rarr; closes. Spot bottlenecks instantly.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#129302;</div>
+                    <h4>10 AI Agents</h4>
+                    <p>Ads, content, outreach, sourcing, CSM, video editing, competitor intel. All specialized. All autonomous.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 14: The Old Way vs New Way -->
+        <div class="slide" data-section="ai-amazon">
+            <div class="glow-orb glow-gold" style="top: 10%; right: 20%;"></div>
+            <div class="section-label fade-up">THE SHIFT</div>
+            <h2 class="fade-up">Old Amazon vs. <span class="highlight">AI Amazon</span></h2>
+            <div class="comparison fade-up">
+                <div class="comparison-row header">
+                    <div class="comp-old">&#128308; THE OLD WAY</div>
+                    <div class="comp-new">&#128994; AI AMAZON</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comp-old">Manual product research (hours)</div>
+                    <div class="comp-new">AI scans 300+ retailers in minutes</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comp-old">Guessing at profitability</div>
+                    <div class="comp-new">Keepa + FBA calculator = exact margins</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comp-old">Checking clearance aisles manually</div>
+                    <div class="comp-new">Automated clearance scanner (24/7)</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comp-old">One brand at a time</div>
+                    <div class="comp-new">Catalog dump: entire retailer in one run</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comp-old">Waiting for answers in Discord</div>
+                    <div class="comp-new">Nova AI responds instantly, 24/7</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comp-old">No accountability system</div>
+                    <div class="comp-new">AI health monitor + pods + rewards</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 15: Ben Bader Quote -->
+        <div class="slide" data-section="ai-amazon">
+            <div class="section-label fade-up">THE POSITIONING</div>
+            <div class="quote fade-up">
+                Everybody and their mother is an Amazon FBA guru. You need a new mechanism. Position it as the new big thing you have to start right now &mdash; or you'll miss it.
+                <div class="quote-author">&mdash; Ben Bader ($160K/mo, all organic)</div>
+            </div>
+            <h3 class="fade-up" style="margin-top: 40px;">That mechanism? <span class="highlight" style="font-size: 1.2em;">AI Amazon FBA.</span></h3>
+        </div>
+
+        <!-- SLIDE 16: Your Unfair Advantage -->
+        <div class="slide" data-section="ai-amazon">
+            <div class="section-label fade-up">YOUR EDGE</div>
+            <h2 class="fade-up">Why You're <span class="accent">Early</span></h2>
+            <p class="subtitle fade-up">Nobody else in the Amazon space has this infrastructure. Here's your window.</p>
+            <ul class="feature-list fade-up">
+                <li><span class="check">&#10003;</span> <span>AI finds the products &mdash; you just validate and buy</span></li>
+                <li><span class="check">&#10003;</span> <span>AI analyzes competition &mdash; BSR, seller count, price history</span></li>
+                <li><span class="check">&#10003;</span> <span>AI optimizes listings &mdash; keywords, images, descriptions</span></li>
+                <li><span class="check">&#10003;</span> <span>AI monitors your health score &mdash; proactive support before you're stuck</span></li>
+                <li><span class="check">&#10003;</span> <span>AI mentors you 24/7 &mdash; Nova knows everything I teach</span></li>
+            </ul>
+            <p class="subtitle fade-up" style="margin-top: 20px; font-size: 18px;"><strong>The question isn't if AI will change Amazon selling. It's whether you'll be ahead of it or behind it.</strong></p>
+        </div>
+
+        <!-- SLIDE 17: Social Proof / Numbers -->
+        <div class="slide" data-section="proof">
+            <div class="glow-orb glow-red" style="top: 40%; left: 10%;"></div>
+            <div class="section-label fade-up">THE PROOF</div>
+            <h2 class="fade-up">By The <span class="gold">Numbers</span></h2>
+            <div class="stats fade-up">
+                <div class="stat">
+                    <div class="stat-number accent">95</div>
+                    <div class="stat-label">Students Loaded</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number gold">1,498</div>
+                    <div class="stat-label">Testimonials Extracted</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number green">908</div>
+                    <div class="stat-label">Retailers Scraped</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number blue">44K</div>
+                    <div class="stat-label">Discord Messages Analyzed</div>
+                </div>
+            </div>
+            <p class="subtitle fade-up" style="margin-top: 30px;">We didn't just build tools. We built a <strong>system</strong> that compounds.</p>
+        </div>
+
+        <!-- SLIDE 18: What's Coming Next -->
+        <div class="slide" data-section="roadmap">
+            <div class="section-label fade-up">WHAT'S NEXT</div>
+            <h2 class="fade-up">The <span class="blue">Roadmap</span></h2>
+            <div class="cards fade-up">
+                <div class="card">
+                    <div class="card-icon">&#128230;</div>
+                    <h4>Weekly Sourcing Drops</h4>
+                    <p>Curated profitable products delivered to your inbox every Monday. AI-vetted, margin-verified.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#127942;</div>
+                    <h4>Milestone Rewards</h4>
+                    <p>Hit your first sale, first $1K, first $5K &mdash; get recognized, earn badges, unlock perks.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#128101;</div>
+                    <h4>Accountability Pods</h4>
+                    <p>Small groups at your level. Weekly check-ins. Peer support. Nobody falls through the cracks.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">&#128640;</div>
+                    <h4>SP-API Integration</h4>
+                    <p>Direct Amazon Seller data. Real-time inventory, sales velocity, PPC metrics &mdash; all in your dashboard.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 19: Inner Circle Intro -->
+        <div class="slide" data-section="offer">
+            <div class="glow-orb glow-red" style="top: 20%; right: 20%;"></div>
+            <div class="glow-orb glow-gold" style="bottom: 30%; left: 30%;"></div>
+            <div class="section-label fade-up">LEVEL UP</div>
+            <h2 class="fade-up">Introducing the <span class="highlight">Inner Circle</span></h2>
+            <p class="subtitle fade-up">For students who want to go deeper, move faster, and get direct access to the AI infrastructure that runs my business.</p>
+        </div>
+
+        <!-- SLIDE 20: Inner Circle Details -->
+        <div class="slide" data-section="offer">
+            <div class="section-label fade-up">INNER CIRCLE</div>
+            <h2 class="fade-up">What You Get</h2>
+            <div class="two-col fade-up">
+                <div class="col">
+                    <h3 style="font-size: 20px; margin-bottom: 16px;">&#128274; Exclusive Access</h3>
+                    <ul class="feature-list" style="margin-top: 0;">
+                        <li><span class="check">&#10003;</span> Priority sourcing drops (first picks)</li>
+                        <li><span class="check">&#10003;</span> Monthly 1-on-1 with Sabbo</li>
+                        <li><span class="check">&#10003;</span> Inner Circle Discord channel</li>
+                        <li><span class="check">&#10003;</span> AI tools deep-dive sessions</li>
+                        <li><span class="check">&#10003;</span> Advanced sourcing strategies</li>
+                    </ul>
+                </div>
+                <div class="col">
+                    <h3 style="font-size: 20px; margin-bottom: 16px;">&#9889; Operator Perks</h3>
+                    <ul class="feature-list" style="margin-top: 0;">
+                        <li><span class="check">&#10003;</span> Custom AI agent setup (your business)</li>
+                        <li><span class="check">&#10003;</span> Behind-the-scenes system access</li>
+                        <li><span class="check">&#10003;</span> Early access to new tools</li>
+                        <li><span class="check">&#10003;</span> Supplier network + contacts</li>
+                        <li><span class="check">&#10003;</span> Accountability pod leader track</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 21: Pricing -->
+        <div class="slide" data-section="offer">
+            <div class="glow-orb glow-red" style="top: 30%; left: 50%;"></div>
+            <div class="section-label fade-up">THE INVESTMENT</div>
+            <h2 class="fade-up">Two Ways to <span class="gold">Go Deeper</span></h2>
+            <div class="cards fade-up" style="grid-template-columns: 1fr 1fr; max-width: 800px;">
+                <div class="card" style="border-color: rgba(255,77,77,0.2);">
+                    <div class="card-icon">&#128293;</div>
+                    <h4>Continuation</h4>
+                    <div class="offer-price" style="font-size: 36px; margin: 12px 0;">$597<span class="per">/mo</span></div>
+                    <ul class="offer-features">
+                        <li>&#10003; Ongoing group calls</li>
+                        <li>&#10003; All platform access</li>
+                        <li>&#10003; Nova AI + sourcing tools</li>
+                        <li>&#10003; Weekly sourcing drops</li>
+                        <li>&#10003; Community access</li>
+                    </ul>
+                </div>
+                <div class="card" style="border-color: rgba(240,192,64,0.3); background: linear-gradient(135deg, rgba(240,192,64,0.05), rgba(255,77,77,0.05));">
+                    <div class="card-icon">&#128081;</div>
+                    <h4>Inner Circle</h4>
+                    <div class="offer-price" style="font-size: 36px; margin: 12px 0;"><span class="gold">$2,500</span><span class="per">/mo</span></div>
+                    <ul class="offer-features">
+                        <li>&#10003; Everything in Continuation</li>
+                        <li>&#10003; Monthly 1-on-1 coaching</li>
+                        <li>&#10003; Priority sourcing drops</li>
+                        <li>&#10003; Custom AI agent setup</li>
+                        <li>&#10003; Inner Circle channel</li>
+                        <li>&#10003; Supplier network access</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 22: Scarcity -->
+        <div class="slide" data-section="offer">
+            <div class="section-label fade-up">LIMITED</div>
+            <h2 class="fade-up"><span class="accent">5 Spots</span> for Inner Circle</h2>
+            <p class="subtitle fade-up">I'm keeping this tight. 5 students max. If you're on this call and you're serious &mdash; DM me right now.</p>
+            <div class="stats fade-up" style="margin-top: 40px;">
+                <div class="stat">
+                    <div class="stat-number accent">5</div>
+                    <div class="stat-label">Spots Available</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number gold">$0</div>
+                    <div class="stat-label">Today's Deposit</div>
+                </div>
+            </div>
+            <p class="subtitle fade-up" style="margin-top: 20px;">DM "INNER CIRCLE" to lock your spot. We'll hop on a quick call this week.</p>
+        </div>
+
+        <!-- SLIDE 23: Referral -->
+        <div class="slide" data-section="offer">
+            <div class="section-label fade-up">BONUS</div>
+            <h2 class="fade-up">Refer &amp; <span class="green">Earn</span></h2>
+            <div class="offer-box fade-up">
+                <h3 style="margin-bottom: 16px;">10% Referral Commission</h3>
+                <p class="subtitle" style="font-size: 18px; max-width: 100%;">Know someone who should be in this program? Send them our way. If they enroll, you get <strong class="green">10% of the sale</strong> &mdash; cash in your pocket.</p>
+                <ul class="offer-features" style="margin-top: 20px;">
+                    <li>&#10003; $300-$1,000 per referral depending on program</li>
+                    <li>&#10003; No cap on referrals</li>
+                    <li>&#10003; Paid out within 30 days of enrollment</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SLIDE 24: Close -->
+        <div class="slide" data-section="close">
+            <div class="glow-orb glow-red" style="top: 30%; left: 40%;"></div>
+            <div class="glow-orb glow-gold" style="bottom: 20%; right: 30%;"></div>
+            <div class="section-label fade-up">LET'S GO</div>
+            <h1 class="fade-up">Questions?</h1>
+            <p class="subtitle fade-up" style="margin-top: 20px; font-size: 20px;">The AI revolution is here. You're already in the room.<br>Now it's about <strong>how deep you want to go.</strong></p>
+            <p class="fade-up" style="margin-top: 40px; font-size: 14px; color: var(--text-dim);">DM "INNER CIRCLE" &bull; 247profits.org &bull; @alldayfba</p>
+        </div>
+
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <button onclick="prevSlide()" id="prevBtn">&#8592;</button>
+        <button onclick="nextSlide()" id="nextBtn">&#8594;</button>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const progressBar = document.getElementById('progressBar');
+        const slideCounter = document.getElementById('slideCounter');
+        let current = 0;
+        const total = slides.length;
+
+        function updateSlide() {
+            slides.forEach((s, i) => {
+                s.classList.remove('active', 'exit');
+                // Reset animations
+                s.querySelectorAll('.fade-up').forEach(el => {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(20px)';
+                    el.style.animation = 'none';
+                });
+                if (i < current) s.classList.add('exit');
+            });
+
+            slides[current].classList.add('active');
+            // Trigger animations
+            setTimeout(() => {
+                slides[current].querySelectorAll('.fade-up').forEach((el, i) => {
+                    el.style.animation = `fadeUp 0.6s ease ${0.1 + i * 0.1}s forwards`;
+                });
+            }, 50);
+
+            const pct = ((current + 1) / total) * 100;
+            progressBar.style.width = pct + '%';
+            slideCounter.textContent = String(current + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+        }
+
+        function nextSlide() {
+            if (current < total - 1) { current++; updateSlide(); }
+        }
+
+        function prevSlide() {
+            if (current > 0) { current--; updateSlide(); }
+        }
+
+        // Keyboard nav
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+            if (e.key === 'Home') { current = 0; updateSlide(); }
+            if (e.key === 'End') { current = total - 1; updateSlide(); }
+        });
+
+        // Touch support
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        // Initialize
+        updateSlide();
+    </script>
+</body>
+</html>
