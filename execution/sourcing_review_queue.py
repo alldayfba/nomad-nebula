@@ -326,7 +326,9 @@ def format_discord_message(product: dict) -> str:
     src = f"${product['source_price']:.2f}" if product.get('source_price') else "?"
     bsr_str = f"{product['bsr']:,}" if product.get('bsr') else "N/A"
 
-    msg = f"""**{product['name'][:100]}**
+    msg = f"""🤖 **AI Powered Product Find**
+
+**{product['name'][:100]}**
 
 **ASIN:** `{product.get('asin', '?')}`
 **BSR:** {bsr_str} in {product.get('category', 'Unknown')}
@@ -364,7 +366,7 @@ def send_to_discord(conn: sqlite3.Connection, channel_id: str, dry_run: bool = F
     products = [dict(r) for r in rows]
 
     # Send header
-    header = f"**Daily Sourcing Drop** — {len(products)} products | {datetime.now().strftime('%B %d, %Y')}\n{'─' * 40}"
+    header = f"🤖 **AI Powered Product Find** — {len(products)} products | {datetime.now().strftime('%B %d, %Y')}\n{'─' * 40}"
 
     if dry_run:
         print(f"\n[DRY RUN] Would send to channel {channel_id}:\n")

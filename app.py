@@ -2289,6 +2289,84 @@ def nova_students():
         return jsonify({"error": str(e), "students": []}), 500
 
 
+# ── Product Review Queue API ─────────────────────────────────────────────────
+
+PRODUCT_CHANNEL_ID = "1352031282799837237"  # 🔎┃new-product-lead
+
+@app.route("/api/product-queue/pending", methods=["GET"])
+def product_queue_pending():
+    """List pending products for admin review."""
+    try:
+        from execution.sourcing_review_queue import get_db, review_pending, get_status
+        conn = get_db()
+        products = review_pending(conn)
+        stats = get_status(conn)
+        conn.close()
+        return jsonify({"products": products, "stats": stats})
+    except Exception as e:
+        return jsonify({"products": [], "error": str(e)}), 500
+
+
+@app.route("/api/product-queue/approve", methods=["POST"])
+def product_queue_approve():
+    """Approve products for Discord delivery."""
+    try:
+        from execution.sourcing_review_queue import get_db, approve_products
+        data = request.get_json() or {}
+        ids = data.get("ids")
+        conn = get_db()
+        if ids:
+            count = approve_products(conn, [int(i) for i in ids])
+        else:
+            count = approve_products(conn)
+        conn.close()
+        return jsonify({"approved": count})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/product-queue/reject", methods=["POST"])
+def product_queue_reject():
+    """Reject products with reason."""
+    try:
+        from execution.sourcing_review_queue import get_db, reject_products
+        data = request.get_json() or {}
+        ids = data.get("ids", [])
+        reason = data.get("reason", "")
+        conn = get_db()
+        count = reject_products(conn, [int(i) for i in ids], reason)
+        conn.close()
+        return jsonify({"rejected": count})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/product-queue/send", methods=["POST"])
+def product_queue_send():
+    """Send approved products to Discord #new-product-lead channel."""
+    try:
+        from execution.sourcing_review_queue import get_db, send_to_discord
+        conn = get_db()
+        sent = send_to_discord(conn, PRODUCT_CHANNEL_ID)
+        conn.close()
+        return jsonify({"sent": sent})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/product-queue/ingest", methods=["POST"])
+def product_queue_ingest():
+    """Ingest new products from sourcing results into the review queue."""
+    try:
+        from execution.sourcing_review_queue import get_db, ingest_dir
+        conn = get_db()
+        count = ingest_dir(conn)
+        conn.close()
+        return jsonify({"ingested": count})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 if __name__ == "__main__":
     cleanup_old_results()
     app.run(debug=True, port=5050)
