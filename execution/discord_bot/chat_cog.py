@@ -543,11 +543,32 @@ class ChatCog(commands.Cog):
         # Build multimodal content if images are attached
         _image_blocks = []
         if image_urls:
+            import base64
+            import httpx
             for img_url in image_urls[:4]:  # Max 4 images per message
-                _image_blocks.append({
-                    "type": "image",
-                    "source": {"type": "url", "url": img_url},
-                })
+                try:
+                    # Download image and convert to base64 (Discord CDN URLs need direct fetch)
+                    img_resp = httpx.get(img_url, timeout=10.0, follow_redirects=True)
+                    if img_resp.status_code == 200:
+                        ct = img_resp.headers.get("content-type", "image/png")
+                        # Normalize content type
+                        if "jpeg" in ct or "jpg" in ct:
+                            media_type = "image/jpeg"
+                        elif "png" in ct:
+                            media_type = "image/png"
+                        elif "gif" in ct:
+                            media_type = "image/gif"
+                        elif "webp" in ct:
+                            media_type = "image/webp"
+                        else:
+                            media_type = "image/png"
+                        b64 = base64.standard_b64encode(img_resp.content).decode("utf-8")
+                        _image_blocks.append({
+                            "type": "image",
+                            "source": {"type": "base64", "media_type": media_type, "data": b64},
+                        })
+                except Exception as img_err:
+                    print(f"[chat-cog] Failed to download image: {img_err}", file=sys.stderr)
 
         # Inject recent channel conversation for context (so Nova knows what was discussed)
         # Live context = last 200 messages. For older history, pull a compressed summary from DB.
