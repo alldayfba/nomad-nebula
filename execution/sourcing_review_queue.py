@@ -318,6 +318,61 @@ def reject_products(conn: sqlite3.Connection, ids: list[int], reason: str = "") 
 # ── Discord Send ─────────────────────────────────────────────────────────────
 
 
+def _get_gift_card_discount(retailer_name: str) -> str:
+    """Look up current gift card discount for a retailer from CardBear DB."""
+    try:
+        gc_db = TMP_DIR / "price_tracker.db"
+        if not gc_db.exists():
+            return "None"
+        conn = sqlite3.connect(str(gc_db))
+        conn.row_factory = sqlite3.Row
+        row = conn.execute(
+            "SELECT discount_percent, cardbear_url FROM gift_card_latest WHERE LOWER(retailer_name) = LOWER(?) AND discount_percent > 0",
+            (retailer_name,)
+        ).fetchone()
+        conn.close()
+        if row and row["discount_percent"] > 0:
+            url_part = f" — [CardBear]({row['cardbear_url']})" if row.get("cardbear_url") else ""
+            return f"{row['discount_percent']:.1f}% off gift cards{url_part}"
+    except Exception:
+        pass
+    return "None"
+
+
+def _extract_retailer_from_url(url: str) -> str:
+    """Extract retailer name from a source URL."""
+    if not url:
+        return ""
+    url_lower = url.lower()
+    retailers = {
+        "walmart": "Walmart", "target": "Target", "cvs": "CVS",
+        "walgreens": "Walgreens", "costco": "Costco", "homedepot": "Home Depot",
+        "lowes": "Lowe's", "bestbuy": "Best Buy", "kohls": "Kohl's",
+        "macys": "Macy's", "nordstrom": "Nordstrom", "sephora": "Sephora",
+        "ulta": "Ulta", "staples": "Staples", "gamestop": "GameStop",
+        "nike": "Nike", "adidas": "Adidas", "amazon": "Amazon",
+    }
+    for key, name in retailers.items():
+        if key in url_lower:
+            return name
+    return ""
+
+
+def _get_product_image(product: dict) -> str | None:
+    """Get a product image URL. Try raw_json first, then Amazon fallback."""
+    # Check if the scan result stored an image URL
+    raw = product.get("raw_json")
+    if raw:
+        try:
+            data = json.loads(raw) if isinstance(raw, str) else raw
+            for key in ("image_url", "image", "img_url", "thumbnail", "amazon_image"):
+                if data.get(key):
+                    return data[key]
+        except Exception:
+            pass
+    return None
+
+
 def format_discord_embed(product: dict) -> dict:
     """Format a single product as a Discord embed."""
     roi_str = f"{product['roi_percent']:.0f}%" if product.get('roi_percent') else "N/A"
@@ -335,8 +390,40 @@ def format_discord_embed(product: dict) -> dict:
     sellers = product.get('fba_seller_count', '?')
     amz_on = "Yes" if product.get('amazon_on_listing') else "No"
 
+    # Auto-lookup gift card discount from CardBear
+    retailer = _extract_retailer_from_url(product.get('source_url', ''))
+    coupon_str = product.get('coupon') or ""
+    gc_discount_pct = 0.0
+    if retailer:
+        gc_info = _get_gift_card_discount(retailer)
+        if gc_info != "None":
+            coupon_str = gc_info
+            # Extract the discount % for ROI calculation
+            import re as _re
+            m = _re.search(r'([\d.]+)%', gc_info)
+            if m:
+                gc_discount_pct = float(m.group(1))
+    if not coupon_str:
+        coupon_str = "None"
+
+    # Calculate ROI with gift card discount applied
+    roi_with_gc = "N/A"
+    if gc_discount_pct > 0 and product.get('source_price') and product.get('amazon_price'):
+        discounted_cost = product['source_price'] * (1 - gc_discount_pct / 100)
+        gc_profit = product.get('profit', 0) + (product['source_price'] - discounted_cost)
+        if discounted_cost > 0:
+            roi_with_gc = f"{(gc_profit / discounted_cost * 100):.0f}%"
+
+    # Build ROI display — show both if gift card discount exists
+    if gc_discount_pct > 0 and roi_with_gc != "N/A":
+        roi_display = f"{roi_str} → **{roi_with_gc}** w/ GC"
+    else:
+        roi_display = roi_str
+
     notes_parts = []
     notes_parts.append(f"FBA Sellers: {sellers} | Amazon on listing: {amz_on}")
+    if retailer:
+        notes_parts.append(f"Source: {retailer}")
     if product.get('source_url'):
         notes_parts.append(f"[Buy Link]({product['source_url']})")
 
@@ -349,18 +436,20 @@ def format_discord_embed(product: dict) -> dict:
             {"name": "💰 Sell Price", "value": amz, "inline": True},
             {"name": "📈 Profit", "value": profit_str, "inline": True},
             {"name": "🧮 Profit Margin", "value": margin, "inline": True},
-            {"name": "📊 ROI", "value": roi_str, "inline": True},
+            {"name": "📊 ROI", "value": roi_display, "inline": True},
             {"name": "📦 ASIN", "value": f"[{asin}](https://www.amazon.com/dp/{asin})", "inline": True},
             {"name": "📉 BSR", "value": f"{bsr_str} in {product.get('category', 'Unknown')}", "inline": True},
-            {"name": "🎟️ Coupons", "value": product.get('coupon', 'None'), "inline": True},
+            {"name": "🎟️ Coupons / Gift Cards", "value": coupon_str, "inline": True},
             {"name": "📝 Notes", "value": "\n".join(notes_parts) if notes_parts else "—", "inline": False},
         ],
         "footer": {"text": "24/7 Profits AI Sourcing"},
         "timestamp": datetime.utcnow().isoformat(),
     }
 
-    if asin and asin != '?':
-        embed["thumbnail"] = {"url": f"https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN={asin}&Format=_SL250_&ID=AsinImage&ServiceVersion=20070822"}
+    # Try to get a real product image
+    img_url = _get_product_image(product)
+    if img_url:
+        embed["thumbnail"] = {"url": img_url}
 
     return embed
 
