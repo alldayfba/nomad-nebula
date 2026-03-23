@@ -194,6 +194,29 @@ def extract_keepa_data(product: dict, price: float) -> dict:
         elif amz_price is not None:
             amazon_on_listing = False
 
+    # Weight (for accurate FBA fee calculation)
+    weight_lbs = None
+    package_weight = product.get("packageWeight")
+    item_weight = product.get("itemWeight")
+    if package_weight and package_weight > 0:
+        weight_lbs = package_weight / 100.0  # Keepa stores in hundredths of pounds
+    elif item_weight and item_weight > 0:
+        weight_lbs = item_weight / 100.0
+
+    # Price staleness: check how recent the price data is
+    price_age_days = None
+    csv_data = product.get("csv", [])
+    if csv_data and len(csv_data) > 0:
+        # Check Amazon price CSV (index 0) for last timestamp
+        amz_csv = csv_data[0] if csv_data[0] else []
+        if amz_csv and len(amz_csv) >= 2:
+            import time as _time
+            last_ts_keepa = amz_csv[-2]  # Second-to-last = last timestamp
+            if last_ts_keepa and last_ts_keepa > 0:
+                # Keepa epoch: 2011-01-01
+                last_unix = 1293840000 + (last_ts_keepa * 60)
+                price_age_days = round((_time.time() - last_unix) / 86400, 1)
+
     return {
         "asin": product.get("asin", ""),
         "title": product.get("title", ""),
@@ -204,6 +227,8 @@ def extract_keepa_data(product: dict, price: float) -> dict:
         "fba_seller_count": fba_seller_count,
         "new_offer_count": new_offer_count,
         "amazon_on_listing": amazon_on_listing,
+        "weight_lbs": weight_lbs,
+        "price_age_days": price_age_days,
         "product_url": f"https://www.amazon.com/dp/{product.get('asin', '')}",
         "match_confidence": 0.92,
         "match_method": "keepa_batch_upc",

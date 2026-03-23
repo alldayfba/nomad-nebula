@@ -63,6 +63,11 @@ except ImportError:
     _is_ungated = None
 
 try:
+    from execution.gating_checker import check_gating as _check_gating
+except ImportError:
+    _check_gating = None
+
+try:
     from execution.catalog_diff import diff_catalogs, find_previous_catalog, print_diff_summary
 except ImportError:
     diff_catalogs = None
@@ -130,8 +135,21 @@ def prefilter(products: list[dict], min_price: float = 5.0, max_price: float = 0
         if max_price > 0 and price > max_price:
             continue
 
+        # Detect price drops (compare_at_price vs price)
+        compare = p.get("compare_at_price", 0)
+        if compare and compare > 0 and price < compare:
+            drop_pct = round(((compare - price) / compare) * 100, 1)
+            p["price_drop_pct"] = drop_pct
+            p["original_price"] = compare
+            p["on_sale"] = True
+        else:
+            p["on_sale"] = False
+
         seen_upcs.add(upc)
         filtered.append(p)
+
+    # Sort: sale items first (highest drop %), then by price
+    filtered.sort(key=lambda x: x.get("price_drop_pct", 0), reverse=True)
 
     return filtered
 
@@ -265,7 +283,10 @@ def batch_match(products: list[dict], max_tokens: int = 3000,
 
 def analyze_matches(matched: list[dict], min_roi: float = 15.0,
                     min_profit: float = 2.0, max_bsr: int = 500000,
-                    strict: bool = False) -> list[dict]:
+                    strict: bool = False,
+                    max_sellers: int = 0, min_sellers: int = 0,
+                    min_monthly_sales: int = 0,
+                    no_amazon: bool = False) -> list[dict]:
     """Run profitability calc + velocity analysis on matched products.
 
     Args:
@@ -339,6 +360,17 @@ def analyze_matches(matched: list[dict], min_roi: float = 15.0,
         if bsr and bsr > max_bsr:
             filter_status = "HIGH_BSR"
 
+        # Step 15: Seller count filter
+        fba_count = m.get("fba_seller_count")
+        if max_sellers > 0 and fba_count is not None and fba_count > max_sellers:
+            filter_status = "TOO_MANY_SELLERS"
+        if min_sellers > 0 and fba_count is not None and fba_count < min_sellers:
+            filter_status = "TOO_FEW_SELLERS"
+
+        # Step 16: Amazon-as-seller hard filter (opt-in)
+        if no_amazon and m.get("amazon_on_listing"):
+            filter_status = "AMAZON_ON_LISTING"
+
         if strict and filter_status != "PASS":
             continue  # Old behavior: drop filtered products
 
@@ -347,6 +379,13 @@ def analyze_matches(matched: list[dict], min_roi: float = 15.0,
         # Velocity analysis (cheap mode — uses data already in the Keepa response)
         keepa_raw = m.pop("keepa_raw", {})
         velocity = analyze_velocity(keepa_raw, mode="cheap")
+
+        # Step 16: Monthly sales filter
+        monthly_est = velocity.get("monthly_sales_estimate")
+        if min_monthly_sales > 0 and monthly_est is not None and monthly_est < min_monthly_sales:
+            m["filter_status"] = "LOW_VELOCITY"
+            if strict:
+                continue
 
         # Step 18: IP complaint risk detection from seller count history
         csv_data = keepa_raw.get("csv", [])
@@ -555,15 +594,34 @@ def check_ungating(results: list[dict]) -> list[dict]:
     gated_count = 0
     for r in results:
         brand = r.get("brand", "")
-        if brand and _is_ungated(brand):
-            r["ungated"] = True
-            r["gating_risk"] = False
+        category = r.get("category", "")
+
+        # Use new gating_checker if available (Step 17)
+        if _check_gating:
+            gating = _check_gating(brand, category)
+            r["gating_risk"] = gating["gating_risk"]
+            r["gating_warning"] = gating.get("reason", "")
+            r["gating_recommendation"] = gating.get("recommendation", "")
+            if gating["gating_risk"] in ("high", "medium"):
+                gated_count += 1
+            # Override with student-specific ungating if available
+            if _is_ungated and brand and _is_ungated(brand):
+                r["ungated"] = True
+            else:
+                r["ungated"] = False
+        elif _is_ungated:
+            # Fallback to old student ungated brands check
+            if brand and _is_ungated(brand):
+                r["ungated"] = True
+                r["gating_risk"] = "none"
+            else:
+                r["ungated"] = False
+                r["gating_risk"] = "unknown"
+                r["gating_warning"] = f"Brand '{brand}' may be gated — verify before purchasing"
+                gated_count += 1
         else:
-            r["ungated"] = False
-            r["gating_risk"] = True
-            r["gating_warning"] = f"Brand '{brand}' may be gated — verify before purchasing"
-            # Step 6: No score penalty — informational flag only
-            gated_count += 1
+            r["gating_risk"] = "unknown"
+            r["ungated"] = None
 
     if gated_count:
         print(f"[ungating] {gated_count} products may be brand-gated (flagged, not removed)", file=sys.stderr)
@@ -660,6 +718,12 @@ def format_output(results: list[dict], domain: str, tokens_used: int,
                 "gating_risk": r.get("gating_risk"),
                 "gating_warning": r.get("gating_warning", ""),
                 "filter_status": r.get("filter_status", "PASS"),
+                # Accuracy fields
+                "weight_lbs": r.get("weight_lbs"),
+                "price_age_days": r.get("price_age_days"),
+                "price_stale": (r.get("price_age_days") or 0) > 7,
+                "on_sale": r.get("on_sale", False),
+                "price_drop_pct": r.get("price_drop_pct"),
             }
             for r in results
         ],
@@ -717,6 +781,10 @@ def run_pipeline(
     verify_links: bool = False,
     no_coupon: bool = False,
     strict: bool = False,
+    max_sellers: int = 0,
+    min_sellers: int = 0,
+    min_monthly_sales: int = 0,
+    no_amazon: bool = False,
 ) -> dict:
     """Run the full catalog sourcing pipeline.
 
@@ -819,7 +887,11 @@ def run_pipeline(
 
     # ── Stage 4: Profitability + Velocity ───────────────────────────────
     print("[STAGE 4] Analyzing profitability + velocity...", file=sys.stderr)
-    analyzed = analyze_matches(matched, min_roi=min_roi, min_profit=min_profit, max_bsr=max_bsr, strict=strict)
+    analyzed = analyze_matches(
+        matched, min_roi=min_roi, min_profit=min_profit, max_bsr=max_bsr,
+        strict=strict, max_sellers=max_sellers, min_sellers=min_sellers,
+        min_monthly_sales=min_monthly_sales, no_amazon=no_amazon,
+    )
     print(f"[STAGE 4] Complete: {len(analyzed)} profitable products\n", file=sys.stderr)
 
     # ── Stage 4b: Deep Verify top N ─────────────────────────────────────
@@ -886,6 +958,8 @@ def main():
         description="Full catalog sourcing pipeline — scrape → filter → match → analyze → score"
     )
     parser.add_argument("url", help="Retailer URL (e.g., https://www.shopwss.com)")
+    parser.add_argument("--preset", choices=["beginner", "intermediate", "advanced", "high_ticket", "fast_flips"],
+                        default=None, help="Filter preset (overrides individual filter flags)")
     parser.add_argument("--max-tokens", type=int, default=3000, help="Max Keepa tokens to spend (default: 3000)")
     parser.add_argument("--min-roi", type=float, default=15.0, help="Min ROI %% (default: 15)")
     parser.add_argument("--min-profit", type=float, default=2.0, help="Min profit per unit (default: $2)")
@@ -898,11 +972,16 @@ def main():
     parser.add_argument("--deep-verify", type=int, default=0, help="Deep verify top N with Keepa offers (21 tokens each)")
     parser.add_argument("--verify-links", action="store_true", help="Enable buy link verification (off by default)")
     parser.add_argument("--strict", action="store_true", help="Drop products below thresholds instead of tagging them")
+    parser.add_argument("--max-sellers", type=int, default=0, help="Max FBA sellers (0=no filter, recommended: 15)")
+    parser.add_argument("--min-sellers", type=int, default=0, help="Min FBA sellers (0=no filter)")
+    parser.add_argument("--min-monthly-sales", type=int, default=0, help="Min monthly sales estimate (0=no filter)")
+    parser.add_argument("--no-amazon", action="store_true", help="Filter out listings where Amazon is a seller")
     parser.add_argument("--no-coupon", action="store_true", help="Skip coupon auto-discovery")
     parser.add_argument("--json", action="store_true", help="Output full JSON to stdout")
     args = parser.parse_args()
 
-    output = run_pipeline(
+    # Apply preset if specified (overrides individual filter flags)
+    pipeline_kwargs = dict(
         url=args.url,
         max_tokens=args.max_tokens,
         min_roi=args.min_roi,
@@ -917,7 +996,19 @@ def main():
         verify_links=args.verify_links,
         no_coupon=args.no_coupon,
         strict=args.strict,
+        max_sellers=args.max_sellers,
+        min_sellers=args.min_sellers,
+        min_monthly_sales=args.min_monthly_sales,
+        no_amazon=args.no_amazon,
     )
+
+    if args.preset:
+        from execution.filter_presets import get_preset
+        preset = get_preset(args.preset)
+        pipeline_kwargs.update(preset)
+        print(f"[pipeline] Using '{args.preset}' preset", file=sys.stderr)
+
+    output = run_pipeline(**pipeline_kwargs)
 
     if args.json:
         print(json.dumps(output, indent=2))

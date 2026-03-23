@@ -261,3 +261,27 @@ schedules:
     args: "churn-alerts"
     auto_run: true
     description: Push at-risk/churned student alerts to 247profits for student dashboard
+
+  # ── Sourcing Automation (clearance + daily leads) ──────────────────────
+  # NOTE: auto_run false + dry-run per Learned Rule #6 — Sabbo approves before live sends
+
+  - skill: clearance-scan
+    cron: "0 5 * * *"            # 5 AM daily
+    script: execution/clearance_scanner.py
+    args: "--top 5 --total-tokens 2500 --tier 1"
+    auto_run: false
+    description: Daily clearance scan of top 5 Tier 1 stores
+
+  - skill: daily-leads
+    cron: "0 7 * * *"            # 7 AM daily (after clearance scan completes)
+    script: execution/daily_lead_scanner.py
+    args: "--tier 1 --top 5 --total-tokens 2500 --dry-run"
+    auto_run: false
+    description: Daily lead scanner with Discord alerts (dry-run until approved)
+
+  - skill: reorder-check
+    cron: "0 10 * * 1,4"         # 10 AM Mon + Thu
+    script: execution/reorder_tracker.py
+    args: "check"
+    auto_run: false
+    description: Check tracked products for restock/price changes

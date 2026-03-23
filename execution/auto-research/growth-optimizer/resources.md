@@ -389,3 +389,15 @@ Each entry represents a tested hypothesis and its outcome.
 - Hypothesis: Fix 1 growth system issues to improve throughput
 - Issues identified:
   - [low_conversion] Only 0% of sourced products are profitable — refine sourcing criteria
+
+### Experiment 61 — 2026-03-22 20:00
+**[LOSS]** 75.00 → 75.00 (delta: +0.00)
+- Hypothesis: Fix 1 growth system issues to improve throughput
+- Issues identified:
+  - [low_conversion] Only 0% of sourced products are profitable — refine sourcing criteria
+
+### Experiment 62 — 2026-03-22 20:58
+**[LOSS]** 75.00 → 75.00 (delta: +0.00)
+- Hypothesis: Fix 1 growth system issues to improve throughput
+- Issues identified:
+  - [low_conversion] Only 0% of sourced products are profitable — refine sourcing criteria

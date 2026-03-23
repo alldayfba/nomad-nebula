@@ -161,16 +161,38 @@ def _parse_sitemap_for_products(xml_text: str, base_url: str) -> list[str]:
     sitemap_locs = root.findall(".//sm:sitemap/sm:loc", ns)
     if sitemap_locs:
         headers = {"User-Agent": USER_AGENT}
+        product_kws = ["product", "item", "catalog", "pdp", "sku"]
+        skip_kws = ["image", "video", "blog", "article", "news", "facet",
+                     "brand-shop", "brand-cat", "thematic", "landing", "categor"]
+
+        # First: try product-specific sub-sitemaps
         for loc in sitemap_locs:
             url = loc.text.strip() if loc.text else ""
-            # Only fetch product sitemaps
-            if any(kw in url.lower() for kw in ["product", "item", "catalog"]):
+            if any(kw in url.lower() for kw in product_kws):
                 try:
                     r = requests.get(url, headers=headers, timeout=15)
                     if r.status_code == 200:
-                        product_urls.extend(_extract_urls_from_sitemap(r.text, ns))
+                        found = _extract_urls_from_sitemap(r.text, ns)
+                        product_urls.extend(found)
+                        print(f"[catalog] Sub-sitemap {url}: {len(found)} product URLs", file=sys.stderr)
                 except Exception:
                     continue
+
+        # If none found, try ALL non-skip sub-sitemaps (e.g., sitemap_1.xml)
+        if not product_urls:
+            for loc in sitemap_locs:
+                url = loc.text.strip() if loc.text else ""
+                if any(kw in url.lower() for kw in skip_kws):
+                    continue
+                try:
+                    r = requests.get(url, headers=headers, timeout=15)
+                    if r.status_code == 200:
+                        found = _extract_urls_from_sitemap(r.text, ns)
+                        product_urls.extend(found)
+                        print(f"[catalog] Sub-sitemap {url}: {len(found)} product URLs", file=sys.stderr)
+                except Exception:
+                    continue
+
         return product_urls
 
     # Direct URL list
@@ -406,15 +428,38 @@ def scrape_sitemap_jsonld(base_url: str, limit: int = 0, delay: float = 1.0,
 
     print(f"[catalog] Scraping via sitemap + JSON-LD: {base}", file=sys.stderr)
 
-    # Get product URLs from sitemap
+    # Get product URLs from sitemap (try multiple locations)
+    product_urls = []
+    sitemap_locations = [
+        f"{base}/sitemap.xml",
+        f"{base}/sitemap_index.xml",
+    ]
+
+    # Check robots.txt for sitemap location
     try:
-        r = requests.get(f"{base}/sitemap.xml", headers=headers, timeout=15)
-        if r.status_code != 200:
-            print(f"[catalog] No sitemap found at {base}/sitemap.xml", file=sys.stderr)
-            return []
-        product_urls = _parse_sitemap_for_products(r.text, base)
-    except Exception as e:
-        print(f"[catalog] Sitemap fetch error: {e}", file=sys.stderr)
+        robots = requests.get(f"{base}/robots.txt", headers=headers, timeout=10)
+        if robots.status_code == 200:
+            for line in robots.text.split("\n"):
+                if line.lower().startswith("sitemap:"):
+                    sm_url = line.split(":", 1)[1].strip()
+                    if sm_url and sm_url not in sitemap_locations:
+                        sitemap_locations.insert(0, sm_url)
+    except Exception:
+        pass
+
+    for sitemap_url in sitemap_locations:
+        try:
+            r = requests.get(sitemap_url, headers=headers, timeout=15)
+            if r.status_code == 200 and "<" in r.text[:100]:
+                product_urls = _parse_sitemap_for_products(r.text, base)
+                if product_urls:
+                    print(f"[catalog] Found sitemap at {sitemap_url}", file=sys.stderr)
+                    break
+        except Exception:
+            continue
+
+    if not product_urls:
+        print(f"[catalog] No sitemap/product URLs found for {base}", file=sys.stderr)
         return []
 
     if not product_urls:
@@ -431,36 +476,94 @@ def scrape_sitemap_jsonld(base_url: str, limit: int = 0, delay: float = 1.0,
     if limit > 0:
         product_urls = product_urls[:limit]
 
-    for idx, url in enumerate(product_urls):
+    # Probe first 5 URLs to detect if we need Playwright (403/JS-rendered)
+    use_playwright = False
+    fail_count = 0
+    for probe_url in product_urls[:5]:
         try:
-            r = requests.get(url, headers=headers, timeout=15)
-            if r.status_code != 200:
+            r = requests.get(probe_url, headers=headers, timeout=10)
+            if r.status_code in (403, 429):
+                fail_count += 1
+            elif r.status_code == 200:
+                extracted = _extract_jsonld_product(r.text, probe_url)
+                if not extracted:
+                    fail_count += 1
+        except Exception:
+            fail_count += 1
+
+    if fail_count >= 3:
+        print(f"[catalog] {fail_count}/5 probe pages failed — switching to Playwright", file=sys.stderr)
+        use_playwright = True
+
+    # ── Playwright-based scraping ────────────────────────────────────
+    if use_playwright:
+        try:
+            from playwright.sync_api import sync_playwright
+        except ImportError:
+            print("[catalog] Playwright not installed — cannot scrape JS-rendered pages", file=sys.stderr)
+            return products
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            context = browser.new_context(user_agent=USER_AGENT)
+            page = context.new_page()
+
+            for idx, url in enumerate(product_urls):
+                try:
+                    page.goto(url, wait_until="domcontentloaded", timeout=20000)
+                    time.sleep(1)  # Let JS render
+                    html = page.content()
+                    extracted = _extract_jsonld_product(html, url)
+                    if extracted:
+                        products.append(extracted)
+                except Exception as e:
+                    if idx < 3:
+                        print(f"[catalog] Playwright error on {url}: {e}", file=sys.stderr)
+                    continue
+
+                if (idx + 1) % 50 == 0:
+                    print(
+                        f"[catalog] Progress: {idx + 1}/{len(product_urls)} pages, "
+                        f"{len(products)} products extracted (Playwright)",
+                        file=sys.stderr,
+                    )
+                if checkpoint_path and (idx + 1) % CHECKPOINT_INTERVAL == 0:
+                    _save_checkpoint(checkpoint_path, products, resume_from + idx + 1)
+
+            browser.close()
+
+    else:
+        # ── Standard requests-based scraping ────────────────────────────
+        for idx, url in enumerate(product_urls):
+            try:
+                r = requests.get(url, headers=headers, timeout=15)
+                if r.status_code != 200:
+                    continue
+
+                extracted = _extract_jsonld_product(r.text, url)
+                if extracted:
+                    products.append(extracted)
+
+            except Exception as e:
+                if idx < 3:
+                    print(f"[catalog] Error scraping {url}: {e}", file=sys.stderr)
                 continue
 
-            extracted = _extract_jsonld_product(r.text, url)
-            if extracted:
-                products.append(extracted)
+            if (idx + 1) % 50 == 0:
+                print(
+                    f"[catalog] Progress: {idx + 1}/{len(product_urls)} pages, "
+                    f"{len(products)} products extracted",
+                    file=sys.stderr,
+                )
+            if checkpoint_path and (idx + 1) % CHECKPOINT_INTERVAL == 0:
+                _save_checkpoint(checkpoint_path, products, resume_from + idx + 1)
 
-        except Exception as e:
-            print(f"[catalog] Error scraping {url}: {e}", file=sys.stderr)
-            continue
-
-        if (idx + 1) % 50 == 0:
-            print(
-                f"[catalog] Progress: {idx + 1}/{len(product_urls)} pages, "
-                f"{len(products)} products extracted",
-                file=sys.stderr,
-            )
-
-        # Checkpoint
-        if checkpoint_path and (idx + 1) % CHECKPOINT_INTERVAL == 0:
-            _save_checkpoint(checkpoint_path, products, resume_from + idx + 1)
-
-        time.sleep(delay)
+            time.sleep(delay)
 
     print(
         f"[catalog] Done: {len(product_urls)} pages visited, "
-        f"{len(products)} products extracted",
+        f"{len(products)} products extracted"
+        f"{' (via Playwright)' if use_playwright else ''}",
         file=sys.stderr,
     )
     return products

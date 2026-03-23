@@ -238,10 +238,17 @@ IP_RISK_BRANDS = [
 
 # ─── Multi-pack Detection Patterns ───────────────────────────────────────────
 MULTIPACK_PATTERNS = [
-    r"(\d+)\s*-?\s*pack", r"pack\s*of\s*(\d+)", r"(\d+)\s*count",
+    r"(\d+)\s*-?\s*pack\b", r"pack\s*of\s*(\d+)", r"(\d+)\s*count\b",
     r"(\d+)\s*ct\b", r"set\s*of\s*(\d+)", r"(\d+)\s*piece",
     r"(\d+)\s*pk\b", r"bundle\s*of\s*(\d+)",
 ]
+
+# Patterns that look like pack counts but aren't (years, model numbers)
+MULTIPACK_FALSE_POSITIVES = re.compile(
+    r"(?:20[12]\d|19\d\d)"  # Years: 2020-2029, 1900-1999
+    r"|(?:model|version|gen|edition|series|v)\s*\d+"  # Model numbers
+    r"|(?:\d{3,}[a-z])"  # Part numbers like "500ml"
+, re.IGNORECASE)
 
 # Weight/volume normalization (all → oz for comparison)
 WEIGHT_CONVERSIONS = {
@@ -327,8 +334,48 @@ def get_referral_fee_rate(category):
     return REFERRAL_FEE_RATES["default"]
 
 
-def estimate_fba_fee(sell_price):
-    """Estimate FBA fulfillment fee based on price bracket."""
+def estimate_fba_fee(sell_price, weight_lbs=None):
+    """Estimate FBA fulfillment fee based on price bracket and weight.
+
+    If weight is available (from Keepa), uses weight-based tiers for accuracy.
+    Otherwise falls back to price-based estimate.
+
+    Weight-based FBA fees (2026, standard-size):
+    - 2 oz or less: $3.06
+    - 2-6 oz: $3.15
+    - 6-10 oz: $3.33
+    - 10 oz - 1 lb: $3.68
+    - 1-1.5 lb: $4.25
+    - 1.5-2 lb: $4.95
+    - 2-2.5 lb: $5.40
+    - 2.5-3 lb: $5.75
+    - Each additional lb: +$0.40
+    """
+    if weight_lbs and weight_lbs > 0:
+        # Weight-based (more accurate when Keepa provides weight)
+        oz = weight_lbs * 16
+        if oz <= 2:
+            return 3.06
+        elif oz <= 6:
+            return 3.15
+        elif oz <= 10:
+            return 3.33
+        elif oz <= 16:
+            return 3.68
+        elif weight_lbs <= 1.5:
+            return 4.25
+        elif weight_lbs <= 2:
+            return 4.95
+        elif weight_lbs <= 2.5:
+            return 5.40
+        elif weight_lbs <= 3:
+            return 5.75
+        else:
+            # 3+ lbs: $5.75 + $0.40 per additional lb
+            extra_lbs = weight_lbs - 3
+            return round(5.75 + (extra_lbs * 0.40), 2)
+
+    # Fallback: price-based estimate
     if not sell_price or sell_price <= 0:
         return 5.00  # safe default
     for max_price, fee in FBA_FEE_BY_PRICE:
@@ -490,7 +537,11 @@ def _extract_pack_quantity(title):
         match = re.search(pattern, title_lower)
         if match:
             qty = int(match.group(1))
-            if 2 <= qty <= 200:  # sanity check — ignore "1 pack" or absurd numbers
+            # Sanity: 2-100 range, and the matched text shouldn't be a year/model
+            if 2 <= qty <= 100:
+                matched_text = match.group(0)
+                if MULTIPACK_FALSE_POSITIVES.search(matched_text):
+                    continue  # Skip years like "2024 count" or model numbers
                 return qty
     return 1
 

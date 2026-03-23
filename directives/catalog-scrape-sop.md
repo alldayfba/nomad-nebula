@@ -15,10 +15,24 @@
 ## Pipeline Stages
 
 1. **SCRAPE** (0 tokens) — Dump entire retailer catalog. Auto-detects platform (Shopify API, sitemap + JSON-LD, or Playwright). Outputs UPC + price + title per variant.
-2. **PRE-FILTER** (0 tokens) — Price range ($5-$60 default), valid UPC, in-stock, dedup, coupon math.
-3. **MATCH** (1 token per product) — Batch UPC lookup on Keepa (100/batch). Maps UPC → ASIN + Amazon price + BSR.
-4. **ANALYZE** (0 extra tokens) — Profitability calc (fees, tax, shipping) + velocity analysis (BSR trend + FBA seller count).
-5. **SCORE** (0 tokens) — Confidence scoring → verify → output leads list.
+2. **PRE-FILTER** (0 tokens) — Price range (no cap by default), valid UPC, in-stock, dedup, coupon math, price-drop detection.
+3. **MATCH** (1 token per product) — Batch UPC lookup on Keepa (100/batch). Maps UPC → ASIN + Amazon price + BSR + weight.
+4. **ANALYZE** (0 extra tokens) — Real FBA fee calc (weight-based when available) + velocity analysis + IP risk detection + gating check + Amazon-as-seller detection.
+5. **SCORE** (0 tokens) — Confidence scoring (missing data = neutral 50, not 0) → output ALL products with positive margin (StartUpFBA style, tag don't drop).
+
+## Smart Filters (added 2026-03-22)
+
+Every product now includes: `amazon_on_listing`, `ip_risk`, `gating_risk`, `filter_status`, `weight_lbs`, `price_age_days`, `price_stale`, `on_sale`, `price_drop_pct`. Filter presets: `--preset beginner/intermediate/advanced/high_ticket/fast_flips`.
+
+## Store Selection (CRITICAL)
+
+**Multi-brand retailers work best** — stores that carry Nike, Adidas, health/beauty brands etc. that are also sold on Amazon. DTC brands (BBW, ColourPop, Fenty) don't work because their products aren't on Amazon. Target clearance pages specifically — `clearance_scanner.py` handles this.
+
+| Store Type | Hit Rate | Example |
+|---|---|---|
+| Multi-brand clearance | HIGH | Walmart, Target, CVS, Kohl's clearance |
+| Multi-brand full price | MEDIUM | ShopWSS, Dick's (arb from MSRP gap) |
+| DTC / single-brand | LOW | BBW, Fenty, ColourPop (products not on Amazon) |
 
 ## CLI Usage
 

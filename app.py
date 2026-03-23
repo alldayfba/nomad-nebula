@@ -514,7 +514,9 @@ def api_sourcing():
     data = request.get_json() or {}
     api_key = request.headers.get("X-API-Key") or data.get("api_key", "")
     expected_key = os.environ.get("SOURCING_API_KEY", "")
-    if expected_key and api_key != expected_key:
+    if not expected_key:
+        return jsonify({"error": "Server misconfiguration: SOURCING_API_KEY not set"}), 500
+    if api_key != expected_key:
         return jsonify({"error": "Unauthorized", "message": "Valid X-API-Key header required"}), 401
 
     # C3 — Keepa token budget guard
@@ -531,12 +533,49 @@ def api_sourcing():
                 "message": f"Keepa token budget low ({int(tokens_left)} remaining). Try again in a few minutes.",
                 "tokens_left": int(tokens_left),
             }), 429
-    except Exception:
-        pass  # Non-fatal — proceed without token check if Keepa unavailable
+    except Exception as e:
+        app.logger.warning(f"Keepa token check failed: {e}")
+        return jsonify({
+            "error": "token_check_failed",
+            "message": "Unable to verify Keepa token budget. Try again shortly.",
+        }), 503
 
     mode = data.get("mode", "").strip()
     if not mode:
         return jsonify({"ok": False, "error": "mode is required"}), 400
+    VALID_MODES = {"url", "brand", "category", "oos", "deals", "a2a", "finder", "catalog", "scan"}
+    if mode not in VALID_MODES:
+        return jsonify({"ok": False, "error": f"Invalid mode. Must be one of: {', '.join(sorted(VALID_MODES))}"}), 400
+
+    # SSRF protection — validate URLs for URL-based modes
+    def _validate_external_url(url_str):
+        from urllib.parse import urlparse
+        parsed = urlparse(url_str)
+        if parsed.scheme not in ("http", "https"):
+            return False
+        hostname = parsed.hostname or ""
+        blocked = ("localhost", "127.0.0.1", "0.0.0.0", "[::]", "metadata.google.internal")
+        if hostname in blocked:
+            return False
+        if hostname.startswith("169.254.") or hostname.startswith("10."):
+            return False
+        if hostname.startswith("192.168."):
+            return False
+        if hostname.startswith("172."):
+            parts = hostname.split(".")
+            if len(parts) >= 2:
+                try:
+                    second = int(parts[1])
+                    if 16 <= second <= 31:
+                        return False
+                except ValueError:
+                    pass
+        return True
+
+    target_url = data.get("url") or data.get("retailer_url", "")
+    if mode in ("url", "catalog") and target_url:
+        if not _validate_external_url(target_url):
+            return jsonify({"ok": False, "error": "URL must be a public HTTP(S) URL"}), 400
 
     # Build CLI args (same logic as /sourcing/cli)
     cli_args = [mode]

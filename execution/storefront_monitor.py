@@ -371,6 +371,24 @@ def _run_stage2(
         )
         db.update_storefront_last_active(seller_id, had_new_product=True)
 
+        # Step 13: Write to unified scan_results for cross-mode querying
+        try:
+            from storefront_stalker import normalize_to_schema_b
+            schema_b = normalize_to_schema_b({
+                "asin": asin, "title": product_name, "price": amazon_price,
+                "sales_rank": bsr, "fba_seller_count": fba_sellers,
+                "amazon_on_listing": amazon_on_listing,
+                "deal_score": {"A": 80, "B": 60, "C": 40, "?": 20}.get(grade, 20),
+            }, seller_id=seller_id)
+            schema_b["estimated_profit"] = profit
+            schema_b["estimated_roi"] = roi
+            schema_b["source_url"] = buy_link or f"https://www.amazon.com/dp/{asin}"
+            schema_b["source_retailer"] = retailer_name or f"Storefront Monitor ({seller_id})"
+            schema_b["mode"] = "storefront_monitor"
+            db.insert_scan_result(schema_b, mode="storefront_monitor")
+        except Exception as exc:
+            logger.debug("[monitor] Schema B write failed for %s: %s", asin, exc)
+
         # Build final embed
         embed = _build_stage2_embed(
             seller_name=seller_name, asin=asin, product_name=product_name,
