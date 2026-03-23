@@ -110,7 +110,8 @@ def _get_student_context(discord_user_id):
 
 def _log_chat_to_nova(user_id: str, platform: str, question: str, answer: str,
                       channel_id: str = "", tokens_in: int = 0, tokens_out: int = 0):
-    """Log every chat interaction to nova.db for audit trail."""
+    """Log every chat interaction to nova.db AND Supabase for cross-platform sync."""
+    # Local SQLite log
     try:
         from nova_core.database import get_conn
         conn = get_conn()
@@ -122,7 +123,70 @@ def _log_chat_to_nova(user_id: str, platform: str, question: str, answer: str,
         )
         conn.commit()
     except Exception:
-        pass  # Logging should never break the bot
+        pass
+
+    # Supabase sync — fire and forget
+    _sync_chat_to_supabase(user_id, platform, question, answer)
+
+
+def _sync_chat_to_supabase(discord_user_id: str, platform: str, question: str, answer: str):
+    """Sync Discord Nova conversations to Supabase so SaaS Nova can see them."""
+    try:
+        import httpx
+        sb_url = os.getenv("PROFITS_SUPABASE_URL") or os.getenv("STUDENT_SAAS_SUPABASE_URL", "")
+        sb_key = os.getenv("PROFITS_SUPABASE_KEY") or os.getenv("STUDENT_SAAS_SUPABASE_KEY", "")
+        if not sb_url or not sb_key:
+            return
+
+        headers = {"apikey": sb_key, "Authorization": f"Bearer {sb_key}", "Content-Type": "application/json"}
+
+        # Find the Supabase user_id from discord_user_id
+        r = httpx.get(
+            f"{sb_url}/rest/v1/users?discord_user_id=eq.{discord_user_id}&select=id",
+            headers=headers, timeout=5.0,
+        )
+        users = r.json() if r.status_code == 200 else []
+        if not users:
+            return
+        supabase_user_id = users[0]["id"]
+
+        # Find or create a conversation for this platform
+        conv_r = httpx.get(
+            f"{sb_url}/rest/v1/academy_chat_conversations?user_id=eq.{supabase_user_id}&title=eq.Discord&select=id&limit=1",
+            headers=headers, timeout=5.0,
+        )
+        convs = conv_r.json() if conv_r.status_code == 200 else []
+
+        if convs:
+            conv_id = convs[0]["id"]
+            httpx.patch(
+                f"{sb_url}/rest/v1/academy_chat_conversations?id=eq.{conv_id}",
+                headers=headers, json={"updated_at": datetime.utcnow().isoformat()}, timeout=5.0,
+            )
+        else:
+            cr = httpx.post(
+                f"{sb_url}/rest/v1/academy_chat_conversations",
+                headers={**headers, "Prefer": "return=representation"},
+                json={"user_id": supabase_user_id, "title": "Discord"},
+                timeout=5.0,
+            )
+            created = cr.json()
+            conv_id = created[0]["id"] if isinstance(created, list) and created else None
+            if not conv_id:
+                return
+
+        # Insert both messages
+        httpx.post(
+            f"{sb_url}/rest/v1/academy_chat_messages",
+            headers=headers,
+            json=[
+                {"conversation_id": conv_id, "role": "user", "content": question[:2000]},
+                {"conversation_id": conv_id, "role": "assistant", "content": answer[:4000]},
+            ],
+            timeout=5.0,
+        )
+    except Exception:
+        pass  # Sync should never break the bot
 
 try:
     from anthropic import AsyncAnthropic
@@ -566,17 +630,75 @@ class ChatCog(commands.Cog):
         tokens_in = 0
         tokens_out = 0
 
+        # Web search tool definition
+        web_search_tool = {
+            "name": "web_search",
+            "description": "Search the web for current info about Amazon FBA, ecommerce, products, or any topic. Use when you need up-to-date data.",
+            "input_schema": {
+                "type": "object",
+                "properties": {"query": {"type": "string", "description": "The search query"}},
+                "required": ["query"],
+            },
+        }
+
+        system_prompt += "\n\nYou have a web_search tool. Use it when students ask about current Amazon policies, fees, product research, or anything you're unsure about. Reference Sabbo's frameworks FIRST, then supplement with search results."
+
+        async def _do_web_search(query: str) -> str:
+            """DuckDuckGo instant answer — free, no key."""
+            try:
+                import aiohttp
+                async with aiohttp.ClientSession() as s:
+                    async with s.get(
+                        f"https://api.duckduckgo.com/?q={query}&format=json&no_html=1&skip_disambig=1",
+                        timeout=aiohttp.ClientTimeout(total=5),
+                    ) as r:
+                        if r.status != 200:
+                            return "Search unavailable."
+                        d = await r.json(content_type=None)
+                        parts = []
+                        if d.get("AbstractText"):
+                            parts.append(d["AbstractText"])
+                        if d.get("Answer"):
+                            parts.append(d["Answer"])
+                        for t in list(d.get("RelatedTopics") or [])[:5]:
+                            if isinstance(t, dict) and t.get("Text"):
+                                parts.append(t["Text"])
+                        return "\n\n".join(parts) if parts else "No results found."
+            except Exception:
+                return "Search unavailable."
+
+        async def _call_with_tools(api_client, msgs, max_loops=3):
+            """Call Claude with web_search tool support, handling tool_use responses."""
+            current_msgs = list(msgs)
+            for _ in range(max_loops):
+                coro = api_client.messages.create(
+                    model=self.model, max_tokens=1800,
+                    system=system_prompt, messages=current_msgs,
+                    tools=[web_search_tool],
+                )
+                response = await asyncio.wait_for(coro, timeout=45.0)
+
+                # Check for tool use
+                tool_block = next((b for b in response.content if b.type == "tool_use"), None)
+                if tool_block and tool_block.name == "web_search":
+                    search_q = (tool_block.input or {}).get("query", "")
+                    search_result = await _do_web_search(search_q)
+                    current_msgs.append({"role": "assistant", "content": response.content})
+                    current_msgs.append({"role": "user", "content": [
+                        {"type": "tool_result", "tool_use_id": tool_block.id, "content": search_result}
+                    ]})
+                    continue
+
+                # No tool use — extract text
+                text_block = next((b for b in response.content if b.type == "text"), None)
+                return (text_block.text if text_block else "", response.usage.input_tokens, response.usage.output_tokens)
+            return ("I had trouble searching. Let me answer based on what I know.", 0, 0)
+
         # Attempt 1: Local Claude CLI proxy (free via Max plan)
         if client:
             try:
-                coro = client.messages.create(
-                    model=self.model, max_tokens=1800,
-                    system=system_prompt, messages=messages,
-                )
-                response = await asyncio.wait_for(coro, timeout=45.0)
-                reply = response.content[0].text
-                tokens_in = response.usage.input_tokens
-                tokens_out = response.usage.output_tokens
+                result = await _call_with_tools(client, messages)
+                reply, tokens_in, tokens_out = result[0], result[1], result[2]
                 _proxy_health.record_success()
                 _error_tracker.record_success(_time_mod.time() - _call_start)
             except Exception as e1:
@@ -607,14 +729,8 @@ class ChatCog(commands.Cog):
         # Attempt 3: Direct API key (costs money, last resort)
         if reply is None and self.claude_api:
             try:
-                coro3 = self.claude_api.messages.create(
-                    model=self.model, max_tokens=1800,
-                    system=system_prompt, messages=messages,
-                )
-                response = await asyncio.wait_for(coro3, timeout=45.0)
-                reply = response.content[0].text
-                tokens_in = response.usage.input_tokens
-                tokens_out = response.usage.output_tokens
+                result3 = await _call_with_tools(self.claude_api, messages)
+                reply, tokens_in, tokens_out = result3[0], result3[1], result3[2]
             except Exception as e3:
                 self.db.log_audit(str(user_id), "api_error", str(e3)[:500])
 
