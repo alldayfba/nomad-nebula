@@ -820,6 +820,16 @@
     #ghl-webinar-wrapper .ghl-countdown-number { font-size: 26px; }
     #ghl-webinar-wrapper .ghl-countdown-sep { font-size: 18px; }
   }
+
+  /* Rotating purple border for Typeform modal */
+  @property --tf-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+  @keyframes tf-rotate { to { --tf-angle: 360deg; } }
+
+  /* Typeform modal display fix */
+  #typeform-modal[style*="display: block"],
+  #typeform-modal[style*="display:block"] {
+    display: flex !important;
+  }
 </style>
 
 <!-- MAIN CONTENT -->
@@ -845,14 +855,17 @@
   </div>
 
   <!-- Typeform Modal -->
-  <div id="typeform-modal" style="display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px);">
-    <div style="position:relative; max-width:600px; margin:5vh auto; height:90vh; border-radius:20px; overflow:hidden; background:#fff;">
-      <button onclick="closeTypeform()" style="position:absolute; top:12px; right:16px; z-index:10; background:none; border:none; font-size:28px; cursor:pointer; color:#666;">&times;</button>
-      <div style="padding:24px 24px 8px; text-align:center;">
-        <h3 style="font-size:20px; font-weight:800; color:#1a1a2e; margin:0 0 4px; font-family:'Inter',sans-serif;">Register Your Spot Now</h3>
-        <p style="font-size:14px; color:#6b7280; margin:0; font-family:'Inter',sans-serif;">Enter your name, email &amp; phone number to secure your spot on this webinar</p>
+  <div id="typeform-modal" onclick="if(event.target===this)closeTypeform()" style="display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); display:none; align-items:center; justify-content:center;">
+    <div id="tf-inner" style="position:relative; width:90%; max-width:480px; height:auto; max-height:85vh; border-radius:24px; overflow:hidden; background:#fff; margin:auto; box-shadow:0 25px 80px rgba(139,92,246,0.3), 0 0 0 2px rgba(139,92,246,0.5);">
+      <!-- Rotating purple border glow -->
+      <div style="position:absolute; inset:-2px; border-radius:26px; background:conic-gradient(from var(--tf-angle,0deg), #8B5CF6, #38BDF8, #8B5CF6, #38BDF8, #8B5CF6); z-index:-1; animation:tf-rotate 3s linear infinite;"></div>
+      <div style="position:absolute; inset:2px; border-radius:22px; background:#fff; z-index:-1;"></div>
+      <button onclick="closeTypeform()" style="position:absolute; top:8px; right:12px; z-index:10; background:none; border:none; font-size:24px; cursor:pointer; color:#999; font-family:'Inter',sans-serif; line-height:1;">&times;</button>
+      <div style="padding:20px 20px 4px; text-align:center;">
+        <h3 style="font-size:18px; font-weight:800; color:#1a1a2e; margin:0 0 4px; font-family:'Inter',sans-serif;">Register Your Spot Now</h3>
+        <p style="font-size:13px; color:#6b7280; margin:0; font-family:'Inter',sans-serif;">Enter your name, email &amp; phone number to secure your spot</p>
       </div>
-      <div data-tf-live="01K2TPGR3G5VY293ZQWJR6ZG16" style="height:calc(100% - 80px);"></div>
+      <div data-tf-live="01K2TPGR3G5VY293ZQWJR6ZG16" style="height:420px; max-height:60vh;"></div>
     </div>
   </div>
 
@@ -924,46 +937,81 @@
   </header>
 
   <!-- ========== 2. WHAT YOU'LL LEARN ========== -->
-  <section class="ghl-section">
-    <div class="ghl-wrap ghl-section-card ghl-animate">
-      <div class="ghl-learn-card">
-        <div class="ghl-h2" style="text-align:left;">On This Live Workshop, You'll Learn All of Our 'Cheat Codes' For Starting + Scaling An <u>Amazon</u> Business With AI in 2026:</div>
+  <section class="ghl-section" style="padding:24px 0;">
+    <div class="ghl-wrap ghl-animate" style="max-width:720px;">
+      <div class="ghl-learn-card" style="padding:28px 24px;">
+        <div class="ghl-h2" style="text-align:center;font-size:clamp(18px,4vw,24px);margin-bottom:16px;">On This Live Workshop, You'll Learn All of Our <em>'Cheat Codes'</em> For Starting + Scaling An <u>Amazon</u> Business With AI in 2026:</div>
 
-        <ul class="ghl-learn-list" style="margin-top:24px;">
-          <li class="ghl-learn-item">
-            <span class="ghl-learn-num">1</span>
-            <span>How to find the select few <strong style="color:var(--text);">'Money Printing Products'</strong> on Amazon using AI that other sellers will never discover.</span>
+        <ul class="ghl-learn-list" style="margin-top:12px;">
+          <li class="ghl-learn-item" style="padding:8px 0;">
+            <span class="ghl-learn-num" style="width:20px;height:20px;min-width:20px;font-size:11px;">&#x1F534;</span>
+            <span style="font-size:14px;">How to find the select few <strong style="color:var(--text);">'Money Printing Products'</strong> on Amazon using AI that other sellers will never discover.</span>
           </li>
-          <li class="ghl-learn-item">
-            <span class="ghl-learn-num">2</span>
-            <span>How to access <strong style="color:var(--text);">$10K&ndash;$70K in business credit</strong> to fund your inventory &mdash; even with no business history.</span>
+          <li class="ghl-learn-item" style="padding:8px 0;">
+            <span class="ghl-learn-num" style="width:20px;height:20px;min-width:20px;font-size:11px;">&#x1F534;</span>
+            <span style="font-size:14px;">How to access <strong style="color:var(--text);">$10K&ndash;$70K in business credit</strong> to fund your inventory &mdash; even with no business history.</span>
           </li>
-          <li class="ghl-learn-item">
-            <span class="ghl-learn-num">3</span>
-            <span>The <strong style="color:var(--text);">AI sourcing system</strong> that finds profitable products in 60 minutes while manual sellers spend 10+ hours per week.</span>
+          <li class="ghl-learn-item" style="padding:8px 0;">
+            <span class="ghl-learn-num" style="width:20px;height:20px;min-width:20px;font-size:11px;">&#x1F534;</span>
+            <span style="font-size:14px;">The <strong style="color:var(--text);">AI sourcing system</strong> that finds profitable products in 60 minutes while manual sellers spend 10+ hours per week.</span>
           </li>
-          <li class="ghl-learn-item">
-            <span class="ghl-learn-num">4</span>
-            <span>How to launch your first product and <strong style="color:var(--text);">start making sales in 7&ndash;14 days</strong> using the Honeymoon Period strategy.</span>
+          <li class="ghl-learn-item" style="padding:8px 0;">
+            <span class="ghl-learn-num" style="width:20px;height:20px;min-width:20px;font-size:11px;">&#x1F534;</span>
+            <span style="font-size:14px;">How to launch your first product and <strong style="color:var(--text);">start making sales in 7&ndash;14 days</strong> using the Honeymoon Period strategy.</span>
           </li>
-          <li class="ghl-learn-item">
-            <span class="ghl-learn-num">5</span>
-            <span>The <strong style="color:var(--text);">Done-For-You systems</strong> our students use to scale to $10K&ndash;$30K/month without touching a single product.</span>
+          <li class="ghl-learn-item" style="padding:8px 0;">
+            <span class="ghl-learn-num" style="width:20px;height:20px;min-width:20px;font-size:11px;">&#x1F534;</span>
+            <span style="font-size:14px;">The <strong style="color:var(--text);">Done-For-You systems</strong> our students use to scale to $10K&ndash;$30K/month without touching a single product.</span>
           </li>
-          <li class="ghl-learn-item">
-            <span class="ghl-learn-num">6</span>
-            <span>How to tie it all together with AI so you <strong style="color:var(--text);">make more money FASTER</strong>.</span>
+          <li class="ghl-learn-item" style="padding:8px 0;">
+            <span class="ghl-learn-num" style="width:20px;height:20px;min-width:20px;font-size:11px;">&#x1F534;</span>
+            <span style="font-size:14px;">How to tie it all together with AI so you <strong style="color:var(--text);">make more money FASTER</strong>.</span>
           </li>
         </ul>
       </div>
 
-      <div style="display:flex;justify-content:center;margin-top:36px;">
+      <div style="display:flex;justify-content:center;margin-top:20px;">
         <button onclick="openTypeform()" class="ghl-btn">Click Here To Save Your Seat &rarr;</button>
       </div>
     </div>
   </section>
 
-  <!-- ========== 3. THIS IS FOR YOU / NOT FOR YOU ========== -->
+  <!-- ========== 3. MEET YOUR HOST (moved before qualification) ========== -->
+  <section class="ghl-section">
+    <div class="ghl-wrap ghl-section-card ghl-animate" style="max-width:900px;margin-left:auto;margin-right:auto;">
+      <div class="ghl-h2" style="text-align:center;margin-bottom:24px;">Meet Your Host... <span class="ghl-grad">Sabbo Jean-Baptiste</span></div>
+
+      <div class="ghl-host">
+        <div class="ghl-host-left">
+          <img loading="lazy" src="/static/images/sabbo-fba-boxes.jpg" alt="Sabbo Jean-Baptiste - AllDayFBA Founder" style="border-radius:16px;width:100%;object-fit:cover;">
+        </div>
+
+        <div class="ghl-host-right">
+          <p style="font-size:15px;line-height:1.75;color:#374151;">
+            A few years ago, I was just another person trying to figure out how to make money online. I started Amazon FBA because I was tired of the 9-5 grind and wanted to build something real.
+          </p>
+          <p style="font-size:15px;line-height:1.75;color:#374151;">
+            Fast forward to today &mdash; I've built a multi-six-figure Amazon business, created AI-powered tools that find profitable products in minutes, and helped <strong style="color:var(--text);">over 700 students</strong> start and scale their own Amazon businesses.
+          </p>
+          <p style="font-size:15px;line-height:1.75;color:#374151;">
+            And now I have a new system using AI that makes it faster, more profitable, and more accessible than ever before.
+          </p>
+          <p style="font-size:15px;line-height:1.75;color:#374151;">
+            After this live training, you'll understand exactly how hundreds of my students are building $10K&ndash;$30K/month Amazon businesses &mdash; and how you can join them before it's too late.
+          </p>
+          <p style="font-size:15px;line-height:1.75;color:#374151;font-weight:700;">
+            Register for the free class below and I'll see you soon!
+          </p>
+
+          <div style="margin-top:20px;">
+            <button onclick="openTypeform()" class="ghl-btn">Click Here To Save Your Seat &rarr;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 4. THIS IS FOR YOU / NOT FOR YOU ========== -->
   <section class="ghl-section">
     <div class="ghl-wrap ghl-animate">
       <div class="ghl-qualify-grid">
@@ -1014,41 +1062,6 @@
           </ul>
         </div>
 
-      </div>
-    </div>
-  </section>
-
-  <!-- ========== 4. MEET YOUR HOST ========== -->
-  <section class="ghl-section">
-    <div class="ghl-wrap ghl-section-card ghl-animate">
-      <div class="ghl-h2" style="text-align:center;margin-bottom:24px;">Meet Your Host... <span class="ghl-grad">Sabbo Jean-Baptiste</span></div>
-
-      <div class="ghl-host">
-        <div class="ghl-host-left">
-          <img loading="lazy" src="/static/images/sabbo-fba-boxes.jpg" alt="Sabbo Jean-Baptiste - AllDayFBA Founder">
-        </div>
-
-        <div class="ghl-host-right">
-          <p style="font-size:16px;line-height:1.75;color:#374151;">
-            A few years ago, I was just another person trying to figure out how to make money online. I started Amazon FBA because I wanted freedom &mdash; freedom from the 9-5, freedom to travel, freedom to build something real.
-          </p>
-          <p style="font-size:16px;line-height:1.75;color:#374151;">
-            Fast forward to today &mdash; I've built a multi-six-figure Amazon business, created AI-powered tools that find profitable products in minutes, and helped over 700 students start and scale their own Amazon businesses.
-          </p>
-          <p style="font-size:16px;line-height:1.75;color:#374151;">
-            And now I have a new system using AI that makes it faster, more profitable, and more accessible than ever before.
-          </p>
-          <p style="font-size:16px;line-height:1.75;color:#374151;">
-            After this live training, you'll understand exactly how hundreds of my students are building $10K&ndash;$30K/month Amazon businesses &mdash; and how you can join them before it's too late.
-          </p>
-          <p style="font-size:16px;line-height:1.75;color:#374151;font-weight:700;">
-            Register for the free class below and I'll see you soon!
-          </p>
-
-          <div style="margin-top:24px;">
-            <button onclick="openTypeform()" class="ghl-btn">Click Here To Save Your Seat &rarr;</button>
-          </div>
-        </div>
       </div>
     </div>
   </section>
@@ -1203,11 +1216,13 @@
 
 // === TYPEFORM MODAL ===
 function openTypeform() {
-  document.getElementById('typeform-modal').style.display = 'block';
+  var m = document.getElementById('typeform-modal');
+  m.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
 function closeTypeform() {
-  document.getElementById('typeform-modal').style.display = 'none';
+  var m = document.getElementById('typeform-modal');
+  m.style.display = 'none';
   document.body.style.overflow = '';
 }
 </script>
