@@ -1,0 +1,591 @@
+<!--
+  ====================================
+  GHL OPTIMIZED EXPIRED REPLAY PAGE
+  ====================================
+  INSTRUCTIONS:
+  1. In GoHighLevel, create a new funnel/page
+  2. Add a "Custom Code" element (or use Full Width Section)
+  3. Copy and paste this ENTIRE file content
+  4. Save and publish
+  ====================================
+-->
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+  /* === AGGRESSIVE GHL RESET === */
+  html, body, .hl_page-creator--content, .hl-page-preview,
+  [class*="hl_"], [class*="funnel"], [class*="row"],
+  [class*="col"], [class*="section"], [class*="container"] {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  /* === GHL CONTAINER OVERRIDE - FULL WIDTH === */
+  #ghl-expired-wrapper {
+    all: initial;
+    display: block;
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: -20px 0 0 calc(-50vw + 50%) !important;
+    margin-right: calc(-50vw + 50%) !important;
+    padding: 0 !important;
+    position: relative;
+    top: 0 !important;
+    background: #ffffff;
+    overflow-x: hidden;
+    min-height: 100vh;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #ghl-expired-wrapper,
+  #ghl-expired-wrapper *,
+  #ghl-expired-wrapper *::before,
+  #ghl-expired-wrapper *::after {
+    box-sizing: border-box;
+  }
+
+  /* Variables */
+  #ghl-expired-wrapper {
+    --bg: #ffffff;
+    --text: #1a1a2e;
+    --muted: #64748b;
+    --muted2: #94a3b8;
+    --purple: #8B5CF6;
+    --purple-dark: #6D28D9;
+    --purple-light: #C084FC;
+    --red: #EF4444;
+    --orange: #F97316;
+    --green: #22C55E;
+    --card-bg: #f8f7ff;
+    --card-border: rgba(139,92,246,.15);
+    --shadow: 0 20px 60px rgba(139,92,246,.12);
+    --radius: 20px;
+  }
+
+  /* === FALLING AMAZON BOXES === */
+  #ghl-expired-wrapper .ghl-boxes-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  #ghl-expired-wrapper .ghl-box {
+    position: absolute;
+    font-size: 32px;
+    opacity: 0.04;
+    animation: ghl-fall linear infinite;
+    top: -60px;
+  }
+
+  @keyframes ghl-fall {
+    0% { transform: translateY(-60px) rotate(0deg); }
+    100% { transform: translateY(110vh) rotate(360deg); }
+  }
+
+  #ghl-expired-wrapper .ghl-box:nth-child(1) { left: 5%; animation-duration: 18s; animation-delay: 0s; font-size: 28px; }
+  #ghl-expired-wrapper .ghl-box:nth-child(2) { left: 15%; animation-duration: 22s; animation-delay: 3s; font-size: 36px; }
+  #ghl-expired-wrapper .ghl-box:nth-child(3) { left: 25%; animation-duration: 16s; animation-delay: 6s; font-size: 24px; }
+  #ghl-expired-wrapper .ghl-box:nth-child(4) { left: 38%; animation-duration: 20s; animation-delay: 1s; font-size: 30px; }
+  #ghl-expired-wrapper .ghl-box:nth-child(5) { left: 50%; animation-duration: 24s; animation-delay: 4s; font-size: 40px; }
+  #ghl-expired-wrapper .ghl-box:nth-child(6) { left: 62%; animation-duration: 17s; animation-delay: 7s; font-size: 26px; }
+  #ghl-expired-wrapper .ghl-box:nth-child(7) { left: 75%; animation-duration: 21s; animation-delay: 2s; font-size: 34px; }
+  #ghl-expired-wrapper .ghl-box:nth-child(8) { left: 88%; animation-duration: 19s; animation-delay: 5s; font-size: 28px; }
+
+  /* Content Container */
+  #ghl-expired-wrapper .ghl-wrap {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (min-width: 768px) {
+    #ghl-expired-wrapper .ghl-wrap {
+      padding: 0 40px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #ghl-expired-wrapper .ghl-wrap {
+      padding: 0 16px;
+    }
+  }
+
+  /* === EXPIRED BANNER === */
+  #ghl-expired-wrapper .ghl-expired-banner {
+    background: linear-gradient(90deg, var(--red), var(--orange));
+    padding: 16px 20px;
+    text-align: center;
+    width: 100%;
+  }
+
+  #ghl-expired-wrapper .ghl-expired-banner p {
+    margin: 0;
+    color: white;
+    font-weight: 800;
+    font-size: clamp(14px, 3.5vw, 17px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    letter-spacing: 0.02em;
+  }
+
+  /* === HERO === */
+  #ghl-expired-wrapper .ghl-hero {
+    padding: 56px 0 40px;
+    text-align: center;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-expired-wrapper .ghl-hero {
+      padding: 40px 0 28px;
+    }
+  }
+
+  #ghl-expired-wrapper .ghl-h1 {
+    margin: 0 0 20px;
+    font-size: clamp(28px, 5.5vw, 48px);
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    color: var(--text);
+    font-weight: 900;
+  }
+
+  #ghl-expired-wrapper .ghl-grad {
+    background: linear-gradient(135deg, var(--purple), var(--purple-light));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  #ghl-expired-wrapper .ghl-sub {
+    margin: 0 auto 32px;
+    color: var(--muted);
+    font-size: clamp(16px, 3.5vw, 19px);
+    line-height: 1.65;
+    max-width: 640px;
+    text-align: center;
+  }
+
+  /* === WHAT YOU MISSED CARD === */
+  #ghl-expired-wrapper .ghl-missed-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 40px 36px;
+    margin: 0 auto 40px;
+    box-shadow: var(--shadow);
+  }
+
+  @media (max-width: 768px) {
+    #ghl-expired-wrapper .ghl-missed-card {
+      padding: 28px 20px;
+    }
+  }
+
+  #ghl-expired-wrapper .ghl-missed-card h2 {
+    margin: 0 0 24px;
+    font-size: clamp(20px, 4vw, 26px);
+    color: var(--text);
+    font-weight: 800;
+    text-align: center;
+  }
+
+  #ghl-expired-wrapper .ghl-missed-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 14px;
+  }
+
+  #ghl-expired-wrapper .ghl-missed-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 18px;
+    background: rgba(139,92,246,.04);
+    border: 1px solid rgba(139,92,246,.1);
+    border-radius: 14px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--text);
+    transition: all .2s ease;
+  }
+
+  #ghl-expired-wrapper .ghl-missed-item:hover {
+    border-color: rgba(139,92,246,.25);
+    background: rgba(139,92,246,.07);
+    transform: translateY(-1px);
+  }
+
+  #ghl-expired-wrapper .ghl-missed-icon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    margin-top: 1px;
+  }
+
+  /* === CTA BUTTON === */
+  #ghl-expired-wrapper .ghl-cta-btn {
+    display: block;
+    max-width: 520px;
+    margin: 0 auto 20px;
+    padding: 22px 32px;
+    background: linear-gradient(135deg, var(--purple) 0%, var(--purple-dark) 100%);
+    border: 2px solid rgba(139,92,246,.5);
+    border-radius: 16px;
+    text-decoration: none;
+    text-align: center;
+    box-shadow: 0 16px 48px rgba(139,92,246,.35), 0 0 30px rgba(139,92,246,.2);
+    transition: all .3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  #ghl-expired-wrapper .ghl-cta-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,.15), transparent);
+    opacity: 0;
+    transition: opacity .3s ease;
+  }
+
+  #ghl-expired-wrapper .ghl-cta-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 64px rgba(139,92,246,.45), 0 0 50px rgba(139,92,246,.3);
+  }
+
+  #ghl-expired-wrapper .ghl-cta-btn:hover::before {
+    opacity: 1;
+  }
+
+  #ghl-expired-wrapper .ghl-btn-text {
+    display: block;
+    font-size: clamp(20px, 4vw, 26px);
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 4px;
+    letter-spacing: -0.01em;
+    position: relative;
+    z-index: 1;
+  }
+
+  #ghl-expired-wrapper .ghl-btn-sub {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: clamp(14px, 3vw, 16px);
+    font-weight: 600;
+    color: rgba(255,255,255,.85);
+    position: relative;
+    z-index: 1;
+  }
+
+  #ghl-expired-wrapper .ghl-btn-arrow {
+    display: inline-block;
+    font-size: 18px;
+    animation: ghl-bounce-arrow 2s ease-in-out infinite;
+  }
+
+  @keyframes ghl-bounce-arrow {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(5px); }
+  }
+
+  /* === SCARCITY LINE === */
+  #ghl-expired-wrapper .ghl-scarcity {
+    text-align: center;
+    margin: 0 0 48px;
+    font-size: 15px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  #ghl-expired-wrapper .ghl-scarcity strong {
+    color: var(--purple);
+  }
+
+  /* === GUARANTEE BOX === */
+  #ghl-expired-wrapper .ghl-guarantee {
+    background: linear-gradient(135deg, rgba(34,197,94,.06), rgba(34,197,94,.02));
+    border: 2px solid rgba(34,197,94,.25);
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    margin: 0 auto 48px;
+    text-align: center;
+    max-width: 600px;
+  }
+
+  #ghl-expired-wrapper .ghl-guarantee-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  #ghl-expired-wrapper .ghl-guarantee h3 {
+    margin: 0 0 10px;
+    font-size: clamp(18px, 3.5vw, 22px);
+    color: var(--text);
+    font-weight: 800;
+  }
+
+  #ghl-expired-wrapper .ghl-guarantee p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* === STUDENT RESULTS === */
+  #ghl-expired-wrapper .ghl-results {
+    margin: 0 auto 48px;
+    text-align: center;
+  }
+
+  #ghl-expired-wrapper .ghl-results h2 {
+    margin: 0 0 24px;
+    font-size: clamp(22px, 4.5vw, 30px);
+    color: var(--text);
+    font-weight: 800;
+  }
+
+  #ghl-expired-wrapper .ghl-results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 640px) {
+    #ghl-expired-wrapper .ghl-results-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  #ghl-expired-wrapper .ghl-result-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 28px 24px;
+    text-align: center;
+    transition: all .3s ease;
+  }
+
+  #ghl-expired-wrapper .ghl-result-card:hover {
+    border-color: rgba(139,92,246,.3);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(139,92,246,.12);
+  }
+
+  #ghl-expired-wrapper .ghl-result-number {
+    font-size: clamp(28px, 5vw, 36px);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--purple), var(--purple-light));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin: 0 0 4px;
+  }
+
+  #ghl-expired-wrapper .ghl-result-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 4px;
+  }
+
+  #ghl-expired-wrapper .ghl-result-desc {
+    font-size: 14px;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  /* === FINAL CTA === */
+  #ghl-expired-wrapper .ghl-final-cta {
+    text-align: center;
+    padding: 48px 0 24px;
+    border-top: 1px solid rgba(139,92,246,.1);
+    margin-top: 8px;
+  }
+
+  #ghl-expired-wrapper .ghl-final-cta h2 {
+    margin: 0 0 12px;
+    font-size: clamp(22px, 4.5vw, 32px);
+    color: var(--text);
+    font-weight: 900;
+  }
+
+  #ghl-expired-wrapper .ghl-final-cta p {
+    margin: 0 0 28px;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* === FOOTER === */
+  #ghl-expired-wrapper .ghl-footer {
+    text-align: center;
+    padding: 40px 0 32px;
+    font-size: 12px;
+    color: var(--muted2);
+    line-height: 1.7;
+  }
+
+  #ghl-expired-wrapper .ghl-footer a {
+    color: var(--muted);
+    text-decoration: none;
+    transition: color .2s;
+  }
+
+  #ghl-expired-wrapper .ghl-footer a:hover {
+    color: var(--purple);
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 640px) {
+    #ghl-expired-wrapper .ghl-hero {
+      padding: 32px 0 20px;
+    }
+
+    #ghl-expired-wrapper .ghl-missed-card {
+      padding: 24px 16px;
+    }
+
+    #ghl-expired-wrapper .ghl-cta-btn {
+      padding: 18px 24px;
+    }
+
+    #ghl-expired-wrapper .ghl-guarantee {
+      padding: 24px 20px;
+    }
+  }
+
+  @media (max-width: 430px) {
+    #ghl-expired-wrapper .ghl-wrap {
+      padding: 0 14px;
+    }
+  }
+</style>
+
+<div id="ghl-expired-wrapper">
+
+  <!-- Falling Amazon Boxes Background -->
+  <div class="ghl-boxes-bg">
+    <div class="ghl-box">📦</div>
+    <div class="ghl-box">📦</div>
+    <div class="ghl-box">📦</div>
+    <div class="ghl-box">📦</div>
+    <div class="ghl-box">📦</div>
+    <div class="ghl-box">📦</div>
+    <div class="ghl-box">📦</div>
+    <div class="ghl-box">📦</div>
+  </div>
+
+  <!-- Expired Banner -->
+  <div class="ghl-expired-banner">
+    <p>&#9888;&#65039; This Replay Has Expired &#9888;&#65039;</p>
+  </div>
+
+  <!-- Hero -->
+  <div class="ghl-wrap">
+    <div class="ghl-hero">
+      <h1 class="ghl-h1">The Replay Is Gone &mdash;<br>But You Can <span class="ghl-grad">Still Apply</span></h1>
+      <p class="ghl-sub">If you watched any part of the training, you already know the system works. The question is: <strong style="color: #1a1a2e;">are you ready to start?</strong></p>
+    </div>
+
+    <!-- What You Missed -->
+    <div class="ghl-missed-card">
+      <h2>What The Training Covered</h2>
+      <ul class="ghl-missed-list">
+        <li class="ghl-missed-item">
+          <div class="ghl-missed-icon">&#10003;</div>
+          <div>The <strong>AI Amazon system</strong> that finds profitable products in 60 minutes &mdash; while others spend weeks guessing</div>
+        </li>
+        <li class="ghl-missed-item">
+          <div class="ghl-missed-icon">&#10003;</div>
+          <div>How to access <strong>$10K&ndash;$70K in business credit</strong> to fund your inventory &mdash; even with no prior history</div>
+        </li>
+        <li class="ghl-missed-item">
+          <div class="ghl-missed-icon">&#10003;</div>
+          <div>Why <strong>700+ students</strong> trust this system to build real, revenue-generating Amazon businesses</div>
+        </li>
+        <li class="ghl-missed-item">
+          <div class="ghl-missed-icon">&#10003;</div>
+          <div>The <strong>guarantee</strong> that we work with you until you win &mdash; not a 30-day access window, but actual results</div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Primary CTA -->
+    <a href="/webinar/apply" class="ghl-cta-btn">
+      <span class="ghl-btn-text">Apply Now &mdash; Book Your Free Strategy Call</span>
+      <span class="ghl-btn-sub">Limited spots available <span class="ghl-btn-arrow">&rarr;</span></span>
+    </a>
+
+    <!-- Scarcity -->
+    <p class="ghl-scarcity"><strong>15 spots per month.</strong> Personalized coaching. Not a course &mdash; a system with an operator behind it.</p>
+
+    <!-- Guarantee Box -->
+    <div class="ghl-guarantee">
+      <span class="ghl-guarantee-icon">&#128170;</span>
+      <h3>$10K Revenue in 6 Months &mdash; Or We Keep Working</h3>
+      <p>This isn't a "try it and hope" program. We coach you until you hit $10K in revenue. If it takes longer, we keep working with you at no extra cost. Your success is our reputation.</p>
+    </div>
+
+    <!-- Student Results -->
+    <div class="ghl-results">
+      <h2>Students Who Took Action</h2>
+      <div class="ghl-results-grid">
+        <div class="ghl-result-card">
+          <p class="ghl-result-number">$10K</p>
+          <p class="ghl-result-name">Xavier</p>
+          <p class="ghl-result-desc">First $10K in 7 days after joining</p>
+        </div>
+        <div class="ghl-result-card">
+          <p class="ghl-result-number">$48K/mo</p>
+          <p class="ghl-result-name">Brandon</p>
+          <p class="ghl-result-desc">Scaled to $48K/month recurring</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Final CTA -->
+    <div class="ghl-final-cta">
+      <h2>Ready to Build Your Amazon Business?</h2>
+      <p>The replay is gone, but the opportunity isn't. Apply below to see if you qualify.</p>
+      <a href="/webinar/apply" class="ghl-cta-btn">
+        <span class="ghl-btn-text">Apply for a Strategy Call</span>
+        <span class="ghl-btn-sub">Free. No obligation. <span class="ghl-btn-arrow">&rarr;</span></span>
+      </a>
+    </div>
+
+    <!-- Footer / Disclaimer -->
+    <div class="ghl-footer">
+      <p>AllDayFBA &middot; Results vary. Earnings depend on effort, capital, and execution.<br>
+      This is not a guarantee of income. See our <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.</p>
+      <p style="margin-top: 8px;">&copy; 2026 AllDayFBA. All rights reserved.</p>
+    </div>
+  </div>
+
+</div>

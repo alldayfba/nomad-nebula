@@ -803,6 +803,17 @@ def webinar_apply():
     return render_template("webinar-application.html")
 
 
+@app.route("/webinar/expired")
+def webinar_expired():
+    return render_template("webinar-expired.html")
+
+
+@app.route("/webinar/exit")
+def webinar_exit():
+    return render_template("webinar-exit.html")
+
+
+
 @app.route("/webinar/slides")
 def webinar_slides():
     return render_template("webinar-slides.html")

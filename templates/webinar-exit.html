@@ -1,0 +1,310 @@
+<!--
+  ====================================
+  GHL OPTIMIZED EXIT-INTENT POPUP
+  ====================================
+  INSTRUCTIONS:
+  1. In GoHighLevel, use as popup/modal content
+  2. Add a "Custom Code" element inside a popup
+  3. Copy and paste this ENTIRE file content
+  4. Trigger on exit-intent or timer
+  ====================================
+-->
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+  /* === AGGRESSIVE GHL RESET === */
+  html, body, .hl_page-creator--content, .hl-page-preview,
+  [class*="hl_"], [class*="funnel"], [class*="row"],
+  [class*="col"], [class*="section"], [class*="container"] {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  /* === GHL CONTAINER OVERRIDE === */
+  #ghl-exit-wrapper {
+    all: initial;
+    display: block;
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0;
+    position: relative;
+    background: #ffffff;
+    overflow: hidden;
+    box-sizing: border-box;
+    border-radius: 24px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #ghl-exit-wrapper,
+  #ghl-exit-wrapper *,
+  #ghl-exit-wrapper *::before,
+  #ghl-exit-wrapper *::after {
+    box-sizing: border-box;
+  }
+
+  /* Variables */
+  #ghl-exit-wrapper {
+    --text: #1a1a2e;
+    --muted: #64748b;
+    --muted2: #94a3b8;
+    --purple: #8B5CF6;
+    --purple-dark: #6D28D9;
+    --purple-light: #C084FC;
+    --card-bg: #f8f7ff;
+    --card-border: rgba(139,92,246,.15);
+  }
+
+  /* === FALLING AMAZON BOXES (subtle, inside popup) === */
+  #ghl-exit-wrapper .ghl-boxes-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  #ghl-exit-wrapper .ghl-box {
+    position: absolute;
+    font-size: 20px;
+    opacity: 0.04;
+    animation: ghl-exit-fall linear infinite;
+    top: -40px;
+  }
+
+  @keyframes ghl-exit-fall {
+    0% { transform: translateY(-40px) rotate(0deg); }
+    100% { transform: translateY(110%) rotate(360deg); }
+  }
+
+  #ghl-exit-wrapper .ghl-box:nth-child(1) { left: 8%; animation-duration: 14s; animation-delay: 0s; }
+  #ghl-exit-wrapper .ghl-box:nth-child(2) { left: 28%; animation-duration: 18s; animation-delay: 2s; font-size: 24px; }
+  #ghl-exit-wrapper .ghl-box:nth-child(3) { left: 52%; animation-duration: 16s; animation-delay: 5s; }
+  #ghl-exit-wrapper .ghl-box:nth-child(4) { left: 72%; animation-duration: 20s; animation-delay: 1s; font-size: 22px; }
+  #ghl-exit-wrapper .ghl-box:nth-child(5) { left: 90%; animation-duration: 15s; animation-delay: 4s; }
+
+  /* === CONTENT === */
+  #ghl-exit-wrapper .ghl-exit-content {
+    position: relative;
+    z-index: 1;
+    padding: 48px 36px 40px;
+    text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    #ghl-exit-wrapper .ghl-exit-content {
+      padding: 36px 20px 32px;
+    }
+  }
+
+  /* Headline */
+  #ghl-exit-wrapper .ghl-exit-h1 {
+    margin: 0 0 10px;
+    font-size: clamp(24px, 5vw, 32px);
+    font-weight: 900;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  #ghl-exit-wrapper .ghl-exit-sub {
+    margin: 0 0 28px;
+    font-size: clamp(15px, 3.5vw, 17px);
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  /* Photo */
+  #ghl-exit-wrapper .ghl-exit-photo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(139,92,246,.3);
+    box-shadow: 0 8px 28px rgba(139,92,246,.15);
+    margin: 0 auto 20px;
+    display: block;
+  }
+
+  /* Personal message */
+  #ghl-exit-wrapper .ghl-exit-message {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 24px 22px;
+    margin: 0 0 28px;
+    text-align: left;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text);
+  }
+
+  #ghl-exit-wrapper .ghl-exit-message strong {
+    color: var(--purple-dark);
+  }
+
+  /* CTA Buttons */
+  #ghl-exit-wrapper .ghl-exit-ctas {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0 0 24px;
+  }
+
+  #ghl-exit-wrapper .ghl-exit-cta-primary {
+    display: block;
+    padding: 18px 24px;
+    background: linear-gradient(135deg, var(--purple) 0%, var(--purple-dark) 100%);
+    border: 2px solid rgba(139,92,246,.5);
+    border-radius: 14px;
+    text-decoration: none;
+    text-align: center;
+    color: #ffffff;
+    font-size: clamp(16px, 3.5vw, 19px);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    box-shadow: 0 12px 36px rgba(139,92,246,.3), 0 0 20px rgba(139,92,246,.15);
+    transition: all .3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  #ghl-exit-wrapper .ghl-exit-cta-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,.12), transparent);
+    opacity: 0;
+    transition: opacity .3s ease;
+  }
+
+  #ghl-exit-wrapper .ghl-exit-cta-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 48px rgba(139,92,246,.4), 0 0 30px rgba(139,92,246,.25);
+  }
+
+  #ghl-exit-wrapper .ghl-exit-cta-primary:hover::before {
+    opacity: 1;
+  }
+
+  #ghl-exit-wrapper .ghl-exit-cta-secondary {
+    display: block;
+    padding: 16px 24px;
+    background: transparent;
+    border: 2px solid rgba(139,92,246,.3);
+    border-radius: 14px;
+    text-decoration: none;
+    text-align: center;
+    color: var(--purple);
+    font-size: clamp(15px, 3vw, 17px);
+    font-weight: 700;
+    transition: all .3s ease;
+    cursor: pointer;
+  }
+
+  #ghl-exit-wrapper .ghl-exit-cta-secondary:hover {
+    background: rgba(139,92,246,.06);
+    border-color: rgba(139,92,246,.5);
+    transform: translateY(-1px);
+  }
+
+  /* Trust line */
+  #ghl-exit-wrapper .ghl-exit-trust {
+    margin: 0 0 28px;
+    font-size: 14px;
+    color: var(--muted2);
+    font-weight: 500;
+    font-style: italic;
+  }
+
+  /* Testimonial */
+  #ghl-exit-wrapper .ghl-exit-testimonial {
+    background: rgba(139,92,246,.04);
+    border: 1px solid rgba(139,92,246,.12);
+    border-radius: 14px;
+    padding: 20px 18px;
+    text-align: left;
+  }
+
+  #ghl-exit-wrapper .ghl-exit-testimonial p {
+    margin: 0 0 10px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text);
+    font-style: italic;
+  }
+
+  #ghl-exit-wrapper .ghl-exit-testimonial .ghl-exit-author {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--purple);
+    font-style: normal;
+  }
+
+  /* Purple top accent bar */
+  #ghl-exit-wrapper .ghl-exit-accent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--purple), var(--purple-light), var(--purple));
+    z-index: 2;
+  }
+</style>
+
+<div id="ghl-exit-wrapper">
+
+  <!-- Purple accent bar at top -->
+  <div class="ghl-exit-accent"></div>
+
+  <!-- Falling Amazon Boxes -->
+  <div class="ghl-boxes-bg">
+    <div class="ghl-box">📦</div>
+    <div class="ghl-box">📦</div>
+    <div class="ghl-box">📦</div>
+    <div class="ghl-box">📦</div>
+    <div class="ghl-box">📦</div>
+  </div>
+
+  <div class="ghl-exit-content">
+
+    <!-- Headline -->
+    <h2 class="ghl-exit-h1">Wait &mdash; Before You Go...</h2>
+    <p class="ghl-exit-sub">Maybe you have questions? Maybe you need to talk to someone? I get that.</p>
+
+    <!-- Photo -->
+    <img src="/static/images/sabbo-fba-boxes.jpg" alt="Sabbo" class="ghl-exit-photo" />
+
+    <!-- Personal message -->
+    <div class="ghl-exit-message">
+      I know this is a big decision. If you need <strong>personal attention</strong>, I'm here. DM me on Instagram and I'll personally answer any questions you have &mdash; no script, no sales team, just me.
+    </div>
+
+    <!-- CTAs -->
+    <div class="ghl-exit-ctas">
+      <a href="https://instagram.com/alldayfba" target="_blank" rel="noopener" class="ghl-exit-cta-primary">
+        DM Me on Instagram &rarr;
+      </a>
+      <a href="/webinar/apply" class="ghl-exit-cta-secondary">
+        Apply for a Strategy Call &rarr;
+      </a>
+    </div>
+
+    <!-- Trust line -->
+    <p class="ghl-exit-trust">No pressure. No sales pitch in DMs. Just honest answers.</p>
+
+    <!-- Student testimonial -->
+    <div class="ghl-exit-testimonial">
+      <p>"I was skeptical too. I DM'd Sabbo before signing up and he answered every question I had. No pressure at all. Now I'm doing $14K/month on Amazon."</p>
+      <p class="ghl-exit-author">&mdash; Xavier, Inner Circle Member</p>
+    </div>
+
+  </div>
+
+</div>
