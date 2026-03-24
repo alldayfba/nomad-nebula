@@ -1,477 +1,1540 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Live Training: AI Amazon Scaling | 24/7 Profits</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+<!--
+  ====================================
+  GHL OPTIMIZED WEBINAR REGISTRATION PAGE
+  ====================================
+  INSTRUCTIONS:
+  1. In GoHighLevel, create a new funnel/page
+  2. Add a "Custom Code" element (or use Full Width Section)
+  3. Copy and paste this ENTIRE file content
+  4. Save and publish
 
-        :root {
-            --bg: #1A0A2E;
-            --bg-dark: #0d0618;
-            --surface: #231540;
-            --accent: #6B2FA0;
-            --accent-light: #9B59B6;
-            --gold: #FFD700;
-            --gold-dark: #B8860B;
-            --text: #FFFFFF;
-            --text-muted: #B794E0;
-            --text-dim: #8B7AAD;
-            --green: #4ADE80;
-            --red: #FF6B6B;
-            --radius: 16px;
-        }
+  Works as both a Flask template (served from app.py)
+  AND as a GHL Custom Code paste.
+  ====================================
+-->
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(180deg, var(--bg) 0%, var(--bg-dark) 100%);
-            color: var(--text);
-            min-height: 100vh;
-            overflow-x: hidden;
-            padding-top: 48px;
-        }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
-        /* === SCARCITY BAR === */
-        .scarcity-bar {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-            height: 48px; display: flex; align-items: center; justify-content: center; gap: 16px;
-            background: linear-gradient(90deg, var(--accent), #9B59B6);
-            font-size: 0.85rem; font-weight: 700; color: white;
-            text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .scarcity-bar .live-dot {
-            width: 8px; height: 8px; border-radius: 50%; background: var(--green);
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        .timer-box {
-            background: rgba(0,0,0,0.25); padding: 4px 12px; border-radius: 6px;
-            font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9rem; letter-spacing: 2px;
-        }
-        .seats-left { color: var(--gold); font-weight: 800; }
+<style>
+  /* === AGGRESSIVE GHL RESET === */
+  html, body, .hl_page-creator--content, .hl-page-preview,
+  [class*="hl_"], [class*="funnel"], [class*="row"],
+  [class*="col"], [class*="section"], [class*="container"] {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
 
-        /* === HERO === */
-        .hero {
-            text-align: center; padding: 4rem 1.5rem 2rem;
-            max-width: 900px; margin: 0 auto;
-        }
-        .hero-tag {
-            display: inline-block; padding: 8px 20px; border-radius: 30px;
-            background: rgba(107,47,160,0.2); border: 1px solid rgba(107,47,160,0.4);
-            color: var(--accent-light); font-size: 0.75rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 2rem;
-        }
-        .hero h1 {
-            font-size: clamp(2rem, 6vw, 3.8rem); font-weight: 900;
-            line-height: 1.08; letter-spacing: -2px; margin-bottom: 1.5rem;
-        }
-        .hero h1 .highlight {
-            text-decoration: underline; text-decoration-color: var(--gold);
-            text-underline-offset: 6px; text-decoration-thickness: 3px;
-        }
-        .hero .sub {
-            font-size: clamp(1rem, 2.5vw, 1.35rem); color: var(--text-muted);
-            font-weight: 400; line-height: 1.6; max-width: 650px; margin: 0 auto;
-        }
-        .hero .sub strong { color: var(--text); font-weight: 600; }
+  /* === GHL CONTAINER OVERRIDE - FULL WIDTH === */
+  #ghl-webinar-wrapper {
+    all: initial;
+    display: block;
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: -20px 0 0 calc(-50vw + 50%) !important;
+    margin-right: calc(-50vw + 50%) !important;
+    padding: 0 !important;
+    position: relative;
+    top: 0 !important;
+    background: radial-gradient(1500px 1000px at 15% 10%, rgba(139,92,246,.18), transparent 55%),
+                radial-gradient(1250px 875px at 80% 25%, rgba(56,189,248,.14), transparent 55%),
+                radial-gradient(1125px 812px at 55% 85%, rgba(139,92,246,.12), transparent 60%),
+                linear-gradient(180deg, #070a16, #05060c);
+    overflow-x: hidden;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
 
-        /* === VIDEO === */
-        .video-section { max-width: 850px; margin: 3rem auto; padding: 0 1.5rem; }
-        .video-container {
-            position: relative; border-radius: var(--radius); overflow: hidden;
-            border: 1px solid rgba(107,47,160,0.3);
-            box-shadow: 0 40px 80px rgba(0,0,0,0.4), 0 0 60px rgba(107,47,160,0.15);
-        }
-        .video-inner {
-            aspect-ratio: 16/9; background: #000;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .play-btn {
-            width: 80px; height: 80px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), #9B59B6);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: transform 0.3s, box-shadow 0.3s;
-            box-shadow: 0 10px 40px rgba(107,47,160,0.5);
-        }
-        .play-btn:hover { transform: scale(1.1); box-shadow: 0 15px 50px rgba(107,47,160,0.7); }
-        .play-btn svg { width: 32px; height: 32px; fill: white; margin-left: 4px; }
+  /* Reset box-sizing */
+  #ghl-webinar-wrapper,
+  #ghl-webinar-wrapper *,
+  #ghl-webinar-wrapper *::before,
+  #ghl-webinar-wrapper *::after {
+    box-sizing: border-box;
+  }
 
-        /* === CTA SECTION === */
-        .cta-section {
-            text-align: center; padding: 3rem 1.5rem;
-            max-width: 700px; margin: 0 auto;
-        }
-        .cta-btn {
-            display: inline-block; padding: 1.25rem 3.5rem;
-            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-            color: #1A0A2E; font-size: 1.2rem; font-weight: 800;
-            border-radius: 12px; border: none; cursor: pointer;
-            text-transform: uppercase; letter-spacing: 1px;
-            box-shadow: 0 10px 40px rgba(255,215,0,0.3);
-            transition: transform 0.3s, box-shadow 0.3s;
-            text-decoration: none;
-        }
-        .cta-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 50px rgba(255,215,0,0.4); }
-        .cta-sub {
-            margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted);
-        }
-        .cta-sub strong { color: var(--gold); }
-        .event-details {
-            margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-dim);
-        }
+  /* Variables */
+  #ghl-webinar-wrapper {
+    --bg0: #05060c;
+    --bg1: #070a16;
+    --text: rgba(255,255,255,.92);
+    --muted: rgba(255,255,255,.72);
+    --muted2: rgba(255,255,255,.60);
+    --purple: #8B5CF6;
+    --blue: #38BDF8;
+    --green: #4ADE80;
+    --gold: #FFD700;
+    --shadow: 0 20px 60px rgba(0,0,0,.55);
+    --radius: 20px;
+    --radius2: 26px;
+  }
 
-        /* === REGISTRATION FORM === */
-        .form-section {
-            max-width: 550px; margin: 0 auto; padding: 3rem 1.5rem;
-        }
-        .form-card {
-            background: var(--surface); border: 1px solid rgba(107,47,160,0.2);
-            border-radius: var(--radius); padding: 2.5rem;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        .form-card h3 {
-            font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; text-align: center;
-        }
-        .form-card .form-sub {
-            font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-bottom: 2rem;
-        }
-        .form-group { margin-bottom: 1.25rem; }
-        .form-group label {
-            display: block; font-size: 0.8rem; font-weight: 600;
-            color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;
-        }
-        .form-group input, .form-group select {
-            width: 100%; padding: 14px 16px; border-radius: 10px;
-            border: 1px solid rgba(107,47,160,0.2); background: rgba(0,0,0,0.2);
-            color: var(--text); font-size: 1rem; font-family: inherit;
-            transition: border-color 0.3s;
-        }
-        .form-group input:focus, .form-group select:focus {
-            outline: none; border-color: var(--accent-light);
-        }
-        .form-group select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239B59B6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 14px center; background-size: 16px; padding-right: 40px; }
-        .form-group select option { background: var(--surface); color: var(--text); }
-        .form-submit {
-            width: 100%; padding: 16px; margin-top: 1rem;
-            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-            color: #1A0A2E; font-size: 1.1rem; font-weight: 800;
-            border: none; border-radius: 10px; cursor: pointer;
-            text-transform: uppercase; letter-spacing: 1px;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .form-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,215,0,0.3); }
-        .form-privacy {
-            text-align: center; font-size: 0.75rem; color: var(--text-dim);
-            margin-top: 1rem;
-        }
+  /* === Galaxy Background === */
+  #ghl-webinar-wrapper .ghl-galaxy {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+  }
 
-        /* === WHAT YOU'LL LEARN === */
-        .learn-section {
-            max-width: 750px; margin: 0 auto; padding: 4rem 1.5rem;
-        }
-        .learn-section h2 {
-            font-size: 2rem; font-weight: 800; text-align: center; margin-bottom: 2rem;
-        }
-        .learn-list { list-style: none; }
-        .learn-list li {
-            display: flex; gap: 14px; padding: 16px 0;
-            border-bottom: 1px solid rgba(107,47,160,0.1);
-            font-size: 1.05rem; line-height: 1.5;
-        }
-        .learn-list li:last-child { border-bottom: none; }
-        .learn-check {
-            width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
-            background: rgba(107,47,160,0.15); color: var(--green);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 14px; font-weight: 700;
-        }
+  #ghl-webinar-wrapper .ghl-stars,
+  #ghl-webinar-wrapper .ghl-stars2,
+  #ghl-webinar-wrapper .ghl-nebula {
+    position: absolute;
+    inset: -50%;
+    background-repeat: repeat;
+    transform: translate3d(0,0,0);
+    opacity: .9;
+    width: 200%;
+    height: 200%;
+  }
 
-        /* === SOCIAL PROOF === */
-        .proof-section {
-            max-width: 800px; margin: 0 auto; padding: 3rem 1.5rem; text-align: center;
-        }
-        .proof-section h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; }
-        .proof-stats {
-            display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap;
-        }
-        .proof-stat { text-align: center; }
-        .proof-stat .num {
-            font-size: 2.5rem; font-weight: 900; letter-spacing: -1px;
-        }
-        .proof-stat .label {
-            font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;
-            letter-spacing: 1px; margin-top: 4px;
-        }
+  #ghl-webinar-wrapper .ghl-stars {
+    background-image:
+      radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,.65) 50%, transparent 52%),
+      radial-gradient(1.5px 1.5px at 35% 55%, rgba(255,255,255,.55) 50%, transparent 52%),
+      radial-gradient(1px 1px at 70% 40%, rgba(255,255,255,.55) 50%, transparent 52%),
+      radial-gradient(1.2px 1.2px at 85% 70%, rgba(255,255,255,.45) 50%, transparent 52%);
+    background-size: 325px 325px;
+    animation: ghl-drift 28s linear infinite;
+    opacity: .65;
+  }
 
-        /* === HOST === */
-        .host-section {
-            max-width: 700px; margin: 0 auto; padding: 3rem 1.5rem; text-align: center;
-        }
-        .host-section h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
-        .host-section p {
-            font-size: 1rem; color: var(--text-muted); line-height: 1.7;
-        }
-        .host-section p strong { color: var(--text); }
+  #ghl-webinar-wrapper .ghl-stars2 {
+    background-image:
+      radial-gradient(1.2px 1.2px at 12% 72%, rgba(255,255,255,.6) 50%, transparent 52%),
+      radial-gradient(1px 1px at 48% 18%, rgba(255,255,255,.5) 50%, transparent 52%),
+      radial-gradient(1.6px 1.6px at 78% 62%, rgba(255,255,255,.45) 50%, transparent 52%);
+    background-size: 425px 425px;
+    animation: ghl-drift2 44s linear infinite;
+    opacity: .45;
+    filter: blur(.2px);
+  }
 
-        /* === FOOTER CTA === */
-        .footer-cta {
-            text-align: center; padding: 4rem 1.5rem 6rem;
-            max-width: 700px; margin: 0 auto;
-        }
-        .footer-cta h2 {
-            font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 800; margin-bottom: 1.5rem;
-        }
+  #ghl-webinar-wrapper .ghl-nebula {
+    background-image:
+      radial-gradient(420px 320px at 20% 30%, rgba(139,92,246,.18), transparent 60%),
+      radial-gradient(520px 420px at 75% 25%, rgba(56,189,248,.14), transparent 62%),
+      radial-gradient(560px 520px at 55% 80%, rgba(139,92,246,.12), transparent 64%);
+    background-size: 900px 900px;
+    animation: ghl-nebula 18s ease-in-out infinite alternate;
+    opacity: .9;
+    mix-blend-mode: screen;
+  }
 
-        /* === BACKGROUND === */
-        .bg-orb {
-            position: fixed; border-radius: 50%; filter: blur(120px);
-            opacity: 0.08; pointer-events: none; z-index: -1;
-        }
+  @keyframes ghl-drift {
+    from { transform: translate3d(-2%, -2%, 0); }
+    to { transform: translate3d(2%, 2%, 0); }
+  }
 
-        /* === STARS === */
-        #bgStars { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0; animation: twinkle var(--d) infinite; }
-        @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(0.5); } 50% { opacity: 0.3; transform: scale(1); } }
+  @keyframes ghl-drift2 {
+    from { transform: translate3d(2%, -1%, 0) scale(1.02); }
+    to { transform: translate3d(-2%, 1%, 0) scale(1.02); }
+  }
 
-        @media (max-width: 768px) {
-            .scarcity-bar { font-size: 0.7rem; gap: 8px; padding: 0 12px; }
-            .timer-box { font-size: 0.75rem; }
-            .proof-stats { gap: 1.5rem; }
-            .proof-stat .num { font-size: 2rem; }
-            .hero { padding: 2.5rem 1rem 1rem; }
-            .cta-btn { padding: 1rem 2rem; font-size: 1rem; }
-        }
+  @keyframes ghl-nebula {
+    from { transform: translate3d(-1%, 1%, 0) scale(1.01); }
+    to { transform: translate3d(1%, -1%, 0) scale(1.02); }
+  }
 
-        @media (max-width: 480px) {
-            .scarcity-bar { flex-wrap: wrap; height: auto; padding: 8px 12px; gap: 4px; }
-            body { padding-top: 60px; }
-        }
-    </style>
-</head>
-<body>
-    <div id="bgStars"></div>
-    <div class="bg-orb" style="width: 600px; height: 600px; background: #6B2FA0; top: -200px; right: -200px;"></div>
-    <div class="bg-orb" style="width: 500px; height: 500px; background: #9B59B6; bottom: -200px; left: -200px;"></div>
+  /* === Falling Amazon Boxes === */
+  #ghl-webinar-wrapper .ghl-amazon-boxes {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
 
-    <!-- Scarcity Bar -->
-    <div class="scarcity-bar">
-        <span class="live-dot"></span>
-        <span>LIVE TRAINING &mdash; WEDNESDAY 8PM EST</span>
-        <span class="timer-box" id="countdown">00:00:00:00</span>
-        <span class="seats-left">100 SEATS LEFT</span>
+  #ghl-webinar-wrapper .ghl-box {
+    position: absolute;
+    font-size: 40px;
+    opacity: 0.12;
+    animation: ghl-fall linear infinite;
+    will-change: transform, opacity;
+  }
+
+  #ghl-webinar-wrapper .ghl-box:nth-child(1) { left: 8%; top: 5%; animation-duration: 25s; animation-delay: 0s; font-size: 32px; }
+  #ghl-webinar-wrapper .ghl-box:nth-child(2) { left: 22%; top: 15%; animation-duration: 28s; animation-delay: 3s; font-size: 38px; }
+  #ghl-webinar-wrapper .ghl-box:nth-child(3) { left: 35%; top: 8%; animation-duration: 30s; animation-delay: 7s; font-size: 28px; }
+  #ghl-webinar-wrapper .ghl-box:nth-child(4) { left: 50%; top: 20%; animation-duration: 26s; animation-delay: 2s; font-size: 42px; }
+  #ghl-webinar-wrapper .ghl-box:nth-child(5) { left: 65%; top: 12%; animation-duration: 29s; animation-delay: 5s; font-size: 35px; }
+  #ghl-webinar-wrapper .ghl-box:nth-child(6) { left: 12%; top: 30%; animation-duration: 32s; animation-delay: 8s; font-size: 40px; }
+  #ghl-webinar-wrapper .ghl-box:nth-child(7) { left: 28%; top: 40%; animation-duration: 27s; animation-delay: 4s; font-size: 33px; }
+  #ghl-webinar-wrapper .ghl-box:nth-child(8) { left: 42%; top: 35%; animation-duration: 31s; animation-delay: 9s; font-size: 45px; }
+  #ghl-webinar-wrapper .ghl-box:nth-child(9) { left: 58%; top: 45%; animation-duration: 28s; animation-delay: 1s; font-size: 30px; }
+  #ghl-webinar-wrapper .ghl-box:nth-child(10) { left: 72%; top: 38%; animation-duration: 29s; animation-delay: 6s; font-size: 37px; }
+  #ghl-webinar-wrapper .ghl-box:nth-child(11) { left: 18%; top: 60%; animation-duration: 33s; animation-delay: 10s; font-size: 26px; opacity: 0.10; }
+  #ghl-webinar-wrapper .ghl-box:nth-child(12) { left: 38%; top: 55%; animation-duration: 35s; animation-delay: 12s; font-size: 29px; opacity: 0.10; }
+  #ghl-webinar-wrapper .ghl-box:nth-child(13) { left: 55%; top: 65%; animation-duration: 34s; animation-delay: 11s; font-size: 31px; opacity: 0.10; }
+  #ghl-webinar-wrapper .ghl-box:nth-child(14) { left: 75%; top: 58%; animation-duration: 32s; animation-delay: 13s; font-size: 27px; opacity: 0.10; }
+  #ghl-webinar-wrapper .ghl-box:nth-child(15) { left: 88%; top: 70%; animation-duration: 30s; animation-delay: 8s; font-size: 34px; opacity: 0.10; }
+
+  @keyframes ghl-fall {
+    0% {
+      transform: translateY(-100vh) translateX(-20px) rotate(0deg) scale(0.8);
+      opacity: 0;
+    }
+    5% { opacity: 0.12; }
+    50% {
+      transform: translateY(50vh) translateX(10px) rotate(180deg) scale(1);
+      opacity: 0.12;
+    }
+    95% { opacity: 0.12; }
+    100% {
+      transform: translateY(200vh) translateX(30px) rotate(360deg) scale(0.9);
+      opacity: 0;
+    }
+  }
+
+  /* === Content Container === */
+  #ghl-webinar-wrapper .ghl-wrap {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (min-width: 768px) {
+    #ghl-webinar-wrapper .ghl-wrap { padding: 0 40px; }
+  }
+  @media (min-width: 1024px) {
+    #ghl-webinar-wrapper .ghl-wrap { padding: 0 48px; }
+  }
+  @media (max-width: 480px) {
+    #ghl-webinar-wrapper .ghl-wrap { padding: 0 16px; }
+  }
+
+  /* === Pill Badge === */
+  #ghl-webinar-wrapper .ghl-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    border: 1px solid rgba(139,92,246,.4);
+    background: rgba(139,92,246,.15);
+    border-radius: 999px;
+    color: rgba(255,255,255,.95);
+    font-size: 14px;
+    box-shadow: 0 0 20px rgba(139,92,246,.25);
+  }
+
+  #ghl-webinar-wrapper .ghl-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ff3b7a;
+    box-shadow: 0 0 0 4px rgba(255,59,122,.25), 0 0 12px rgba(255,59,122,.5);
+    animation: ghl-pulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes ghl-pulse {
+    0%, 100% { transform: scale(1); opacity: .9; }
+    50% { transform: scale(1.15); opacity: 1; }
+  }
+
+  /* === Buttons === */
+  #ghl-webinar-wrapper .ghl-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 18px 36px;
+    border-radius: 16px;
+    border: 2px solid rgba(255,255,255,.18);
+    background: linear-gradient(135deg, rgba(139,92,246,.95), rgba(56,189,248,.9));
+    color: #071019;
+    font-weight: 900;
+    text-decoration: none;
+    font-size: 18px;
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    box-shadow: 0 0 30px rgba(139,92,246,.4), 0 0 60px rgba(56,189,248,.3), 0 20px 50px rgba(0,0,0,.3);
+    transition: transform .2s ease, filter .2s ease, box-shadow .2s ease;
+    cursor: pointer;
+    animation: ghl-btn-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes ghl-btn-glow {
+    0%, 100% {
+      box-shadow: 0 0 30px rgba(139,92,246,.4), 0 0 60px rgba(56,189,248,.3), 0 20px 50px rgba(0,0,0,.3);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(139,92,246,.6), 0 0 80px rgba(56,189,248,.5), 0 20px 50px rgba(0,0,0,.3);
+    }
+  }
+
+  #ghl-webinar-wrapper .ghl-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    filter: brightness(1.1);
+    box-shadow: 0 0 50px rgba(139,92,246,.7), 0 0 100px rgba(56,189,248,.6), 0 25px 60px rgba(0,0,0,.4);
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-btn {
+      padding: 16px 32px;
+      font-size: 16px;
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+
+  /* === Hero Section === */
+  #ghl-webinar-wrapper .ghl-hero {
+    padding: 20px 0 32px;
+    text-align: center;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-hero { padding: 16px 0 20px; }
+  }
+
+  #ghl-webinar-wrapper .ghl-h1 {
+    margin: 0 0 20px;
+    font-size: clamp(28px, 5vw, 52px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: rgba(255,255,255,.98);
+    font-weight: 900;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-h1 {
+      font-size: clamp(24px, 7vw, 36px);
+      line-height: 1.15;
+      margin: 0 0 16px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #ghl-webinar-wrapper .ghl-h1 { font-size: clamp(22px, 8vw, 30px); }
+  }
+
+  #ghl-webinar-wrapper .ghl-grad {
+    background: linear-gradient(90deg, rgba(139,92,246,1), rgba(56,189,248,1));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* === Countdown Box === */
+  #ghl-webinar-wrapper .ghl-countdown-box {
+    background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+    border: 2px solid rgba(139,92,246,.6);
+    border-radius: 20px;
+    padding: 28px 24px;
+    margin: 24px auto;
+    max-width: 600px;
+    box-shadow: 0 0 50px rgba(139,92,246,.35), 0 20px 60px rgba(0,0,0,.5);
+    animation: ghl-glow-pulse 2s ease-in-out infinite;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-countdown-box {
+      padding: 24px 20px;
+      margin: 20px auto;
+      border-radius: 16px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #ghl-webinar-wrapper .ghl-countdown-box { padding: 20px 16px; }
+  }
+
+  @keyframes ghl-glow-pulse {
+    0%, 100% { box-shadow: 0 0 40px rgba(139,92,246,.3), 0 20px 60px rgba(0,0,0,.5); }
+    50% { box-shadow: 0 0 60px rgba(139,92,246,.5), 0 20px 60px rgba(0,0,0,.5); }
+  }
+
+  #ghl-webinar-wrapper .ghl-countdown-label {
+    text-align: center;
+    font-size: clamp(14px, 3.5vw, 17px);
+    font-weight: 900;
+    color: rgba(255,255,255,.98);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  @media (max-width: 480px) {
+    #ghl-webinar-wrapper .ghl-countdown-label { font-size: 13px; margin-bottom: 12px; }
+  }
+
+  #ghl-webinar-wrapper .ghl-countdown-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(8px, 3vw, 16px);
+    margin-bottom: 16px;
+    flex-wrap: nowrap;
+  }
+
+  @media (max-width: 480px) {
+    #ghl-webinar-wrapper .ghl-countdown-display { gap: 6px; margin-bottom: 12px; }
+  }
+
+  #ghl-webinar-wrapper .ghl-countdown-item {
+    text-align: center;
+    min-width: 50px;
+  }
+
+  @media (max-width: 480px) {
+    #ghl-webinar-wrapper .ghl-countdown-item { min-width: 40px; }
+  }
+
+  #ghl-webinar-wrapper .ghl-countdown-number {
+    display: block;
+    font-size: clamp(36px, 10vw, 56px);
+    font-weight: 900;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-countdown-number { font-size: clamp(32px, 12vw, 44px); }
+  }
+
+  @media (max-width: 480px) {
+    #ghl-webinar-wrapper .ghl-countdown-number { font-size: clamp(28px, 13vw, 36px); }
+  }
+
+  #ghl-webinar-wrapper .ghl-countdown-text {
+    display: block;
+    font-size: clamp(10px, 2.5vw, 12px);
+    text-transform: uppercase;
+    color: var(--muted2);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-top: 6px;
+  }
+
+  @media (max-width: 480px) {
+    #ghl-webinar-wrapper .ghl-countdown-text { font-size: 9px; letter-spacing: 0.3px; }
+  }
+
+  #ghl-webinar-wrapper .ghl-countdown-sep {
+    font-size: clamp(24px, 8vw, 40px);
+    font-weight: 900;
+    color: rgba(255,255,255,.4);
+    line-height: 1;
+    padding: 0 clamp(4px, 1.5vw, 8px);
+  }
+
+  @media (max-width: 480px) {
+    #ghl-webinar-wrapper .ghl-countdown-sep { font-size: clamp(20px, 9vw, 28px); padding: 0 2px; }
+  }
+
+  #ghl-webinar-wrapper .ghl-countdown-date {
+    text-align: center;
+    font-size: clamp(13px, 3vw, 15px);
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  @media (max-width: 480px) {
+    #ghl-webinar-wrapper .ghl-countdown-date { font-size: 12px; }
+  }
+
+  /* === Hero Card === */
+  #ghl-webinar-wrapper .ghl-hero-card {
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+    border: 1px solid rgba(255,255,255,.12);
+    box-shadow: var(--shadow);
+    padding: 36px 32px;
+    margin-top: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-hero-card { padding: 28px 24px; margin-top: 20px; border-radius: 16px; }
+  }
+
+  @media (max-width: 480px) {
+    #ghl-webinar-wrapper .ghl-hero-card { padding: 24px 20px; }
+  }
+
+  #ghl-webinar-wrapper .ghl-hero-card::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    background: radial-gradient(600px 200px at 20% 0%, rgba(139,92,246,.20), transparent 60%),
+                radial-gradient(600px 260px at 80% 20%, rgba(56,189,248,.16), transparent 62%);
+    opacity: .9;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #ghl-webinar-wrapper .ghl-hero-card > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  #ghl-webinar-wrapper .ghl-sub {
+    margin: 0 0 20px;
+    color: var(--muted);
+    font-size: clamp(15px, 3.5vw, 18px);
+    line-height: 1.6;
+    text-align: center;
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-sub { margin: 0 0 18px; line-height: 1.55; font-size: clamp(14px, 4vw, 16px); }
+  }
+
+  #ghl-webinar-wrapper .ghl-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+    justify-content: center;
+  }
+
+  #ghl-webinar-wrapper .ghl-mini {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    color: var(--muted2);
+    font-size: 12px;
+    justify-content: center;
+  }
+
+  #ghl-webinar-wrapper .ghl-mini span {
+    padding: 8px 12px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.04);
+    border-radius: 999px;
+  }
+
+  /* === Section === */
+  #ghl-webinar-wrapper .ghl-section {
+    padding: 40px 0;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-section { padding: 28px 0; }
+  }
+
+  #ghl-webinar-wrapper .ghl-section-card {
+    border-radius: var(--radius2);
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.10);
+    box-shadow: var(--shadow);
+    padding: 48px 40px;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-section-card { padding: 32px 24px; border-radius: 20px; }
+  }
+
+  @media (max-width: 480px) {
+    #ghl-webinar-wrapper .ghl-section-card { padding: 28px 20px; }
+  }
+
+  #ghl-webinar-wrapper .ghl-h2 {
+    margin: 0 0 14px;
+    font-size: clamp(24px, 4.5vw, 34px);
+    letter-spacing: -.3px;
+    color: rgba(255,255,255,.95);
+    font-weight: 800;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-h2 { margin: 0 0 12px; }
+  }
+
+  #ghl-webinar-wrapper .ghl-p {
+    margin: 0 0 24px;
+    color: var(--muted);
+    line-height: 1.65;
+    font-size: clamp(15px, 3.2vw, 17px);
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-p { margin: 0 0 20px; }
+  }
+
+  /* === Grid === */
+  #ghl-webinar-wrapper .ghl-grid3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 28px;
+  }
+
+  @media (max-width: 980px) {
+    #ghl-webinar-wrapper .ghl-grid3 { grid-template-columns: 1fr; gap: 20px; }
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-grid3 { margin-top: 24px; gap: 16px; }
+  }
+
+  #ghl-webinar-wrapper .ghl-grid4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-top: 28px;
+  }
+
+  @media (max-width: 980px) {
+    #ghl-webinar-wrapper .ghl-grid4 { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 480px) {
+    #ghl-webinar-wrapper .ghl-grid4 { grid-template-columns: 1fr; gap: 16px; }
+  }
+
+  /* === Step Card === */
+  #ghl-webinar-wrapper .ghl-step {
+    padding: 28px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+    border: 1px solid rgba(255,255,255,.10);
+    overflow: hidden;
+    position: relative;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-step { padding: 24px; }
+  }
+
+  #ghl-webinar-wrapper .ghl-step::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    background: radial-gradient(420px 160px at 15% 0%, rgba(139,92,246,.18), transparent 60%),
+                radial-gradient(420px 180px at 80% 10%, rgba(56,189,248,.12), transparent 60%);
+    opacity: .7;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #ghl-webinar-wrapper .ghl-step > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  #ghl-webinar-wrapper .ghl-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(0,0,0,.35);
+    font-size: 12px;
+    color: rgba(255,255,255,.88);
+    font-weight: 800;
+    margin-bottom: 12px;
+  }
+
+  #ghl-webinar-wrapper .ghl-badge i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    display: inline-block;
+  }
+
+  #ghl-webinar-wrapper .ghl-step h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+    letter-spacing: -.2px;
+    color: rgba(255,255,255,.95);
+  }
+
+  #ghl-webinar-wrapper .ghl-step p {
+    margin: 0 0 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+
+  /* === Video Container === */
+  #ghl-webinar-wrapper .ghl-video-container {
+    margin: 24px auto;
+    max-width: 700px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid rgba(139,92,246,.5);
+    box-shadow: 0 0 40px rgba(139,92,246,.3), 0 20px 60px rgba(0,0,0,.5);
+    position: relative;
+    width: 100%;
+  }
+
+  #ghl-webinar-wrapper .ghl-video-inner {
+    aspect-ratio: 16/9;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #ghl-webinar-wrapper .ghl-play-btn {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 10px 40px rgba(139,92,246,.5);
+    border: none;
+  }
+
+  #ghl-webinar-wrapper .ghl-play-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 15px 50px rgba(139,92,246,.7);
+  }
+
+  #ghl-webinar-wrapper .ghl-play-btn svg {
+    width: 32px;
+    height: 32px;
+    fill: white;
+    margin-left: 4px;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-video-container { max-width: 100%; border-radius: 10px; }
+    #ghl-webinar-wrapper .ghl-play-btn { width: 64px; height: 64px; }
+    #ghl-webinar-wrapper .ghl-play-btn svg { width: 26px; height: 26px; }
+  }
+
+  /* === Registration Form === */
+  #ghl-webinar-wrapper .ghl-form-section {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  #ghl-webinar-wrapper .ghl-form-card {
+    border-radius: var(--radius);
+    background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+    border: 2px solid rgba(139,92,246,.4);
+    box-shadow: 0 0 50px rgba(139,92,246,.25), 0 20px 60px rgba(0,0,0,.5);
+    padding: 40px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #ghl-webinar-wrapper .ghl-form-card::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    background: radial-gradient(500px 200px at 50% 0%, rgba(139,92,246,.15), transparent 60%);
+    opacity: .9;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #ghl-webinar-wrapper .ghl-form-card > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-form-card { padding: 32px 24px; }
+  }
+
+  @media (max-width: 480px) {
+    #ghl-webinar-wrapper .ghl-form-card { padding: 28px 20px; }
+  }
+
+  #ghl-webinar-wrapper .ghl-form-title {
+    font-size: clamp(22px, 4vw, 28px);
+    font-weight: 900;
+    margin: 0 0 8px;
+    text-align: center;
+    color: rgba(255,255,255,.98);
+  }
+
+  #ghl-webinar-wrapper .ghl-form-sub {
+    font-size: clamp(13px, 3vw, 15px);
+    color: var(--muted);
+    text-align: center;
+    margin: 0 0 28px;
+    line-height: 1.5;
+  }
+
+  #ghl-webinar-wrapper .ghl-form-group {
+    margin-bottom: 18px;
+  }
+
+  #ghl-webinar-wrapper .ghl-form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  #ghl-webinar-wrapper .ghl-form-group input,
+  #ghl-webinar-wrapper .ghl-form-group select {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(139,92,246,.25);
+    background: rgba(0,0,0,.3);
+    color: rgba(255,255,255,.92);
+    font-size: 16px;
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    outline: none;
+  }
+
+  #ghl-webinar-wrapper .ghl-form-group input:focus,
+  #ghl-webinar-wrapper .ghl-form-group select:focus {
+    border-color: var(--purple);
+    box-shadow: 0 0 20px rgba(139,92,246,.2);
+  }
+
+  #ghl-webinar-wrapper .ghl-form-group input::placeholder {
+    color: rgba(255,255,255,.35);
+  }
+
+  #ghl-webinar-wrapper .ghl-form-group select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238B5CF6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px;
+    padding-right: 40px;
+  }
+
+  #ghl-webinar-wrapper .ghl-form-group select option {
+    background: #0d0f1a;
+    color: rgba(255,255,255,.92);
+  }
+
+  #ghl-webinar-wrapper .ghl-form-submit {
+    width: 100%;
+    padding: 18px;
+    margin-top: 8px;
+    border-radius: 14px;
+    border: 2px solid rgba(255,255,255,.18);
+    background: linear-gradient(135deg, rgba(139,92,246,.95), rgba(56,189,248,.9));
+    color: #071019;
+    font-size: 18px;
+    font-weight: 900;
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 0 30px rgba(139,92,246,.4), 0 0 60px rgba(56,189,248,.3);
+    transition: transform .2s ease, filter .2s ease, box-shadow .2s ease;
+    animation: ghl-btn-glow 2s ease-in-out infinite;
+  }
+
+  #ghl-webinar-wrapper .ghl-form-submit:hover {
+    transform: translateY(-2px) scale(1.01);
+    filter: brightness(1.1);
+    box-shadow: 0 0 50px rgba(139,92,246,.7), 0 0 100px rgba(56,189,248,.6);
+  }
+
+  #ghl-webinar-wrapper .ghl-form-privacy {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted2);
+    margin-top: 14px;
+    line-height: 1.5;
+  }
+
+  /* === Social Proof Stats === */
+  #ghl-webinar-wrapper .ghl-stats {
+    display: flex;
+    justify-content: center;
+    gap: clamp(20px, 4vw, 48px);
+    flex-wrap: wrap;
+    margin-top: 28px;
+  }
+
+  #ghl-webinar-wrapper .ghl-stat {
+    text-align: center;
+  }
+
+  #ghl-webinar-wrapper .ghl-stat-num {
+    font-size: clamp(32px, 6vw, 48px);
+    font-weight: 900;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  #ghl-webinar-wrapper .ghl-stat-num.ghl-gold {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  #ghl-webinar-wrapper .ghl-stat-num.ghl-green {
+    background: linear-gradient(135deg, #4ADE80, #22D3EE);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  #ghl-webinar-wrapper .ghl-stat-label {
+    font-size: clamp(10px, 2.5vw, 13px);
+    text-transform: uppercase;
+    color: var(--muted2);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-top: 6px;
+  }
+
+  /* === Learn List === */
+  #ghl-webinar-wrapper .ghl-learn-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  #ghl-webinar-wrapper .ghl-learn-item {
+    display: flex;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    font-size: clamp(15px, 3.2vw, 17px);
+    line-height: 1.55;
+    color: var(--muted);
+    align-items: flex-start;
+  }
+
+  #ghl-webinar-wrapper .ghl-learn-item:last-child {
+    border-bottom: none;
+  }
+
+  #ghl-webinar-wrapper .ghl-learn-check {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    background: rgba(139,92,246,.15);
+    border: 1px solid rgba(139,92,246,.3);
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+
+  /* === Host Section === */
+  #ghl-webinar-wrapper .ghl-host {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 32px;
+    align-items: stretch;
+    margin-top: 16px;
+  }
+
+  @media (max-width: 980px) {
+    #ghl-webinar-wrapper .ghl-host { grid-template-columns: 1fr; gap: 24px; }
+  }
+
+  #ghl-webinar-wrapper .ghl-host-left {
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.25);
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 100%;
+  }
+
+  @media (max-width: 980px) {
+    #ghl-webinar-wrapper .ghl-host-left {
+      padding-bottom: 80%;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+  }
+
+  #ghl-webinar-wrapper .ghl-host-left img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+  }
+
+  #ghl-webinar-wrapper .ghl-host-right {
+    padding: 28px;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.05);
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-host-right { padding: 24px; }
+  }
+
+  #ghl-webinar-wrapper .ghl-host-right h3 {
+    margin: 0 0 12px;
+    font-size: 20px;
+    color: rgba(255,255,255,.95);
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-host-right h3 { font-size: 18px; }
+  }
+
+  #ghl-webinar-wrapper .ghl-host-right p {
+    margin: 0 0 12px;
+    color: var(--muted);
+    line-height: 1.65;
+    font-size: 15px;
+  }
+
+  #ghl-webinar-wrapper .ghl-host-right ul {
+    color: rgba(255,255,255,.82);
+    margin: 0;
+    padding-left: 20px;
+    list-style-type: disc;
+    line-height: 1.65;
+    font-size: 15px;
+  }
+
+  #ghl-webinar-wrapper .ghl-host-right ul li {
+    margin: 8px 0;
+  }
+
+  /* === Final CTA === */
+  #ghl-webinar-wrapper .ghl-final-cta {
+    text-align: center;
+    padding: 32px 24px;
+  }
+
+  #ghl-webinar-wrapper .ghl-final-cta h2 {
+    margin: 0 0 14px;
+    font-size: clamp(24px, 5vw, 30px);
+    letter-spacing: -.4px;
+    color: rgba(255,255,255,.95);
+    font-weight: 900;
+  }
+
+  #ghl-webinar-wrapper .ghl-final-cta p {
+    margin: 0 auto 20px;
+    max-width: 600px;
+    color: var(--muted);
+    line-height: 1.65;
+    font-size: 15px;
+  }
+
+  /* === Footer === */
+  #ghl-webinar-wrapper .ghl-footer {
+    padding: 32px 0 48px;
+    color: var(--muted2);
+    font-size: 12px;
+    text-align: center;
+  }
+
+  #ghl-webinar-wrapper .ghl-footer p {
+    margin: 0 0 14px;
+  }
+
+  /* === Force image responsiveness === */
+  #ghl-webinar-wrapper img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  #ghl-webinar-wrapper .ghl-host-left img[src] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* === Scroll Animations === */
+  #ghl-webinar-wrapper .ghl-animate {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+
+  #ghl-webinar-wrapper .ghl-animate.ghl-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  #ghl-webinar-wrapper .ghl-animate-stagger {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  }
+
+  #ghl-webinar-wrapper .ghl-animate-stagger.ghl-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  #ghl-webinar-wrapper .ghl-delay-1 { transition-delay: 0.1s; }
+  #ghl-webinar-wrapper .ghl-delay-2 { transition-delay: 0.2s; }
+  #ghl-webinar-wrapper .ghl-delay-3 { transition-delay: 0.3s; }
+  #ghl-webinar-wrapper .ghl-delay-4 { transition-delay: 0.4s; }
+
+  /* Hero elements animate on load */
+  #ghl-webinar-wrapper .ghl-hero-animate {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: ghl-fadeInUp 0.7s ease-out forwards;
+  }
+
+  #ghl-webinar-wrapper .ghl-hero-animate-delay-1 { animation-delay: 0.1s; }
+  #ghl-webinar-wrapper .ghl-hero-animate-delay-2 { animation-delay: 0.25s; }
+  #ghl-webinar-wrapper .ghl-hero-animate-delay-3 { animation-delay: 0.4s; }
+  #ghl-webinar-wrapper .ghl-hero-animate-delay-4 { animation-delay: 0.55s; }
+  #ghl-webinar-wrapper .ghl-hero-animate-delay-5 { animation-delay: 0.7s; }
+  #ghl-webinar-wrapper .ghl-hero-animate-delay-6 { animation-delay: 0.85s; }
+
+  @keyframes ghl-fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* === Extra small breakpoints === */
+  @media (max-width: 640px) {
+    #ghl-webinar-wrapper .ghl-h1 { font-size: clamp(22px, 7.5vw, 28px); }
+  }
+
+  @media (max-width: 375px) {
+    #ghl-webinar-wrapper .ghl-h1 { font-size: 22px; }
+    #ghl-webinar-wrapper .ghl-countdown-number { font-size: 26px; }
+    #ghl-webinar-wrapper .ghl-countdown-sep { font-size: 18px; }
+  }
+</style>
+
+<!-- MAIN CONTENT -->
+<div id="ghl-webinar-wrapper">
+  <!-- Galaxy Background -->
+  <div class="ghl-galaxy" aria-hidden="true">
+    <div class="ghl-nebula"></div>
+    <div class="ghl-stars"></div>
+    <div class="ghl-stars2"></div>
+  </div>
+
+  <!-- Falling Amazon Boxes -->
+  <div class="ghl-amazon-boxes" aria-hidden="true">
+    <div class="ghl-box">&#x1F4E6;</div>
+    <div class="ghl-box">&#x1F4E6;</div>
+    <div class="ghl-box">&#x1F4E6;</div>
+    <div class="ghl-box">&#x1F4E6;</div>
+    <div class="ghl-box">&#x1F4E6;</div>
+    <div class="ghl-box">&#x1F4E6;</div>
+    <div class="ghl-box">&#x1F4E6;</div>
+    <div class="ghl-box">&#x1F4E6;</div>
+    <div class="ghl-box">&#x1F4E6;</div>
+    <div class="ghl-box">&#x1F4E6;</div>
+    <div class="ghl-box">&#x1F4E6;</div>
+    <div class="ghl-box">&#x1F4E6;</div>
+    <div class="ghl-box">&#x1F4E6;</div>
+    <div class="ghl-box">&#x1F4E6;</div>
+    <div class="ghl-box">&#x1F4E6;</div>
+  </div>
+
+  <!-- ========== HERO SECTION ========== -->
+  <header class="ghl-hero">
+    <div class="ghl-wrap">
+
+      <!-- Live Pill -->
+      <div class="ghl-pill ghl-hero-animate ghl-hero-animate-delay-1" style="margin-top:12px;margin-bottom:24px;">
+        <span class="ghl-dot"></span>
+        <span><strong>FREE LIVE TRAINING &mdash; AI AMAZON SCALING</strong></span>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="ghl-h1 ghl-hero-animate ghl-hero-animate-delay-2">
+        How Beginners Are Building <span class="ghl-grad">$10K&ndash;$30K/Month</span> Amazon Businesses in 90 Days Using AI
+      </h1>
+
+      <!-- Subheadline -->
+      <p class="ghl-sub ghl-hero-animate ghl-hero-animate-delay-2">
+        <strong style="color:rgba(255,255,255,.95);">WITHOUT</strong> prior experience &mdash; AI does the heavy lifting. No guesswork. No outdated strategies. Just a proven system.
+      </p>
+
+      <!-- Video Teaser -->
+      <div class="ghl-video-container ghl-hero-animate ghl-hero-animate-delay-3">
+        <div class="ghl-video-inner">
+          <button class="ghl-play-btn" onclick="this.style.display='none'" aria-label="Play video">
+            <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Primary CTA -->
+      <div class="ghl-hero-animate ghl-hero-animate-delay-4" style="margin-bottom:24px;">
+        <a class="ghl-btn" href="#ghl-register">Register Free &mdash; Save My Seat</a>
+      </div>
+
+      <!-- Countdown Timer -->
+      <div class="ghl-countdown-box ghl-hero-animate ghl-hero-animate-delay-5">
+        <div class="ghl-countdown-label">Limited To 100 Live Attendees</div>
+        <div class="ghl-countdown-display">
+          <div class="ghl-countdown-item">
+            <span class="ghl-countdown-number" id="ghlDays">00</span>
+            <span class="ghl-countdown-text">Days</span>
+          </div>
+          <div class="ghl-countdown-sep">:</div>
+          <div class="ghl-countdown-item">
+            <span class="ghl-countdown-number" id="ghlHours">00</span>
+            <span class="ghl-countdown-text">Hours</span>
+          </div>
+          <div class="ghl-countdown-sep">:</div>
+          <div class="ghl-countdown-item">
+            <span class="ghl-countdown-number" id="ghlMinutes">00</span>
+            <span class="ghl-countdown-text">Minutes</span>
+          </div>
+          <div class="ghl-countdown-sep">:</div>
+          <div class="ghl-countdown-item">
+            <span class="ghl-countdown-number" id="ghlSeconds">00</span>
+            <span class="ghl-countdown-text">Seconds</span>
+          </div>
+        </div>
+        <div class="ghl-countdown-date" id="ghlCountdownDate">Wednesday @ 8:00 PM EST</div>
+      </div>
+
+      <!-- Hero Card -->
+      <div class="ghl-hero-card ghl-hero-animate ghl-hero-animate-delay-6">
+        <p class="ghl-sub">
+          <strong style="color:rgba(255,255,255,.90);">Live Wednesday 8PM Eastern Time</strong><br>
+          Free training. No replay guarantee. Show up live and get the system that changed the game for 700+ sellers.
+        </p>
+        <div class="ghl-hero-actions">
+          <a class="ghl-btn" href="#ghl-register">Register Free &mdash; Save My Seat</a>
+        </div>
+        <div class="ghl-mini" style="justify-content:center;margin-top:14px;">
+          <span>100 Live Seats</span>
+          <span>Wednesday 8PM EST</span>
+          <span>Free &mdash; No Replay</span>
+        </div>
+      </div>
+
     </div>
+  </header>
 
-    <!-- Hero -->
-    <section class="hero">
-        <div class="hero-tag">Free Live Training &mdash; AI Amazon Scaling</div>
-        <h1>How Beginners Are Building <span class="highlight">$10K&ndash;$30K/Month</span> Amazon Businesses in 90 Days Using AI</h1>
-        <p class="sub"><strong>WITHOUT</strong> prior experience &mdash; AI does the heavy lifting. No guesswork. No outdated strategies. Just a proven system.</p>
-    </section>
+  <!-- ========== WHAT YOU'LL LEARN ========== -->
+  <section class="ghl-section" id="learn">
+    <div class="ghl-wrap ghl-section-card ghl-animate">
+      <div class="ghl-h2" style="text-align:center;">What You'll Learn Live</div>
+      <p class="ghl-p" style="text-align:center;max-width:680px;margin-left:auto;margin-right:auto;">
+        This is not a pitch fest. You will leave with a working framework you can execute immediately.
+      </p>
 
-    <!-- Video Teaser -->
-    <section class="video-section">
-        <div class="video-container">
-            <div class="video-inner">
-                <div class="play-btn" onclick="this.style.display='none'">
-                    <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                </div>
-            </div>
+      <ul class="ghl-learn-list">
+        <li class="ghl-learn-item">
+          <span class="ghl-learn-check">&#10003;</span>
+          <span>Why 95% of Amazon sellers fail &mdash; and what the top 5% do differently using AI</span>
+        </li>
+        <li class="ghl-learn-item">
+          <span class="ghl-learn-check">&#10003;</span>
+          <span>The 5-phase AI Amazon system that takes you from zero to $10K/month in 90 days</span>
+        </li>
+        <li class="ghl-learn-item">
+          <span class="ghl-learn-check">&#10003;</span>
+          <span>How our students find winning products in under 60 minutes (while others spend 10+ hours/week)</span>
+        </li>
+        <li class="ghl-learn-item">
+          <span class="ghl-learn-check">&#10003;</span>
+          <span>How to access $10K&ndash;$70K in business credit to fund your inventory &mdash; even as a beginner</span>
+        </li>
+        <li class="ghl-learn-item">
+          <span class="ghl-learn-check">&#10003;</span>
+          <span>Real student results: Xavier ($10K in 7 days), Grace (first sale after 2 years stuck), Brandon ($48K/month)</span>
+        </li>
+      </ul>
+
+      <div style="display:flex;justify-content:center;margin-top:28px;">
+        <a class="ghl-btn" href="#ghl-register">Register Free &mdash; Save My Seat</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SOCIAL PROOF STATS ========== -->
+  <section class="ghl-section">
+    <div class="ghl-wrap ghl-section-card ghl-animate">
+      <div class="ghl-h2" style="text-align:center;">The Numbers Don't Lie</div>
+
+      <div class="ghl-stats">
+        <div class="ghl-stat">
+          <div class="ghl-stat-num ghl-gold">700+</div>
+          <div class="ghl-stat-label">Active Sellers</div>
         </div>
-    </section>
-
-    <!-- Primary CTA -->
-    <section class="cta-section">
-        <a href="#register" class="cta-btn">Register Free &mdash; Save My Seat</a>
-        <p class="cta-sub">Live Wednesday 8PM Eastern Time &bull; <strong>Limited To 100 Live Attendees</strong></p>
-        <p class="event-details">Free training. No replay guarantee. Show up live.</p>
-    </section>
-
-    <!-- What You'll Learn -->
-    <section class="learn-section">
-        <h2>What You'll Learn Live</h2>
-        <ul class="learn-list">
-            <li>
-                <span class="learn-check">&#10003;</span>
-                <span>Why 95% of Amazon sellers fail &mdash; and what the top 5% do differently using AI</span>
-            </li>
-            <li>
-                <span class="learn-check">&#10003;</span>
-                <span>The 5-phase AI Amazon system that takes you from zero to $10K/month in 90 days</span>
-            </li>
-            <li>
-                <span class="learn-check">&#10003;</span>
-                <span>How our students find winning products in under 60 minutes (while others spend 10+ hours/week)</span>
-            </li>
-            <li>
-                <span class="learn-check">&#10003;</span>
-                <span>How to access $10K&ndash;$70K in business credit to fund your inventory &mdash; even as a beginner</span>
-            </li>
-            <li>
-                <span class="learn-check">&#10003;</span>
-                <span>Real student results: Xavier ($10K in 7 days), Grace (first sale after 2 years stuck), Brandon ($48K/month)</span>
-            </li>
-        </ul>
-    </section>
-
-    <!-- Social Proof -->
-    <section class="proof-section">
-        <h3>The Numbers Don't Lie</h3>
-        <div class="proof-stats">
-            <div class="proof-stat">
-                <div class="num" style="color: var(--gold);">700+</div>
-                <div class="label">Active Sellers</div>
-            </div>
-            <div class="proof-stat">
-                <div class="num" style="color: var(--green);">$50M+</div>
-                <div class="label">Student Sales</div>
-            </div>
-            <div class="proof-stat">
-                <div class="num" style="color: var(--accent-light);">5</div>
-                <div class="label">Live Calls/Week</div>
-            </div>
-            <div class="proof-stat">
-                <div class="num" style="color: var(--text);">90</div>
-                <div class="label">Day Promise</div>
-            </div>
+        <div class="ghl-stat">
+          <div class="ghl-stat-num ghl-green">$50M+</div>
+          <div class="ghl-stat-label">Student Sales</div>
         </div>
-    </section>
-
-    <!-- Registration Form -->
-    <section class="form-section" id="register">
-        <div class="form-card">
-            <h3>Register Free</h3>
-            <p class="form-sub">Save your seat for Wednesday's live AI Amazon training</p>
-            <form id="regForm" onsubmit="handleSubmit(event)">
-                <div class="form-group">
-                    <label>First Name</label>
-                    <input type="text" name="first_name" placeholder="Your first name" required>
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" name="email" placeholder="your@email.com" required>
-                </div>
-                <div class="form-group">
-                    <label>Phone (for reminders)</label>
-                    <input type="tel" name="phone" placeholder="(555) 123-4567">
-                </div>
-                <div class="form-group">
-                    <label>How much capital do you have available?</label>
-                    <select name="capital" required>
-                        <option value="" disabled selected>Select one</option>
-                        <option value="under_3k">Under $3,000</option>
-                        <option value="3k_5k">$3,000 &ndash; $5,000</option>
-                        <option value="5k_10k">$5,000 &ndash; $10,000</option>
-                        <option value="10k_20k">$10,000 &ndash; $20,000</option>
-                        <option value="20k_plus">$20,000+</option>
-                    </select>
-                </div>
-                <button type="submit" class="form-submit">Save My Seat &rarr;</button>
-            </form>
-            <p class="form-privacy">Your information is 100% private. We'll never share or spam you.</p>
+        <div class="ghl-stat">
+          <div class="ghl-stat-num">5</div>
+          <div class="ghl-stat-label">Live Calls/Week</div>
         </div>
-    </section>
+        <div class="ghl-stat">
+          <div class="ghl-stat-num">90</div>
+          <div class="ghl-stat-label">Day Promise</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <!-- Host Section -->
-    <section class="host-section">
-        <h3>Your Host: Sabbo Jean-Baptiste</h3>
-        <p>Founder of <strong>24/7 Profits</strong> and active Amazon seller doing <strong>$20K&ndash;$50K/month</strong>. Not a guru who stopped selling &mdash; an operator who coaches from the trenches. Built the AI sourcing system that students use to find products in minutes, not hours. <strong>700+ students. $50M+ in student-generated sales.</strong></p>
-    </section>
+  <!-- ========== REGISTRATION FORM ========== -->
+  <section class="ghl-section" id="ghl-register">
+    <div class="ghl-wrap">
+      <div class="ghl-form-section">
+        <div class="ghl-form-card ghl-animate">
+          <h3 class="ghl-form-title">Register Free</h3>
+          <p class="ghl-form-sub">Save your seat for Wednesday's live AI Amazon training</p>
 
-    <!-- Footer CTA -->
-    <section class="footer-cta">
-        <h2>Ready to Start Your Amazon Business the Smart Way?</h2>
-        <a href="#register" class="cta-btn">Register Free &mdash; Save My Seat</a>
-        <p class="cta-sub" style="margin-top: 1.5rem;">Wednesday at 8PM EST &bull; <strong>100 Live Seats</strong> &bull; Free</p>
-    </section>
+          <form id="ghlRegForm" onsubmit="handleGhlSubmit(event)">
+            <div class="ghl-form-group">
+              <label>First Name</label>
+              <input type="text" name="first_name" placeholder="Your first name" required>
+            </div>
+            <div class="ghl-form-group">
+              <label>Email</label>
+              <input type="email" name="email" placeholder="your@email.com" required>
+            </div>
+            <div class="ghl-form-group">
+              <label>Phone (for reminders)</label>
+              <input type="tel" name="phone" placeholder="(555) 123-4567">
+            </div>
+            <div class="ghl-form-group">
+              <label>How much capital do you have available?</label>
+              <select name="capital" required>
+                <option value="" disabled selected>Select one</option>
+                <option value="under_3k">Under $3,000</option>
+                <option value="3k_5k">$3,000 &ndash; $5,000</option>
+                <option value="5k_10k">$5,000 &ndash; $10,000</option>
+                <option value="10k_20k">$10,000 &ndash; $20,000</option>
+                <option value="20k_plus">$20,000+</option>
+              </select>
+            </div>
+            <button type="submit" class="ghl-form-submit">Save My Seat &rarr;</button>
+          </form>
+          <p class="ghl-form-privacy">Your information is 100% private. We'll never share or spam you.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <script>
-        // Star Generation
-        const starsContainer = document.getElementById('bgStars');
-        for (let i = 0; i < 120; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            const size = Math.random() * 2;
-            star.style.width = size + 'px';
-            star.style.height = size + 'px';
-            star.style.left = Math.random() * 100 + '%';
-            star.style.top = Math.random() * 100 + '%';
-            star.style.setProperty('--d', (Math.random() * 3 + 2) + 's');
-            star.style.animationDelay = Math.random() * 5 + 's';
-            starsContainer.appendChild(star);
-        }
+  <!-- ========== HOST SECTION ========== -->
+  <section class="ghl-section">
+    <div class="ghl-wrap ghl-section-card ghl-animate">
+      <div class="ghl-h2">Meet Your Host</div>
 
-        // Countdown to next Wednesday 8PM EST
-        function getNextWebinar() {
-            const now = new Date();
-            // EST offset: UTC-5 (ignoring DST for simplicity; EDT is UTC-4)
-            const estOffset = -5;
-            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-            const est = new Date(utc + (3600000 * estOffset));
+      <div class="ghl-host">
+        <div class="ghl-host-left">
+          <img loading="lazy" src="https://storage.googleapis.com/msgsndr/ZPMdw3padKDXvshNxYui/media/69530f89ee1047344a3e1fcd.jpeg" alt="Sabbo - AllDayFBA Founder">
+        </div>
 
-            let target = new Date(est);
-            target.setHours(20, 0, 0, 0);
+        <div class="ghl-host-right">
+          <h3>Sabbo Jean-Baptiste &mdash; Founder of <span class="ghl-grad">24/7 Profits</span></h3>
 
-            // Find next Wednesday (3 = Wednesday)
-            const dayOfWeek = est.getDay();
-            let daysUntilWed = (3 - dayOfWeek + 7) % 7;
+          <p>Active Amazon seller doing <strong style="color:rgba(255,255,255,.90);">$20K&ndash;$50K/month</strong>. Not a guru who stopped selling &mdash; an operator who coaches from the trenches.</p>
 
-            // If it's Wednesday but past 8PM, go to next week
-            if (daysUntilWed === 0 && est.getHours() >= 20) {
-                daysUntilWed = 7;
-            }
+          <p>Built the AI sourcing system that students use to find products in minutes, not hours. The same system that powered <strong style="color:rgba(255,255,255,.90);">$50M+ in student-generated sales</strong> across 700+ sellers.</p>
 
-            target.setDate(est.getDate() + daysUntilWed);
+          <p style="margin-top:12px;color:rgba(255,255,255,.88);font-weight:850;">Why listen to Sabbo:</p>
+          <ul>
+            <li>Active seller &mdash; not retired, not theoretical</li>
+            <li>Built proprietary AI tools his students use daily</li>
+            <li>700+ students coached, $50M+ in collective sales</li>
+            <li>5 live coaching calls per week &mdash; real-time support</li>
+          </ul>
 
-            // Convert back to local time for countdown
-            const targetUTC = target.getTime() - (3600000 * estOffset);
-            return new Date(targetUTC - (now.getTimezoneOffset() * 60000));
-        }
+          <p style="margin-top:16px;">No fluff. No recycled YouTube advice. Just the system and how to apply it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        const countdownEl = document.getElementById('countdown');
-        function updateCountdown() {
-            const now = new Date();
-            const target = getNextWebinar();
-            const diff = target - now;
+  <!-- ========== FOOTER CTA ========== -->
+  <section class="ghl-section">
+    <div class="ghl-wrap ghl-section-card ghl-final-cta ghl-animate">
+      <h2>Ready to Start Your Amazon Business the Smart Way?</h2>
+      <p>
+        This free live training happens every Wednesday at 8PM EST. Seats are limited to 100 live attendees. No replay guarantee. Show up live.
+      </p>
+      <a class="ghl-btn" href="#ghl-register">Register Free &mdash; Save My Seat</a>
+      <div class="ghl-mini" style="justify-content:center;margin-top:14px;">
+        <span>100 Live Seats</span>
+        <span>Wednesday 8PM EST</span>
+        <span>Free</span>
+      </div>
+    </div>
+  </section>
 
-            if (diff <= 0) {
-                countdownEl.textContent = 'LIVE NOW';
-                return;
-            }
+  <!-- ========== FOOTER ========== -->
+  <footer class="ghl-footer">
+    <div class="ghl-wrap">
+      <p style="margin-bottom:12px;font-size:11px;max-width:800px;margin-left:auto;margin-right:auto;line-height:1.6;">
+        <strong>Income Disclaimer:</strong> Any financial numbers referenced here are estimates, projections, or past results and should not be considered exact, actual, or as a promise of potential earnings. Results depend on many factors. There are NO guarantees of success or income.
+      </p>
+      <p>
+        &copy; <span id="ghlYear"></span> AllDayFBA &bull; 24/7 Profits &bull; All rights reserved
+      </p>
+    </div>
+  </footer>
+</div>
 
-            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const s = Math.floor((diff % (1000 * 60)) / 1000);
+<!-- ========== SCRIPTS ========== -->
+<script>
+(function() {
+  // === COUNTDOWN TO NEXT WEDNESDAY 8PM EST ===
+  function getNextWebinar() {
+    var now = new Date();
+    // Determine EST/EDT offset
+    // Create a date in the US Eastern timezone
+    var estString = now.toLocaleString('en-US', { timeZone: 'America/New_York' });
+    var estNow = new Date(estString);
 
-            countdownEl.textContent =
-                String(d).padStart(2, '0') + ':' +
-                String(h).padStart(2, '0') + ':' +
-                String(m).padStart(2, '0') + ':' +
-                String(s).padStart(2, '0');
-        }
+    var target = new Date(estNow);
+    target.setHours(20, 0, 0, 0);
 
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
+    // Find next Wednesday (3 = Wednesday)
+    var dayOfWeek = estNow.getDay();
+    var daysUntilWed = (3 - dayOfWeek + 7) % 7;
 
-        // Form Submit
-        function handleSubmit(e) {
-            e.preventDefault();
-            // In production, POST to GHL webhook or API endpoint
-            window.location.href = '/webinar/thankyou';
-        }
+    // If it's Wednesday but past 8PM EST, go to next week
+    if (daysUntilWed === 0 && estNow.getHours() >= 20) {
+      daysUntilWed = 7;
+    }
 
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            });
-        });
-    </script>
-</body>
-</html>
+    target.setDate(estNow.getDate() + daysUntilWed);
+
+    // Convert back: calculate the UTC time of target in EST
+    // Get the offset between local and EST
+    var localNow = now.getTime();
+    var estNowMs = estNow.getTime();
+    var offset = localNow - estNowMs;
+
+    return new Date(target.getTime() + offset);
+  }
+
+  // Format the countdown date text
+  function formatWebinarDate() {
+    var now = new Date();
+    var estString = now.toLocaleString('en-US', { timeZone: 'America/New_York' });
+    var estNow = new Date(estString);
+    var target = new Date(estNow);
+    target.setHours(20, 0, 0, 0);
+    var dayOfWeek = estNow.getDay();
+    var daysUntilWed = (3 - dayOfWeek + 7) % 7;
+    if (daysUntilWed === 0 && estNow.getHours() >= 20) {
+      daysUntilWed = 7;
+    }
+    target.setDate(estNow.getDate() + daysUntilWed);
+
+    var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var day = target.getDate();
+    var suffix = 'th';
+    if (day === 1 || day === 21 || day === 31) suffix = 'st';
+    else if (day === 2 || day === 22) suffix = 'nd';
+    else if (day === 3 || day === 23) suffix = 'rd';
+
+    return 'Wednesday, ' + months[target.getMonth()] + ' ' + day + suffix + ' @ 8:00 PM EST';
+  }
+
+  var dateEl = document.getElementById('ghlCountdownDate');
+  if (dateEl) {
+    dateEl.textContent = formatWebinarDate();
+  }
+
+  function updateCountdown() {
+    var now = new Date();
+    var target = getNextWebinar();
+    var diff = target - now;
+
+    if (diff <= 0) {
+      document.getElementById('ghlDays').textContent = '00';
+      document.getElementById('ghlHours').textContent = '00';
+      document.getElementById('ghlMinutes').textContent = '00';
+      document.getElementById('ghlSeconds').textContent = '00';
+      return;
+    }
+
+    var d = Math.floor(diff / (1000 * 60 * 60 * 24));
+    var h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    var s = Math.floor((diff % (1000 * 60)) / 1000);
+
+    document.getElementById('ghlDays').textContent = String(d).padStart(2, '0');
+    document.getElementById('ghlHours').textContent = String(h).padStart(2, '0');
+    document.getElementById('ghlMinutes').textContent = String(m).padStart(2, '0');
+    document.getElementById('ghlSeconds').textContent = String(s).padStart(2, '0');
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // Set current year
+  var yearEl = document.getElementById('ghlYear');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  // === SCROLL ANIMATION OBSERVER ===
+  var animateElements = document.querySelectorAll('#ghl-webinar-wrapper .ghl-animate');
+
+  var observerOptions = {
+    root: null,
+    rootMargin: '0px 0px -80px 0px',
+    threshold: 0.1
+  };
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('ghl-visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  animateElements.forEach(function(el) { observer.observe(el); });
+
+  // === SMOOTH SCROLL FOR ANCHOR LINKS ===
+  var anchors = document.querySelectorAll('#ghl-webinar-wrapper a[href^="#"]');
+  anchors.forEach(function(anchor) {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      var targetEl = document.querySelector(this.getAttribute('href'));
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+})();
+
+// === FORM SUBMIT ===
+function handleGhlSubmit(e) {
+  e.preventDefault();
+  // In production, POST to GHL webhook or API endpoint
+  window.location.href = '/webinar/thankyou';
+}
+</script>

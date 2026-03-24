@@ -1,217 +1,1039 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>You're In! | 24/7 Profits</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --bg: #1A0A2E; --surface: #231540; --accent: #6B2FA0; --accent-light: #9B59B6;
-            --gold: #FFD700; --text: #FFFFFF; --text-muted: #B794E0; --text-dim: #8B7AAD;
-            --green: #4ADE80;
-        }
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: linear-gradient(180deg, var(--bg) 0%, #0d0618 100%);
-            color: var(--text); min-height: 100vh;
-        }
-        .container { max-width: 650px; margin: 0 auto; padding: 4rem 1.5rem; text-align: center; }
+<!--
+  ====================================
+  GHL OPTIMIZED THANK YOU PAGE - FULL WIDTH
+  AI Amazon Scaling Masterclass
+  ====================================
+  INSTRUCTIONS:
+  1. In GoHighLevel, create a new funnel/page
+  2. Add a "Custom Code" element (or use Full Width Section)
+  3. Copy and paste this ENTIRE file content
+  4. Save and publish
+  ====================================
+-->
 
-        .check-circle {
-            width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 2rem;
-            background: rgba(74,222,128,0.15); border: 2px solid var(--green);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 36px; color: var(--green);
-        }
-        h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; margin-bottom: 1rem; letter-spacing: -1px; }
-        .sub { font-size: 1.15rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 3rem; }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
-        .details-card {
-            background: var(--surface); border: 1px solid rgba(107,47,160,0.2);
-            border-radius: 16px; padding: 2rem; margin-bottom: 2rem; text-align: left;
-        }
-        .details-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--gold); }
-        .detail-row {
-            display: flex; gap: 12px; padding: 10px 0;
-            border-bottom: 1px solid rgba(107,47,160,0.1); font-size: 1rem;
-        }
-        .detail-row:last-child { border-bottom: none; }
-        .detail-icon { font-size: 1.2rem; flex-shrink: 0; }
-        .detail-label { color: var(--text-muted); font-size: 0.85rem; }
-        .detail-value { font-weight: 600; }
+<style>
+  /* === AGGRESSIVE GHL RESET === */
+  html, body, .hl_page-creator--content, .hl-page-preview,
+  [class*="hl_"], [class*="funnel"], [class*="row"],
+  [class*="col"], [class*="section"], [class*="container"] {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
 
-        .calendar-btns {
-            display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
-            margin: 2rem 0;
-        }
-        .cal-btn {
-            padding: 12px 24px; border-radius: 10px; font-size: 0.9rem; font-weight: 600;
-            border: 1px solid rgba(107,47,160,0.3); background: rgba(107,47,160,0.1);
-            color: var(--text); cursor: pointer; transition: all 0.3s;
-            text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
-        }
-        .cal-btn:hover { background: rgba(107,47,160,0.25); border-color: var(--accent-light); }
+  /* === GHL CONTAINER OVERRIDE - FULL WIDTH === */
+  #ghl-thankyou-wrapper {
+    all: initial;
+    display: block;
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: -20px 0 0 calc(-50vw + 50%) !important;
+    margin-right: calc(-50vw + 50%) !important;
+    padding: 0 !important;
+    position: relative;
+    top: 0 !important;
+    background: radial-gradient(1500px 1000px at 15% 10%, rgba(139,92,246,.18), transparent 55%),
+                radial-gradient(1250px 875px at 80% 25%, rgba(56,189,248,.14), transparent 55%),
+                radial-gradient(1125px 812px at 55% 85%, rgba(139,92,246,.12), transparent 60%),
+                linear-gradient(180deg, #070a16, #05060c);
+    overflow-x: hidden;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
 
-        .share-section {
-            background: var(--surface); border: 1px solid rgba(107,47,160,0.15);
-            border-radius: 16px; padding: 2rem; margin: 2rem 0;
-        }
-        .share-section h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .share-section p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem; }
-        .share-link {
-            display: flex; gap: 8px;
-        }
-        .share-link input {
-            flex: 1; padding: 10px 14px; border-radius: 8px;
-            border: 1px solid rgba(107,47,160,0.2); background: rgba(0,0,0,0.2);
-            color: var(--text); font-size: 0.85rem; font-family: inherit;
-        }
-        .copy-btn {
-            padding: 10px 20px; border-radius: 8px;
-            background: var(--accent); color: white; border: none;
-            font-size: 0.85rem; font-weight: 600; cursor: pointer;
-        }
+  #ghl-thankyou-wrapper,
+  #ghl-thankyou-wrapper *,
+  #ghl-thankyou-wrapper *::before,
+  #ghl-thankyou-wrapper *::after {
+    box-sizing: border-box;
+  }
 
-        .prep-section { margin: 3rem 0; text-align: left; }
-        .prep-section h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; text-align: center; }
-        .prep-list { list-style: none; }
-        .prep-list li {
-            display: flex; gap: 12px; padding: 12px 0;
-            border-bottom: 1px solid rgba(107,47,160,0.08);
-            font-size: 0.95rem; color: var(--text-muted);
-        }
-        .prep-num {
-            width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
-            background: rgba(107,47,160,0.15); color: var(--accent-light);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 13px; font-weight: 700;
-        }
+  /* Variables */
+  #ghl-thankyou-wrapper {
+    --bg0: #05060c;
+    --bg1: #070a16;
+    --text: rgba(255,255,255,.92);
+    --muted: rgba(255,255,255,.72);
+    --muted2: rgba(255,255,255,.60);
+    --purple: #8B5CF6;
+    --blue: #38BDF8;
+    --green: #10B981;
+    --gold: #FFD700;
+    --shadow: 0 20px 60px rgba(0,0,0,.55);
+    --radius: 20px;
+    --radius2: 26px;
+  }
 
-        .bg-orb {
-            position: fixed; border-radius: 50%; filter: blur(120px);
-            opacity: 0.06; pointer-events: none; z-index: -1;
-        }
-    </style>
-</head>
-<body>
-    <div class="bg-orb" style="width: 500px; height: 500px; background: #6B2FA0; top: -100px; right: -100px;"></div>
+  /* Galaxy Background */
+  #ghl-thankyou-wrapper .ghl-galaxy {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+  }
 
-    <div class="container">
-        <div class="check-circle">&#10003;</div>
-        <h1>You're In!</h1>
-        <p class="sub">Your seat is saved for the <strong style="color: var(--text);">AI Amazon Scaling Masterclass</strong>. Here's everything you need to know.</p>
+  #ghl-thankyou-wrapper .ghl-stars,
+  #ghl-thankyou-wrapper .ghl-stars2,
+  #ghl-thankyou-wrapper .ghl-nebula {
+    position: absolute;
+    inset: -50%;
+    background-repeat: repeat;
+    transform: translate3d(0,0,0);
+    opacity: .9;
+    width: 200%;
+    height: 200%;
+  }
 
-        <!-- Event Details -->
-        <div class="details-card">
-            <h3>Event Details</h3>
-            <div class="detail-row">
-                <span class="detail-icon">&#128197;</span>
-                <div>
-                    <div class="detail-label">Date</div>
-                    <div class="detail-value" id="eventDate">Wednesday</div>
-                </div>
-            </div>
-            <div class="detail-row">
-                <span class="detail-icon">&#128336;</span>
-                <div>
-                    <div class="detail-label">Time</div>
-                    <div class="detail-value">8:00 PM Eastern Time</div>
-                </div>
-            </div>
-            <div class="detail-row">
-                <span class="detail-icon">&#9201;</span>
-                <div>
-                    <div class="detail-label">Duration</div>
-                    <div class="detail-value">~60 minutes (presentation + Q&A)</div>
-                </div>
-            </div>
-            <div class="detail-row">
-                <span class="detail-icon">&#128279;</span>
-                <div>
-                    <div class="detail-label">Where</div>
-                    <div class="detail-value">Link will be emailed 15 minutes before</div>
-                </div>
-            </div>
+  #ghl-thankyou-wrapper .ghl-stars {
+    background-image:
+      radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,.65) 50%, transparent 52%),
+      radial-gradient(1.5px 1.5px at 35% 55%, rgba(255,255,255,.55) 50%, transparent 52%),
+      radial-gradient(1px 1px at 70% 40%, rgba(255,255,255,.55) 50%, transparent 52%),
+      radial-gradient(1.2px 1.2px at 85% 70%, rgba(255,255,255,.45) 50%, transparent 52%);
+    background-size: 325px 325px;
+    animation: ghl-drift 28s linear infinite;
+    opacity: .65;
+  }
+
+  #ghl-thankyou-wrapper .ghl-stars2 {
+    background-image:
+      radial-gradient(1.2px 1.2px at 12% 72%, rgba(255,255,255,.6) 50%, transparent 52%),
+      radial-gradient(1px 1px at 48% 18%, rgba(255,255,255,.5) 50%, transparent 52%),
+      radial-gradient(1.6px 1.6px at 78% 62%, rgba(255,255,255,.45) 50%, transparent 52%);
+    background-size: 425px 425px;
+    animation: ghl-drift2 44s linear infinite;
+    opacity: .45;
+    filter: blur(.2px);
+  }
+
+  #ghl-thankyou-wrapper .ghl-nebula {
+    background-image:
+      radial-gradient(420px 320px at 20% 30%, rgba(139,92,246,.18), transparent 60%),
+      radial-gradient(520px 420px at 75% 25%, rgba(56,189,248,.14), transparent 62%),
+      radial-gradient(560px 520px at 55% 80%, rgba(139,92,246,.12), transparent 64%);
+    background-size: 900px 900px;
+    animation: ghl-nebula 18s ease-in-out infinite alternate;
+    opacity: .9;
+    mix-blend-mode: screen;
+  }
+
+  @keyframes ghl-drift {
+    from { transform: translate3d(-2%, -2%, 0); }
+    to { transform: translate3d(2%, 2%, 0); }
+  }
+
+  @keyframes ghl-drift2 {
+    from { transform: translate3d(2%, -1%, 0) scale(1.02); }
+    to { transform: translate3d(-2%, 1%, 0) scale(1.02); }
+  }
+
+  @keyframes ghl-nebula {
+    from { transform: translate3d(-1%, 1%, 0) scale(1.01); }
+    to { transform: translate3d(1%, -1%, 0) scale(1.02); }
+  }
+
+  /* Confetti Animation */
+  #ghl-thankyou-wrapper .ghl-confetti {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  #ghl-thankyou-wrapper .ghl-confetti-piece {
+    position: absolute;
+    font-size: 24px;
+    opacity: 0;
+    animation: ghl-confetti-fall linear forwards;
+  }
+
+  @keyframes ghl-confetti-fall {
+    0% {
+      opacity: 1;
+      transform: translateY(-20px) rotate(0deg);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(100vh) rotate(720deg);
+    }
+  }
+
+  /* Content Container */
+  #ghl-thankyou-wrapper .ghl-wrap {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (min-width: 768px) {
+    #ghl-thankyou-wrapper .ghl-wrap {
+      padding: 0 40px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #ghl-thankyou-wrapper .ghl-wrap {
+      padding: 0 16px;
+    }
+  }
+
+  /* Success Checkmark */
+  #ghl-thankyou-wrapper .ghl-success-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--green), #059669);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    box-shadow: 0 0 40px rgba(16,185,129,.4), 0 0 80px rgba(16,185,129,.2);
+    animation: ghl-success-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes ghl-success-pulse {
+    0%, 100% { box-shadow: 0 0 40px rgba(16,185,129,.4), 0 0 80px rgba(16,185,129,.2); }
+    50% { box-shadow: 0 0 60px rgba(16,185,129,.6), 0 0 100px rgba(16,185,129,.3); }
+  }
+
+  #ghl-thankyou-wrapper .ghl-success-icon svg {
+    width: 40px;
+    height: 40px;
+    stroke: white;
+    stroke-width: 3;
+    fill: none;
+  }
+
+  /* Hero Section */
+  #ghl-thankyou-wrapper .ghl-hero {
+    padding: 40px 0 32px;
+    text-align: center;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-thankyou-wrapper .ghl-hero {
+      padding: 24px 0 20px;
+    }
+  }
+
+  #ghl-thankyou-wrapper .ghl-h1 {
+    margin: 0 0 16px;
+    font-size: clamp(28px, 5vw, 48px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: rgba(255,255,255,.98);
+    font-weight: 900;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-thankyou-wrapper .ghl-h1 {
+      font-size: clamp(24px, 7vw, 34px);
+    }
+  }
+
+  #ghl-thankyou-wrapper .ghl-grad {
+    background: linear-gradient(90deg, rgba(139,92,246,1), rgba(56,189,248,1));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  #ghl-thankyou-wrapper .ghl-grad-green {
+    background: linear-gradient(90deg, var(--green), #34D399);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  #ghl-thankyou-wrapper .ghl-sub {
+    margin: 0 0 28px;
+    color: var(--muted);
+    font-size: clamp(15px, 3.5vw, 18px);
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  /* Countdown Box */
+  #ghl-thankyou-wrapper .ghl-countdown-box {
+    background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+    border: 2px solid rgba(139,92,246,.6);
+    border-radius: 16px;
+    padding: 20px 24px;
+    margin: 20px auto;
+    max-width: 500px;
+    box-shadow: 0 0 50px rgba(139,92,246,.35), 0 20px 60px rgba(0,0,0,.5);
+    animation: ghl-glow-pulse 2s ease-in-out infinite;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-thankyou-wrapper .ghl-countdown-box {
+      padding: 16px 12px;
+      margin: 16px auto;
+      max-width: 100%;
+    }
+  }
+
+  @keyframes ghl-glow-pulse {
+    0%, 100% { box-shadow: 0 0 40px rgba(139,92,246,.3), 0 20px 60px rgba(0,0,0,.5); }
+    50% { box-shadow: 0 0 60px rgba(139,92,246,.5), 0 20px 60px rgba(0,0,0,.5); }
+  }
+
+  #ghl-thankyou-wrapper .ghl-countdown-label {
+    text-align: center;
+    font-size: clamp(11px, 3vw, 14px);
+    font-weight: 800;
+    color: rgba(255,255,255,.9);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  #ghl-thankyou-wrapper .ghl-countdown-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(4px, 2vw, 12px);
+    margin-bottom: 12px;
+    flex-wrap: nowrap;
+  }
+
+  #ghl-thankyou-wrapper .ghl-countdown-item {
+    text-align: center;
+    min-width: clamp(42px, 12vw, 60px);
+  }
+
+  #ghl-thankyou-wrapper .ghl-countdown-number {
+    display: block;
+    font-size: clamp(24px, 7vw, 38px);
+    font-weight: 900;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  #ghl-thankyou-wrapper .ghl-countdown-text {
+    display: block;
+    font-size: clamp(8px, 2vw, 11px);
+    text-transform: uppercase;
+    color: var(--muted2);
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    margin-top: 4px;
+  }
+
+  #ghl-thankyou-wrapper .ghl-countdown-sep {
+    font-size: clamp(16px, 5vw, 26px);
+    font-weight: 900;
+    color: rgba(255,255,255,.35);
+    line-height: 1;
+    padding: 0 clamp(2px, 1vw, 6px);
+  }
+
+  #ghl-thankyou-wrapper .ghl-countdown-date {
+    text-align: center;
+    font-size: clamp(11px, 2.8vw, 14px);
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  /* Event Details Card */
+  #ghl-thankyou-wrapper .ghl-details-card {
+    background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-top: 32px;
+    text-align: left;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  #ghl-thankyou-wrapper .ghl-details-card h3 {
+    margin: 0 0 16px;
+    font-size: 18px;
+    color: var(--gold);
+    font-weight: 800;
+  }
+
+  #ghl-thankyou-wrapper .ghl-detail-row {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    font-size: clamp(14px, 3vw, 16px);
+    align-items: flex-start;
+  }
+
+  #ghl-thankyou-wrapper .ghl-detail-row:last-child {
+    border-bottom: none;
+  }
+
+  #ghl-thankyou-wrapper .ghl-detail-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  #ghl-thankyou-wrapper .ghl-detail-label {
+    color: var(--muted2);
+    font-size: clamp(11px, 2.5vw, 13px);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  #ghl-thankyou-wrapper .ghl-detail-value {
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  /* Action Buttons */
+  #ghl-thankyou-wrapper .ghl-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 32px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  #ghl-thankyou-wrapper .ghl-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 18px 32px;
+    border-radius: 16px;
+    border: 2px solid rgba(255,255,255,.18);
+    color: #071019;
+    font-weight: 900;
+    text-decoration: none;
+    font-size: 17px;
+    transition: transform .2s ease, filter .2s ease, box-shadow .2s ease;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  #ghl-thankyou-wrapper .ghl-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    filter: brightness(1.1);
+  }
+
+  /* Calendar Buttons Row */
+  #ghl-thankyou-wrapper .ghl-cal-row {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+  }
+
+  @media (max-width: 480px) {
+    #ghl-thankyou-wrapper .ghl-cal-row {
+      flex-direction: column;
+    }
+  }
+
+  #ghl-thankyou-wrapper .ghl-btn-google {
+    background: linear-gradient(135deg, var(--green), #059669);
+    box-shadow: 0 0 25px rgba(16,185,129,.35), 0 15px 40px rgba(0,0,0,.3);
+    flex: 1;
+  }
+
+  #ghl-thankyou-wrapper .ghl-btn-google:hover {
+    box-shadow: 0 0 40px rgba(16,185,129,.5), 0 20px 50px rgba(0,0,0,.4);
+  }
+
+  #ghl-thankyou-wrapper .ghl-btn-apple {
+    background: linear-gradient(135deg, #6B7280, #4B5563);
+    box-shadow: 0 0 25px rgba(107,114,128,.3), 0 15px 40px rgba(0,0,0,.3);
+    flex: 1;
+  }
+
+  #ghl-thankyou-wrapper .ghl-btn-apple:hover {
+    box-shadow: 0 0 40px rgba(107,114,128,.5), 0 20px 50px rgba(0,0,0,.4);
+  }
+
+  #ghl-thankyou-wrapper .ghl-btn-outlook {
+    background: linear-gradient(135deg, #0078D4, #005A9E);
+    box-shadow: 0 0 25px rgba(0,120,212,.3), 0 15px 40px rgba(0,0,0,.3);
+    flex: 1;
+  }
+
+  #ghl-thankyou-wrapper .ghl-btn-outlook:hover {
+    box-shadow: 0 0 40px rgba(0,120,212,.5), 0 20px 50px rgba(0,0,0,.4);
+  }
+
+  #ghl-thankyou-wrapper .ghl-btn svg {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+
+  #ghl-thankyou-wrapper .ghl-btn-sm {
+    font-size: clamp(13px, 3vw, 15px);
+    padding: 14px 16px;
+    gap: 8px;
+  }
+
+  #ghl-thankyou-wrapper .ghl-btn-sm svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Share Section */
+  #ghl-thankyou-wrapper .ghl-share-card {
+    background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-top: 32px;
+    text-align: center;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  #ghl-thankyou-wrapper .ghl-share-card h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    color: rgba(255,255,255,.95);
+    font-weight: 800;
+  }
+
+  #ghl-thankyou-wrapper .ghl-share-card p {
+    margin: 0 0 16px;
+    color: var(--muted);
+    font-size: clamp(13px, 3vw, 15px);
+    line-height: 1.5;
+  }
+
+  #ghl-thankyou-wrapper .ghl-share-link {
+    display: flex;
+    gap: 8px;
+  }
+
+  #ghl-thankyou-wrapper .ghl-share-link input {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(0,0,0,.3);
+    color: var(--text);
+    font-size: clamp(12px, 3vw, 14px);
+    font-family: 'Inter', sans-serif;
+    outline: none;
+  }
+
+  #ghl-thankyou-wrapper .ghl-share-link input:focus {
+    border-color: var(--purple);
+  }
+
+  #ghl-thankyou-wrapper .ghl-copy-btn {
+    padding: 12px 24px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--purple), #7C3AED);
+    color: white;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .2s ease, filter .2s ease;
+    font-family: 'Inter', sans-serif;
+  }
+
+  #ghl-thankyou-wrapper .ghl-copy-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.15);
+  }
+
+  /* How to Prepare Card */
+  #ghl-thankyou-wrapper .ghl-info-card {
+    background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-top: 32px;
+    text-align: left;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  #ghl-thankyou-wrapper .ghl-info-card h3 {
+    margin: 0 0 20px;
+    font-size: 18px;
+    color: rgba(255,255,255,.95);
+    font-weight: 800;
+    text-align: center;
+  }
+
+  #ghl-thankyou-wrapper .ghl-info-card ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  #ghl-thankyou-wrapper .ghl-info-card li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin: 0;
+    padding: 14px 0;
+    color: var(--muted);
+    font-size: clamp(14px, 3vw, 15px);
+    line-height: 1.5;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+
+  #ghl-thankyou-wrapper .ghl-info-card li:last-child {
+    border-bottom: none;
+  }
+
+  #ghl-thankyou-wrapper .ghl-prep-num {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(139,92,246,.25), rgba(56,189,248,.15));
+    color: var(--purple);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    flex-shrink: 0;
+    border: 1px solid rgba(139,92,246,.3);
+  }
+
+  /* Footer */
+  #ghl-thankyou-wrapper .ghl-footer {
+    padding: 48px 0;
+    color: var(--muted2);
+    font-size: 12px;
+    text-align: center;
+  }
+
+  #ghl-thankyou-wrapper .ghl-footer p {
+    margin: 0 0 14px;
+  }
+
+  /* Animations */
+  #ghl-thankyou-wrapper .ghl-hero-animate {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: ghl-fadeInUp 0.7s ease-out forwards;
+  }
+
+  #ghl-thankyou-wrapper .ghl-hero-animate-delay-1 { animation-delay: 0.1s; }
+  #ghl-thankyou-wrapper .ghl-hero-animate-delay-2 { animation-delay: 0.25s; }
+  #ghl-thankyou-wrapper .ghl-hero-animate-delay-3 { animation-delay: 0.4s; }
+  #ghl-thankyou-wrapper .ghl-hero-animate-delay-4 { animation-delay: 0.55s; }
+  #ghl-thankyou-wrapper .ghl-hero-animate-delay-5 { animation-delay: 0.7s; }
+  #ghl-thankyou-wrapper .ghl-hero-animate-delay-6 { animation-delay: 0.85s; }
+  #ghl-thankyou-wrapper .ghl-hero-animate-delay-7 { animation-delay: 1.0s; }
+  #ghl-thankyou-wrapper .ghl-hero-animate-delay-8 { animation-delay: 1.15s; }
+
+  @keyframes ghl-fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Force image responsiveness */
+  #ghl-thankyou-wrapper img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Contact footer link */
+  #ghl-thankyou-wrapper .ghl-footer a {
+    color: var(--purple);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  #ghl-thankyou-wrapper .ghl-footer a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<!-- MAIN CONTENT -->
+<div id="ghl-thankyou-wrapper">
+  <!-- Galaxy Background -->
+  <div class="ghl-galaxy" aria-hidden="true">
+    <div class="ghl-nebula"></div>
+    <div class="ghl-stars"></div>
+    <div class="ghl-stars2"></div>
+  </div>
+
+  <!-- Confetti Container -->
+  <div class="ghl-confetti" id="ghlConfetti" aria-hidden="true"></div>
+
+  <!-- Hero Section -->
+  <header class="ghl-hero">
+    <div class="ghl-wrap">
+      <!-- Success Icon -->
+      <div class="ghl-success-icon ghl-hero-animate ghl-hero-animate-delay-1">
+        <svg viewBox="0 0 24 24">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+
+      <h1 class="ghl-h1 ghl-hero-animate ghl-hero-animate-delay-2">
+        You're <span class="ghl-grad-green">In!</span>
+      </h1>
+
+      <p class="ghl-sub ghl-hero-animate ghl-hero-animate-delay-2">
+        Your seat is saved for the <strong style="color:rgba(255,255,255,.95);">AI Amazon Scaling Masterclass</strong>.<br>
+        Here's everything you need to know.
+      </p>
+
+      <!-- Countdown -->
+      <div class="ghl-countdown-box ghl-hero-animate ghl-hero-animate-delay-3">
+        <div class="ghl-countdown-label">Masterclass Starts In</div>
+        <div class="ghl-countdown-display">
+          <div class="ghl-countdown-item">
+            <span class="ghl-countdown-number" id="ghlDays">00</span>
+            <span class="ghl-countdown-text">Days</span>
+          </div>
+          <div class="ghl-countdown-sep">:</div>
+          <div class="ghl-countdown-item">
+            <span class="ghl-countdown-number" id="ghlHours">00</span>
+            <span class="ghl-countdown-text">Hrs</span>
+          </div>
+          <div class="ghl-countdown-sep">:</div>
+          <div class="ghl-countdown-item">
+            <span class="ghl-countdown-number" id="ghlMinutes">00</span>
+            <span class="ghl-countdown-text">Min</span>
+          </div>
+          <div class="ghl-countdown-sep">:</div>
+          <div class="ghl-countdown-item">
+            <span class="ghl-countdown-number" id="ghlSeconds">00</span>
+            <span class="ghl-countdown-text">Sec</span>
+          </div>
         </div>
+        <div class="ghl-countdown-date" id="ghlCountdownDate">Wednesday @ 8:00 PM EST</div>
+      </div>
 
-        <!-- Add to Calendar -->
-        <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Add to Your Calendar</h3>
-        <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">Don't miss it &mdash; add it now so you get a reminder.</p>
-        <div class="calendar-btns">
-            <a href="#" class="cal-btn" id="googleCal">&#128197; Google Calendar</a>
-            <a href="#" class="cal-btn" id="appleCal">&#127823; Apple Calendar</a>
-            <a href="#" class="cal-btn" id="outlookCal">&#128231; Outlook</a>
+      <!-- Event Details Card -->
+      <div class="ghl-details-card ghl-hero-animate ghl-hero-animate-delay-4">
+        <h3>Event Details</h3>
+        <div class="ghl-detail-row">
+          <span class="ghl-detail-icon">&#128197;</span>
+          <div>
+            <div class="ghl-detail-label">Date</div>
+            <div class="ghl-detail-value" id="ghlEventDate">Next Wednesday</div>
+          </div>
         </div>
-
-        <!-- Share -->
-        <div class="share-section">
-            <h3>Know Someone Who Should See This?</h3>
-            <p>If you have a friend or partner thinking about Amazon FBA, invite them.</p>
-            <div class="share-link">
-                <input type="text" value="https://247profits.org/webinar/register" id="shareUrl" readonly>
-                <button class="copy-btn" onclick="copyLink()">Copy</button>
-            </div>
+        <div class="ghl-detail-row">
+          <span class="ghl-detail-icon">&#128336;</span>
+          <div>
+            <div class="ghl-detail-label">Time</div>
+            <div class="ghl-detail-value">8:00 PM Eastern Time</div>
+          </div>
         </div>
-
-        <!-- How to Prepare -->
-        <div class="prep-section">
-            <h3>How to Prepare</h3>
-            <ul class="prep-list">
-                <li>
-                    <span class="prep-num">1</span>
-                    <span>Know how much capital you have available to invest ($3K&ndash;$20K+)</span>
-                </li>
-                <li>
-                    <span class="prep-num">2</span>
-                    <span>Write down your #1 question about Amazon FBA or AI</span>
-                </li>
-                <li>
-                    <span class="prep-num">3</span>
-                    <span>Clear your schedule from 8:00&ndash;9:15 PM EST on Wednesday</span>
-                </li>
-                <li>
-                    <span class="prep-num">4</span>
-                    <span>If you have a partner or spouse who should hear this, invite them</span>
-                </li>
-            </ul>
+        <div class="ghl-detail-row">
+          <span class="ghl-detail-icon">&#9201;</span>
+          <div>
+            <div class="ghl-detail-label">Duration</div>
+            <div class="ghl-detail-value">~60 minutes (presentation + Q&amp;A)</div>
+          </div>
         </div>
+        <div class="ghl-detail-row">
+          <span class="ghl-detail-icon">&#128279;</span>
+          <div>
+            <div class="ghl-detail-label">Where</div>
+            <div class="ghl-detail-value">Link will be emailed 15 minutes before</div>
+          </div>
+        </div>
+      </div>
 
-        <p style="font-size: 0.85rem; color: var(--text-dim); margin-top: 3rem;">
-            Questions? Reply to the confirmation email or DM @alldayfba on Instagram.
-        </p>
+      <!-- Add to Calendar Buttons -->
+      <div class="ghl-actions ghl-hero-animate ghl-hero-animate-delay-5">
+        <div class="ghl-cal-row">
+          <a class="ghl-btn ghl-btn-sm ghl-btn-google" href="#" id="ghlGoogleCal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            Google
+          </a>
+          <a class="ghl-btn ghl-btn-sm ghl-btn-apple" href="#" id="ghlAppleCal">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+            </svg>
+            Apple
+          </a>
+          <a class="ghl-btn ghl-btn-sm ghl-btn-outlook" href="#" id="ghlOutlookCal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            Outlook
+          </a>
+        </div>
+      </div>
+
+      <!-- Share Section -->
+      <div class="ghl-share-card ghl-hero-animate ghl-hero-animate-delay-6">
+        <h3>Know Someone Who Should See This?</h3>
+        <p>If you have a friend or partner thinking about Amazon FBA, invite them.</p>
+        <div class="ghl-share-link">
+          <input type="text" value="https://247profits.org/webinar/register" id="ghlShareUrl" readonly>
+          <button class="ghl-copy-btn" id="ghlCopyBtn" onclick="ghlCopyLink()">Copy</button>
+        </div>
+      </div>
+
+      <!-- How to Prepare -->
+      <div class="ghl-info-card ghl-hero-animate ghl-hero-animate-delay-7">
+        <h3>How to Prepare</h3>
+        <ul>
+          <li>
+            <span class="ghl-prep-num">1</span>
+            <span>Know how much capital you have available to invest ($3K&ndash;$20K+)</span>
+          </li>
+          <li>
+            <span class="ghl-prep-num">2</span>
+            <span>Write down your #1 question about Amazon FBA or AI</span>
+          </li>
+          <li>
+            <span class="ghl-prep-num">3</span>
+            <span>Clear your schedule from 8:00&ndash;9:15 PM EST on Wednesday</span>
+          </li>
+          <li>
+            <span class="ghl-prep-num">4</span>
+            <span>If you have a partner or spouse who should hear this, invite them</span>
+          </li>
+        </ul>
+      </div>
     </div>
+  </header>
 
-    <script>
-        // Calculate next Wednesday date for display
-        function getNextWednesday() {
-            const now = new Date();
-            const day = now.getDay();
-            let daysUntil = (3 - day + 7) % 7;
-            if (daysUntil === 0 && now.getHours() >= 20) daysUntil = 7;
-            const target = new Date(now);
-            target.setDate(now.getDate() + daysUntil);
-            return target;
-        }
+  <!-- Footer -->
+  <footer class="ghl-footer">
+    <div class="ghl-wrap">
+      <p style="margin-bottom:8px;">
+        Questions? Reply to the confirmation email or DM <a href="https://instagram.com/alldayfba" target="_blank" rel="noopener">@alldayfba</a> on Instagram.
+      </p>
+      <p style="margin-bottom:12px;font-size:11px;max-width:800px;margin-left:auto;margin-right:auto;line-height:1.6;">
+        <strong>Income Disclaimer:</strong> Any financial numbers referenced here are estimates, projections, or past results and should not be considered exact, actual, or as a promise of potential earnings. Results depend on many factors. There are NO guarantees of success or income.
+      </p>
+      <p>
+        &copy; <span id="ghlYear"></span> AllDayFBA &bull; 24/7 Profits &bull; All rights reserved
+      </p>
+    </div>
+  </footer>
+</div>
 
-        const wed = getNextWednesday();
-        const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
-        document.getElementById('eventDate').textContent = wed.toLocaleDateString('en-US', options);
+<!-- SCRIPTS -->
+<script>
+(function() {
+  // === NEXT WEDNESDAY CALCULATOR ===
+  function getNextWednesday() {
+    var now = new Date();
+    // Convert to EST
+    var estOffset = -5;
+    var utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    var est = new Date(utc + (3600000 * estOffset));
 
-        // Google Calendar link
-        const startISO = new Date(wed.getFullYear(), wed.getMonth(), wed.getDate(), 20, 0).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-        const endISO = new Date(wed.getFullYear(), wed.getMonth(), wed.getDate(), 21, 15).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-        document.getElementById('googleCal').href = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=AI+Amazon+Scaling+Masterclass&dates=${startISO}/${endISO}&details=Free+live+training+with+Sabbo+from+24/7+Profits.+Link+will+be+emailed+15+min+before.&sf=true`;
+    var day = est.getDay();
+    var daysUntil = (3 - day + 7) % 7;
+    // If it's Wednesday and past 8PM EST, go to next week
+    if (daysUntil === 0 && est.getHours() >= 20) daysUntil = 7;
+    // If it's past Wednesday this week, go to next Wednesday
+    if (daysUntil === 0) daysUntil = 7;
 
-        function copyLink() {
-            const input = document.getElementById('shareUrl');
-            input.select();
-            document.execCommand('copy');
-            const btn = document.querySelector('.copy-btn');
-            btn.textContent = 'Copied!';
-            setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
-        }
-    </script>
-</body>
-</html>
+    var target = new Date(est);
+    target.setDate(est.getDate() + daysUntil);
+    target.setHours(20, 0, 0, 0);
+    return target;
+  }
+
+  var wed = getNextWednesday();
+  var dateOptions = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+  var dateStr = wed.toLocaleDateString('en-US', dateOptions);
+
+  // Set event date in details card
+  var eventDateEl = document.getElementById('ghlEventDate');
+  if (eventDateEl) eventDateEl.textContent = dateStr;
+
+  // Set countdown date label
+  var countdownDateEl = document.getElementById('ghlCountdownDate');
+  if (countdownDateEl) countdownDateEl.textContent = dateStr + ' @ 8:00 PM EST';
+
+  // === COUNTDOWN TIMER ===
+  // Build target date in UTC: next Wednesday at 8PM EST = next Wednesday + 1AM next day UTC (or midnight + 20h offset)
+  var targetYear = wed.getFullYear();
+  var targetMonth = wed.getMonth();
+  var targetDay = wed.getDate();
+  // 8PM EST = 1AM UTC next day (EST = UTC-5), but we use local-relative approach
+  // Create target as EST 8PM
+  var targetTimestamp = new Date(targetYear, targetMonth, targetDay, 20, 0, 0).getTime();
+  // Adjust for timezone offset (user's local vs EST)
+  var localOffsetMs = new Date().getTimezoneOffset() * 60000;
+  var estOffsetMs = 5 * 3600000;
+  var tzDiff = localOffsetMs - estOffsetMs;
+  // Not needed if we compute directly - simpler approach:
+  // Target is next Wednesday 8PM EST. Compute as UTC timestamp.
+  var targetUTC = Date.UTC(targetYear, targetMonth, targetDay, 20 + 5, 0, 0); // 8PM + 5 = 1AM UTC next day...
+  // Simplify: just use the date and set hours to 20:00 EST = 01:00 UTC next day
+  var targetMs = Date.UTC(targetYear, targetMonth, targetDay + 1, 1, 0, 0);
+
+  function updateCountdown() {
+    var now = Date.now();
+    var distance = targetMs - now;
+
+    if (distance < 0) {
+      document.getElementById('ghlDays').textContent = '00';
+      document.getElementById('ghlHours').textContent = '00';
+      document.getElementById('ghlMinutes').textContent = '00';
+      document.getElementById('ghlSeconds').textContent = '00';
+      return;
+    }
+
+    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    document.getElementById('ghlDays').textContent = String(days).padStart(2, '0');
+    document.getElementById('ghlHours').textContent = String(hours).padStart(2, '0');
+    document.getElementById('ghlMinutes').textContent = String(minutes).padStart(2, '0');
+    document.getElementById('ghlSeconds').textContent = String(seconds).padStart(2, '0');
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // Set current year
+  var yearEl = document.getElementById('ghlYear');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  // === CALENDAR LINKS ===
+  var eventTitle = 'AI Amazon Scaling Masterclass - 24/7 Profits';
+  var eventDescription = 'Free live training with Sabbo from 24/7 Profits.\\nLink will be emailed 15 minutes before the event.\\n\\nPrepare: Know your capital, write your #1 question, invite your partner.';
+  var eventLocation = 'Online (link emailed 15 min before)';
+
+  // Format: YYYYMMDDTHHMMSSZ (UTC)
+  var startUTC = new Date(Date.UTC(targetYear, targetMonth, targetDay + 1, 1, 0, 0));
+  var endUTC = new Date(Date.UTC(targetYear, targetMonth, targetDay + 1, 2, 15, 0));
+
+  function formatDateUTC(d) {
+    return d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  }
+
+  var startStr = formatDateUTC(startUTC);
+  var endStr = formatDateUTC(endUTC);
+
+  // Google Calendar
+  var googleCalEl = document.getElementById('ghlGoogleCal');
+  if (googleCalEl) {
+    googleCalEl.href = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+      '&text=' + encodeURIComponent(eventTitle) +
+      '&dates=' + startStr + '/' + endStr +
+      '&details=' + encodeURIComponent(eventDescription) +
+      '&location=' + encodeURIComponent(eventLocation) +
+      '&sf=true';
+  }
+
+  // Apple Calendar (generate .ics download)
+  var appleCalEl = document.getElementById('ghlAppleCal');
+  if (appleCalEl) {
+    appleCalEl.addEventListener('click', function(e) {
+      e.preventDefault();
+      var ics = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//24/7 Profits//Masterclass//EN',
+        'BEGIN:VEVENT',
+        'DTSTART:' + startStr,
+        'DTEND:' + endStr,
+        'SUMMARY:' + eventTitle,
+        'DESCRIPTION:' + eventDescription.replace(/\\n/g, '\\n'),
+        'LOCATION:' + eventLocation,
+        'STATUS:CONFIRMED',
+        'END:VEVENT',
+        'END:VCALENDAR'
+      ].join('\r\n');
+      var blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'ai-amazon-masterclass.ics';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  // Outlook Calendar
+  var outlookCalEl = document.getElementById('ghlOutlookCal');
+  if (outlookCalEl) {
+    outlookCalEl.href = 'https://outlook.live.com/calendar/0/deeplink/compose?subject=' +
+      encodeURIComponent(eventTitle) +
+      '&startdt=' + startUTC.toISOString() +
+      '&enddt=' + endUTC.toISOString() +
+      '&body=' + encodeURIComponent(eventDescription) +
+      '&location=' + encodeURIComponent(eventLocation);
+  }
+
+  // === CONFETTI ANIMATION ===
+  function createConfetti() {
+    var container = document.getElementById('ghlConfetti');
+    if (!container) return;
+    var confettiEmojis = ['&#127881;', '&#127882;', '&#10024;', '&#11088;', '&#128171;', '&#127775;', '&#128230;', '&#128176;', '&#128640;'];
+    var textEmojis = ['\uD83C\uDF89', '\uD83C\uDF8A', '\u2728', '\u2B50', '\uD83D\uDCAB', '\uD83C\uDF1F', '\uD83D\uDCE6', '\uD83D\uDCB0', '\uD83D\uDE80'];
+
+    for (var i = 0; i < 50; i++) {
+      (function(idx) {
+        setTimeout(function() {
+          var confetti = document.createElement('div');
+          confetti.className = 'ghl-confetti-piece';
+          confetti.textContent = textEmojis[Math.floor(Math.random() * textEmojis.length)];
+          confetti.style.left = Math.random() * 100 + '%';
+          confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+          confetti.style.fontSize = (Math.random() * 16 + 16) + 'px';
+          container.appendChild(confetti);
+
+          setTimeout(function() { confetti.remove(); }, 5000);
+        }, idx * 100);
+      })(i);
+    }
+  }
+
+  // Trigger confetti on load
+  setTimeout(createConfetti, 500);
+})();
+
+// === COPY LINK ===
+function ghlCopyLink() {
+  var input = document.getElementById('ghlShareUrl');
+  if (!input) return;
+  input.select();
+  input.setSelectionRange(0, 99999);
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(input.value);
+  } else {
+    document.execCommand('copy');
+  }
+
+  var btn = document.getElementById('ghlCopyBtn');
+  if (btn) {
+    btn.textContent = 'Copied!';
+    setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+  }
+}
+</script>

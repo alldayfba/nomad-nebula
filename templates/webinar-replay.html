@@ -1,226 +1,1085 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Replay: AI Amazon Scaling Masterclass | 24/7 Profits</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --bg: #1A0A2E; --surface: #231540; --accent: #6B2FA0; --accent-light: #9B59B6;
-            --gold: #FFD700; --gold-dark: #B8860B; --text: #FFFFFF; --text-muted: #B794E0;
-            --text-dim: #8B7AAD; --green: #4ADE80; --red: #FF6B6B;
-        }
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: linear-gradient(180deg, var(--bg) 0%, #0d0618 100%);
-            color: var(--text); min-height: 100vh; padding-top: 48px;
-        }
+<!--
+  ====================================
+  GHL OPTIMIZED REPLAY PAGE - FULL WIDTH
+  AI Amazon Scaling Masterclass
+  ====================================
+  INSTRUCTIONS:
+  1. In GoHighLevel, create a new funnel/page
+  2. Add a "Custom Code" element (or use Full Width Section)
+  3. Copy and paste this ENTIRE file content
+  4. Replace the Wistia placeholder with your embed code
+  5. Save and publish
+  ====================================
+-->
 
-        /* Scarcity Bar */
-        .scarcity-bar {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-            height: 48px; display: flex; align-items: center; justify-content: center; gap: 16px;
-            background: linear-gradient(90deg, #c0392b, #e74c3c);
-            font-size: 0.85rem; font-weight: 700; color: white;
-            text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .timer-box {
-            background: rgba(0,0,0,0.25); padding: 4px 12px; border-radius: 6px;
-            font-family: monospace; font-size: 0.9rem; letter-spacing: 2px;
-        }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
-        .container { max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem; }
+<style>
+  /* === AGGRESSIVE GHL RESET === */
+  html, body, .hl_page-creator--content, .hl-page-preview,
+  [class*="hl_"], [class*="funnel"], [class*="row"],
+  [class*="col"], [class*="section"], [class*="container"] {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
 
-        h1 {
-            font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; text-align: center;
-            margin-bottom: 0.75rem; letter-spacing: -1px;
-        }
-        .sub { font-size: 1.1rem; color: var(--text-muted); text-align: center; margin-bottom: 2.5rem; line-height: 1.5; }
+  /* === GHL CONTAINER OVERRIDE - FULL WIDTH === */
+  #ghl-replay-wrapper {
+    all: initial;
+    display: block;
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: -20px 0 0 calc(-50vw + 50%) !important;
+    margin-right: calc(-50vw + 50%) !important;
+    padding: 0 !important;
+    position: relative;
+    top: 0 !important;
+    background: radial-gradient(1500px 1000px at 15% 10%, rgba(139,92,246,.18), transparent 55%),
+                radial-gradient(1250px 875px at 80% 25%, rgba(56,189,248,.14), transparent 55%),
+                radial-gradient(1125px 812px at 55% 85%, rgba(139,92,246,.12), transparent 60%),
+                linear-gradient(180deg, #070a16, #05060c);
+    overflow-x: hidden;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
 
-        /* Video */
-        .video-container {
-            border-radius: 16px; overflow: hidden;
-            border: 1px solid rgba(107,47,160,0.3);
-            box-shadow: 0 40px 80px rgba(0,0,0,0.4);
-            margin-bottom: 3rem;
-        }
-        .video-inner { aspect-ratio: 16/9; background: #000; }
+  #ghl-replay-wrapper,
+  #ghl-replay-wrapper *,
+  #ghl-replay-wrapper *::before,
+  #ghl-replay-wrapper *::after {
+    box-sizing: border-box;
+  }
 
-        /* CTA */
-        .cta-section { text-align: center; margin: 2rem 0; }
-        .cta-btn {
-            display: inline-block; padding: 1.25rem 3.5rem;
-            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-            color: #1A0A2E; font-size: 1.2rem; font-weight: 800;
-            border-radius: 12px; text-decoration: none;
-            text-transform: uppercase; letter-spacing: 1px;
-            box-shadow: 0 10px 40px rgba(255,215,0,0.3);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .cta-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 50px rgba(255,215,0,0.4); }
-        .cta-sub { margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted); }
+  /* Variables */
+  #ghl-replay-wrapper {
+    --bg0: #05060c;
+    --bg1: #070a16;
+    --text: rgba(255,255,255,.92);
+    --muted: rgba(255,255,255,.72);
+    --muted2: rgba(255,255,255,.60);
+    --purple: #8B5CF6;
+    --blue: #38BDF8;
+    --orange: #F97316;
+    --red: #EF4444;
+    --gold: #FBBF24;
+    --green: #4ADE80;
+    --shadow: 0 20px 60px rgba(0,0,0,.55);
+    --radius: 20px;
+    --radius2: 26px;
+  }
 
-        /* Offer Summary */
-        .offer-card {
-            background: var(--surface); border: 1px solid rgba(107,47,160,0.2);
-            border-radius: 16px; padding: 2.5rem; margin: 3rem 0; max-width: 700px; margin-left: auto; margin-right: auto;
-        }
-        .offer-card h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 1.5rem; text-align: center; }
-        .offer-list { list-style: none; }
-        .offer-list li {
-            display: flex; gap: 12px; padding: 8px 0; font-size: 0.95rem;
-        }
-        .offer-check { color: var(--green); font-weight: 700; flex-shrink: 0; }
-        .offer-price {
-            text-align: center; margin-top: 1.5rem; padding-top: 1.5rem;
-            border-top: 1px solid rgba(107,47,160,0.15);
-        }
-        .price-old { font-size: 1.2rem; color: var(--text-dim); text-decoration: line-through; }
-        .price-new { font-size: 2.5rem; font-weight: 900; color: var(--gold); margin: 0.25rem 0; }
-        .price-plan { font-size: 0.9rem; color: var(--text-muted); }
+  /* Galaxy Background */
+  #ghl-replay-wrapper .ghl-galaxy {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+  }
 
-        /* Guarantee */
-        .guarantee {
-            border: 2px solid var(--gold); border-radius: 16px; padding: 2rem;
-            max-width: 700px; margin: 2rem auto; text-align: center;
-        }
-        .guarantee h4 { color: var(--gold); font-size: 1rem; font-weight: 700; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
-        .guarantee p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
+  #ghl-replay-wrapper .ghl-stars,
+  #ghl-replay-wrapper .ghl-stars2,
+  #ghl-replay-wrapper .ghl-nebula {
+    position: absolute;
+    inset: -50%;
+    background-repeat: repeat;
+    transform: translate3d(0,0,0);
+    opacity: .9;
+    width: 200%;
+    height: 200%;
+  }
 
-        /* Bonuses */
-        .bonuses { max-width: 700px; margin: 2rem auto; }
-        .bonuses h3 { font-size: 1.1rem; font-weight: 700; text-align: center; margin-bottom: 1rem; color: var(--red); }
-        .bonus-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .bonus-item {
-            background: rgba(107,47,160,0.08); border: 1px solid rgba(107,47,160,0.15);
-            border-radius: 12px; padding: 1.25rem;
-        }
-        .bonus-item h5 { font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; }
-        .bonus-item .val { font-size: 0.8rem; color: var(--gold); font-weight: 600; }
+  #ghl-replay-wrapper .ghl-stars {
+    background-image:
+      radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,.65) 50%, transparent 52%),
+      radial-gradient(1.5px 1.5px at 35% 55%, rgba(255,255,255,.55) 50%, transparent 52%),
+      radial-gradient(1px 1px at 70% 40%, rgba(255,255,255,.55) 50%, transparent 52%),
+      radial-gradient(1.2px 1.2px at 85% 70%, rgba(255,255,255,.45) 50%, transparent 52%);
+    background-size: 325px 325px;
+    animation: ghl-drift 28s linear infinite;
+    opacity: .65;
+  }
 
-        .bg-orb { position: fixed; border-radius: 50%; filter: blur(120px); opacity: 0.06; pointer-events: none; z-index: -1; }
+  #ghl-replay-wrapper .ghl-stars2 {
+    background-image:
+      radial-gradient(1.2px 1.2px at 12% 72%, rgba(255,255,255,.6) 50%, transparent 52%),
+      radial-gradient(1px 1px at 48% 18%, rgba(255,255,255,.5) 50%, transparent 52%),
+      radial-gradient(1.6px 1.6px at 78% 62%, rgba(255,255,255,.45) 50%, transparent 52%);
+    background-size: 425px 425px;
+    animation: ghl-drift2 44s linear infinite;
+    opacity: .45;
+    filter: blur(.2px);
+  }
 
-        @media (max-width: 768px) {
-            .bonus-grid { grid-template-columns: 1fr; }
-            .scarcity-bar { font-size: 0.7rem; gap: 8px; }
-        }
-    </style>
-</head>
-<body>
-    <div class="bg-orb" style="width: 500px; height: 500px; background: #6B2FA0; top: -100px; right: -100px;"></div>
+  #ghl-replay-wrapper .ghl-nebula {
+    background-image:
+      radial-gradient(420px 320px at 20% 30%, rgba(139,92,246,.18), transparent 60%),
+      radial-gradient(520px 420px at 75% 25%, rgba(56,189,248,.14), transparent 62%),
+      radial-gradient(560px 520px at 55% 80%, rgba(139,92,246,.12), transparent 64%);
+    background-size: 900px 900px;
+    animation: ghl-nebula 18s ease-in-out infinite alternate;
+    opacity: .9;
+    mix-blend-mode: screen;
+  }
 
-    <!-- Scarcity Bar -->
-    <div class="scarcity-bar">
-        <span>REPLAY EXPIRES IN:</span>
-        <span class="timer-box" id="countdown">48:00:00</span>
-        <span style="color: var(--gold);">WATCH NOW</span>
+  @keyframes ghl-drift {
+    from { transform: translate3d(-2%, -2%, 0); }
+    to { transform: translate3d(2%, 2%, 0); }
+  }
+
+  @keyframes ghl-drift2 {
+    from { transform: translate3d(2%, -1%, 0) scale(1.02); }
+    to { transform: translate3d(-2%, 1%, 0) scale(1.02); }
+  }
+
+  @keyframes ghl-nebula {
+    from { transform: translate3d(-1%, 1%, 0) scale(1.01); }
+    to { transform: translate3d(1%, -1%, 0) scale(1.02); }
+  }
+
+  /* Content Container */
+  #ghl-replay-wrapper .ghl-wrap {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (min-width: 768px) {
+    #ghl-replay-wrapper .ghl-wrap {
+      padding: 0 40px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #ghl-replay-wrapper .ghl-wrap {
+      padding: 0 16px;
+    }
+  }
+
+  /* Urgency Banner */
+  #ghl-replay-wrapper .ghl-urgency-banner {
+    background: linear-gradient(90deg, var(--red), var(--orange));
+    padding: 14px 20px;
+    margin-top: 16px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    border-radius: 12px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  #ghl-replay-wrapper .ghl-urgency-banner p {
+    margin: 0;
+    color: white;
+    font-weight: 800;
+    font-size: clamp(14px, 3.5vw, 16px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  #ghl-replay-wrapper .ghl-urgency-banner .ghl-timer {
+    background: rgba(0,0,0,.25);
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 16px;
+  }
+
+  /* Pill Badge */
+  #ghl-replay-wrapper .ghl-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    border: 1px solid rgba(249,115,22,.5);
+    background: rgba(249,115,22,.15);
+    border-radius: 999px;
+    color: rgba(255,255,255,.95);
+    font-size: 14px;
+    box-shadow: 0 0 20px rgba(249,115,22,.25);
+  }
+
+  #ghl-replay-wrapper .ghl-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--orange);
+    box-shadow: 0 0 0 4px rgba(249,115,22,.25), 0 0 12px rgba(249,115,22,.5);
+    animation: ghl-pulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes ghl-pulse {
+    0%, 100% { transform: scale(1); opacity: .9; }
+    50% { transform: scale(1.15); opacity: 1; }
+  }
+
+  /* Hero Section */
+  #ghl-replay-wrapper .ghl-hero {
+    padding: 40px 0 32px;
+    text-align: center;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-replay-wrapper .ghl-hero {
+      padding: 24px 0 20px;
+    }
+  }
+
+  #ghl-replay-wrapper .ghl-h1 {
+    margin: 0 0 16px;
+    font-size: clamp(26px, 5vw, 44px);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: rgba(255,255,255,.98);
+    font-weight: 900;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-replay-wrapper .ghl-h1 {
+      font-size: clamp(22px, 6.5vw, 32px);
+    }
+  }
+
+  #ghl-replay-wrapper .ghl-grad {
+    background: linear-gradient(90deg, rgba(139,92,246,1), rgba(56,189,248,1));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  #ghl-replay-wrapper .ghl-grad-orange {
+    background: linear-gradient(90deg, var(--orange), #FBBF24);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  #ghl-replay-wrapper .ghl-sub {
+    margin: 0 0 28px;
+    color: var(--muted);
+    font-size: clamp(15px, 3.5vw, 18px);
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  /* Video Container */
+  #ghl-replay-wrapper .ghl-video-container {
+    background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+    border: 2px solid rgba(139,92,246,.5);
+    border-radius: 20px;
+    padding: 8px;
+    margin: 24px auto;
+    box-shadow: 0 0 50px rgba(139,92,246,.3), 0 20px 60px rgba(0,0,0,.5);
+    overflow: hidden;
+  }
+
+  #ghl-replay-wrapper .ghl-video-inner {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    background: #000;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  #ghl-replay-wrapper .ghl-video-inner iframe,
+  #ghl-replay-wrapper .ghl-video-inner video,
+  #ghl-replay-wrapper .ghl-video-inner .wistia_embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  /* Placeholder for Wistia */
+  #ghl-replay-wrapper .ghl-video-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    background: linear-gradient(135deg, rgba(139,92,246,.2), rgba(56,189,248,.1));
+    color: var(--muted);
+    font-size: 16px;
+    text-align: center;
+    padding: 20px;
+  }
+
+  #ghl-replay-wrapper .ghl-video-placeholder svg {
+    width: 64px;
+    height: 64px;
+    opacity: 0.5;
+  }
+
+  /* Last Chance CTA Box */
+  #ghl-replay-wrapper .ghl-cta-box {
+    background: linear-gradient(180deg, rgba(249,115,22,.15), rgba(249,115,22,.05));
+    border: 2px solid rgba(249,115,22,.5);
+    border-radius: 20px;
+    padding: 32px 28px;
+    margin: 40px auto;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(249,115,22,.2), 0 20px 60px rgba(0,0,0,.4);
+    animation: ghl-cta-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes ghl-cta-glow {
+    0%, 100% { box-shadow: 0 0 40px rgba(249,115,22,.2), 0 20px 60px rgba(0,0,0,.4); }
+    50% { box-shadow: 0 0 60px rgba(249,115,22,.35), 0 20px 60px rgba(0,0,0,.4); }
+  }
+
+  @media (max-width: 768px) {
+    #ghl-replay-wrapper .ghl-cta-box {
+      padding: 28px 20px;
+      margin: 32px auto;
+    }
+  }
+
+  #ghl-replay-wrapper .ghl-cta-box h2 {
+    margin: 0 0 12px;
+    font-size: clamp(22px, 4.5vw, 30px);
+    color: rgba(255,255,255,.98);
+    font-weight: 900;
+  }
+
+  #ghl-replay-wrapper .ghl-cta-box p {
+    margin: 0 0 20px;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  #ghl-replay-wrapper .ghl-cta-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+
+  #ghl-replay-wrapper .ghl-cta-feature {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: rgba(0,0,0,.3);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 999px;
+    color: rgba(255,255,255,.85);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  #ghl-replay-wrapper .ghl-cta-feature span {
+    font-size: 16px;
+  }
+
+  /* Scroll CTA Button */
+  #ghl-replay-wrapper .ghl-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 18px 36px;
+    border-radius: 16px;
+    border: 2px solid rgba(255,255,255,.18);
+    background: linear-gradient(135deg, var(--orange), #FBBF24);
+    color: #071019;
+    font-weight: 900;
+    text-decoration: none;
+    font-size: 18px;
+    box-shadow: 0 0 30px rgba(249,115,22,.4), 0 0 60px rgba(251,191,36,.3), 0 20px 50px rgba(0,0,0,.3);
+    transition: transform .2s ease, filter .2s ease, box-shadow .2s ease;
+    cursor: pointer;
+    animation: ghl-orange-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes ghl-orange-glow {
+    0%, 100% { box-shadow: 0 0 30px rgba(249,115,22,.4), 0 0 60px rgba(251,191,36,.3), 0 20px 50px rgba(0,0,0,.3); }
+    50% { box-shadow: 0 0 40px rgba(249,115,22,.6), 0 0 80px rgba(251,191,36,.5), 0 20px 50px rgba(0,0,0,.3); }
+  }
+
+  #ghl-replay-wrapper .ghl-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    filter: brightness(1.1);
+  }
+
+  @media (max-width: 768px) {
+    #ghl-replay-wrapper .ghl-btn {
+      padding: 16px 28px;
+      font-size: 16px;
+      width: 100%;
+    }
+  }
+
+  /* Offer Card */
+  #ghl-replay-wrapper .ghl-offer-card {
+    background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: var(--radius2);
+    padding: 40px 32px;
+    margin: 40px auto;
+    max-width: 700px;
+    box-shadow: var(--shadow);
+  }
+
+  @media (max-width: 768px) {
+    #ghl-replay-wrapper .ghl-offer-card {
+      padding: 28px 20px;
+    }
+  }
+
+  #ghl-replay-wrapper .ghl-offer-card h3 {
+    margin: 0 0 24px;
+    font-size: clamp(20px, 4vw, 26px);
+    color: rgba(255,255,255,.98);
+    font-weight: 900;
+    text-align: center;
+  }
+
+  #ghl-replay-wrapper .ghl-offer-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  #ghl-replay-wrapper .ghl-offer-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    font-size: clamp(14px, 3vw, 16px);
+    color: rgba(255,255,255,.88);
+    line-height: 1.5;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+
+  #ghl-replay-wrapper .ghl-offer-list li:last-child {
+    border-bottom: none;
+  }
+
+  #ghl-replay-wrapper .ghl-check {
+    color: var(--green);
+    font-weight: 700;
+    flex-shrink: 0;
+    font-size: 18px;
+  }
+
+  /* Pricing Block */
+  #ghl-replay-wrapper .ghl-pricing {
+    text-align: center;
+    margin-top: 28px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(255,255,255,.1);
+  }
+
+  #ghl-replay-wrapper .ghl-price-old {
+    font-size: clamp(18px, 3.5vw, 22px);
+    color: var(--muted2);
+    text-decoration: line-through;
+    font-weight: 600;
+  }
+
+  #ghl-replay-wrapper .ghl-price-new {
+    font-size: clamp(40px, 8vw, 56px);
+    font-weight: 900;
+    background: linear-gradient(90deg, var(--orange), var(--gold));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin: 4px 0;
+    line-height: 1.1;
+  }
+
+  #ghl-replay-wrapper .ghl-price-plan {
+    font-size: clamp(13px, 3vw, 15px);
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* Bonus Grid */
+  #ghl-replay-wrapper .ghl-bonus-section {
+    margin: 40px auto;
+    max-width: 700px;
+  }
+
+  #ghl-replay-wrapper .ghl-bonus-section h3 {
+    margin: 0 0 20px;
+    font-size: clamp(16px, 3.5vw, 20px);
+    font-weight: 800;
+    text-align: center;
+    color: var(--red);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  #ghl-replay-wrapper .ghl-bonus-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  @media (max-width: 640px) {
+    #ghl-replay-wrapper .ghl-bonus-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  #ghl-replay-wrapper .ghl-bonus-item {
+    background: rgba(249,115,22,.08);
+    border: 1px solid rgba(249,115,22,.2);
+    border-radius: 14px;
+    padding: 20px;
+    transition: transform .2s ease, border-color .2s ease;
+  }
+
+  #ghl-replay-wrapper .ghl-bonus-item:hover {
+    transform: translateY(-2px);
+    border-color: rgba(249,115,22,.4);
+  }
+
+  #ghl-replay-wrapper .ghl-bonus-item h5 {
+    margin: 0 0 6px;
+    font-size: clamp(14px, 3vw, 16px);
+    font-weight: 800;
+    color: rgba(255,255,255,.95);
+  }
+
+  #ghl-replay-wrapper .ghl-bonus-item p {
+    margin: 0 0 8px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  #ghl-replay-wrapper .ghl-bonus-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  /* Guarantee Box */
+  #ghl-replay-wrapper .ghl-guarantee {
+    border: 2px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    max-width: 700px;
+    margin: 40px auto;
+    text-align: center;
+    background: rgba(251,191,36,.05);
+    box-shadow: 0 0 30px rgba(251,191,36,.1);
+  }
+
+  @media (max-width: 768px) {
+    #ghl-replay-wrapper .ghl-guarantee {
+      padding: 24px 20px;
+    }
+  }
+
+  #ghl-replay-wrapper .ghl-guarantee h4 {
+    margin: 0 0 12px;
+    color: var(--gold);
+    font-size: clamp(14px, 3vw, 16px);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  #ghl-replay-wrapper .ghl-guarantee p {
+    margin: 0;
+    font-size: clamp(14px, 3vw, 16px);
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* Section Cards */
+  #ghl-replay-wrapper .ghl-section {
+    padding: 40px 0;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-replay-wrapper .ghl-section {
+      padding: 28px 0;
+    }
+  }
+
+  #ghl-replay-wrapper .ghl-h2 {
+    margin: 0 0 14px;
+    font-size: clamp(24px, 4.5vw, 34px);
+    letter-spacing: -.3px;
+    color: rgba(255,255,255,.95);
+    font-weight: 800;
+    text-align: center;
+  }
+
+  #ghl-replay-wrapper .ghl-p {
+    margin: 0 0 24px;
+    color: var(--muted);
+    line-height: 1.65;
+    font-size: clamp(15px, 3.2vw, 17px);
+    text-align: center;
+  }
+
+  /* Testimonials */
+  #ghl-replay-wrapper .ghl-section-card {
+    border-radius: var(--radius2);
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.10);
+    box-shadow: var(--shadow);
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-replay-wrapper .ghl-section-card {
+      padding: 32px 24px;
+    }
+  }
+
+  #ghl-replay-wrapper .ghl-testimonials {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 20px;
+  }
+
+  @media (max-width: 980px) {
+    #ghl-replay-wrapper .ghl-testimonials {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    #ghl-replay-wrapper .ghl-testimonials {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+
+  #ghl-replay-wrapper .ghl-t-card {
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.05);
+    position: relative;
+    transition: transform .2s ease, border-color .2s ease;
+    margin: 0;
+  }
+
+  #ghl-replay-wrapper .ghl-t-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(139,92,246,.4);
+  }
+
+  #ghl-replay-wrapper .ghl-t-card img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    object-position: center 15%;
+    display: block;
+    filter: saturate(1.05) contrast(1.02);
+  }
+
+  #ghl-replay-wrapper .ghl-t-card figcaption {
+    padding: 16px 18px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  #ghl-replay-wrapper .ghl-t-card figcaption strong {
+    color: rgba(255,255,255,.95);
+    font-weight: 700;
+  }
+
+  /* Footer */
+  #ghl-replay-wrapper .ghl-footer {
+    padding: 32px 0 48px;
+    color: var(--muted2);
+    font-size: 12px;
+    text-align: center;
+  }
+
+  #ghl-replay-wrapper .ghl-footer p {
+    margin: 0 0 14px;
+  }
+
+  /* Animations */
+  #ghl-replay-wrapper .ghl-hero-animate {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: ghl-fadeInUp 0.7s ease-out forwards;
+  }
+
+  #ghl-replay-wrapper .ghl-hero-animate-delay-1 { animation-delay: 0.1s; }
+  #ghl-replay-wrapper .ghl-hero-animate-delay-2 { animation-delay: 0.25s; }
+  #ghl-replay-wrapper .ghl-hero-animate-delay-3 { animation-delay: 0.4s; }
+  #ghl-replay-wrapper .ghl-hero-animate-delay-4 { animation-delay: 0.55s; }
+  #ghl-replay-wrapper .ghl-hero-animate-delay-5 { animation-delay: 0.7s; }
+
+  @keyframes ghl-fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  #ghl-replay-wrapper .ghl-animate {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+
+  #ghl-replay-wrapper .ghl-animate.ghl-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Force image responsiveness */
+  #ghl-replay-wrapper img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* CTA sub text */
+  #ghl-replay-wrapper .ghl-cta-sub {
+    margin: 12px 0 0;
+    font-size: 14px;
+    color: var(--muted2);
+    text-align: center;
+  }
+</style>
+
+<!-- MAIN CONTENT -->
+<div id="ghl-replay-wrapper">
+  <!-- Urgency Banner -->
+  <div class="ghl-urgency-banner">
+    <p>
+      REPLAY EXPIRES IN: <span class="ghl-timer" id="ghlExpiryTimer">48:00:00</span> &mdash; <strong>WATCH NOW</strong>
+    </p>
+  </div>
+
+  <!-- Galaxy Background -->
+  <div class="ghl-galaxy" aria-hidden="true">
+    <div class="ghl-nebula"></div>
+    <div class="ghl-stars"></div>
+    <div class="ghl-stars2"></div>
+  </div>
+
+  <!-- Hero Section -->
+  <header class="ghl-hero">
+    <div class="ghl-wrap">
+      <!-- Badge -->
+      <div class="ghl-pill ghl-hero-animate ghl-hero-animate-delay-1" style="margin-bottom:24px;">
+        <span class="ghl-dot"></span>
+        <span><strong>REPLAY AVAILABLE</strong> &mdash; Limited Time</span>
+      </div>
+
+      <h1 class="ghl-h1 ghl-hero-animate ghl-hero-animate-delay-2">
+        <span class="ghl-grad">AI Amazon Scaling</span><br>
+        <span class="ghl-grad-orange">Masterclass</span>
+      </h1>
+
+      <p class="ghl-sub ghl-hero-animate ghl-hero-animate-delay-2">
+        Watch the full training below &mdash; this replay expires in <strong style="color:rgba(239,68,68,1);" id="expiryText">48 hours</strong>.<br>
+        Watch now, then apply for your strategy call below.
+      </p>
+
+      <!-- Video Container -->
+      <div class="ghl-video-container ghl-hero-animate ghl-hero-animate-delay-3">
+        <div class="ghl-video-inner">
+          <!-- ============================================
+               WISTIA EMBED CODE GOES HERE
+               Replace this placeholder with your Wistia embed
+               ============================================ -->
+          <div class="ghl-video-placeholder" id="ghlVideoPlaceholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span>Webinar Replay Video<br><small style="opacity:0.7;">Replace this placeholder with your Wistia embed code</small></span>
+          </div>
+          <!-- END WISTIA PLACEHOLDER -->
+        </div>
+      </div>
+
+      <!-- Primary CTA -->
+      <div class="ghl-hero-animate ghl-hero-animate-delay-4" style="margin-top:28px;">
+        <a href="/webinar/apply" class="ghl-btn">
+          Apply Now &mdash; Book Your Strategy Call
+        </a>
+        <p class="ghl-cta-sub">15 spots per month &bull; Free strategy call &bull; No commitment</p>
+      </div>
     </div>
+  </header>
 
-    <div class="container">
-        <h1>AI Amazon Scaling Masterclass</h1>
-        <p class="sub">Watch the full training below &mdash; this replay expires in <strong style="color: var(--red);" id="expiryText">48 hours</strong>.</p>
+  <!-- Offer Summary Card -->
+  <div class="ghl-wrap">
+    <div class="ghl-offer-card ghl-animate">
+      <h3>What's Inside <span class="ghl-grad">24/7 Profits Inner Circle</span></h3>
+      <ul class="ghl-offer-list">
+        <li><span class="ghl-check">&#10003;</span> 5 live coaching calls/week (2x with Sabbo + 3x specialist coaches)</li>
+        <li><span class="ghl-check">&#10003;</span> Complete A-Z Amazon FBA course</li>
+        <li><span class="ghl-check">&#10003;</span> AI-powered product discovery tool</li>
+        <li><span class="ghl-check">&#10003;</span> Daily curated product leads</li>
+        <li><span class="ghl-check">&#10003;</span> Ungating scripts &amp; templates</li>
+        <li><span class="ghl-check">&#10003;</span> Prep center access</li>
+        <li><span class="ghl-check">&#10003;</span> Funding systems ($10K&ndash;$70K+ business credit)</li>
+        <li><span class="ghl-check">&#10003;</span> Private Discord (700+ sellers, 10-30 min response)</li>
+        <li><span class="ghl-check">&#10003;</span> Bonus: Brand-direct income stream ($3K&ndash;$10K/mo additional)</li>
+      </ul>
 
-        <!-- Video Embed -->
-        <div class="video-container">
-            <div class="video-inner">
-                <!-- Replace with Wistia embed in production -->
-                <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:1.2rem;">
-                    Webinar Replay Video
-                </div>
-            </div>
+      <div class="ghl-pricing">
+        <div class="ghl-price-old">$10,000</div>
+        <div class="ghl-price-new">$5,000</div>
+        <div class="ghl-price-plan">Or 6 payments of $997/mo &bull; No interest</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Last Chance CTA Box -->
+  <div class="ghl-wrap">
+    <div class="ghl-cta-box ghl-animate">
+      <h2>Last Chance to Join the <span class="ghl-grad-orange">Inner Circle</span></h2>
+      <p>
+        The framework you just watched is only the beginning. Inside the Inner Circle, you get the full system,
+        live support, and everything you need to build a real Amazon business.
+      </p>
+
+      <div class="ghl-cta-features">
+        <div class="ghl-cta-feature"><span>&#10003;</span> Full Source &rarr; Ship &rarr; Sell System</div>
+        <div class="ghl-cta-feature"><span>&#10003;</span> Weekly Live Coaching Calls</div>
+        <div class="ghl-cta-feature"><span>&#10003;</span> Private Discord Community</div>
+        <div class="ghl-cta-feature"><span>&#10003;</span> DFY Product Drops</div>
+        <div class="ghl-cta-feature"><span>&#10003;</span> 1-on-1 Onboarding Support</div>
+        <div class="ghl-cta-feature"><span>&#10003;</span> Supplier Rolodex Access</div>
+      </div>
+
+      <a href="/webinar/apply" class="ghl-btn">
+        Apply Now &mdash; Book Your Strategy Call &rarr;
+      </a>
+    </div>
+  </div>
+
+  <!-- Webinar-Exclusive Bonuses -->
+  <div class="ghl-wrap">
+    <div class="ghl-bonus-section ghl-animate">
+      <h3>Webinar-Exclusive Bonuses (Expire With Replay)</h3>
+      <div class="ghl-bonus-grid">
+        <div class="ghl-bonus-item">
+          <h5>1-on-1 Product Research Session</h5>
+          <p>30 min with Sabbo &mdash; find your first product together</p>
+          <div class="ghl-bonus-value">$500 Value</div>
         </div>
-
-        <!-- Primary CTA -->
-        <div class="cta-section">
-            <a href="/webinar/apply" class="cta-btn">Apply Now &mdash; Book Your Strategy Call</a>
-            <p class="cta-sub">15 spots per month &bull; Free strategy call &bull; No commitment</p>
+        <div class="ghl-bonus-item">
+          <h5>AI Sourcing Tool Early Access</h5>
+          <p>Beta access to the proprietary AI product finder</p>
+          <div class="ghl-bonus-value">$297 Value</div>
         </div>
-
-        <!-- Offer Summary -->
-        <div class="offer-card">
-            <h3>What's Inside 24/7 Profits Inner Circle</h3>
-            <ul class="offer-list">
-                <li><span class="offer-check">&#10003;</span> 5 live coaching calls/week (2x with Sabbo + 3x specialist coaches)</li>
-                <li><span class="offer-check">&#10003;</span> Complete A-Z Amazon FBA course</li>
-                <li><span class="offer-check">&#10003;</span> AI-powered product discovery tool</li>
-                <li><span class="offer-check">&#10003;</span> Daily curated product leads</li>
-                <li><span class="offer-check">&#10003;</span> Ungating scripts &amp; templates</li>
-                <li><span class="offer-check">&#10003;</span> Prep center access</li>
-                <li><span class="offer-check">&#10003;</span> Funding systems ($10K&ndash;$70K+ business credit)</li>
-                <li><span class="offer-check">&#10003;</span> Private Discord (700+ sellers, 10-30 min response)</li>
-                <li><span class="offer-check">&#10003;</span> Bonus: Brand-direct income stream ($3K&ndash;$10K/mo additional)</li>
-            </ul>
-            <div class="offer-price">
-                <div class="price-old">$10,000</div>
-                <div class="price-new">$5,000</div>
-                <div class="price-plan">Or 6 payments of $997/mo &bull; No interest</div>
-            </div>
+        <div class="ghl-bonus-item">
+          <h5>Funding Blueprint</h5>
+          <p>Step-by-step to unlock $10K&ndash;$70K in business credit</p>
+          <div class="ghl-bonus-value">$197 Value</div>
         </div>
-
-        <!-- Webinar Bonuses -->
-        <div class="bonuses">
-            <h3>Webinar-Exclusive Bonuses (Expire With Replay)</h3>
-            <div class="bonus-grid">
-                <div class="bonus-item">
-                    <h5>1-on-1 Product Research Session</h5>
-                    <p style="font-size:0.8rem;color:var(--text-muted);">30 min with Sabbo &mdash; find your first product together</p>
-                    <div class="val">$500 Value</div>
-                </div>
-                <div class="bonus-item">
-                    <h5>AI Sourcing Tool Early Access</h5>
-                    <p style="font-size:0.8rem;color:var(--text-muted);">Beta access to the proprietary AI product finder</p>
-                    <div class="val">$297 Value</div>
-                </div>
-                <div class="bonus-item">
-                    <h5>Funding Blueprint</h5>
-                    <p style="font-size:0.8rem;color:var(--text-muted);">Step-by-step to unlock $10K&ndash;$70K in business credit</p>
-                    <div class="val">$197 Value</div>
-                </div>
-                <div class="bonus-item">
-                    <h5>First 10 Product Leads</h5>
-                    <p style="font-size:0.8rem;color:var(--text-muted);">Hand-picked by the team, delivered on day 1</p>
-                    <div class="val">$250 Value</div>
-                </div>
-            </div>
+        <div class="ghl-bonus-item">
+          <h5>First 10 Product Leads</h5>
+          <p>Hand-picked by the team, delivered on day 1</p>
+          <div class="ghl-bonus-value">$250 Value</div>
         </div>
+      </div>
+    </div>
+  </div>
 
-        <!-- Guarantee -->
-        <div class="guarantee">
-            <h4>The 24/7 Profits Guarantee</h4>
-            <p>If you follow the system and don't generate $10,000 in revenue within 6 months, we extend your access and continue working with you &mdash; at no additional cost &mdash; until you do.</p>
+  <!-- Guarantee -->
+  <div class="ghl-wrap">
+    <div class="ghl-guarantee ghl-animate">
+      <h4>The 24/7 Profits Guarantee</h4>
+      <p>If you follow the system and don't generate $10,000 in revenue within 6 months, we extend your access and continue working with you &mdash; at no additional cost &mdash; until you do.</p>
+    </div>
+  </div>
+
+  <!-- Testimonials Section -->
+  <section class="ghl-section">
+    <div class="ghl-wrap" style="max-width:1200px;">
+      <div class="ghl-section-card ghl-animate">
+        <div class="ghl-h2">Students Who Took Action</div>
+        <p class="ghl-p">These members booked their call, joined the Inner Circle, and now they're winning</p>
+
+        <div class="ghl-testimonials">
+          <!-- Brandon: $234K year -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17136121/file/8a0e7e26ed877659ef37accde78aede6.png" alt="Brandon 234K year">
+            <figcaption><strong>Brandon:</strong> $234K in 12 months; December at $48K. 2025 target: $500K+.</figcaption>
+          </figure>
+
+          <!-- Jeff: $188K -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17136120/file/1f4dae2357e6ed937df2d8a33b3c14c7.png" alt="Jeff 188K">
+            <figcaption><strong>Jeff:</strong> $188K in under 12 months &mdash; all FBM, no VA, no warehouse.</figcaption>
+          </figure>
+
+          <!-- Winston: $54K -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17136118/file/783c0047ba8ba7bb594c5d6c93e3e534.png" alt="Winston 54K">
+            <figcaption><strong>Winston:</strong> $54K month after a few months on the system.</figcaption>
+          </figure>
+
+          <!-- Diaz: $52K -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17136122/file/7fa034019bda579f4001de6ae44e6b79.png" alt="Diaz 52K">
+            <figcaption><strong>Diaz:</strong> $52K in 9 days, with $28K+ clean profit.</figcaption>
+          </figure>
+
+          <!-- Nico: $50K -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17136119/file/10963a37add08191d7232d882fe63c05.png" alt="Nico 50K">
+            <figcaption><strong>Nico:</strong> $50K month with $10K+ profit &mdash; no ads.</figcaption>
+          </figure>
+
+          <!-- Isaac: $44K day -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17461953/file/fc0c6961522048cf41f2d22f1d1bdca8.png" alt="Isaac 44K">
+            <figcaption><strong>Isaac:</strong> $44K day using fast-turn criteria + supplier plays.</figcaption>
+          </figure>
+
+          <!-- Xavier: $11K -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/3039304/file/e8b8f2b5ac49d23a4b91029fe29740cd.png" alt="Xavier 11K">
+            <figcaption><strong>Xavier:</strong> $11K his first week on Amazon.</figcaption>
+          </figure>
+
+          <!-- Gabe -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/16788324/file/3d75e46d3cfcbd4066bdf1ed4dd62e84.png" alt="Gabe">
+            <figcaption><strong>Gabe:</strong> First $8K in 30 days &mdash; beginner momentum.</figcaption>
+          </figure>
+
+          <!-- Raf -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/9607714/file/b94dc5de9d019191867d4f077d860687.png" alt="Raf">
+            <figcaption><strong>Raf (age 15):</strong> $4K day two weeks after starting.</figcaption>
+          </figure>
         </div>
 
         <!-- Final CTA -->
-        <div class="cta-section" style="margin-top: 3rem;">
-            <a href="/webinar/apply" class="cta-btn">Apply Now &rarr;</a>
-            <p class="cta-sub">2-minute application &bull; Not a commitment &bull; Just a conversation</p>
+        <div style="text-align:center;margin-top:32px;">
+          <a href="/webinar/apply" class="ghl-btn">
+            Apply Now &rarr;
+          </a>
+          <p class="ghl-cta-sub">2-minute application &bull; Not a commitment &bull; Just a conversation</p>
         </div>
+      </div>
     </div>
+  </section>
 
-    <script>
-        // 48hr countdown from page load (in production, use server-side timestamp)
-        let replaySeconds = 48 * 60 * 60;
-        const countdownEl = document.getElementById('countdown');
-        const expiryEl = document.getElementById('expiryText');
+  <!-- Footer -->
+  <footer class="ghl-footer">
+    <div class="ghl-wrap">
+      <p style="margin-bottom:12px;font-size:11px;max-width:800px;margin-left:auto;margin-right:auto;line-height:1.6;">
+        <strong>Income Disclaimer:</strong> Any financial numbers referenced here are estimates, projections, or past results and should not be considered exact, actual, or as a promise of potential earnings. Results depend on many factors. There are NO guarantees of success or income.
+      </p>
+      <p>
+        &copy; <span id="ghlYear"></span> AllDayFBA &bull; 24/7 Profits &bull; All rights reserved
+      </p>
+    </div>
+  </footer>
+</div>
 
-        function updateReplayTimer() {
-            if (replaySeconds <= 0) {
-                countdownEl.textContent = 'EXPIRED';
-                expiryEl.textContent = 'has expired';
-                return;
-            }
-            replaySeconds--;
-            const h = Math.floor(replaySeconds / 3600);
-            const m = Math.floor((replaySeconds % 3600) / 60);
-            const s = replaySeconds % 60;
-            countdownEl.textContent =
-                String(h).padStart(2, '0') + ':' +
-                String(m).padStart(2, '0') + ':' +
-                String(s).padStart(2, '0');
+<!-- SCRIPTS -->
+<script>
+(function() {
+  // === EXPIRY COUNTDOWN (48 hours from first visit, persisted) ===
+  var storageKey = 'ghlReplayExpiry48hr';
+  var expiryTime = localStorage.getItem(storageKey);
+
+  if (!expiryTime) {
+    expiryTime = new Date().getTime() + (48 * 60 * 60 * 1000);
+    localStorage.setItem(storageKey, expiryTime);
+  }
+
+  var timerEl = document.getElementById('ghlExpiryTimer');
+  var expiryTextEl = document.getElementById('expiryText');
+
+  function updateExpiryTimer() {
+    var now = new Date().getTime();
+    var distance = parseInt(expiryTime) - now;
+
+    if (distance < 0) {
+      timerEl.textContent = 'EXPIRED';
+      if (expiryTextEl) expiryTextEl.textContent = 'has expired';
+      return;
+    }
+
+    var hours = Math.floor(distance / (1000 * 60 * 60));
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    timerEl.textContent =
+      String(hours).padStart(2, '0') + ':' +
+      String(minutes).padStart(2, '0') + ':' +
+      String(seconds).padStart(2, '0');
+
+    // Update inline text too
+    if (expiryTextEl && hours > 0) {
+      expiryTextEl.textContent = hours + ' hours';
+    }
+  }
+
+  updateExpiryTimer();
+  setInterval(updateExpiryTimer, 1000);
+
+  // Set current year
+  var yearEl = document.getElementById('ghlYear');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  // === SMOOTH SCROLL FOR CTA LINKS ===
+  document.querySelectorAll('#ghl-replay-wrapper a[href="/webinar/apply"]').forEach(function(link) {
+    // These are external links, no scroll override needed
+  });
+
+  // === SCROLL ANIMATION OBSERVER ===
+  var animateElements = document.querySelectorAll('#ghl-replay-wrapper .ghl-animate');
+
+  var observerOptions = {
+    root: null,
+    rootMargin: '0px 0px -80px 0px',
+    threshold: 0.1
+  };
+
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('ghl-visible');
+          observer.unobserve(entry.target);
         }
-        setInterval(updateReplayTimer, 1000);
-    </script>
-</body>
-</html>
+      });
+    }, observerOptions);
+
+    animateElements.forEach(function(el) { observer.observe(el); });
+  } else {
+    // Fallback: just show everything
+    animateElements.forEach(function(el) { el.classList.add('ghl-visible'); });
+  }
+})();
+</script>
