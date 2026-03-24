@@ -13,7 +13,7 @@
   ====================================
 -->
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="//embed.typeform.com/next/embed.js"></script>
 
 <style>
@@ -23,6 +23,14 @@
   [class*="col"], [class*="section"], [class*="container"] {
     margin-top: 0 !important;
     padding-top: 0 !important;
+  }
+
+  /* Make CF/GHL wrappers transparent */
+  .elBody, .elSection, .elRow, .elContainer, .elContent, .elHeader, .elFooter,
+  .wrapper, .container, .row, .section, .main-wrapper, .content, .cf-container,
+  #funnel-container, #containerAll, .pageContainer, #PageContainer, .site-wrapper,
+  #root, #app, .main-content, .page-wrapper, [class*="funnel"], [class*="page"] {
+    background: transparent !important;
   }
 
   /* === GHL CONTAINER OVERRIDE - FULL WIDTH === */
@@ -37,10 +45,13 @@
     padding: 0 !important;
     position: relative;
     top: 0 !important;
-    background: #FFFFFF;
+    background: linear-gradient(180deg, #070a16, #05060c);
     overflow-x: hidden;
     min-height: 100vh;
     box-sizing: border-box;
+    color: #ffffff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* Reset box-sizing */
@@ -53,19 +64,137 @@
 
   /* Variables */
   #ghl-webinar-wrapper {
-    --bg: #FFFFFF;
-    --text: #1a1a2e;
-    --muted: #6b7280;
-    --muted2: #9ca3af;
+    --bg: #070a16;
+    --bg2: #05060c;
+    --fg: #ffffff;
+    --text: #ffffff;
+    --muted: #bfc2d6;
+    --muted2: #98a0b9;
+    --card: #11101a;
+    --border: #23223a;
     --purple: #8B5CF6;
     --blue: #38BDF8;
+    --brand: #8b5cf6;
+    --brand2: #6d28d9;
     --green: #10B981;
     --red: #EF4444;
     --accent-red: #EF4444;
-    --shadow: 0 4px 24px rgba(0,0,0,.08);
-    --card-border: rgba(0,0,0,.08);
+    --shadow: 0 18px 60px rgba(139,92,246,.22);
+    --shadow-lg: 0 25px 80px rgba(139,92,246,.30);
+    --card-border: rgba(139,92,246,.2);
     --radius: 20px;
     --radius2: 26px;
+  }
+
+  /* === BACKGROUND CORNER GLOWS === */
+  #ghl-webinar-wrapper::before {
+    content: '';
+    position: fixed;
+    top: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(139,92,246,0.15), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  #ghl-webinar-wrapper::after {
+    content: '';
+    position: fixed;
+    bottom: -200px;
+    left: -200px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(56,189,248,0.12), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* === PURE CSS GALAXY BACKGROUND === */
+  #ghl-webinar-wrapper .ghl-stars {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+    background-image:
+      radial-gradient(circle 3px at 10% 15%, rgba(255,255,255,0.9), transparent),
+      radial-gradient(circle 2px at 25% 35%, rgba(255,255,255,0.8), transparent),
+      radial-gradient(circle 1px at 45% 20%, rgba(255,255,255,0.7), transparent),
+      radial-gradient(circle 2px at 60% 50%, rgba(255,255,255,0.85), transparent),
+      radial-gradient(circle 1px at 75% 30%, rgba(255,255,255,0.75), transparent),
+      radial-gradient(circle 3px at 85% 60%, rgba(255,255,255,0.9), transparent),
+      radial-gradient(circle 1px at 90% 20%, rgba(255,255,255,0.7), transparent),
+      radial-gradient(circle 2px at 15% 70%, rgba(255,255,255,0.8), transparent),
+      radial-gradient(circle 1px at 35% 85%, rgba(255,255,255,0.7), transparent),
+      radial-gradient(circle 2px at 55% 75%, rgba(255,255,255,0.85), transparent),
+      radial-gradient(circle 1px at 70% 90%, rgba(255,255,255,0.75), transparent),
+      radial-gradient(circle 3px at 88% 85%, rgba(255,255,255,0.9), transparent),
+      radial-gradient(circle 1px at 5% 45%, rgba(255,255,255,0.7), transparent),
+      radial-gradient(circle 2px at 40% 60%, rgba(255,255,255,0.8), transparent),
+      radial-gradient(circle 1px at 65% 40%, rgba(255,255,255,0.75), transparent),
+      radial-gradient(circle 2px at 80% 10%, rgba(255,255,255,0.85), transparent),
+      radial-gradient(circle 1px at 30% 5%, rgba(255,255,255,0.7), transparent),
+      radial-gradient(circle 3px at 50% 45%, rgba(255,255,255,0.9), transparent),
+      radial-gradient(circle 1px at 95% 50%, rgba(255,255,255,0.7), transparent),
+      radial-gradient(circle 2px at 20% 55%, rgba(255,255,255,0.8), transparent);
+    background-size: 100% 100%;
+    animation: ghl-stars-twinkle 5s ease-in-out infinite alternate;
+  }
+
+  @keyframes ghl-stars-twinkle {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+
+  #ghl-webinar-wrapper .ghl-stars2 {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+    background-image:
+      radial-gradient(circle 1px at 12% 22%, rgba(217,208,255,.7), transparent),
+      radial-gradient(circle 2px at 38% 12%, rgba(217,208,255,.8), transparent),
+      radial-gradient(circle 1px at 52% 68%, rgba(217,208,255,.6), transparent),
+      radial-gradient(circle 2px at 72% 42%, rgba(217,208,255,.7), transparent),
+      radial-gradient(circle 1px at 88% 78%, rgba(217,208,255,.5), transparent),
+      radial-gradient(circle 1px at 28% 92%, rgba(217,208,255,.6), transparent),
+      radial-gradient(circle 2px at 62% 8%, rgba(217,208,255,.8), transparent),
+      radial-gradient(circle 1px at 82% 52%, rgba(217,208,255,.7), transparent),
+      radial-gradient(circle 1px at 18% 48%, rgba(217,208,255,.6), transparent),
+      radial-gradient(circle 2px at 48% 32%, rgba(217,208,255,.7), transparent);
+    background-size: 100% 100%;
+    animation: ghl-stars2-drift 8s ease-in-out infinite alternate;
+  }
+
+  @keyframes ghl-stars2-drift {
+    0% { opacity: 0.4; transform: translateX(0); }
+    100% { opacity: 0.7; transform: translateX(5px); }
+  }
+
+  #ghl-webinar-wrapper .ghl-nebula {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+    background:
+      radial-gradient(ellipse 1200px 700px at 15% -10%, rgba(139,92,246,.22), transparent 60%),
+      radial-gradient(ellipse 900px 600px at 85% -6%, rgba(109,40,217,.18), transparent 65%),
+      radial-gradient(ellipse 1200px 800px at 50% 120%, rgba(139,92,246,.16), transparent 70%);
+    animation: ghl-nebula-shift 20s ease-in-out infinite alternate;
+  }
+
+  @keyframes ghl-nebula-shift {
+    0% { opacity: 0.85; }
+    100% { opacity: 1; }
   }
 
   /* === Falling Amazon Boxes === */
@@ -138,31 +267,55 @@
     #ghl-webinar-wrapper .ghl-wrap { padding: 0 16px; }
   }
 
-  /* === Pill Badge === */
+  /* === Pill Badge (Rotating Glow Border) === */
   #ghl-webinar-wrapper .ghl-pill {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 20px;
-    border: 1px solid rgba(139,92,246,.3);
-    background: rgba(139,92,246,.08);
+    gap: 10px;
+    padding: 10px 18px;
     border-radius: 999px;
-    color: var(--purple);
-    font-size: 14px;
+    color: rgba(255,255,255,.95);
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    background: rgba(0,0,0,.4);
+    z-index: 1;
   }
+  #ghl-webinar-wrapper .ghl-pill::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 999px;
+    background: conic-gradient(from var(--pill-angle, 0deg), #8B5CF6, #38BDF8, #8B5CF6, #38BDF8, #8B5CF6);
+    z-index: -1;
+    animation: pill-rotate 4s linear infinite;
+  }
+  #ghl-webinar-wrapper .ghl-pill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: rgba(7,10,22,.95);
+    z-index: -1;
+  }
+  @property --pill-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+  @keyframes pill-rotate { to { --pill-angle: 360deg; } }
 
   #ghl-webinar-wrapper .ghl-dot {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #ff3b7a;
-    box-shadow: 0 0 0 4px rgba(255,59,122,.15), 0 0 12px rgba(255,59,122,.3);
-    animation: ghl-pulse 1.8s ease-in-out infinite;
+    background: #ef4444;
+    box-shadow: 0 0 0 0 rgba(239,68,68,.7);
+    animation: ghl-pulse-dot 2s ease-in-out infinite;
   }
 
-  @keyframes ghl-pulse {
-    0%, 100% { transform: scale(1); opacity: .9; }
-    50% { transform: scale(1.15); opacity: 1; }
+  @keyframes ghl-pulse-dot {
+    0% { box-shadow: 0 0 0 0 rgba(239,68,68,.7); }
+    50% { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+    100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
   }
 
   /* === Buttons === */
@@ -224,16 +377,14 @@
   #ghl-webinar-wrapper .ghl-h1 {
     margin: 0 0 20px;
     font-size: clamp(28px, 5vw, 52px);
-    line-height: 1.1;
+    line-height: 1.15;
     letter-spacing: -0.02em;
-    color: var(--text);
+    color: #ffffff;
     font-weight: 900;
-  }
-
-  #ghl-webinar-wrapper .ghl-h1 u {
-    text-decoration-color: var(--purple);
-    text-underline-offset: 4px;
-    text-decoration-thickness: 3px;
+    background: linear-gradient(180deg, #ffffff 0%, #e0e0ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   @media (max-width: 768px) {
@@ -248,22 +399,32 @@
     #ghl-webinar-wrapper .ghl-h1 { font-size: clamp(22px, 8vw, 30px); }
   }
 
+  @media (max-width: 640px) {
+    #ghl-webinar-wrapper .ghl-h1 { font-size: clamp(22px, 7.5vw, 28px); }
+  }
+
+  @media (max-width: 375px) {
+    #ghl-webinar-wrapper .ghl-h1 { font-size: 22px; }
+  }
+
   #ghl-webinar-wrapper .ghl-grad {
-    background: linear-gradient(90deg, rgba(139,92,246,1), rgba(56,189,248,1));
+    background: linear-gradient(135deg, #8b5cf6 0%, #c084fc 100%);
     -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     background-clip: text;
-    color: transparent;
+    font-weight: 900;
   }
 
   /* === Countdown Box === */
   #ghl-webinar-wrapper .ghl-countdown-box {
-    background: #FFFFFF;
+    background: rgba(17,16,26,.8);
     border: 2px solid rgba(139,92,246,.4);
     border-radius: 20px;
     padding: 28px 24px;
     margin: 24px auto;
     max-width: 600px;
-    box-shadow: 0 0 40px rgba(139,92,246,.12), 0 8px 32px rgba(0,0,0,.06);
+    box-shadow: 0 0 40px rgba(139,92,246,.12), 0 8px 32px rgba(0,0,0,.3);
+    backdrop-filter: blur(10px);
   }
 
   @media (max-width: 768px) {
@@ -282,7 +443,7 @@
     text-align: center;
     font-size: clamp(14px, 3.5vw, 17px);
     font-weight: 900;
-    color: var(--text);
+    color: #ffffff;
     margin-bottom: 16px;
     text-transform: uppercase;
     letter-spacing: 0.8px;
@@ -333,6 +494,10 @@
     #ghl-webinar-wrapper .ghl-countdown-number { font-size: clamp(28px, 13vw, 36px); }
   }
 
+  @media (max-width: 375px) {
+    #ghl-webinar-wrapper .ghl-countdown-number { font-size: 26px; }
+  }
+
   #ghl-webinar-wrapper .ghl-countdown-text {
     display: block;
     font-size: clamp(10px, 2.5vw, 12px);
@@ -359,15 +524,36 @@
     #ghl-webinar-wrapper .ghl-countdown-sep { font-size: clamp(20px, 9vw, 28px); padding: 0 2px; }
   }
 
+  @media (max-width: 375px) {
+    #ghl-webinar-wrapper .ghl-countdown-sep { font-size: 18px; }
+  }
+
+  /* Countdown date in RED */
   #ghl-webinar-wrapper .ghl-countdown-date {
     text-align: center;
     font-size: clamp(13px, 3vw, 15px);
-    color: var(--muted);
-    font-weight: 700;
+    color: #EF4444;
+    font-weight: 800;
   }
 
   @media (max-width: 480px) {
     #ghl-webinar-wrapper .ghl-countdown-date { font-size: 12px; }
+  }
+
+  /* === Hero Card === */
+  #ghl-webinar-wrapper .ghl-hero-card {
+    max-width: 680px;
+    margin: 28px auto 0;
+    padding: 32px 28px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(139,92,246,.08) 0%, rgba(109,40,217,.08) 100%);
+    border: 1px solid rgba(139,92,246,.3);
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-hero-card { padding: 24px 20px; }
   }
 
   /* === Section === */
@@ -382,11 +568,12 @@
 
   #ghl-webinar-wrapper .ghl-section-card {
     border-radius: var(--radius2);
-    background: #FFFFFF;
-    border: 1px solid var(--card-border);
+    background: rgba(17,16,26,.6);
+    border: 1px solid rgba(139,92,246,.2);
     box-shadow: var(--shadow);
     padding: 48px 40px;
     width: 100%;
+    backdrop-filter: blur(10px);
   }
 
   @media (max-width: 768px) {
@@ -397,18 +584,17 @@
     #ghl-webinar-wrapper .ghl-section-card { padding: 28px 20px; }
   }
 
+  /* === Section Headers === */
   #ghl-webinar-wrapper .ghl-h2 {
     margin: 0 0 14px;
     font-size: clamp(24px, 4.5vw, 34px);
     letter-spacing: -.3px;
-    color: var(--text);
+    color: #ffffff;
     font-weight: 800;
-  }
-
-  #ghl-webinar-wrapper .ghl-h2 u {
-    text-decoration-color: var(--purple);
-    text-underline-offset: 4px;
-    text-decoration-thickness: 3px;
+    background: linear-gradient(180deg, #ffffff 0%, #e0e0ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   @media (max-width: 768px) {
@@ -426,126 +612,159 @@
     #ghl-webinar-wrapper .ghl-p { margin: 0 0 20px; }
   }
 
-  /* === Learn List (with left purple border accent) === */
-  #ghl-webinar-wrapper .ghl-learn-card {
-    border-left: 4px solid var(--purple);
-    padding-left: 24px;
+  /* === Sub text === */
+  #ghl-webinar-wrapper .ghl-sub {
+    color: #e5e7fb;
+    font-size: clamp(16px, 3.5vw, 20px);
+    font-weight: 600;
+    margin: 0 0 20px;
+    line-height: 1.5;
   }
 
-  @media (max-width: 480px) {
-    #ghl-webinar-wrapper .ghl-learn-card { padding-left: 16px; }
-  }
-
-  #ghl-webinar-wrapper .ghl-learn-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  #ghl-webinar-wrapper .ghl-learn-item {
-    display: flex;
-    gap: 16px;
-    padding: 18px 0;
-    border-bottom: 1px solid rgba(0,0,0,.06);
-    font-size: clamp(15px, 3.2vw, 17px);
-    line-height: 1.55;
-    color: var(--muted);
-    align-items: flex-start;
-  }
-
-  #ghl-webinar-wrapper .ghl-learn-item:last-child {
-    border-bottom: none;
-  }
-
-  #ghl-webinar-wrapper .ghl-learn-num {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    background: linear-gradient(135deg, #FF6B35, #EF4444);
-    color: #FFFFFF;
-    display: flex;
+  /* === Mini badges === */
+  #ghl-webinar-wrapper .ghl-mini {
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 800;
-    margin-top: 2px;
+    gap: 16px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 600;
   }
 
-  /* === For You / Not For You === */
-  #ghl-webinar-wrapper .ghl-qualify-grid {
+  #ghl-webinar-wrapper .ghl-mini span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* === 3-Column Grid === */
+  #ghl-webinar-wrapper .ghl-grid3 {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 24px;
-    margin-top: 24px;
+    margin-top: 28px;
+  }
+
+  @media (max-width: 980px) {
+    #ghl-webinar-wrapper .ghl-grid3 { grid-template-columns: 1fr; gap: 20px; }
+  }
+
+  /* === Step Cards === */
+  #ghl-webinar-wrapper .ghl-step {
+    padding: 32px 28px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(139,92,246,.06) 0%, rgba(109,40,217,.06) 100%);
+    border: 1px solid rgba(139,92,246,.2);
+    position: relative;
+    overflow: hidden;
+    transition: all .3s ease;
+  }
+
+  #ghl-webinar-wrapper .ghl-step::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(139,92,246,.08), transparent 60%);
+    pointer-events: none;
+  }
+
+  #ghl-webinar-wrapper .ghl-step:hover {
+    border-color: rgba(139,92,246,.4);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(139,92,246,.25);
   }
 
   @media (max-width: 768px) {
-    #ghl-webinar-wrapper .ghl-qualify-grid { grid-template-columns: 1fr; gap: 20px; }
+    #ghl-webinar-wrapper .ghl-step { padding: 24px 20px; }
   }
 
-  #ghl-webinar-wrapper .ghl-qualify-col {
-    border-radius: 18px;
-    padding: 32px 28px;
-    border: 1px solid var(--card-border);
-    background: #FFFFFF;
-    box-shadow: var(--shadow);
-  }
-
-  @media (max-width: 480px) {
-    #ghl-webinar-wrapper .ghl-qualify-col { padding: 24px 20px; }
-  }
-
-  #ghl-webinar-wrapper .ghl-qualify-col h3 {
-    margin: 0 0 20px;
-    font-size: 20px;
+  #ghl-webinar-wrapper .ghl-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(139,92,246,.12);
+    color: #c084fc;
+    font-size: 11px;
     font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
   }
 
-  #ghl-webinar-wrapper .ghl-qualify-col.ghl-for h3 {
-    color: var(--green);
+  #ghl-webinar-wrapper .ghl-step h3 {
+    margin: 0 0 12px;
+    font-size: 20px;
+    color: #ffffff;
+    font-weight: 800;
+    position: relative;
+    z-index: 1;
   }
 
-  #ghl-webinar-wrapper .ghl-qualify-col.ghl-not h3 {
-    color: var(--red);
-  }
-
-  #ghl-webinar-wrapper .ghl-qualify-list {
+  #ghl-webinar-wrapper .ghl-step ul {
     list-style: none;
     margin: 0;
     padding: 0;
+    position: relative;
+    z-index: 1;
   }
 
-  #ghl-webinar-wrapper .ghl-qualify-list li {
+  #ghl-webinar-wrapper .ghl-step li {
+    padding: 8px 0;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: #d9dbe8;
     display: flex;
-    gap: 12px;
-    padding: 10px 0;
-    font-size: 15px;
-    line-height: 1.55;
-    color: #374151;
+    gap: 10px;
     align-items: flex-start;
   }
 
-  #ghl-webinar-wrapper .ghl-qualify-icon {
-    flex-shrink: 0;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
+  #ghl-webinar-wrapper .ghl-step li::before {
+    content: "\2713";
+    color: var(--purple);
     font-weight: 700;
+    flex-shrink: 0;
     margin-top: 1px;
   }
 
-  #ghl-webinar-wrapper .ghl-qualify-icon.ghl-check {
-    background: rgba(16,185,129,.12);
+  /* Green step card variant */
+  #ghl-webinar-wrapper .ghl-step.ghl-step-green {
+    background: linear-gradient(135deg, rgba(16,185,129,.06) 0%, rgba(16,185,129,.03) 100%);
+    border-color: rgba(16,185,129,.25);
+  }
+  #ghl-webinar-wrapper .ghl-step.ghl-step-green::before {
+    background: radial-gradient(circle at center, rgba(16,185,129,.08), transparent 60%);
+  }
+  #ghl-webinar-wrapper .ghl-step.ghl-step-green:hover {
+    border-color: rgba(16,185,129,.5);
+    box-shadow: 0 20px 60px rgba(16,185,129,.2);
+  }
+  #ghl-webinar-wrapper .ghl-step.ghl-step-green li::before {
+    content: "\2713";
     color: var(--green);
   }
 
-  #ghl-webinar-wrapper .ghl-qualify-icon.ghl-x {
-    background: rgba(239,68,68,.12);
+  /* Red step card variant */
+  #ghl-webinar-wrapper .ghl-step.ghl-step-red {
+    background: linear-gradient(135deg, rgba(239,68,68,.06) 0%, rgba(239,68,68,.03) 100%);
+    border-color: rgba(239,68,68,.25);
+  }
+  #ghl-webinar-wrapper .ghl-step.ghl-step-red::before {
+    background: radial-gradient(circle at center, rgba(239,68,68,.08), transparent 60%);
+  }
+  #ghl-webinar-wrapper .ghl-step.ghl-step-red:hover {
+    border-color: rgba(239,68,68,.5);
+    box-shadow: 0 20px 60px rgba(239,68,68,.2);
+  }
+  #ghl-webinar-wrapper .ghl-step.ghl-step-red li::before {
+    content: "\2717";
     color: var(--red);
   }
 
@@ -564,8 +783,7 @@
 
   #ghl-webinar-wrapper .ghl-host-left {
     border-radius: 18px;
-    border: 1px solid var(--card-border);
-    background: #f3f4f6;
+    border: 1px solid rgba(139,92,246,.2);
     overflow: hidden;
     position: relative;
     width: 100%;
@@ -603,115 +821,286 @@
   #ghl-webinar-wrapper .ghl-host-right h3 {
     margin: 0 0 16px;
     font-size: clamp(22px, 4vw, 28px);
-    color: var(--text);
+    color: #ffffff;
     font-weight: 800;
   }
 
   #ghl-webinar-wrapper .ghl-host-right p {
     margin: 0 0 16px;
-    color: #4b5563;
+    color: #d9dbe8;
     line-height: 1.7;
     font-size: 16px;
   }
 
-  /* === Student Results Grid === */
-  #ghl-webinar-wrapper .ghl-results-grid {
+  #ghl-webinar-wrapper .ghl-host-right ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  #ghl-webinar-wrapper .ghl-host-right li {
+    padding: 6px 0;
+    font-size: 15px;
+    line-height: 1.55;
+    color: #d9dbe8;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  #ghl-webinar-wrapper .ghl-host-right li::before {
+    content: "\2713";
+    color: var(--purple);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* === For You / Not For You (2-column styled) === */
+  #ghl-webinar-wrapper .ghl-qualify-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-qualify-grid { grid-template-columns: 1fr; gap: 20px; }
+  }
+
+  #ghl-webinar-wrapper .ghl-qualify-col {
+    border-radius: 18px;
+    padding: 32px 28px;
+    border: 1px solid rgba(139,92,246,.2);
+    background: rgba(17,16,26,.6);
+    backdrop-filter: blur(10px);
+  }
+
+  @media (max-width: 480px) {
+    #ghl-webinar-wrapper .ghl-qualify-col { padding: 24px 20px; }
+  }
+
+  #ghl-webinar-wrapper .ghl-qualify-col h3 {
+    margin: 0 0 20px;
+    font-size: 20px;
+    font-weight: 800;
+    color: #ffffff;
+  }
+
+  #ghl-webinar-wrapper .ghl-qualify-col.ghl-for {
+    background: linear-gradient(135deg, rgba(16,185,129,.06) 0%, rgba(16,185,129,.03) 100%);
+    border-color: rgba(16,185,129,.25);
+    position: relative;
+    overflow: hidden;
+  }
+  #ghl-webinar-wrapper .ghl-qualify-col.ghl-for::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(16,185,129,.08), transparent 60%);
+    pointer-events: none;
+  }
+
+  #ghl-webinar-wrapper .ghl-qualify-col.ghl-for h3 {
+    color: var(--green);
+  }
+
+  #ghl-webinar-wrapper .ghl-qualify-col.ghl-not {
+    background: linear-gradient(135deg, rgba(239,68,68,.06) 0%, rgba(239,68,68,.03) 100%);
+    border-color: rgba(239,68,68,.25);
+    position: relative;
+    overflow: hidden;
+  }
+  #ghl-webinar-wrapper .ghl-qualify-col.ghl-not::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(239,68,68,.08), transparent 60%);
+    pointer-events: none;
+  }
+
+  #ghl-webinar-wrapper .ghl-qualify-col.ghl-not h3 {
+    color: var(--red);
+  }
+
+  #ghl-webinar-wrapper .ghl-qualify-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  #ghl-webinar-wrapper .ghl-qualify-list li {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    font-size: 15px;
+    line-height: 1.55;
+    color: #d9dbe8;
+    align-items: flex-start;
+  }
+
+  #ghl-webinar-wrapper .ghl-qualify-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    margin-top: 1px;
+  }
+
+  #ghl-webinar-wrapper .ghl-qualify-icon.ghl-check {
+    background: rgba(16,185,129,.15);
+    color: var(--green);
+  }
+
+  #ghl-webinar-wrapper .ghl-qualify-icon.ghl-x {
+    background: rgba(239,68,68,.15);
+    color: var(--red);
+  }
+
+  /* === Section Divider === */
+  #ghl-webinar-wrapper .ghl-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(139,92,246,.3), transparent);
+    margin: 32px 0;
+    border: none;
+  }
+
+  /* === Show Up vs Miss Out (2-column) === */
+  #ghl-webinar-wrapper .ghl-showup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  @media (max-width: 768px) {
+    #ghl-webinar-wrapper .ghl-showup-grid { grid-template-columns: 1fr; gap: 20px; }
+  }
+
+  /* === Testimonials Grid === */
+  #ghl-webinar-wrapper .ghl-testimonials {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 20px;
     margin-top: 28px;
   }
 
-  @media (max-width: 980px) {
-    #ghl-webinar-wrapper .ghl-results-grid { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 1024px) {
+    #ghl-webinar-wrapper .ghl-testimonials { grid-template-columns: repeat(2, 1fr); }
   }
 
-  @media (max-width: 480px) {
-    #ghl-webinar-wrapper .ghl-results-grid { grid-template-columns: 1fr; gap: 16px; }
+  @media (max-width: 640px) {
+    #ghl-webinar-wrapper .ghl-testimonials { grid-template-columns: 1fr; }
   }
 
-  #ghl-webinar-wrapper .ghl-result-card {
-    padding: 28px;
-    border-radius: 18px;
-    background: #FFFFFF;
-    border: 1px solid var(--card-border);
-    box-shadow: var(--shadow);
-    position: relative;
-    overflow: hidden;
-  }
-
-  #ghl-webinar-wrapper .ghl-result-card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--purple), var(--blue));
-  }
-
-  @media (max-width: 768px) {
-    #ghl-webinar-wrapper .ghl-result-card { padding: 24px; }
-  }
-
-  #ghl-webinar-wrapper .ghl-result-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    border-radius: 999px;
-    background: rgba(139,92,246,.08);
-    color: var(--purple);
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 12px;
-  }
-
-  #ghl-webinar-wrapper .ghl-result-badge i {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--purple);
-    display: inline-block;
-  }
-
-  #ghl-webinar-wrapper .ghl-result-card h3 {
-    margin: 0 0 8px;
-    font-size: 18px;
-    color: var(--text);
-    font-weight: 800;
-  }
-
-  #ghl-webinar-wrapper .ghl-result-card p {
+  #ghl-webinar-wrapper .ghl-t-card {
     margin: 0;
-    color: var(--muted);
+    background: linear-gradient(135deg, rgba(139,92,246,.06) 0%, rgba(109,40,217,.06) 100%);
+    border: 1px solid rgba(139,92,246,.2);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,.3);
+    transition: all .3s ease;
+  }
+
+  #ghl-webinar-wrapper .ghl-t-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(139,92,246,.25);
+    border-color: rgba(139,92,246,.4);
+  }
+
+  #ghl-webinar-wrapper .ghl-t-card img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    object-position: center 15%;
+    display: block;
+    filter: saturate(1.05) contrast(1.02);
+  }
+
+  #ghl-webinar-wrapper .ghl-t-card figcaption {
+    padding: 14px 16px;
+    color: #d9dbe8;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  #ghl-webinar-wrapper .ghl-t-card figcaption strong {
+    color: #f0f0ff;
+    font-weight: 700;
+  }
+
+  /* === FAQ === */
+  #ghl-webinar-wrapper .ghl-details {
+    padding: 18px 20px;
+    border: 1px solid rgba(139,92,246,.2);
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(139,92,246,.04) 0%, rgba(109,40,217,.04) 100%);
+    transition: all .3s ease;
+    margin-bottom: 14px;
+  }
+
+  #ghl-webinar-wrapper .ghl-details:hover {
+    border-color: rgba(139,92,246,.4);
+    background: linear-gradient(135deg, rgba(139,92,246,.08) 0%, rgba(109,40,217,.08) 100%);
+  }
+
+  #ghl-webinar-wrapper .ghl-details[open] {
+    border-color: rgba(139,92,246,.5);
+    background: linear-gradient(135deg, rgba(139,92,246,.1) 0%, rgba(109,40,217,.1) 100%);
+  }
+
+  #ghl-webinar-wrapper .ghl-summary {
+    cursor: pointer;
+    font-weight: 700;
     font-size: 15px;
+    color: #f0f0ff;
+    padding-right: 20px;
+    list-style: none;
+  }
+
+  #ghl-webinar-wrapper .ghl-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  #ghl-webinar-wrapper .ghl-summary::after {
+    content: "+";
+    float: right;
+    font-size: 18px;
+    color: var(--purple);
+    font-weight: 700;
+    transition: transform .2s ease;
+  }
+
+  #ghl-webinar-wrapper .ghl-details[open] .ghl-summary::after {
+    content: "-";
+  }
+
+  #ghl-webinar-wrapper .ghl-details p {
+    margin: 12px 0 0;
+    color: #c9cbe8;
     line-height: 1.6;
-  }
-
-  /* Community card special */
-  #ghl-webinar-wrapper .ghl-community-card {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    background: linear-gradient(135deg, rgba(139,92,246,.06), rgba(56,189,248,.06));
-    border: 1px solid rgba(139,92,246,.15);
-  }
-
-  #ghl-webinar-wrapper .ghl-community-card::before {
-    background: linear-gradient(90deg, var(--purple), var(--blue));
+    font-size: 14.5px;
   }
 
   /* === Final CTA === */
   #ghl-webinar-wrapper .ghl-final-cta {
     text-align: center;
     padding: 48px 24px;
-    background: linear-gradient(180deg, rgba(139,92,246,.04), rgba(56,189,248,.04));
+    background: linear-gradient(180deg, rgba(139,92,246,.08), rgba(56,189,248,.04));
     border-radius: var(--radius2);
-    border: 1px solid rgba(139,92,246,.12);
+    border: 1px solid rgba(139,92,246,.3);
+    box-shadow: var(--shadow);
   }
 
   @media (max-width: 768px) {
@@ -722,8 +1111,12 @@
     margin: 0 0 14px;
     font-size: clamp(24px, 5vw, 36px);
     letter-spacing: -.4px;
-    color: var(--text);
+    color: #ffffff;
     font-weight: 900;
+    background: linear-gradient(180deg, #ffffff 0%, #e0e0ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   #ghl-webinar-wrapper .ghl-final-cta p {
@@ -740,10 +1133,27 @@
     color: var(--muted2);
     font-size: 12px;
     text-align: center;
+    border-top: 1px solid rgba(139,92,246,.15);
+    margin-top: 40px;
   }
 
   #ghl-webinar-wrapper .ghl-footer p {
     margin: 0 0 14px;
+  }
+
+  #ghl-webinar-wrapper .ghl-disclaimer {
+    max-width: 800px;
+    margin: 0 auto 14px;
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--muted2);
+  }
+
+  /* === Small text helpers === */
+  #ghl-webinar-wrapper .ghl-small-text {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 12px;
   }
 
   /* === Force image responsiveness === */
@@ -757,23 +1167,6 @@
     visibility: visible !important;
     opacity: 1 !important;
   }
-
-  /* === Scroll Animations === */
-  #ghl-webinar-wrapper .ghl-animate {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-  }
-
-  #ghl-webinar-wrapper .ghl-animate.ghl-visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  #ghl-webinar-wrapper .ghl-delay-1 { transition-delay: 0.1s; }
-  #ghl-webinar-wrapper .ghl-delay-2 { transition-delay: 0.2s; }
-  #ghl-webinar-wrapper .ghl-delay-3 { transition-delay: 0.3s; }
-  #ghl-webinar-wrapper .ghl-delay-4 { transition-delay: 0.4s; }
 
   /* Hero elements animate on load */
   #ghl-webinar-wrapper .ghl-hero-animate {
@@ -794,33 +1187,6 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* === Small text helpers === */
-  #ghl-webinar-wrapper .ghl-small-text {
-    font-size: 13px;
-    color: var(--muted);
-    margin-top: 12px;
-  }
-
-  /* === Disclaimer sections === */
-  #ghl-webinar-wrapper .ghl-disclaimer {
-    max-width: 800px;
-    margin: 0 auto 14px;
-    font-size: 11px;
-    line-height: 1.6;
-    color: var(--muted2);
-  }
-
-  /* === Extra small breakpoints === */
-  @media (max-width: 640px) {
-    #ghl-webinar-wrapper .ghl-h1 { font-size: clamp(22px, 7.5vw, 28px); }
-  }
-
-  @media (max-width: 375px) {
-    #ghl-webinar-wrapper .ghl-h1 { font-size: 22px; }
-    #ghl-webinar-wrapper .ghl-countdown-number { font-size: 26px; }
-    #ghl-webinar-wrapper .ghl-countdown-sep { font-size: 18px; }
-  }
-
   /* Rotating purple border for Typeform modal */
   @property --tf-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
   @keyframes tf-rotate { to { --tf-angle: 360deg; } }
@@ -834,6 +1200,11 @@
 
 <!-- MAIN CONTENT -->
 <div id="ghl-webinar-wrapper">
+
+  <!-- Galaxy Background Layers -->
+  <div class="ghl-stars" aria-hidden="true"></div>
+  <div class="ghl-stars2" aria-hidden="true"></div>
+  <div class="ghl-nebula" aria-hidden="true"></div>
 
   <!-- Falling Amazon Boxes -->
   <div class="ghl-amazon-boxes" aria-hidden="true">
@@ -855,17 +1226,14 @@
   </div>
 
   <!-- Typeform Modal -->
-  <div id="typeform-modal" onclick="if(event.target===this)closeTypeform()" style="display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); display:none; align-items:center; justify-content:center;">
-    <div id="tf-inner" style="position:relative; width:90%; max-width:480px; height:auto; max-height:85vh; border-radius:24px; overflow:hidden; background:#fff; margin:auto; box-shadow:0 25px 80px rgba(139,92,246,0.3), 0 0 0 2px rgba(139,92,246,0.5);">
-      <!-- Rotating purple border glow -->
-      <div style="position:absolute; inset:-2px; border-radius:26px; background:conic-gradient(from var(--tf-angle,0deg), #8B5CF6, #38BDF8, #8B5CF6, #38BDF8, #8B5CF6); z-index:-1; animation:tf-rotate 3s linear infinite;"></div>
-      <div style="position:absolute; inset:2px; border-radius:22px; background:#fff; z-index:-1;"></div>
-      <button onclick="closeTypeform()" style="position:absolute; top:8px; right:12px; z-index:10; background:none; border:none; font-size:24px; cursor:pointer; color:#999; font-family:'Inter',sans-serif; line-height:1;">&times;</button>
+  <div id="typeform-modal" onclick="if(event.target===this)closeTypeform()" style="display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
+    <div style="position:relative; width:90%; max-width:480px; margin:auto; margin-top:8vh; border-radius:24px; overflow:hidden; background:#0d0b18; border:2px solid rgba(139,92,246,0.5); box-shadow:0 25px 80px rgba(139,92,246,0.3);">
+      <button onclick="closeTypeform()" style="position:absolute; top:10px; right:14px; z-index:10; background:none; border:none; font-size:24px; cursor:pointer; color:rgba(255,255,255,0.6); font-family:sans-serif;">&times;</button>
       <div style="padding:20px 20px 4px; text-align:center;">
-        <h3 style="font-size:18px; font-weight:800; color:#1a1a2e; margin:0 0 4px; font-family:'Inter',sans-serif;">Register Your Spot Now</h3>
-        <p style="font-size:13px; color:#6b7280; margin:0; font-family:'Inter',sans-serif;">Enter your name, email &amp; phone number to secure your spot</p>
+        <h3 style="font-size:18px; font-weight:800; color:rgba(255,255,255,.95); margin:0 0 4px; font-family:'Inter',sans-serif;">Register Your Spot Now</h3>
+        <p style="font-size:13px; color:rgba(255,255,255,.6); margin:0; font-family:'Inter',sans-serif;">Enter your name, email &amp; phone number to secure your spot</p>
       </div>
-      <div data-tf-live="01K2TPGR3G5VY293ZQWJR6ZG16" style="height:420px; max-height:60vh;"></div>
+      <div data-tf-live="01K2TPGR3G5VY293ZQWJR6ZG16" style="height:420px;"></div>
     </div>
   </div>
 
@@ -876,33 +1244,22 @@
       <!-- Pill Badge -->
       <div class="ghl-pill ghl-hero-animate ghl-hero-animate-delay-1" style="margin-top:12px;margin-bottom:24px;">
         <span class="ghl-dot"></span>
-        <span><strong>FREE LIVE TRAINING &mdash; AI AMAZON SCALING</strong></span>
+        <span>FREE LIVE TRAINING</span>
       </div>
-
-      <!-- Red accent text -->
-      <p class="ghl-hero-animate ghl-hero-animate-delay-2" style="margin:0 0 12px;font-size:clamp(16px,3.5vw,20px);font-weight:700;color:var(--accent-red);text-transform:uppercase;letter-spacing:0.5px;">
-        Free Live Training Reveals:
-      </p>
 
       <!-- Headline -->
       <h1 class="ghl-h1 ghl-hero-animate ghl-hero-animate-delay-2">
-        The <u>AI Amazon</u> Method To Hit Your First $10,000/Month With Online Business
+        The <span class="ghl-grad">AI Amazon</span> Method To Hit Your First $10,000/Month With Online Business
       </h1>
 
       <!-- Subheadline -->
-      <p class="ghl-hero-animate ghl-hero-animate-delay-2" style="margin:0 0 24px;font-size:clamp(17px,4vw,22px);color:var(--muted);font-style:italic;max-width:680px;margin-left:auto;margin-right:auto;">
+      <p class="ghl-hero-animate ghl-hero-animate-delay-2" style="margin:0 0 28px;font-size:clamp(17px,4vw,22px);color:var(--muted);font-style:italic;max-width:680px;margin-left:auto;margin-right:auto;text-align:center;">
         ...Even if you've never made a dollar online before.
       </p>
 
-      <!-- Event Details -->
-      <div class="ghl-hero-animate ghl-hero-animate-delay-3" style="text-align:center;margin-bottom:20px;">
-        <p style="margin:0 0 4px;color:var(--muted);font-size:clamp(14px,3vw,16px);font-weight:600;">Free Live Training:</p>
-        <p style="margin:0;color:var(--text);font-size:clamp(18px,4vw,24px);font-weight:900;">Thursday, March 27th, 2026 &mdash; 8PM EST</p>
-      </div>
-
       <!-- Countdown Timer -->
-      <div class="ghl-countdown-box ghl-hero-animate ghl-hero-animate-delay-4">
-        <div class="ghl-countdown-label">Limited To 100 Live Attendees</div>
+      <div class="ghl-countdown-box ghl-hero-animate ghl-hero-animate-delay-3">
+        <div class="ghl-countdown-label">Training Starts In:</div>
         <div class="ghl-countdown-display">
           <div class="ghl-countdown-item">
             <span class="ghl-countdown-number" id="ghlDays">00</span>
@@ -927,137 +1284,172 @@
         <div class="ghl-countdown-date">Thursday, March 27th @ 8:00 PM EST</div>
       </div>
 
-      <!-- CTA Button -->
-      <div class="ghl-hero-animate ghl-hero-animate-delay-5" style="text-align:center;margin-top:28px;">
+      <!-- Hero Card -->
+      <div class="ghl-hero-card ghl-hero-animate ghl-hero-animate-delay-4">
+        <p class="ghl-sub">Free Live Training: Thursday, March 27th &mdash; 8PM EST</p>
         <button onclick="openTypeform()" class="ghl-btn">Click Here To Save Your Seat &rarr;</button>
-        <p class="ghl-small-text">100% FREE &mdash; Limited Spots Available</p>
+        <div class="ghl-mini">
+          <span>&#x2705; 100% FREE</span>
+          <span>&#x1F525; Limited to 100 Seats</span>
+        </div>
       </div>
 
     </div>
   </header>
 
   <!-- ========== 2. WHAT YOU'LL LEARN ========== -->
-  <section class="ghl-section" style="padding:24px 0;">
-    <div class="ghl-wrap ghl-animate" style="max-width:720px;">
-      <div class="ghl-learn-card" style="padding:28px 24px;">
-        <div class="ghl-h2" style="text-align:center;font-size:clamp(18px,4vw,24px);margin-bottom:16px;">On This Live Workshop, You'll Learn All of Our <em>'Cheat Codes'</em> For Starting + Scaling An <u>Amazon</u> Business With AI in 2026:</div>
+  <section class="ghl-section">
+    <div class="ghl-wrap">
+      <div class="ghl-section-card">
+        <div class="ghl-h2" style="text-align:center;margin-bottom:28px;">On This Live Workshop, You'll Learn Our 'Cheat Codes' For Starting + Scaling An Amazon Business With AI in 2026</div>
 
-        <ul class="ghl-learn-list" style="margin-top:12px;">
-          <li class="ghl-learn-item" style="padding:8px 0;">
-            <span class="ghl-learn-num" style="width:20px;height:20px;min-width:20px;font-size:11px;">&#x1F534;</span>
-            <span style="font-size:14px;">How to find the select few <strong style="color:var(--text);">'Money Printing Products'</strong> on Amazon using AI that other sellers will never discover.</span>
-          </li>
-          <li class="ghl-learn-item" style="padding:8px 0;">
-            <span class="ghl-learn-num" style="width:20px;height:20px;min-width:20px;font-size:11px;">&#x1F534;</span>
-            <span style="font-size:14px;">How to access <strong style="color:var(--text);">$10K&ndash;$70K in business credit</strong> to fund your inventory &mdash; even with no business history.</span>
-          </li>
-          <li class="ghl-learn-item" style="padding:8px 0;">
-            <span class="ghl-learn-num" style="width:20px;height:20px;min-width:20px;font-size:11px;">&#x1F534;</span>
-            <span style="font-size:14px;">The <strong style="color:var(--text);">AI sourcing system</strong> that finds profitable products in 60 minutes while manual sellers spend 10+ hours per week.</span>
-          </li>
-          <li class="ghl-learn-item" style="padding:8px 0;">
-            <span class="ghl-learn-num" style="width:20px;height:20px;min-width:20px;font-size:11px;">&#x1F534;</span>
-            <span style="font-size:14px;">How to launch your first product and <strong style="color:var(--text);">start making sales in 7&ndash;14 days</strong> using the Honeymoon Period strategy.</span>
-          </li>
-          <li class="ghl-learn-item" style="padding:8px 0;">
-            <span class="ghl-learn-num" style="width:20px;height:20px;min-width:20px;font-size:11px;">&#x1F534;</span>
-            <span style="font-size:14px;">The <strong style="color:var(--text);">Done-For-You systems</strong> our students use to scale to $10K&ndash;$30K/month without touching a single product.</span>
-          </li>
-          <li class="ghl-learn-item" style="padding:8px 0;">
-            <span class="ghl-learn-num" style="width:20px;height:20px;min-width:20px;font-size:11px;">&#x1F534;</span>
-            <span style="font-size:14px;">How to tie it all together with AI so you <strong style="color:var(--text);">make more money FASTER</strong>.</span>
-          </li>
-        </ul>
-      </div>
+        <div class="ghl-grid3">
 
-      <div style="display:flex;justify-content:center;margin-top:20px;">
-        <button onclick="openTypeform()" class="ghl-btn">Click Here To Save Your Seat &rarr;</button>
+          <!-- Step 1 -->
+          <div class="ghl-step">
+            <div class="ghl-badge">Step 1: SOURCE (Where Most People Fail)</div>
+            <h3>SOURCE &mdash; Find Money Printing Products Using AI</h3>
+            <ul>
+              <li>How our AI sourcing system finds profitable products in 60 minutes while manual sellers spend 10+ hours per week</li>
+              <li>The exact criteria we use to identify "money printing" markets that other sellers overlook completely</li>
+              <li>Why 90% of manual sellers fail &mdash; and how AI eliminates their biggest bottleneck</li>
+            </ul>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="ghl-step">
+            <div class="ghl-badge">Step 2: SHIP (The Silent Profit Killer)</div>
+            <h3>SHIP &mdash; Prep, Ship, Never Touch a Product</h3>
+            <ul>
+              <li>How to access prep center networks that handle everything &mdash; you never touch inventory</li>
+              <li>The FBA shipping workflow that gets your products live in 7&ndash;14 days from purchase</li>
+              <li>Margin protection strategies that prevent the #1 silent profit killer new sellers face</li>
+            </ul>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="ghl-step">
+            <div class="ghl-badge">Step 3: SELL (Where the Money Is Made)</div>
+            <h3>SELL &mdash; Launch, Rank, Scale With the System</h3>
+            <ul>
+              <li>How to exploit Amazon's Honeymoon Period to rank new listings fast &mdash; without PPC</li>
+              <li>The organic velocity strategy that compounds sales week over week on autopilot</li>
+              <li>How to reinvest profits and scale from $1K to $10K+ months using the compound scaling framework</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <div style="display:flex;justify-content:center;margin-top:32px;">
+          <button onclick="openTypeform()" class="ghl-btn">Click Here To Save Your Seat &rarr;</button>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ========== 3. MEET YOUR HOST (moved before qualification) ========== -->
+  <!-- ========== 3. MEET YOUR HOST ========== -->
   <section class="ghl-section">
-    <div class="ghl-wrap ghl-section-card ghl-animate" style="max-width:900px;margin-left:auto;margin-right:auto;">
-      <div class="ghl-h2" style="text-align:center;margin-bottom:24px;">Meet Your Host... <span class="ghl-grad">Sabbo</span> &mdash; AllDayFBA</div>
+    <div class="ghl-wrap ghl-section-card" style="max-width:960px;margin-left:auto;margin-right:auto;">
+      <div class="ghl-h2" style="text-align:center;margin-bottom:24px;">Meet your host</div>
 
       <div class="ghl-host">
         <div class="ghl-host-left">
-          <img loading="lazy" src="https://storage.googleapis.com/msgsndr/ZPMdw3padKDXvshNxYui/media/69530f89ee1047344a3e1fcd.jpeg" alt="Sabbo Jean-Baptiste - AllDayFBA Founder" style="border-radius:16px;width:100%;object-fit:cover;">
+          <img loading="lazy" src="https://storage.googleapis.com/msgsndr/ZPMdw3padKDXvshNxYui/media/69530f89ee1047344a3e1fcd.jpeg" alt="Sabbo Jean-Baptiste - AllDayFBA Founder">
         </div>
 
         <div class="ghl-host-right">
-          <p style="font-size:15px;line-height:1.75;color:#374151;">
-            A few years ago, I was just another person trying to figure out how to make money online. I started Amazon FBA because I was tired of the 9-5 grind and wanted to build something real.
+          <h3><span class="ghl-grad">Sabbo &mdash; AllDayFBA</span> &mdash; Amazon Seller &amp; Founder of 24/7 Profits</h3>
+
+          <p>
+            I'm not a guru who stopped selling to teach. I'm an active Amazon seller who puts real capital on the line, manages real inventory, and deals with real risk &mdash; every single day.
           </p>
-          <p style="font-size:15px;line-height:1.75;color:#374151;">
-            Fast forward to today &mdash; I've built a multi-six-figure Amazon business, created AI-powered tools that find profitable products in minutes, and helped <strong style="color:var(--text);">over 700 students</strong> start and scale their own Amazon businesses.
+          <p>
+            I built the Source &rarr; Ship &rarr; Sell system because I needed it for my own business first. Then I watched it work for over 700 students &mdash; from complete beginners to experienced sellers who were stuck.
           </p>
-          <p style="font-size:15px;line-height:1.75;color:#374151;">
-            And now I have a new system using AI that makes it faster, more profitable, and more accessible than ever before.
-          </p>
-          <p style="font-size:15px;line-height:1.75;color:#374151;">
-            After this live training, you'll understand exactly how hundreds of my students are building $10K&ndash;$30K/month Amazon businesses &mdash; and how you can join them before it's too late.
-          </p>
-          <p style="font-size:15px;line-height:1.75;color:#374151;font-weight:700;">
-            Register for the free class below and I'll see you soon!
+          <p>
+            On this training, I'll show you exactly how we use AI to find profitable products faster than anyone sourcing manually, and how the system scales to $10K&ndash;$30K months without you touching a single product.
           </p>
 
-          <div style="margin-top:20px;">
-            <button onclick="openTypeform()" class="ghl-btn">Click Here To Save Your Seat &rarr;</button>
-          </div>
+          <p style="font-weight:700;color:#ffffff;margin-top:8px;">What I've helped sellers do:</p>
+          <ul>
+            <li>Go from zero to $10K+ months in 90 days or less</li>
+            <li>Scale past $30K/month without paid ads</li>
+            <li>Build real asset businesses &mdash; not side hustles</li>
+          </ul>
+
+          <p style="font-weight:700;color:#ffffff;margin-top:16px;">What you'll learn in this training:</p>
+          <ul>
+            <li>The AI sourcing system that replaces 10+ hours of manual work</li>
+            <li>How to access $10K&ndash;$70K in business credit to fund inventory</li>
+            <li>The compound scaling framework to go from first sale to five figures</li>
+          </ul>
+
+          <p style="margin-top:16px;"><span style="color:#EF4444;font-weight:900;">Register for the free class below and I'll see you soon!</span></p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ========== 4. THIS IS FOR YOU / NOT FOR YOU ========== -->
+  <!-- ========== 4. THIS IS / NOT FOR YOU ========== -->
   <section class="ghl-section">
-    <div class="ghl-wrap ghl-animate">
+    <div class="ghl-wrap ghl-section-card">
+      <div class="ghl-h2" style="text-align:center;margin-bottom:8px;">Is This Training Right For You?</div>
+      <hr class="ghl-divider">
+
       <div class="ghl-qualify-grid">
 
         <!-- For You -->
         <div class="ghl-qualify-col ghl-for">
-          <h3>This IS For You If:</h3>
+          <div class="ghl-badge" style="background:rgba(16,185,129,.12);color:#34D399;">THIS IS FOR YOU</div>
+          <h3>This training IS for you if:</h3>
           <ul class="ghl-qualify-list">
             <li>
               <span class="ghl-qualify-icon ghl-check">&#10003;</span>
-              <span>You have $5K&ndash;$20K+ available to invest in inventory</span>
+              <span>You have $5K&ndash;$20K+ to invest in inventory (or access to business credit)</span>
             </li>
             <li>
               <span class="ghl-qualify-icon ghl-check">&#10003;</span>
-              <span>You can dedicate 10&ndash;20 hours per week</span>
+              <span>You can dedicate 10&ndash;20 hours per week to building a real business</span>
             </li>
             <li>
               <span class="ghl-qualify-icon ghl-check">&#10003;</span>
-              <span>You're coachable and will follow a proven system</span>
+              <span>You're coachable, action-oriented, and ready to follow a proven system</span>
             </li>
             <li>
               <span class="ghl-qualify-icon ghl-check">&#10003;</span>
-              <span>You want to build a real asset, not a get-rich-quick scheme</span>
+              <span>You want to build a real income-generating asset &mdash; not a get-rich-quick scheme</span>
+            </li>
+            <li>
+              <span class="ghl-qualify-icon ghl-check">&#10003;</span>
+              <span>You're tired of watching others win on Amazon while you sit on the sideline</span>
             </li>
           </ul>
         </div>
 
         <!-- Not For You -->
         <div class="ghl-qualify-col ghl-not">
-          <h3>This Is NOT For You If:</h3>
+          <div class="ghl-badge" style="background:rgba(239,68,68,.12);color:#F87171;">THIS IS NOT FOR YOU</div>
+          <h3>This training is NOT for you if:</h3>
           <ul class="ghl-qualify-list">
             <li>
               <span class="ghl-qualify-icon ghl-x">&#10007;</span>
-              <span>You have less than $3,000 in total capital</span>
+              <span>You're looking for a "passive income" magic button with zero effort</span>
             </li>
             <li>
               <span class="ghl-qualify-icon ghl-x">&#10007;</span>
-              <span>You want passive income with zero effort</span>
+              <span>You have zero capital and no willingness to invest in yourself</span>
             </li>
             <li>
               <span class="ghl-qualify-icon ghl-x">&#10007;</span>
-              <span>You're not willing to follow coaching</span>
+              <span>You're not willing to put in 10+ hours per week consistently</span>
             </li>
             <li>
               <span class="ghl-qualify-icon ghl-x">&#10007;</span>
-              <span>You expect results without doing the work</span>
+              <span>You think watching a training = making money (execution is everything)</span>
+            </li>
+            <li>
+              <span class="ghl-qualify-icon ghl-x">&#10007;</span>
+              <span>You've already given up on building something real for yourself</span>
             </li>
           </ul>
         </div>
@@ -1066,76 +1458,241 @@
     </div>
   </section>
 
-  <!-- ========== 5. STUDENT RESULTS ========== -->
+  <!-- ========== 4B. SHOW UP VS MISS OUT ========== -->
   <section class="ghl-section">
-    <div class="ghl-wrap ghl-animate">
-      <div class="ghl-h2" style="text-align:center;">Don't Just Take My Word For It</div>
-      <p class="ghl-p" style="text-align:center;max-width:680px;margin-left:auto;margin-right:auto;">
-        Here Are Some of the Results Our Students Are Getting...
-      </p>
+    <div class="ghl-wrap ghl-section-card">
+      <div class="ghl-h2" style="text-align:center;margin-bottom:8px;">Show Up vs. Miss Out</div>
+      <hr class="ghl-divider">
 
-      <div class="ghl-results-grid" style="grid-template-columns:repeat(3,1fr);gap:16px;">
-        <div class="ghl-result-card" style="padding:0;overflow:hidden;border-radius:12px;">
-          <img src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17136121/file/8a0e7e26ed877659ef37accde78aede6.png" alt="Brandon - $234K year" style="width:100%;display:block;">
+      <div class="ghl-showup-grid">
+
+        <!-- Show Up (Green) -->
+        <div class="ghl-step ghl-step-green">
+          <div class="ghl-badge" style="background:rgba(16,185,129,.12);color:#34D399;">IF YOU SHOW UP</div>
+          <h3 style="color:var(--green);">What You Get If You Show Up:</h3>
+          <ul>
+            <li>The exact AI sourcing system our students use to find products in 60 minutes</li>
+            <li>The funding playbook to access $10K-$70K in business credit</li>
+            <li>The 3-step Source &rarr; Ship &rarr; Sell framework broken down live</li>
+            <li>Real student walkthroughs with actual numbers</li>
+            <li>A live Q&amp;A where I answer your specific questions</li>
+            <li>A surprise bonus only for live attendees</li>
+          </ul>
         </div>
-        <div class="ghl-result-card" style="padding:0;overflow:hidden;border-radius:12px;">
-          <img src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17136120/file/1f4dae2357e6ed937df2d8a33b3c14c7.png" alt="Jeff - $188K" style="width:100%;display:block;">
+
+        <!-- Miss Out (Red) -->
+        <div class="ghl-step ghl-step-red">
+          <div class="ghl-badge" style="background:rgba(239,68,68,.12);color:#F87171;">IF YOU SKIP THIS</div>
+          <h3 style="color:var(--red);">What You Miss If You Skip This Class:</h3>
+          <ul>
+            <li>You keep spending 10+ hours/week searching for products manually</li>
+            <li>You stay stuck wondering which products actually make money</li>
+            <li>You miss the funding strategies most sellers never learn</li>
+            <li>You keep buying $500 courses that teach theory, not systems</li>
+            <li>You start next month in the exact same position</li>
+          </ul>
         </div>
-        <div class="ghl-result-card" style="padding:0;overflow:hidden;border-radius:12px;">
-          <img src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17136118/file/783c0047ba8ba7bb594c5d6c93e3e534.png" alt="Winston - $54K month" style="width:100%;display:block;">
-        </div>
-        <div class="ghl-result-card" style="padding:0;overflow:hidden;border-radius:12px;">
-          <img src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17136122/file/7fa034019bda579f4001de6ae44e6b79.png" alt="Diaz - $52K in 9 days" style="width:100%;display:block;">
-        </div>
-        <div class="ghl-result-card" style="padding:0;overflow:hidden;border-radius:12px;">
-          <img src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/3039304/file/e8b8f2b5ac49d23a4b91029fe29740cd.png" alt="Xavier - $11K first week" style="width:100%;display:block;">
-        </div>
-        <div class="ghl-result-card" style="padding:0;overflow:hidden;border-radius:12px;">
-          <img src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17136119/file/10963a37add08191d7232d882fe63c05.png" alt="Nico - $50K month" style="width:100%;display:block;">
-        </div>
-        <div class="ghl-result-card" style="padding:0;overflow:hidden;border-radius:12px;">
-          <img src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17461953/file/fc0c6961522048cf41f2d22f1d1bdca8.png" alt="Isaac - $44K day" style="width:100%;display:block;">
-        </div>
-        <div class="ghl-result-card" style="padding:0;overflow:hidden;border-radius:12px;">
-          <img src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/16788324/file/3d75e46d3cfcbd4066bdf1ed4dd62e84.png" alt="Gabe - $8K first 30 days" style="width:100%;display:block;">
-        </div>
-        <div class="ghl-result-card" style="padding:0;overflow:hidden;border-radius:12px;">
-          <img src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/9607714/file/b94dc5de9d019191867d4f077d860687.png" alt="Raf - $4K day" style="width:100%;display:block;">
-        </div>
+
       </div>
 
-      <!-- Extra row -->
-      <div class="ghl-results-grid" style="grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px;">
-        <div class="ghl-result-card" style="padding:0;overflow:hidden;border-radius:12px;">
-          <img src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/9607708/file/5a31f363d4e6f0c9f2047ecf99e5921e.png" alt="Grace" style="width:100%;display:block;">
-        </div>
-        <div class="ghl-result-card" style="padding:0;overflow:hidden;border-radius:12px;">
-          <img src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/9607712/file/68a258507c7d436449acd2a378895265.png" alt="Talha - $1K days" style="width:100%;display:block;">
-        </div>
-        <div class="ghl-result-card" style="padding:0;overflow:hidden;border-radius:12px;">
-          <img src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17136117/file/9e0e9b6e47fffb70c0ea85d5e4af69b3.png" alt="Ashar - $7K month two" style="width:100%;display:block;">
-        </div>
+      <div style="display:flex;justify-content:center;margin-top:32px;">
+        <button onclick="openTypeform()" class="ghl-btn">Click Here To Save Your Seat &rarr;</button>
       </div>
-
-      <p style="text-align:center;font-size:11px;color:var(--muted2);margin-top:20px;max-width:600px;margin-left:auto;margin-right:auto;">
-        Results are not typical or guaranteed. Individual results vary.
-      </p>
     </div>
   </section>
 
-  <!-- ========== 6. FINAL CTA ========== -->
+  <!-- ========== 5. TESTIMONIALS ========== -->
   <section class="ghl-section">
-    <div class="ghl-wrap ghl-final-cta ghl-animate">
-      <h2>Are You Ready?</h2>
-      <p>This Live Training Is 100% FREE! Register Today.</p>
+    <div class="ghl-wrap">
+      <div class="ghl-section-card">
+        <div class="ghl-h2" style="text-align:center;">Real Results From Real Members</div>
+        <p class="ghl-p" style="text-align:center;max-width:680px;margin-left:auto;margin-right:auto;">
+          Join hundreds of operators building sustainable Amazon businesses
+        </p>
+
+        <div class="ghl-testimonials">
+
+          <!-- Brandon -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17136121/file/8a0e7e26ed877659ef37accde78aede6.png" alt="Brandon 234K year">
+            <figcaption><strong>Brandon:</strong> $234K in 12 months; December at $48K. 2025 target: $500K+.</figcaption>
+          </figure>
+
+          <!-- Jeff -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17136120/file/1f4dae2357e6ed937df2d8a33b3c14c7.png" alt="Jeff 188K under 12 months">
+            <figcaption><strong>Jeff:</strong> $188K in under 12 months &mdash; all FBM, no VA, no warehouse.</figcaption>
+          </figure>
+
+          <!-- Winston -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17136118/file/783c0047ba8ba7bb594c5d6c93e3e534.png" alt="Winston 54K month">
+            <figcaption><strong>Winston:</strong> $54K month after a few months on the system.</figcaption>
+          </figure>
+
+          <!-- Diaz -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17136122/file/7fa034019bda579f4001de6ae44e6b79.png" alt="Diaz 52K in 9 days">
+            <figcaption><strong>Diaz:</strong> $52K in 9 days, with $28K+ clean profit.</figcaption>
+          </figure>
+
+          <!-- Nico -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17136119/file/10963a37add08191d7232d882fe63c05.png" alt="Nico 50K month">
+            <figcaption><strong>Nico:</strong> $50K month with $10K+ profit &mdash; no ads.</figcaption>
+          </figure>
+
+          <!-- Isaac -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17461953/file/fc0c6961522048cf41f2d22f1d1bdca8.png" alt="Isaac 44K day">
+            <figcaption><strong>Isaac:</strong> $44K day using fast-turn criteria + supplier plays.</figcaption>
+          </figure>
+
+          <!-- 20K day -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/9607717/file/2fa63b8bd982de6f9dedc456a0be47eb.jpg" alt="20K day">
+            <figcaption><strong>20K day (Nov):</strong> stacking velocity without ADs.</figcaption>
+          </figure>
+
+          <!-- Xavier -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/3039304/file/e8b8f2b5ac49d23a4b91029fe29740cd.png" alt="Xavier 11K first week">
+            <figcaption><strong>Xavier:</strong> $11K his first week on Amazon.</figcaption>
+          </figure>
+
+          <!-- Tiny -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17136374/file/5b01188f4bcc1e7c85496bf9605a0ee1.png" alt="Tiny five figures">
+            <figcaption><strong>Tiny:</strong> Broke into 5 figures working with us.</figcaption>
+          </figure>
+
+          <!-- Darin -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17136375/file/978497ce710eb1182f2b822fe0960cec.png" alt="Darin five figures plus">
+            <figcaption><strong>Darin:</strong> From zero to 5 figs+ with the framework.</figcaption>
+          </figure>
+
+          <!-- Gabe -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/16788324/file/3d75e46d3cfcbd4066bdf1ed4dd62e84.png" alt="Gabe 8K in 30 days">
+            <figcaption><strong>Gabe:</strong> First $8K in 30 days &mdash; beginner momentum.</figcaption>
+          </figure>
+
+          <!-- Ashar -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/17136117/file/9e0e9b6e47fffb70c0ea85d5e4af69b3.png" alt="Ashar 7K second month">
+            <figcaption><strong>Ashar:</strong> $7K by month two.</figcaption>
+          </figure>
+
+          <!-- Raf -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/9607714/file/b94dc5de9d019191867d4f077d860687.png" alt="Raf 4K day">
+            <figcaption><strong>Raf (age 15):</strong> $4K day two weeks after starting.</figcaption>
+          </figure>
+
+          <!-- Talha -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/9607712/file/68a258507c7d436449acd2a378895265.png" alt="Talha first sale to 1K days">
+            <figcaption><strong>Talha:</strong> From first sale to consistent $1K days.</figcaption>
+          </figure>
+
+          <!-- Daily wins -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/9607707/file/dc1c2b079119f1402e87bcbf71691686.png" alt="Daily wins stacking">
+            <figcaption>Daily wins stacking &mdash; consistent profitable days with the system.</figcaption>
+          </figure>
+
+          <!-- Grace -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/9607708/file/5a31f363d4e6f0c9f2047ecf99e5921e.png" alt="Grace traction">
+            <figcaption><strong>Grace:</strong> Finally gained traction after 2 years trying solo.</figcaption>
+          </figure>
+
+          <!-- Blaise -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/9607710/file/47cb5c094cd5f50e6e5f53bb06cc033d.png" alt="Blaise belief">
+            <figcaption><strong>Blaise:</strong> Realized making money online is real &mdash; now scaling.</figcaption>
+          </figure>
+
+          <!-- DFY products -->
+          <figure class="ghl-t-card">
+            <img loading="lazy" src="https://statics.myclickfunnels.com/workspace/jwXqzk/image/2532028/file/1e28266d67c74a1391999d5c64956312.png" alt="DFY products">
+            <figcaption>We even drop <strong>DFY products</strong> so you can win on autopilot.</figcaption>
+          </figure>
+
+        </div>
+
+        <p style="text-align:center;font-size:11px;color:var(--muted2);margin-top:20px;max-width:600px;margin-left:auto;margin-right:auto;">
+          Results are not typical or guaranteed. Individual results vary.
+        </p>
+
+        <div style="display:flex;justify-content:center;margin-top:28px;">
+          <button onclick="openTypeform()" class="ghl-btn">Click Here To Save Your Seat &rarr;</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 6. FAQ ========== -->
+  <section class="ghl-section">
+    <div class="ghl-wrap ghl-section-card">
+      <div class="ghl-h2" style="text-align:center;margin-bottom:24px;">Frequently Asked Questions</div>
+
+      <details class="ghl-details">
+        <summary class="ghl-summary">Is this really free?</summary>
+        <p>Yes, 100% free. No credit card required. This is a live training where I teach you the Source &rarr; Ship &rarr; Sell system and how AI is changing the Amazon game. Just register and show up.</p>
+      </details>
+
+      <details class="ghl-details">
+        <summary class="ghl-summary">Who is this training for?</summary>
+        <p>Anyone who wants to build a real Amazon FBA business &mdash; whether you're a complete beginner or an existing seller looking to scale with AI. If you have $5K&ndash;$20K to invest in inventory and 10&ndash;20 hours a week, this is built for you.</p>
+      </details>
+
+      <details class="ghl-details">
+        <summary class="ghl-summary">Is this beginner-friendly?</summary>
+        <p>Absolutely. The training walks you through everything step by step. No prior Amazon or e-commerce experience needed. If you can follow instructions, you can do this.</p>
+      </details>
+
+      <details class="ghl-details">
+        <summary class="ghl-summary">How do I attend?</summary>
+        <p>After you register, you'll receive an email with the live training link. The class is on Thursday, March 27th at 8PM EST. Show up live &mdash; there will be no replay.</p>
+      </details>
+
+      <details class="ghl-details">
+        <summary class="ghl-summary">Do I need money to start?</summary>
+        <p>We recommend having $5K-$20K in capital, but I'll show you how to access $10K-$70K in business credit &mdash; even if you're starting from scratch.</p>
+      </details>
+
+      <details class="ghl-details">
+        <summary class="ghl-summary">Is Amazon FBA saturated?</summary>
+        <p>For manual sellers using 2020 strategies? Yes. For sellers using AI to find products others can't see? The opportunity has never been bigger.</p>
+      </details>
+
+      <details class="ghl-details">
+        <summary class="ghl-summary">What if I can't make it live?</summary>
+        <p>You should make every effort to attend live &mdash; that's where the magic happens. Live attendees get bonuses that replay watchers don't.</p>
+      </details>
+
+      <details class="ghl-details">
+        <summary class="ghl-summary">How is this different from other Amazon courses?</summary>
+        <p>This isn't a course. It's a live training where I break down the actual system I use. No fluff. No recycled YouTube advice. And I take questions live.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- ========== 7. FINAL CTA ========== -->
+  <section class="ghl-section">
+    <div class="ghl-wrap ghl-final-cta">
+      <h2>Reserve your seat for the live training</h2>
+      <p>This free class is limited to 100 live attendees. Register now to secure your spot before it fills up.</p>
       <button onclick="openTypeform()" class="ghl-btn">Click Here To Save Your Seat &rarr;</button>
-      <p style="margin-top:16px;font-size:15px;color:var(--muted);font-weight:700;">
-        Thursday, March 27th, 2026 &mdash; 8PM EST
+      <p class="ghl-mini" style="display:block;text-align:center;margin-top:16px;font-size:15px;font-weight:700;">
+        Thursday, March 27th &mdash; 8PM EST
       </p>
     </div>
   </section>
 
-  <!-- ========== 7. DISCLAIMER FOOTER ========== -->
+  <!-- ========== 8. FOOTER ========== -->
   <footer class="ghl-footer">
     <div class="ghl-wrap">
       <p class="ghl-disclaimer">
@@ -1157,17 +1714,13 @@
 <!-- ========== SCRIPTS ========== -->
 <script>
 (function() {
-  // === COUNTDOWN TO THURSDAY MARCH 27, 2026 8PM EST (HARDCODED) ===
-  function getWebinarTarget() {
-    // Thursday, March 27, 2026 at 8:00 PM EST = 2026-03-28T01:00:00Z (UTC)
-    // EST is UTC-5, so 8PM EST = 1AM UTC next day
-    return new Date(Date.UTC(2026, 2, 28, 1, 0, 0));
-  }
+  // === COUNTDOWN TO THURSDAY MARCH 27, 2026 8PM EST ===
+  // EST is UTC-5, so 8PM EST = 1AM UTC next day (March 28)
+  var TARGET = new Date(Date.UTC(2026, 2, 28, 1, 0, 0));
 
   function updateCountdown() {
     var now = new Date();
-    var target = getWebinarTarget();
-    var diff = target - now;
+    var diff = TARGET - now;
 
     if (diff <= 0) {
       document.getElementById('ghlDays').textContent = '00';
@@ -1194,26 +1747,6 @@
   // Set current year
   var yearEl = document.getElementById('ghlYear');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
-
-  // === SCROLL ANIMATION OBSERVER ===
-  var animateElements = document.querySelectorAll('#ghl-webinar-wrapper .ghl-animate');
-
-  var observerOptions = {
-    root: null,
-    rootMargin: '0px 0px -80px 0px',
-    threshold: 0.1
-  };
-
-  var observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('ghl-visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, observerOptions);
-
-  animateElements.forEach(function(el) { observer.observe(el); });
 })();
 
 // === TYPEFORM MODAL ===
