@@ -11,7 +11,7 @@ import time
 import uuid
 from datetime import datetime
 from pathlib import Path
-from flask import Flask, render_template, request, jsonify, Response, stream_with_context
+from flask import Flask, render_template, request, jsonify, Response, stream_with_context, redirect
 from flask_cors import CORS
 
 # Lazy imports for modules with heavy deps (playwright, etc.)
@@ -774,6 +774,38 @@ def _parse_proposal_file(filepath):
 @app.route("/group-call")
 def group_call():
     return render_template("group-call.html")
+
+
+# ── Webinar Funnel Routes ──────────────────────────────────────────────────────
+
+@app.route("/webinar")
+def webinar_redirect():
+    return redirect("/webinar/register")
+
+
+@app.route("/webinar/register")
+def webinar_register():
+    return render_template("webinar-registration.html")
+
+
+@app.route("/webinar/thankyou")
+def webinar_thankyou():
+    return render_template("webinar-thankyou.html")
+
+
+@app.route("/webinar/replay")
+def webinar_replay():
+    return render_template("webinar-replay.html")
+
+
+@app.route("/webinar/apply")
+def webinar_apply():
+    return render_template("webinar-application.html")
+
+
+@app.route("/webinar/slides")
+def webinar_slides():
+    return render_template("webinar-slides.html")
 
 
 @app.route("/dashboard")

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply for a Strategy Call | 24/7 Profits</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #1A0A2E; --surface: #231540; --accent: #6B2FA0; --accent-light: #9B59B6;
+            --gold: #FFD700; --gold-dark: #B8860B; --text: #FFFFFF; --text-muted: #B794E0;
+            --text-dim: #8B7AAD; --green: #4ADE80; --red: #FF6B6B;
+        }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(180deg, var(--bg) 0%, #0d0618 100%);
+            color: var(--text); min-height: 100vh;
+        }
+
+        .container { max-width: 600px; margin: 0 auto; padding: 3rem 1.5rem; }
+
+        .header { text-align: center; margin-bottom: 2.5rem; }
+        .header-tag {
+            display: inline-block; padding: 6px 16px; border-radius: 20px;
+            background: rgba(107,47,160,0.2); border: 1px solid rgba(107,47,160,0.3);
+            color: var(--accent-light); font-size: 0.7rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1.5rem;
+        }
+        .header h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 900; margin-bottom: 0.75rem; letter-spacing: -1px; }
+        .header p { font-size: 1rem; color: var(--text-muted); line-height: 1.5; }
+        .header .spots {
+            display: inline-block; margin-top: 1rem; padding: 8px 16px;
+            background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.3);
+            border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: var(--red);
+        }
+
+        /* Form */
+        .form-card {
+            background: var(--surface); border: 1px solid rgba(107,47,160,0.2);
+            border-radius: 16px; padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .progress-bar {
+            height: 4px; background: rgba(107,47,160,0.2); border-radius: 4px;
+            margin-bottom: 2rem; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            border-radius: 4px; transition: width 0.3s;
+        }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label {
+            display: block; font-size: 0.85rem; font-weight: 600;
+            color: var(--text); margin-bottom: 0.5rem;
+        }
+        .form-group .hint { font-size: 0.75rem; color: var(--text-dim); margin-top: 4px; }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 14px 16px; border-radius: 10px;
+            border: 1px solid rgba(107,47,160,0.2); background: rgba(0,0,0,0.2);
+            color: var(--text); font-size: 1rem; font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: var(--accent-light);
+        }
+        .form-group select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239B59B6' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 14px center; background-size: 16px; padding-right: 40px; }
+        .form-group select option { background: var(--surface); color: var(--text); }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+
+        .radio-group { display: flex; flex-direction: column; gap: 8px; }
+        .radio-option {
+            display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+            border-radius: 10px; border: 1px solid rgba(107,47,160,0.15);
+            background: rgba(0,0,0,0.1); cursor: pointer; transition: all 0.2s;
+        }
+        .radio-option:hover { border-color: rgba(107,47,160,0.4); }
+        .radio-option input[type="radio"] { accent-color: var(--accent); width: 18px; height: 18px; }
+        .radio-option span { font-size: 0.95rem; }
+
+        .form-submit {
+            width: 100%; padding: 16px; margin-top: 0.5rem;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            color: #1A0A2E; font-size: 1.1rem; font-weight: 800;
+            border: none; border-radius: 10px; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 1px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .form-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,215,0,0.3); }
+
+        .form-footer { text-align: center; margin-top: 1.25rem; font-size: 0.75rem; color: var(--text-dim); }
+
+        /* Trust badges */
+        .trust { display: flex; justify-content: center; gap: 2rem; margin-top: 2rem; flex-wrap: wrap; }
+        .trust-item { text-align: center; }
+        .trust-item .icon { font-size: 1.5rem; margin-bottom: 4px; }
+        .trust-item .label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+        .bg-orb { position: fixed; border-radius: 50%; filter: blur(120px); opacity: 0.06; pointer-events: none; z-index: -1; }
+
+        @media (max-width: 480px) {
+            .form-card { padding: 1.5rem; }
+            .trust { gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-orb" style="width: 500px; height: 500px; background: #6B2FA0; top: -100px; right: -100px;"></div>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-tag">24/7 Profits Inner Circle</div>
+            <h1>Apply for a Strategy Call</h1>
+            <p>Takes 2 minutes. This isn't a commitment &mdash; it's a conversation to see if we're a fit.</p>
+            <div class="spots">15 spots per month &bull; Personalized coaching</div>
+        </div>
+
+        <div class="form-card">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <form id="appForm" onsubmit="handleAppSubmit(event)">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="full_name" placeholder="Your full name" required oninput="updateProgress()">
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" placeholder="your@email.com" required oninput="updateProgress()">
+                </div>
+
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" name="phone" placeholder="(555) 123-4567" required oninput="updateProgress()">
+                    <div class="hint">We'll text you a confirmation, not spam.</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Current Amazon Experience</label>
+                    <select name="experience" required onchange="updateProgress(); toggleRevenue()">
+                        <option value="" disabled selected>Select one</option>
+                        <option value="none">Complete beginner &mdash; haven't started yet</option>
+                        <option value="account_only">I have an Amazon account but haven't sold</option>
+                        <option value="under_5k">Selling but under $5K/month</option>
+                        <option value="5k_20k">Selling $5K&ndash;$20K/month</option>
+                        <option value="20k_plus">Selling $20K+/month</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="revenueGroup" style="display: none;">
+                    <label>Current Monthly Revenue</label>
+                    <input type="text" name="revenue" placeholder="e.g., $8,000/month" oninput="updateProgress()">
+                </div>
+
+                <div class="form-group">
+                    <label>Available Capital to Invest</label>
+                    <select name="capital" required onchange="updateProgress()">
+                        <option value="" disabled selected>Select one</option>
+                        <option value="under_3k">Under $3,000</option>
+                        <option value="3k_5k">$3,000 &ndash; $5,000</option>
+                        <option value="5k_10k">$5,000 &ndash; $10,000</option>
+                        <option value="10k_20k">$10,000 &ndash; $20,000</option>
+                        <option value="20k_plus">$20,000+</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>What's your biggest challenge or goal with Amazon?</label>
+                    <textarea name="challenge" placeholder="Tell us what you're struggling with or hoping to achieve..." required oninput="updateProgress()" maxlength="500"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>How did you hear about us?</label>
+                    <select name="source" onchange="updateProgress()">
+                        <option value="" disabled selected>Select one</option>
+                        <option value="webinar">Webinar</option>
+                        <option value="youtube">YouTube</option>
+                        <option value="instagram">Instagram</option>
+                        <option value="tiktok">TikTok</option>
+                        <option value="referral">Friend / Referral</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Are you ready to invest in yourself and start within 30 days?</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="readiness" value="yes" required onchange="updateProgress()">
+                            <span>Yes &mdash; I'm ready to start</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="readiness" value="maybe" onchange="updateProgress()">
+                            <span>Maybe &mdash; I have questions</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="readiness" value="exploring" onchange="updateProgress()">
+                            <span>Just exploring</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="form-submit">Submit Application &rarr;</button>
+            </form>
+
+            <div class="form-footer">Your information is 100% private. This is not a commitment &mdash; just a conversation.</div>
+        </div>
+
+        <!-- Trust -->
+        <div class="trust">
+            <div class="trust-item">
+                <div class="icon">&#128274;</div>
+                <div class="label">100% Private</div>
+            </div>
+            <div class="trust-item">
+                <div class="icon">&#128176;</div>
+                <div class="label">$10K Guarantee</div>
+            </div>
+            <div class="trust-item">
+                <div class="icon">&#128101;</div>
+                <div class="label">700+ Students</div>
+            </div>
+            <div class="trust-item">
+                <div class="icon">&#9201;</div>
+                <div class="label">2 Min to Apply</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateProgress() {
+            const form = document.getElementById('appForm');
+            const fields = form.querySelectorAll('[required]');
+            let filled = 0;
+            fields.forEach(f => {
+                if (f.type === 'radio') {
+                    const name = f.name;
+                    if (form.querySelector(`input[name="${name}"]:checked`)) filled++;
+                } else if (f.value && f.value.trim()) {
+                    filled++;
+                }
+            });
+            // Deduplicate radio groups
+            const radioNames = new Set();
+            form.querySelectorAll('input[type="radio"][required]').forEach(r => radioNames.add(r.name));
+            const totalRequired = fields.length - (form.querySelectorAll('input[type="radio"][required]').length - radioNames.size);
+            const pct = Math.round((filled / totalRequired) * 100);
+            document.getElementById('progressFill').style.width = pct + '%';
+        }
+
+        function toggleRevenue() {
+            const exp = document.querySelector('[name="experience"]').value;
+            const revGroup = document.getElementById('revenueGroup');
+            if (['under_5k', '5k_20k', '20k_plus'].includes(exp)) {
+                revGroup.style.display = 'block';
+            } else {
+                revGroup.style.display = 'none';
+            }
+        }
+
+        function handleAppSubmit(e) {
+            e.preventDefault();
+            const capital = document.querySelector('[name="capital"]').value;
+
+            // Qualification routing
+            if (capital === 'under_3k') {
+                // Disqualified - redirect to free resources
+                window.location.href = '/webinar/thankyou?status=resources';
+            } else {
+                // Qualified or warm - redirect to calendar booking
+                window.location.href = '/webinar/thankyou?status=qualified';
+            }
+        }
+    </script>
+</body>
+</html>

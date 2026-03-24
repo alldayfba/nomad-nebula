@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Replay: AI Amazon Scaling Masterclass | 24/7 Profits</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #1A0A2E; --surface: #231540; --accent: #6B2FA0; --accent-light: #9B59B6;
+            --gold: #FFD700; --gold-dark: #B8860B; --text: #FFFFFF; --text-muted: #B794E0;
+            --text-dim: #8B7AAD; --green: #4ADE80; --red: #FF6B6B;
+        }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(180deg, var(--bg) 0%, #0d0618 100%);
+            color: var(--text); min-height: 100vh; padding-top: 48px;
+        }
+
+        /* Scarcity Bar */
+        .scarcity-bar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+            height: 48px; display: flex; align-items: center; justify-content: center; gap: 16px;
+            background: linear-gradient(90deg, #c0392b, #e74c3c);
+            font-size: 0.85rem; font-weight: 700; color: white;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .timer-box {
+            background: rgba(0,0,0,0.25); padding: 4px 12px; border-radius: 6px;
+            font-family: monospace; font-size: 0.9rem; letter-spacing: 2px;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem; }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; text-align: center;
+            margin-bottom: 0.75rem; letter-spacing: -1px;
+        }
+        .sub { font-size: 1.1rem; color: var(--text-muted); text-align: center; margin-bottom: 2.5rem; line-height: 1.5; }
+
+        /* Video */
+        .video-container {
+            border-radius: 16px; overflow: hidden;
+            border: 1px solid rgba(107,47,160,0.3);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+            margin-bottom: 3rem;
+        }
+        .video-inner { aspect-ratio: 16/9; background: #000; }
+
+        /* CTA */
+        .cta-section { text-align: center; margin: 2rem 0; }
+        .cta-btn {
+            display: inline-block; padding: 1.25rem 3.5rem;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            color: #1A0A2E; font-size: 1.2rem; font-weight: 800;
+            border-radius: 12px; text-decoration: none;
+            text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 10px 40px rgba(255,215,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .cta-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 50px rgba(255,215,0,0.4); }
+        .cta-sub { margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted); }
+
+        /* Offer Summary */
+        .offer-card {
+            background: var(--surface); border: 1px solid rgba(107,47,160,0.2);
+            border-radius: 16px; padding: 2.5rem; margin: 3rem 0; max-width: 700px; margin-left: auto; margin-right: auto;
+        }
+        .offer-card h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 1.5rem; text-align: center; }
+        .offer-list { list-style: none; }
+        .offer-list li {
+            display: flex; gap: 12px; padding: 8px 0; font-size: 0.95rem;
+        }
+        .offer-check { color: var(--green); font-weight: 700; flex-shrink: 0; }
+        .offer-price {
+            text-align: center; margin-top: 1.5rem; padding-top: 1.5rem;
+            border-top: 1px solid rgba(107,47,160,0.15);
+        }
+        .price-old { font-size: 1.2rem; color: var(--text-dim); text-decoration: line-through; }
+        .price-new { font-size: 2.5rem; font-weight: 900; color: var(--gold); margin: 0.25rem 0; }
+        .price-plan { font-size: 0.9rem; color: var(--text-muted); }
+
+        /* Guarantee */
+        .guarantee {
+            border: 2px solid var(--gold); border-radius: 16px; padding: 2rem;
+            max-width: 700px; margin: 2rem auto; text-align: center;
+        }
+        .guarantee h4 { color: var(--gold); font-size: 1rem; font-weight: 700; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+        .guarantee p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
+
+        /* Bonuses */
+        .bonuses { max-width: 700px; margin: 2rem auto; }
+        .bonuses h3 { font-size: 1.1rem; font-weight: 700; text-align: center; margin-bottom: 1rem; color: var(--red); }
+        .bonus-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .bonus-item {
+            background: rgba(107,47,160,0.08); border: 1px solid rgba(107,47,160,0.15);
+            border-radius: 12px; padding: 1.25rem;
+        }
+        .bonus-item h5 { font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; }
+        .bonus-item .val { font-size: 0.8rem; color: var(--gold); font-weight: 600; }
+
+        .bg-orb { position: fixed; border-radius: 50%; filter: blur(120px); opacity: 0.06; pointer-events: none; z-index: -1; }
+
+        @media (max-width: 768px) {
+            .bonus-grid { grid-template-columns: 1fr; }
+            .scarcity-bar { font-size: 0.7rem; gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-orb" style="width: 500px; height: 500px; background: #6B2FA0; top: -100px; right: -100px;"></div>
+
+    <!-- Scarcity Bar -->
+    <div class="scarcity-bar">
+        <span>REPLAY EXPIRES IN:</span>
+        <span class="timer-box" id="countdown">48:00:00</span>
+        <span style="color: var(--gold);">WATCH NOW</span>
+    </div>
+
+    <div class="container">
+        <h1>AI Amazon Scaling Masterclass</h1>
+        <p class="sub">Watch the full training below &mdash; this replay expires in <strong style="color: var(--red);" id="expiryText">48 hours</strong>.</p>
+
+        <!-- Video Embed -->
+        <div class="video-container">
+            <div class="video-inner">
+                <!-- Replace with Wistia embed in production -->
+                <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:1.2rem;">
+                    Webinar Replay Video
+                </div>
+            </div>
+        </div>
+
+        <!-- Primary CTA -->
+        <div class="cta-section">
+            <a href="/webinar/apply" class="cta-btn">Apply Now &mdash; Book Your Strategy Call</a>
+            <p class="cta-sub">15 spots per month &bull; Free strategy call &bull; No commitment</p>
+        </div>
+
+        <!-- Offer Summary -->
+        <div class="offer-card">
+            <h3>What's Inside 24/7 Profits Inner Circle</h3>
+            <ul class="offer-list">
+                <li><span class="offer-check">&#10003;</span> 5 live coaching calls/week (2x with Sabbo + 3x specialist coaches)</li>
+                <li><span class="offer-check">&#10003;</span> Complete A-Z Amazon FBA course</li>
+                <li><span class="offer-check">&#10003;</span> AI-powered product discovery tool</li>
+                <li><span class="offer-check">&#10003;</span> Daily curated product leads</li>
+                <li><span class="offer-check">&#10003;</span> Ungating scripts &amp; templates</li>
+                <li><span class="offer-check">&#10003;</span> Prep center access</li>
+                <li><span class="offer-check">&#10003;</span> Funding systems ($10K&ndash;$70K+ business credit)</li>
+                <li><span class="offer-check">&#10003;</span> Private Discord (700+ sellers, 10-30 min response)</li>
+                <li><span class="offer-check">&#10003;</span> Bonus: Brand-direct income stream ($3K&ndash;$10K/mo additional)</li>
+            </ul>
+            <div class="offer-price">
+                <div class="price-old">$10,000</div>
+                <div class="price-new">$5,000</div>
+                <div class="price-plan">Or 6 payments of $997/mo &bull; No interest</div>
+            </div>
+        </div>
+
+        <!-- Webinar Bonuses -->
+        <div class="bonuses">
+            <h3>Webinar-Exclusive Bonuses (Expire With Replay)</h3>
+            <div class="bonus-grid">
+                <div class="bonus-item">
+                    <h5>1-on-1 Product Research Session</h5>
+                    <p style="font-size:0.8rem;color:var(--text-muted);">30 min with Sabbo &mdash; find your first product together</p>
+                    <div class="val">$500 Value</div>
+                </div>
+                <div class="bonus-item">
+                    <h5>AI Sourcing Tool Early Access</h5>
+                    <p style="font-size:0.8rem;color:var(--text-muted);">Beta access to the proprietary AI product finder</p>
+                    <div class="val">$297 Value</div>
+                </div>
+                <div class="bonus-item">
+                    <h5>Funding Blueprint</h5>
+                    <p style="font-size:0.8rem;color:var(--text-muted);">Step-by-step to unlock $10K&ndash;$70K in business credit</p>
+                    <div class="val">$197 Value</div>
+                </div>
+                <div class="bonus-item">
+                    <h5>First 10 Product Leads</h5>
+                    <p style="font-size:0.8rem;color:var(--text-muted);">Hand-picked by the team, delivered on day 1</p>
+                    <div class="val">$250 Value</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Guarantee -->
+        <div class="guarantee">
+            <h4>The 24/7 Profits Guarantee</h4>
+            <p>If you follow the system and don't generate $10,000 in revenue within 6 months, we extend your access and continue working with you &mdash; at no additional cost &mdash; until you do.</p>
+        </div>
+
+        <!-- Final CTA -->
+        <div class="cta-section" style="margin-top: 3rem;">
+            <a href="/webinar/apply" class="cta-btn">Apply Now &rarr;</a>
+            <p class="cta-sub">2-minute application &bull; Not a commitment &bull; Just a conversation</p>
+        </div>
+    </div>
+
+    <script>
+        // 48hr countdown from page load (in production, use server-side timestamp)
+        let replaySeconds = 48 * 60 * 60;
+        const countdownEl = document.getElementById('countdown');
+        const expiryEl = document.getElementById('expiryText');
+
+        function updateReplayTimer() {
+            if (replaySeconds <= 0) {
+                countdownEl.textContent = 'EXPIRED';
+                expiryEl.textContent = 'has expired';
+                return;
+            }
+            replaySeconds--;
+            const h = Math.floor(replaySeconds / 3600);
+            const m = Math.floor((replaySeconds % 3600) / 60);
+            const s = replaySeconds % 60;
+            countdownEl.textContent =
+                String(h).padStart(2, '0') + ':' +
+                String(m).padStart(2, '0') + ':' +
+                String(s).padStart(2, '0');
+        }
+        setInterval(updateReplayTimer, 1000);
+    </script>
+</body>
+</html>

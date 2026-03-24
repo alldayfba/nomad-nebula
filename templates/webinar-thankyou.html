@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You're In! | 24/7 Profits</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #1A0A2E; --surface: #231540; --accent: #6B2FA0; --accent-light: #9B59B6;
+            --gold: #FFD700; --text: #FFFFFF; --text-muted: #B794E0; --text-dim: #8B7AAD;
+            --green: #4ADE80;
+        }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(180deg, var(--bg) 0%, #0d0618 100%);
+            color: var(--text); min-height: 100vh;
+        }
+        .container { max-width: 650px; margin: 0 auto; padding: 4rem 1.5rem; text-align: center; }
+
+        .check-circle {
+            width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 2rem;
+            background: rgba(74,222,128,0.15); border: 2px solid var(--green);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px; color: var(--green);
+        }
+        h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; margin-bottom: 1rem; letter-spacing: -1px; }
+        .sub { font-size: 1.15rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 3rem; }
+
+        .details-card {
+            background: var(--surface); border: 1px solid rgba(107,47,160,0.2);
+            border-radius: 16px; padding: 2rem; margin-bottom: 2rem; text-align: left;
+        }
+        .details-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--gold); }
+        .detail-row {
+            display: flex; gap: 12px; padding: 10px 0;
+            border-bottom: 1px solid rgba(107,47,160,0.1); font-size: 1rem;
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-icon { font-size: 1.2rem; flex-shrink: 0; }
+        .detail-label { color: var(--text-muted); font-size: 0.85rem; }
+        .detail-value { font-weight: 600; }
+
+        .calendar-btns {
+            display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+        .cal-btn {
+            padding: 12px 24px; border-radius: 10px; font-size: 0.9rem; font-weight: 600;
+            border: 1px solid rgba(107,47,160,0.3); background: rgba(107,47,160,0.1);
+            color: var(--text); cursor: pointer; transition: all 0.3s;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .cal-btn:hover { background: rgba(107,47,160,0.25); border-color: var(--accent-light); }
+
+        .share-section {
+            background: var(--surface); border: 1px solid rgba(107,47,160,0.15);
+            border-radius: 16px; padding: 2rem; margin: 2rem 0;
+        }
+        .share-section h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .share-section p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem; }
+        .share-link {
+            display: flex; gap: 8px;
+        }
+        .share-link input {
+            flex: 1; padding: 10px 14px; border-radius: 8px;
+            border: 1px solid rgba(107,47,160,0.2); background: rgba(0,0,0,0.2);
+            color: var(--text); font-size: 0.85rem; font-family: inherit;
+        }
+        .copy-btn {
+            padding: 10px 20px; border-radius: 8px;
+            background: var(--accent); color: white; border: none;
+            font-size: 0.85rem; font-weight: 600; cursor: pointer;
+        }
+
+        .prep-section { margin: 3rem 0; text-align: left; }
+        .prep-section h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; text-align: center; }
+        .prep-list { list-style: none; }
+        .prep-list li {
+            display: flex; gap: 12px; padding: 12px 0;
+            border-bottom: 1px solid rgba(107,47,160,0.08);
+            font-size: 0.95rem; color: var(--text-muted);
+        }
+        .prep-num {
+            width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+            background: rgba(107,47,160,0.15); color: var(--accent-light);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700;
+        }
+
+        .bg-orb {
+            position: fixed; border-radius: 50%; filter: blur(120px);
+            opacity: 0.06; pointer-events: none; z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-orb" style="width: 500px; height: 500px; background: #6B2FA0; top: -100px; right: -100px;"></div>
+
+    <div class="container">
+        <div class="check-circle">&#10003;</div>
+        <h1>You're In!</h1>
+        <p class="sub">Your seat is saved for the <strong style="color: var(--text);">AI Amazon Scaling Masterclass</strong>. Here's everything you need to know.</p>
+
+        <!-- Event Details -->
+        <div class="details-card">
+            <h3>Event Details</h3>
+            <div class="detail-row">
+                <span class="detail-icon">&#128197;</span>
+                <div>
+                    <div class="detail-label">Date</div>
+                    <div class="detail-value" id="eventDate">Wednesday</div>
+                </div>
+            </div>
+            <div class="detail-row">
+                <span class="detail-icon">&#128336;</span>
+                <div>
+                    <div class="detail-label">Time</div>
+                    <div class="detail-value">8:00 PM Eastern Time</div>
+                </div>
+            </div>
+            <div class="detail-row">
+                <span class="detail-icon">&#9201;</span>
+                <div>
+                    <div class="detail-label">Duration</div>
+                    <div class="detail-value">~60 minutes (presentation + Q&A)</div>
+                </div>
+            </div>
+            <div class="detail-row">
+                <span class="detail-icon">&#128279;</span>
+                <div>
+                    <div class="detail-label">Where</div>
+                    <div class="detail-value">Link will be emailed 15 minutes before</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add to Calendar -->
+        <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Add to Your Calendar</h3>
+        <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">Don't miss it &mdash; add it now so you get a reminder.</p>
+        <div class="calendar-btns">
+            <a href="#" class="cal-btn" id="googleCal">&#128197; Google Calendar</a>
+            <a href="#" class="cal-btn" id="appleCal">&#127823; Apple Calendar</a>
+            <a href="#" class="cal-btn" id="outlookCal">&#128231; Outlook</a>
+        </div>
+
+        <!-- Share -->
+        <div class="share-section">
+            <h3>Know Someone Who Should See This?</h3>
+            <p>If you have a friend or partner thinking about Amazon FBA, invite them.</p>
+            <div class="share-link">
+                <input type="text" value="https://247profits.org/webinar/register" id="shareUrl" readonly>
+                <button class="copy-btn" onclick="copyLink()">Copy</button>
+            </div>
+        </div>
+
+        <!-- How to Prepare -->
+        <div class="prep-section">
+            <h3>How to Prepare</h3>
+            <ul class="prep-list">
+                <li>
+                    <span class="prep-num">1</span>
+                    <span>Know how much capital you have available to invest ($3K&ndash;$20K+)</span>
+                </li>
+                <li>
+                    <span class="prep-num">2</span>
+                    <span>Write down your #1 question about Amazon FBA or AI</span>
+                </li>
+                <li>
+                    <span class="prep-num">3</span>
+                    <span>Clear your schedule from 8:00&ndash;9:15 PM EST on Wednesday</span>
+                </li>
+                <li>
+                    <span class="prep-num">4</span>
+                    <span>If you have a partner or spouse who should hear this, invite them</span>
+                </li>
+            </ul>
+        </div>
+
+        <p style="font-size: 0.85rem; color: var(--text-dim); margin-top: 3rem;">
+            Questions? Reply to the confirmation email or DM @alldayfba on Instagram.
+        </p>
+    </div>
+
+    <script>
+        // Calculate next Wednesday date for display
+        function getNextWednesday() {
+            const now = new Date();
+            const day = now.getDay();
+            let daysUntil = (3 - day + 7) % 7;
+            if (daysUntil === 0 && now.getHours() >= 20) daysUntil = 7;
+            const target = new Date(now);
+            target.setDate(now.getDate() + daysUntil);
+            return target;
+        }
+
+        const wed = getNextWednesday();
+        const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+        document.getElementById('eventDate').textContent = wed.toLocaleDateString('en-US', options);
+
+        // Google Calendar link
+        const startISO = new Date(wed.getFullYear(), wed.getMonth(), wed.getDate(), 20, 0).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        const endISO = new Date(wed.getFullYear(), wed.getMonth(), wed.getDate(), 21, 15).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        document.getElementById('googleCal').href = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=AI+Amazon+Scaling+Masterclass&dates=${startISO}/${endISO}&details=Free+live+training+with+Sabbo+from+24/7+Profits.+Link+will+be+emailed+15+min+before.&sf=true`;
+
+        function copyLink() {
+            const input = document.getElementById('shareUrl');
+            input.select();
+            document.execCommand('copy');
+            const btn = document.querySelector('.copy-btn');
+            btn.textContent = 'Copied!';
+            setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+        }
+    </script>
+</body>
+</html>
