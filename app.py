@@ -785,7 +785,7 @@ def _parse_proposal_file(filepath):
 
 @app.route("/group-call")
 def group_call():
-    return render_template("group-call.html")
+    return render_template("ai-amazon-group-call-april.html")
 
 
 # ── Webinar Funnel Routes ──────────────────────────────────────────────────────
@@ -829,11 +829,6 @@ def webinar_exit():
 @app.route("/webinar/slides")
 def webinar_slides():
     return render_template("webinar-slides.html")
-
-@app.route("/group-call")
-def group_call_april():
-    return render_template("ai-amazon-group-call-april.html")
-
 
 @app.route("/dashboard")
 def dashboard():
