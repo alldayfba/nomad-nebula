@@ -691,25 +691,126 @@
   </div>
 </div>
 
-<!-- SLIDE 10: The Math -->
+<!-- SLIDE 10: The Photocopy Problem -->
 <div class="slide bg-red">
-  <span class="tag tag-red">Why This Matters</span>
-  <h2>AI alone is <span class="accent-red">90%</span> accurate per step</h2>
-  <div style="margin-top:30px; text-align:center">
-    <p style="font-size:28px; color:rgba(255,255,255,0.7)">5 steps in a row?</p>
-    <div class="big-number accent-red" style="font-size:100px; margin:20px 0">59%</div>
-    <p style="font-size:28px; color:rgba(255,255,255,0.7)">That's basically a coin flip.</p>
-  </div>
-  <div class="highlight-box" style="margin-top:30px; border-color:#ff4f6a; background:rgba(255,79,106,0.1); max-width:700px">
-    <p style="font-size:22px"><strong style="color:#fff">The fix:</strong> Push every repeatable step into code (100% reliable). Let the AI only handle the <em>thinking</em>.</p>
+  <span class="tag tag-red">The Problem</span>
+  <h2>AI is like making <span class="accent-red">photocopies<br>of photocopies</span></h2>
+  <p class="subtitle" style="margin-top:20px; max-width:800px">Each copy looks 90% as good as the last. Sounds fine... until you keep going.</p>
+  <div style="display:flex; align-items:center; gap:8px; margin-top:40px; flex-wrap:wrap; justify-content:center">
+    <div style="text-align:center; padding:16px 20px; background:rgba(255,255,255,0.08); border-radius:12px; min-width:90px">
+      <p style="font-size:14px; color:rgba(255,255,255,0.4); margin-bottom:6px">Copy 1</p>
+      <p style="font-size:36px; font-weight:900; color:#fff">90%</p>
+      <div style="width:100%; height:8px; background:rgba(255,255,255,0.1); border-radius:4px; margin-top:8px"><div style="width:90%; height:100%; background:#fff; border-radius:4px"></div></div>
+    </div>
+    <p style="font-size:24px; color:rgba(255,255,255,0.3)">&times;</p>
+    <div style="text-align:center; padding:16px 20px; background:rgba(255,255,255,0.06); border-radius:12px; min-width:90px">
+      <p style="font-size:14px; color:rgba(255,255,255,0.4); margin-bottom:6px">Copy 2</p>
+      <p style="font-size:36px; font-weight:900; color:rgba(255,255,255,0.85)">81%</p>
+      <div style="width:100%; height:8px; background:rgba(255,255,255,0.1); border-radius:4px; margin-top:8px"><div style="width:81%; height:100%; background:rgba(255,255,255,0.85); border-radius:4px"></div></div>
+    </div>
+    <p style="font-size:24px; color:rgba(255,255,255,0.3)">&times;</p>
+    <div style="text-align:center; padding:16px 20px; background:rgba(255,255,255,0.05); border-radius:12px; min-width:90px">
+      <p style="font-size:14px; color:rgba(255,255,255,0.4); margin-bottom:6px">Copy 3</p>
+      <p style="font-size:36px; font-weight:900; color:rgba(255,255,255,0.7)">73%</p>
+      <div style="width:100%; height:8px; background:rgba(255,255,255,0.1); border-radius:4px; margin-top:8px"><div style="width:73%; height:100%; background:rgba(255,255,255,0.7); border-radius:4px"></div></div>
+    </div>
+    <p style="font-size:24px; color:rgba(255,255,255,0.3)">&times;</p>
+    <div style="text-align:center; padding:16px 20px; background:rgba(255,255,255,0.04); border-radius:12px; min-width:90px">
+      <p style="font-size:14px; color:rgba(255,255,255,0.4); margin-bottom:6px">Copy 4</p>
+      <p style="font-size:36px; font-weight:900; color:rgba(255,255,255,0.55)">66%</p>
+      <div style="width:100%; height:8px; background:rgba(255,255,255,0.1); border-radius:4px; margin-top:8px"><div style="width:66%; height:100%; background:rgba(255,159,79,0.8); border-radius:4px"></div></div>
+    </div>
+    <p style="font-size:24px; color:rgba(255,255,255,0.3)">&times;</p>
+    <div style="text-align:center; padding:16px 20px; background:rgba(255,79,106,0.1); border:1px solid rgba(255,79,106,0.3); border-radius:12px; min-width:90px">
+      <p style="font-size:14px; color:rgba(255,79,106,0.6); margin-bottom:6px">Copy 5</p>
+      <p style="font-size:36px; font-weight:900; color:#ff4f6a">59%</p>
+      <div style="width:100%; height:8px; background:rgba(255,255,255,0.1); border-radius:4px; margin-top:8px"><div style="width:59%; height:100%; background:#ff4f6a; border-radius:4px"></div></div>
+    </div>
   </div>
 </div>
 
-<!-- SLIDE 11: AI decides, code does -->
+<!-- SLIDE 11: The Math -->
+<div class="slide bg-red">
+  <span class="tag tag-red">The Math</span>
+  <div style="text-align:center; margin-top:20px">
+    <p style="font-size:32px; font-weight:600; color:rgba(255,255,255,0.6); letter-spacing:2px">
+      <span style="color:#fff">.90</span> &times; <span style="color:#fff">.90</span> &times; <span style="color:#fff">.90</span> &times; <span style="color:#fff">.90</span> &times; <span style="color:#fff">.90</span>
+    </p>
+    <div style="margin:30px 0">
+      <p style="font-size:24px; color:rgba(255,255,255,0.3)">= </p>
+    </div>
+    <div class="big-number accent-red" style="font-size:140px; margin:0">59%</div>
+    <h2 style="margin-top:20px">That's a <span class="accent-red">coin flip</span>.</h2>
+  </div>
+  <p class="subtitle" style="margin-top:30px; max-width:700px">90% sounds great for one step. But real tasks have 5, 10, 20 steps. By step 10 you're at <strong style="color:#ff4f6a">35%</strong>. By step 20 &mdash; <strong style="color:#ff4f6a">12%</strong>. This is why "just use ChatGPT for everything" breaks on anything real.</p>
+</div>
+
+<!-- SLIDE 12: Context Pollution — Visual -->
+<div class="slide bg-red content-left">
+  <span class="tag tag-red">It Gets Worse</span>
+  <h2 style="text-align:left">The more you ask, the <span class="accent-red">dumber it gets</span></h2>
+  <div style="display:flex; gap:16px; margin-top:20px; max-width:900px; align-items:flex-end">
+    <div style="text-align:center; flex:1">
+      <div style="background:rgba(79,255,140,0.3); border-radius:8px 8px 0 0; height:180px; display:flex; align-items:flex-end; justify-content:center; padding-bottom:10px">
+        <p style="font-size:14px; font-weight:700; color:#4fff8c">Peak Quality</p>
+      </div>
+      <p style="font-size:13px; color:rgba(255,255,255,0.4); margin-top:8px">Message 1-5</p>
+    </div>
+    <div style="text-align:center; flex:1">
+      <div style="background:rgba(79,255,140,0.2); border-radius:8px 8px 0 0; height:150px; display:flex; align-items:flex-end; justify-content:center; padding-bottom:10px">
+        <p style="font-size:14px; font-weight:700; color:rgba(79,255,140,0.8)">Good</p>
+      </div>
+      <p style="font-size:13px; color:rgba(255,255,255,0.4); margin-top:8px">Message 5-10</p>
+    </div>
+    <div style="text-align:center; flex:1">
+      <div style="background:rgba(255,159,79,0.25); border-radius:8px 8px 0 0; height:110px; display:flex; align-items:flex-end; justify-content:center; padding-bottom:10px">
+        <p style="font-size:14px; font-weight:700; color:#ff9f4f">Declining</p>
+      </div>
+      <p style="font-size:13px; color:rgba(255,255,255,0.4); margin-top:8px">Message 10-20</p>
+    </div>
+    <div style="text-align:center; flex:1">
+      <div style="background:rgba(255,79,106,0.2); border-radius:8px 8px 0 0; height:70px; display:flex; align-items:flex-end; justify-content:center; padding-bottom:10px">
+        <p style="font-size:14px; font-weight:700; color:#ff4f6a">Foggy</p>
+      </div>
+      <p style="font-size:13px; color:rgba(255,255,255,0.4); margin-top:8px">Message 20-30</p>
+    </div>
+    <div style="text-align:center; flex:1">
+      <div style="background:rgba(255,79,106,0.1); border:1px solid rgba(255,79,106,0.3); border-radius:8px 8px 0 0; height:35px; display:flex; align-items:flex-end; justify-content:center; padding-bottom:6px">
+        <p style="font-size:12px; font-weight:700; color:#ff4f6a">Garbage</p>
+      </div>
+      <p style="font-size:13px; color:rgba(255,255,255,0.4); margin-top:8px">Message 30+</p>
+    </div>
+  </div>
+  <div class="highlight-box" style="margin-top:30px; border-color:#ff4f6a; background:rgba(255,79,106,0.1)">
+    <p>Nick Saraev: "AI quality peaks early then degrades. The more you pile into the conversation &mdash; old instructions, failed attempts, irrelevant details &mdash; the worse every answer gets."</p>
+  </div>
+</div>
+
+<!-- SLIDE 13: The Fix — Visual -->
+<div class="slide bg-green">
+  <span class="tag tag-green">The Fix</span>
+  <h2>Stop making photocopies<br>of photocopies.</h2>
+  <div style="display:flex; align-items:center; gap:20px; margin-top:40px; justify-content:center">
+    <div style="text-align:center; padding:20px 30px; background:rgba(255,79,106,0.1); border:1px solid rgba(255,79,106,0.3); border-radius:16px">
+      <p style="font-size:18px; color:rgba(255,255,255,0.5); margin-bottom:8px">AI does everything</p>
+      <p style="font-size:48px; font-weight:900; color:#ff4f6a">59%</p>
+      <div style="width:120px; height:8px; background:rgba(255,255,255,0.1); border-radius:4px; margin-top:10px"><div style="width:59%; height:100%; background:#ff4f6a; border-radius:4px"></div></div>
+    </div>
+    <div style="font-size:48px; color:#4fff8c">&rarr;</div>
+    <div style="text-align:center; padding:20px 30px; background:rgba(79,255,140,0.1); border:1px solid rgba(79,255,140,0.3); border-radius:16px">
+      <p style="font-size:18px; color:rgba(255,255,255,0.5); margin-bottom:8px">AI thinks + code does</p>
+      <p style="font-size:48px; font-weight:900; color:#4fff8c">99%</p>
+      <div style="width:120px; height:8px; background:rgba(255,255,255,0.1); border-radius:4px; margin-top:10px"><div style="width:99%; height:100%; background:#4fff8c; border-radius:4px"></div></div>
+    </div>
+  </div>
+  <p class="subtitle" style="margin-top:30px; max-width:700px">Code is the original. Perfect fidelity. Same input, same output, every time. The AI just decides <em>which tool to grab</em>.</p>
+</div>
+
+<!-- SLIDE 14: AI decides, code does -->
 <div class="slide bg-green">
   <h2>The AI decides <span class="accent-green">what</span> to do.</h2>
   <h2>The code actually <span class="accent-green">does</span> it.</h2>
-  <p class="subtitle" style="margin-top:30px">That's how you get reliability at scale.</p>
+  <p class="subtitle" style="margin-top:30px">That's how you get reliability at scale.<br>That's the DOE framework. That's what we built.</p>
 </div>
 
 <!-- SLIDE 12: Agents -->
