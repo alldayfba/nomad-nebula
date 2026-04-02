@@ -29,6 +29,13 @@ except ImportError:
     run_audit = None  # type: ignore
 
 app = Flask(__name__)
+
+# Register AI Setter dashboard blueprint
+try:
+    from execution.setter.setter_dashboard import setter_bp
+    app.register_blueprint(setter_bp)
+except ImportError:
+    pass
 CORS(app, resources={
     r"/api/*": {"origins": [
         "https://247profits.org",
@@ -56,6 +63,11 @@ _sourcing_lock = threading.Lock()
 @app.route("/")
 def landing():
     return render_template("landing.html")
+
+
+@app.route("/offer")
+def offer_breakdown():
+    return render_template("offer-breakdown.html")
 
 
 @app.route("/leads")
@@ -818,6 +830,10 @@ def webinar_exit():
 def webinar_slides():
     return render_template("webinar-slides.html")
 
+@app.route("/group-call")
+def group_call_april():
+    return render_template("ai-amazon-group-call-april.html")
+
 
 @app.route("/dashboard")
 def dashboard():
@@ -1451,6 +1467,20 @@ def ceo_students_leaderboard():
 
 
 # ── Whop Payment Webhook ───────────────────────────────────────────────────
+
+@app.route("/webhooks/manychat", methods=["POST"])
+def manychat_webhook():
+    """Handle ManyChat keyword trigger webhooks for AI setter."""
+    try:
+        from execution.setter.manychat_bridge import handle_manychat_webhook
+        payload = request.get_json(force=True, silent=True) or {}
+        result = handle_manychat_webhook(payload)
+        return jsonify(result), 200 if result["status"] != "error" else 400
+    except ImportError:
+        return jsonify({"error": "setter module not available"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route("/webhooks/whop", methods=["POST"])
 def whop_webhook():
@@ -2412,6 +2442,54 @@ def product_queue_ingest():
         conn.close()
         return jsonify({"ingested": count})
     except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# ─── GHL Webhook Routes (Zapier replacement) ───
+
+@app.route("/webhooks/<slug>", methods=["POST"])
+def ghl_webhook(slug):
+    """Generic GHL webhook handler — routes by slug to the right Discord channel."""
+    try:
+        from execution.ghl_automations import WEBHOOK_HANDLERS
+        handler = WEBHOOK_HANDLERS.get(slug)
+        if not handler:
+            return jsonify({"error": f"Unknown webhook: {slug}", "available": list(WEBHOOK_HANDLERS.keys())}), 404
+        data = request.get_json(force=True, silent=True) or {}
+        result = handler(data)
+        return jsonify(result)
+    except Exception as e:
+        app.logger.error(f"[webhook/{slug}] {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+# ─── Automation Engine (used by 247growth.org Automation Builder) ───
+
+@app.route("/automations/execute", methods=["POST"])
+def run_automation():
+    """Execute an automation's action chain from the Automation Builder UI."""
+    # Auth: shared secret or localhost only
+    secret = os.environ.get("AUTOMATION_ENGINE_SECRET", "")
+    if secret:
+        provided = request.headers.get("X-Automation-Secret", "")
+        if provided != secret:
+            return jsonify({"error": "Invalid secret"}), 401
+
+    try:
+        data = request.get_json(force=True, silent=True) or {}
+        automation_id = data.get("automation_id", "unknown")
+        actions = data.get("actions", [])
+        trigger_data = data.get("trigger_data", {})
+        dry_run = data.get("dry_run", False)
+
+        if not actions:
+            return jsonify({"error": "No actions provided"}), 400
+
+        from execution.automation_engine import execute_automation
+        result = execute_automation(automation_id, actions, trigger_data, dry_run=dry_run)
+        return jsonify(result)
+    except Exception as e:
+        app.logger.error(f"[automation-engine] {e}")
         return jsonify({"error": str(e)}), 500
 
 

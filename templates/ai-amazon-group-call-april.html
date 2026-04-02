@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI + Amazon FBA — Group Call April 2026</title>
+<style>
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .slide {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    padding: 60px 80px;
+    position: relative;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .slide.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .bg-dark { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%); }
+  .bg-blue { background: linear-gradient(135deg, #0a0a1a 0%, #0d1b3e 50%, #1a0a2e 100%); }
+  .bg-green { background: linear-gradient(135deg, #0a1a0a 0%, #0d2e1b 50%, #1a2e0a 100%); }
+  .bg-red { background: linear-gradient(135deg, #1a0a0a 0%, #2e0d0d 50%, #2e1a0a 100%); }
+  .bg-purple { background: linear-gradient(135deg, #0a0a1a 0%, #1a0d2e 50%, #2e0a2e 100%); }
+  .bg-orange { background: linear-gradient(135deg, #1a0f0a 0%, #2e1a0d 50%, #2e200a 100%); }
+  .bg-teal { background: linear-gradient(135deg, #0a1a1a 0%, #0d2e2e 50%, #0a2e1a 100%); }
+
+  h1 {
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1.1;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  h2 {
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.15;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+
+  h3 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle {
+    font-size: 24px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    max-width: 700px;
+  }
+
+  .accent { color: #4f8cff; }
+  .accent-green { color: #4fff8c; }
+  .accent-orange { color: #ff9f4f; }
+  .accent-red { color: #ff4f6a; }
+  .accent-purple { color: #b44fff; }
+  .accent-teal { color: #4fffd4; }
+
+  .content-left {
+    align-items: flex-start;
+    text-align: left;
+    padding: 60px 100px;
+  }
+
+  p, li {
+    font-size: 22px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.85);
+  }
+
+  ul {
+    list-style: none;
+    margin-top: 10px;
+  }
+
+  ul li {
+    padding: 10px 0;
+    padding-left: 30px;
+    position: relative;
+  }
+
+  ul li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 18px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #4f8cff;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    width: 100%;
+    max-width: 1100px;
+    margin-top: 20px;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 30px;
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 20px;
+  }
+
+  .grid-4 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 20px;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 30px;
+    backdrop-filter: blur(20px);
+  }
+
+  .card h3 {
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+
+  .card p {
+    font-size: 18px;
+    color: rgba(255,255,255,0.65);
+  }
+
+  .big-number {
+    font-size: 120px;
+    font-weight: 900;
+    letter-spacing: -5px;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+
+  .big-stat {
+    font-size: 80px;
+    font-weight: 900;
+    letter-spacing: -3px;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+
+  .quote {
+    font-size: 32px;
+    font-weight: 600;
+    font-style: italic;
+    text-align: center;
+    max-width: 900px;
+    line-height: 1.4;
+    color: rgba(255,255,255,0.9);
+  }
+
+  .quote-attr {
+    font-size: 18px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 20px;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+  }
+
+  .tag-blue { background: rgba(79,140,255,0.2); color: #4f8cff; }
+  .tag-green { background: rgba(79,255,140,0.2); color: #4fff8c; }
+  .tag-orange { background: rgba(255,159,79,0.2); color: #ff9f4f; }
+  .tag-red { background: rgba(255,79,106,0.2); color: #ff4f6a; }
+  .tag-purple { background: rgba(180,79,255,0.2); color: #b44fff; }
+  .tag-teal { background: rgba(79,255,212,0.2); color: #4fffd4; }
+
+  .versus-table {
+    width: 100%;
+    max-width: 1000px;
+    margin-top: 20px;
+  }
+
+  .versus-row {
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr;
+    gap: 0;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .versus-row:last-child { border-bottom: none; }
+
+  .vs-old {
+    text-align: right;
+    color: rgba(255,255,255,0.35);
+    font-size: 20px;
+    text-decoration: line-through;
+  }
+
+  .vs-arrow {
+    text-align: center;
+    color: #4fff8c;
+    font-size: 20px;
+  }
+
+  .vs-new {
+    text-align: left;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .step-list {
+    counter-reset: steps;
+    max-width: 800px;
+    width: 100%;
+  }
+
+  .step {
+    counter-increment: steps;
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .step:last-child { border-bottom: none; }
+
+  .step-num {
+    font-size: 36px;
+    font-weight: 900;
+    color: #4f8cff;
+    min-width: 50px;
+  }
+
+  .step-content h3 {
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
+
+  .step-content p {
+    font-size: 18px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .terminal-block {
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(79,140,255,0.3);
+    border-radius: 12px;
+    padding: 24px 30px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 18px;
+    color: #4fff8c;
+    max-width: 800px;
+    width: 100%;
+    margin-top: 20px;
+    line-height: 1.8;
+  }
+
+  .terminal-block .prompt { color: #4f8cff; }
+  .terminal-block .comment { color: rgba(255,255,255,0.3); }
+  .terminal-block .output { color: rgba(255,255,255,0.7); }
+
+  .life-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+    max-width: 1000px;
+    margin-top: 20px;
+  }
+
+  .life-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .life-icon {
+    font-size: 28px;
+    min-width: 36px;
+    text-align: center;
+  }
+
+  .life-card h4 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .life-card p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .objection-list {
+    max-width: 900px;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .objection {
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .objection:last-child { border-bottom: none; }
+
+  .objection .q {
+    font-size: 22px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 6px;
+  }
+
+  .objection .a {
+    font-size: 22px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .highlight-box {
+    background: rgba(79,140,255,0.1);
+    border-left: 4px solid #4f8cff;
+    padding: 20px 28px;
+    border-radius: 0 12px 12px 0;
+    margin-top: 20px;
+    max-width: 800px;
+    width: 100%;
+  }
+
+  .highlight-box p {
+    font-size: 20px;
+    color: rgba(255,255,255,0.8);
+  }
+
+  .score-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0;
+    width: 100%;
+    max-width: 600px;
+  }
+
+  .score-bar .label {
+    font-size: 18px;
+    font-weight: 600;
+    min-width: 160px;
+    color: rgba(255,255,255,0.8);
+  }
+
+  .score-bar .bar {
+    flex: 1;
+    height: 28px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .score-bar .fill {
+    height: 100%;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .pipeline-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    max-width: 1100px;
+    margin-top: 30px;
+    flex-wrap: nowrap;
+  }
+
+  .pipeline-step {
+    flex: 1;
+    text-align: center;
+    padding: 20px 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+  }
+
+  .pipeline-step h4 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .pipeline-step p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+  }
+
+  .pipeline-arrow {
+    font-size: 24px;
+    color: #4f8cff;
+    padding: 0 6px;
+    flex-shrink: 0;
+  }
+
+  .grade-row {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 20px;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    max-width: 800px;
+    width: 100%;
+  }
+
+  .grade-row:last-child { border-bottom: none; }
+
+  .grade-badge {
+    font-size: 36px;
+    font-weight: 900;
+    text-align: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .retailer-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    width: 100%;
+    max-width: 1100px;
+    margin-top: 20px;
+  }
+
+  .retailer-pill {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 14px 10px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.8);
+  }
+
+  .retailer-pill small {
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    color: rgba(79,255,140,0.6);
+    margin-top: 4px;
+  }
+
+  .progress {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #4f8cff, #b44fff);
+    transition: width 0.3s ease;
+    z-index: 100;
+  }
+
+  .slide-counter {
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.25);
+    z-index: 100;
+  }
+
+  .nav-hint {
+    position: fixed;
+    bottom: 20px;
+    left: 30px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.15);
+    z-index: 100;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- SEGMENT 1: AI & CLAUDE CODE BASICS           -->
+<!-- ============================================ -->
+
+<!-- SLIDE 1: Title -->
+<div class="slide active bg-dark">
+  <span class="tag tag-blue">Group Call &mdash; April 2026</span>
+  <h1>AI + Claude Code<br>for <span class="accent">Amazon Sellers</span></h1>
+  <p class="subtitle">Understanding AI, setting up your tools, and the first look at <strong style="color:#fff">Seller Spy</strong></p>
+</div>
+
+<!-- SLIDE 2: The AI Overhang -->
+<div class="slide bg-blue">
+  <span class="tag tag-blue">The Opportunity</span>
+  <h2>Most people are drinking<br>the Pacific Ocean through<br>a <span class="accent">tiny straw</span></h2>
+  <p class="subtitle" style="margin-top:20px">The gap between what AI can do and what people <em>think</em> it can do is the biggest arbitrage window of our lifetime.</p>
+  <p class="quote-attr">Nick Saraev &mdash; $160K/mo from AI agencies</p>
+</div>
+
+<!-- SLIDE 3: What Is AI -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-purple">Basics</span>
+  <h2 style="text-align:left">What is <span class="accent-purple">AI</span>, really?</h2>
+  <ul>
+    <li>A pattern recognition engine trained on the entire internet</li>
+    <li>It reads, writes, and reasons &mdash; but it's not magic</li>
+    <li>Think of it as a really smart brain that's read every book ever written</li>
+    <li>It can analyze, create, and make decisions &mdash; but you set the direction</li>
+  </ul>
+  <div class="highlight-box" style="margin-top:30px; border-color:#b44fff; background:rgba(180,79,255,0.1)">
+    <p>AI is the tool. You are the operator. The operator decides what gets built.</p>
+  </div>
+</div>
+
+<!-- SLIDE 4: ChatGPT vs Claude Code -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-blue">The Difference</span>
+  <h2 style="text-align:left">ChatGPT vs <span class="accent">Claude Code</span></h2>
+  <div class="versus-table">
+    <div class="versus-row">
+      <div class="vs-old">You type, it talks back</div>
+      <div class="vs-arrow">&rarr;</div>
+      <div class="vs-new">You type, it <em>does things</em></div>
+    </div>
+    <div class="versus-row">
+      <div class="vs-old">Copy-paste results manually</div>
+      <div class="vs-arrow">&rarr;</div>
+      <div class="vs-new">Reads, writes, and organizes your files</div>
+    </div>
+    <div class="versus-row">
+      <div class="vs-old">Forgets everything next session</div>
+      <div class="vs-arrow">&rarr;</div>
+      <div class="vs-new">Remembers your business forever</div>
+    </div>
+    <div class="versus-row">
+      <div class="vs-old">Can't touch your computer</div>
+      <div class="vs-arrow">&rarr;</div>
+      <div class="vs-new">Runs scripts, searches the web, builds tools</div>
+    </div>
+    <div class="versus-row">
+      <div class="vs-old">Generic answers for everyone</div>
+      <div class="vs-arrow">&rarr;</div>
+      <div class="vs-new">Learns YOUR business, YOUR criteria, YOUR voice</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5: Employee Analogy -->
+<div class="slide bg-purple">
+  <div class="big-stat" style="color:#b44fff">24/7</div>
+  <h2>A senior employee that<br><span class="accent-purple">never sleeps</span>, <span class="accent-purple">never forgets</span>,<br>and gets <span class="accent-purple">better every day</span></h2>
+  <p class="subtitle" style="margin-top:20px">That's Claude Code.</p>
+</div>
+
+<!-- SLIDE 6: The IDE — VS Code -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-green">Setup</span>
+  <h2 style="text-align:left">Your Workspace: <span class="accent-green">VS Code</span></h2>
+  <div class="grid-3">
+    <div class="card">
+      <h3 class="accent">File Explorer</h3>
+      <p>Left sidebar. Your filing cabinet. All your folders and files organized in one place.</p>
+    </div>
+    <div class="card">
+      <h3 class="accent-green">Editor</h3>
+      <p>Center panel. Your notepad. Where you read instructions and see what the AI is doing.</p>
+    </div>
+    <div class="card">
+      <h3 class="accent-purple">Terminal</h3>
+      <p>Bottom panel. Your command line. Type an instruction, the AI does the work.</p>
+    </div>
+  </div>
+  <div class="highlight-box" style="margin-top:30px; border-color:#4fff8c; background:rgba(79,255,140,0.1)">
+    <p>You don't need to know how to code. You need to know how to give instructions.</p>
+  </div>
+</div>
+
+<!-- SLIDE 7: File Types -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-orange">Quick Reference</span>
+  <h2 style="text-align:left">File Types <span class="accent-orange">Explained</span></h2>
+  <div class="grid-2">
+    <div class="card">
+      <h3><span class="accent">.md</span> &mdash; Markdown</h3>
+      <p>Formatted notes. This is how you write instructions for AI. Like Google Docs but simpler.</p>
+    </div>
+    <div class="card">
+      <h3><span class="accent-green">.py</span> &mdash; Python</h3>
+      <p>Automation scripts. The AI writes these, not you. These are the tools that do the actual work.</p>
+    </div>
+    <div class="card">
+      <h3><span class="accent-red">.env</span> &mdash; Secrets</h3>
+      <p>API keys and passwords. Never share this file with anyone. Ever.</p>
+    </div>
+    <div class="card">
+      <h3><span class="accent-orange">.html</span> &mdash; Web Pages</h3>
+      <p>The dashboards and interfaces you see. Like this slideshow right now.</p>
+    </div>
+  </div>
+  <p style="margin-top:30px; color:rgba(255,255,255,0.4); font-size:18px">.md = instructions &nbsp;&nbsp;|&nbsp;&nbsp; .py = tools &nbsp;&nbsp;|&nbsp;&nbsp; everything else = supporting stuff</p>
+</div>
+
+<!-- SLIDE 8: DOE Framework Title -->
+<div class="slide bg-blue">
+  <span class="tag tag-blue">Core Concept</span>
+  <h1>The <span class="accent">DOE</span> Framework</h1>
+  <p class="subtitle" style="font-size:28px; margin-top:20px">Directive. Orchestration. Execution.</p>
+  <p class="subtitle" style="margin-top:10px">This is the secret sauce behind everything we build.</p>
+</div>
+
+<!-- SLIDE 9: DOE Restaurant Analogy -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-blue">DOE Framework</span>
+  <h2 style="text-align:left">The <span class="accent">Restaurant</span> Analogy</h2>
+  <div class="grid-3">
+    <div class="card" style="border-color: rgba(79,140,255,0.3);">
+      <h3 class="accent">D &mdash; Directive</h3>
+      <p style="font-size:20px; color:#fff; margin-bottom:10px">The Recipe Book</p>
+      <p>Written in plain English. Tells the AI exactly what to do, step by step. Like instructions you'd give an employee.</p>
+    </div>
+    <div class="card" style="border-color: rgba(180,79,255,0.3);">
+      <h3 class="accent-purple">O &mdash; Orchestration</h3>
+      <p style="font-size:20px; color:#fff; margin-bottom:10px">The Head Chef</p>
+      <p>The AI brain. Reads the recipe, decides what to do next, calls the shots, handles problems when they come up.</p>
+    </div>
+    <div class="card" style="border-color: rgba(79,255,140,0.3);">
+      <h3 class="accent-green">E &mdash; Execution</h3>
+      <p style="font-size:20px; color:#fff; margin-bottom:10px">The Line Cooks</p>
+      <p>Python scripts. Each one does ONE thing perfectly, every time. Same input, same output. 100% reliable.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 10: The Math -->
+<div class="slide bg-red">
+  <span class="tag tag-red">Why This Matters</span>
+  <h2>AI alone is <span class="accent-red">90%</span> accurate per step</h2>
+  <div style="margin-top:30px; text-align:center">
+    <p style="font-size:28px; color:rgba(255,255,255,0.7)">5 steps in a row?</p>
+    <div class="big-number accent-red" style="font-size:100px; margin:20px 0">59%</div>
+    <p style="font-size:28px; color:rgba(255,255,255,0.7)">That's basically a coin flip.</p>
+  </div>
+  <div class="highlight-box" style="margin-top:30px; border-color:#ff4f6a; background:rgba(255,79,106,0.1); max-width:700px">
+    <p style="font-size:22px"><strong style="color:#fff">The fix:</strong> Push every repeatable step into code (100% reliable). Let the AI only handle the <em>thinking</em>.</p>
+  </div>
+</div>
+
+<!-- SLIDE 11: AI decides, code does -->
+<div class="slide bg-green">
+  <h2>The AI decides <span class="accent-green">what</span> to do.</h2>
+  <h2>The code actually <span class="accent-green">does</span> it.</h2>
+  <p class="subtitle" style="margin-top:30px">That's how you get reliability at scale.</p>
+</div>
+
+<!-- SLIDE 12: Agents -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-purple">Agents</span>
+  <h2 style="text-align:left">Specialized <span class="accent-purple">AI Workers</span></h2>
+  <p style="margin-bottom:20px; color:rgba(255,255,255,0.5)">You don't hire one person to do everything. You hire specialists.</p>
+  <div class="grid-3">
+    <div class="card">
+      <h3 class="accent">Sourcing Bot</h3>
+      <p>Finds products, scans retailers, calculates profitability</p>
+    </div>
+    <div class="card">
+      <h3 class="accent-orange">Content Bot</h3>
+      <p>Writes posts, captions, ad copy, email sequences</p>
+    </div>
+    <div class="card">
+      <h3 class="accent-teal">CSM Bot</h3>
+      <p>Monitors student progress, flags at-risk students, sends check-ins</p>
+    </div>
+    <div class="card">
+      <h3 class="accent-red">Ads Bot</h3>
+      <p>Analyzes ad performance, writes creative, spots waste</p>
+    </div>
+    <div class="card">
+      <h3 class="accent-purple">Amazon Bot</h3>
+      <p>Knows Amazon inside-out: listings, fees, BSR, categories</p>
+    </div>
+    <div class="card">
+      <h3 class="accent-green">Deal Scanner</h3>
+      <p>Runs 24/7 scanning for clearance and arbitrage deals</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 13: Skills -->
+<div class="slide bg-dark">
+  <span class="tag tag-green">Skills</span>
+  <h2>Think of Skills as<br><span class="accent-green">Speed Dial</span></h2>
+  <div class="grid-2" style="margin-top:30px; max-width:900px">
+    <div class="card">
+      <h3 class="accent-red" style="font-size:20px">Without Skills</h3>
+      <p>"Hey Claude, I need you to go to these 15 retailer websites, search for clearance items in the baby products category, check each one on Amazon, calculate the FBA fees, compare the ROI..."</p>
+    </div>
+    <div class="card" style="border-color: rgba(79,255,140,0.3);">
+      <h3 class="accent-green" style="font-size:20px">With Skills</h3>
+      <div class="terminal-block" style="margin-top:10px; padding:16px 20px;">
+        <span class="prompt">/</span><span style="color:#4fff8c">source-products</span>
+      </div>
+      <p style="margin-top:12px">Done. Same result. One command.</p>
+    </div>
+  </div>
+  <p style="margin-top:30px; color:rgba(255,255,255,0.4); font-size:18px">We have 45+ skills built. Each one is a full workflow in a single command.</p>
+</div>
+
+<!-- SLIDE 14: Self-Annealing -->
+<div class="slide bg-teal content-left">
+  <span class="tag tag-teal">Self-Annealing</span>
+  <h2 style="text-align:left">The System Gets<br><span class="accent-teal">Smarter Every Day</span></h2>
+  <div class="step-list">
+    <div class="step">
+      <div class="step-num" style="color:#4fffd4">1</div>
+      <div class="step-content">
+        <h3>Something breaks</h3>
+        <p>An error, a new edge case, an API changes</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="color:#4fffd4">2</div>
+      <div class="step-content">
+        <h3>AI reads the error and fixes it</h3>
+        <p>Automatically. No human intervention needed.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="color:#4fffd4">3</div>
+      <div class="step-content">
+        <h3>Updates the playbook</h3>
+        <p>So it never happens again. The system is now stronger.</p>
+      </div>
+    </div>
+  </div>
+  <div class="highlight-box" style="margin-top:20px; border-color:#4fffd4; background:rgba(79,255,212,0.1)">
+    <p>Most businesses make the same mistakes over and over. This system literally can't.</p>
+  </div>
+</div>
+
+<!-- SLIDE 15: What's Coming for Students -->
+<div class="slide bg-blue">
+  <span class="tag tag-blue">Coming Soon</span>
+  <h1>What You'll<br><span class="accent">Get Access To</span></h1>
+  <div class="grid-2" style="margin-top:30px; max-width:900px">
+    <div class="card" style="border-color: rgba(79,255,140,0.3);">
+      <h3 class="accent-green">Seller Spy</h3>
+      <p>Track any seller's storefront. Get alerts when they add new products. Auto-scored. (Tonight's demo!)</p>
+    </div>
+    <div class="card">
+      <h3 class="accent-orange">AI Deal Drops</h3>
+      <p>Curated product opportunities pushed to your Discord. Best deals surfaced automatically.</p>
+    </div>
+    <div class="card">
+      <h3 class="accent-purple">Listing Optimizer</h3>
+      <p>Paste your listing, get instant SEO-optimized improvements. Titles, bullets, descriptions.</p>
+    </div>
+    <div class="card">
+      <h3 class="accent-teal">Student Dashboard</h3>
+      <p>Track your progress, health score, milestones. See where you are on the path to $10K/mo.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 16: Q&A Bridge -->
+<div class="slide bg-purple">
+  <h1>Questions<br>on <span class="accent-purple">AI Basics?</span></h1>
+  <p class="subtitle" style="font-size:28px; margin-top:20px">Drop them in chat.<br>We'll hit the top 2-3 before moving on.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- SEGMENT 2: SELLER SPY / STOREFRONT STALKING  -->
+<!-- ============================================ -->
+
+<!-- SLIDE 17: Segment 2 Title -->
+<div class="slide bg-dark">
+  <span class="tag tag-red">Segment 2</span>
+  <h1>Seller Spy<br><span class="accent-red">AI Storefront Stalking</span></h1>
+  <p class="subtitle">The first AI tool releasing to students.<br>And it's going to change how you source.</p>
+</div>
+
+<!-- SLIDE 18: The Problem -->
+<div class="slide bg-red content-left">
+  <span class="tag tag-red">The Problem</span>
+  <h2 style="text-align:left">Manual sourcing is <span class="accent-red">broken</span></h2>
+  <ul>
+    <li>2-4 hours a day scrolling Amazon one product at a time</li>
+    <li>Maybe 20-30 products checked per session</li>
+    <li>No idea what successful sellers are actually selling</li>
+    <li>By the time you find something, 50 others already did</li>
+    <li>Checking retailers one at a time &mdash; Walmart, then Target, then CVS...</li>
+    <li>You miss 95% of the opportunities</li>
+  </ul>
+</div>
+
+<!-- SLIDE 19: Library Analogy -->
+<div class="slide bg-dark">
+  <h2>Manual sourcing is like reading<br><span class="accent-red">every book in the library</span><br>to find the one you want.</h2>
+  <div style="margin:40px 0">
+    <p style="font-size:64px; text-align:center">&#8595;</p>
+  </div>
+  <h2>Seller Spy is the <span class="accent-green">librarian</span><br>who already read every book and<br>hands you the <span class="accent-green">top 5</span>.</h2>
+</div>
+
+<!-- SLIDE 20: 5-Step Pipeline -->
+<div class="slide bg-dark">
+  <span class="tag tag-blue">How It Works</span>
+  <h2>The <span class="accent">5-Step Pipeline</span></h2>
+  <div class="pipeline-flow">
+    <div class="pipeline-step" style="border-color: rgba(79,140,255,0.3);">
+      <h4 class="accent">1. Find</h4>
+      <p>Identify successful sellers in your niche</p>
+    </div>
+    <div class="pipeline-arrow">&rarr;</div>
+    <div class="pipeline-step" style="border-color: rgba(180,79,255,0.3);">
+      <h4 class="accent-purple">2. Scan</h4>
+      <p>AI scrapes their entire storefront</p>
+    </div>
+    <div class="pipeline-arrow">&rarr;</div>
+    <div class="pipeline-step" style="border-color: rgba(255,159,79,0.3);">
+      <h4 class="accent-orange">3. Score</h4>
+      <p>Every product scored 0-100</p>
+    </div>
+    <div class="pipeline-arrow">&rarr;</div>
+    <div class="pipeline-step" style="border-color: rgba(79,255,140,0.3);">
+      <h4 class="accent-green">4. Source</h4>
+      <p>Find cheaper at 100+ retailers</p>
+    </div>
+    <div class="pipeline-arrow">&rarr;</div>
+    <div class="pipeline-step" style="border-color: rgba(79,255,212,0.3);">
+      <h4 class="accent-teal">5. Monitor</h4>
+      <p>24/7 alerts on new products</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 21: Step 1 — Find Sellers -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-blue">Step 1</span>
+  <h2 style="text-align:left"><span class="accent">Find</span> Successful Sellers</h2>
+  <div class="step-list">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h3>Go to Amazon</h3>
+        <p>Search for a top product in your niche</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h3>Click "Sold by [Seller Name]"</h3>
+        <p>Opens their storefront &mdash; see everything they sell</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h3>Copy the Seller ID</h3>
+        <p>It's in the URL: amazon.com/s?me=<strong style="color:#4f8cff">A1B2C3D4E5F6G7</strong></p>
+      </div>
+    </div>
+  </div>
+  <div class="highlight-box" style="margin-top:20px">
+    <p>That's it. You just identified a target. Seller Spy does the rest.</p>
+  </div>
+</div>
+
+<!-- SLIDE 22: Step 2 — Scan -->
+<div class="slide bg-purple">
+  <span class="tag tag-purple">Step 2</span>
+  <h2><span class="accent-purple">Scan</span> Their Entire Storefront</h2>
+  <div class="grid-2" style="margin-top:30px; max-width:900px">
+    <div class="card">
+      <h3 style="color:#fff">What happens</h3>
+      <p>An invisible browser visits every page of their storefront. Extracts every product: title, price, ASIN, rating, review count.</p>
+    </div>
+    <div class="card" style="border-color: rgba(180,79,255,0.3);">
+      <h3 class="accent-purple">Speed</h3>
+      <p>A seller with 500 products? Scanned in about 3 minutes. No manual clicking. No copy-pasting.</p>
+    </div>
+  </div>
+  <p style="margin-top:30px; color:rgba(255,255,255,0.4); font-size:18px">Completely automated. You add the seller, Seller Spy handles everything.</p>
+</div>
+
+<!-- SLIDE 23: Step 3 — Deal Score -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-orange">Step 3</span>
+  <h2 style="text-align:left">Every Product Gets a<br><span class="accent-orange">Deal Score</span> (0-100)</h2>
+  <div style="max-width:650px; margin-top:20px">
+    <div class="score-bar">
+      <div class="label">Demand</div>
+      <div class="bar"><div class="fill" style="width:40%; background: linear-gradient(90deg, #4f8cff, #6fa8ff);">40%</div></div>
+    </div>
+    <div class="score-bar">
+      <div class="label">Competition</div>
+      <div class="bar"><div class="fill" style="width:25%; background: linear-gradient(90deg, #b44fff, #d47fff);">25%</div></div>
+    </div>
+    <div class="score-bar">
+      <div class="label">Price Sweet Spot</div>
+      <div class="bar"><div class="fill" style="width:20%; background: linear-gradient(90deg, #ff9f4f, #ffbf7f);">20%</div></div>
+    </div>
+    <div class="score-bar">
+      <div class="label">Review Quality</div>
+      <div class="bar"><div class="fill" style="width:15%; background: linear-gradient(90deg, #4fffd4, #7fffe4);">15%</div></div>
+    </div>
+  </div>
+  <div class="highlight-box" style="margin-top:30px; border-color:#ff9f4f; background:rgba(255,159,79,0.1)">
+    <p>The AI weighs all four factors automatically. No spreadsheets. No guessing.</p>
+  </div>
+</div>
+
+<!-- SLIDE 24: Score Breakdown — Demand -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-blue">Deal Score</span>
+  <h2 style="text-align:left"><span class="accent">Demand</span> &mdash; Is It Selling?</h2>
+  <p style="margin-bottom:20px; color:rgba(255,255,255,0.5)">BSR = Best Sellers Rank. Lower number = more popular.</p>
+  <div class="step-list">
+    <div class="step">
+      <div class="step-num" style="font-size:28px; color:#4fff8c">40</div>
+      <div class="step-content">
+        <h3>BSR under 500</h3>
+        <p>Top seller &mdash; flies off shelves</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="font-size:28px; color:#4fff8c">35</div>
+      <div class="step-content">
+        <h3>BSR 500-2,000</h3>
+        <p>Strong seller &mdash; consistent daily sales</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="font-size:28px; color:#ff9f4f">20</div>
+      <div class="step-content">
+        <h3>BSR 5,000-20,000</h3>
+        <p>Decent &mdash; sells regularly</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="font-size:28px; color:#ff4f6a">2</div>
+      <div class="step-content">
+        <h3>BSR over 250,000</h3>
+        <p>Barely moving &mdash; avoid</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 25: Score Breakdown — Competition & Price -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-purple">Deal Score</span>
+  <h2 style="text-align:left"><span class="accent-purple">Competition</span> + <span class="accent-orange">Price</span></h2>
+  <div class="grid-2">
+    <div class="card" style="border-color: rgba(180,79,255,0.3);">
+      <h3 class="accent-purple">Competition (25 pts)</h3>
+      <p style="font-size:20px; color:#fff; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06)">1-2 FBA sellers = 25 pts (great!)</p>
+      <p style="font-size:20px; color:#fff; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06)">3-5 sellers = 20 pts (still good)</p>
+      <p style="font-size:20px; color:#ff4f6a; padding:8px 0;">Amazon on listing = 5 pts (avoid)</p>
+    </div>
+    <div class="card" style="border-color: rgba(255,159,79,0.3);">
+      <h3 class="accent-orange">Price Sweet Spot (20 pts)</h3>
+      <p style="font-size:20px; color:#fff; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06)">$15-$50 = 20 pts (ideal FBA range)</p>
+      <p style="font-size:20px; color:#fff; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06)">$50-$100 = 15 pts (higher risk)</p>
+      <p style="font-size:20px; color:#ff4f6a; padding:8px 0;">Under $8 = 5 pts (fees kill you)</p>
+    </div>
+  </div>
+  <div class="highlight-box" style="margin-top:30px; border-color:#ff4f6a; background:rgba(255,79,106,0.1)">
+    <p>If Amazon is selling the product &mdash; move on. They almost always win the Buy Box.</p>
+  </div>
+</div>
+
+<!-- SLIDE 26: Verdict Scale -->
+<div class="slide bg-dark">
+  <span class="tag tag-green">Deal Score</span>
+  <h2>Reading the <span class="accent-green">Verdict</span></h2>
+  <div style="margin-top:20px">
+    <div class="grade-row">
+      <div class="grade-badge" style="background:rgba(79,255,140,0.2); color:#4fff8c;">70+</div>
+      <div>
+        <p style="font-size:24px; font-weight:700; color:#4fff8c">BUY &mdash; Strong opportunity</p>
+        <p style="font-size:18px; color:rgba(255,255,255,0.5)">Verify the numbers and move fast</p>
+      </div>
+    </div>
+    <div class="grade-row">
+      <div class="grade-badge" style="background:rgba(255,159,79,0.2); color:#ff9f4f;">50+</div>
+      <div>
+        <p style="font-size:24px; font-weight:700; color:#ff9f4f">MAYBE &mdash; Worth investigating</p>
+        <p style="font-size:18px; color:rgba(255,255,255,0.5)">Check manually before committing</p>
+      </div>
+    </div>
+    <div class="grade-row">
+      <div class="grade-badge" style="background:rgba(79,140,255,0.2); color:#4f8cff;">30+</div>
+      <div>
+        <p style="font-size:24px; font-weight:700; color:#4f8cff">RESEARCH &mdash; Needs more data</p>
+        <p style="font-size:18px; color:rgba(255,255,255,0.5)">Potential, but don't buy yet</p>
+      </div>
+    </div>
+    <div class="grade-row">
+      <div class="grade-badge" style="background:rgba(255,79,106,0.2); color:#ff4f6a;">&lt;30</div>
+      <div>
+        <p style="font-size:24px; font-weight:700; color:#ff4f6a">SKIP &mdash; Not worth your time</p>
+        <p style="font-size:18px; color:rgba(255,255,255,0.5)">Move on to the next one</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 27: Step 4 — Reverse Source -->
+<div class="slide bg-green">
+  <span class="tag tag-green">Step 4</span>
+  <h1>Reverse <span class="accent-green">Source</span></h1>
+  <p class="subtitle" style="font-size:28px; margin-top:20px">Top-scoring products get searched across<br><strong style="color:#fff">100+ retailers</strong> automatically.</p>
+  <p class="subtitle" style="margin-top:10px">Find the same product cheaper at Walmart, Target, CVS, Costco...</p>
+</div>
+
+<!-- SLIDE 28: Retailer Network -->
+<div class="slide bg-dark">
+  <span class="tag tag-green">Retailer Network</span>
+  <h2><span class="accent-green">100+</span> Retailers Checked Automatically</h2>
+  <div class="retailer-grid">
+    <div class="retailer-pill">Walmart<small>3% cashback</small></div>
+    <div class="retailer-pill">Target<small>1% cashback</small></div>
+    <div class="retailer-pill">CVS<small>3% cashback</small></div>
+    <div class="retailer-pill">Walgreens<small>2% cashback</small></div>
+    <div class="retailer-pill">Costco</div>
+    <div class="retailer-pill">Home Depot<small>2% cashback</small></div>
+    <div class="retailer-pill">Best Buy<small>1% cashback</small></div>
+    <div class="retailer-pill">Kohl's<small>4% cashback</small></div>
+    <div class="retailer-pill">Lowe's<small>2% cashback</small></div>
+    <div class="retailer-pill">Sam's Club</div>
+    <div class="retailer-pill">Macy's<small>3% cashback</small></div>
+    <div class="retailer-pill">Ulta<small>2% cashback</small></div>
+    <div class="retailer-pill">Dick's<small>2% cashback</small></div>
+    <div class="retailer-pill">BJ's</div>
+    <div class="retailer-pill">Kroger<small>1% cashback</small></div>
+  </div>
+  <p style="margin-top:20px; color:rgba(255,255,255,0.35); font-size:16px">+ 85 more Tier-2 retailers: Nordstrom, TJ Maxx, Wayfair, Big Lots, GameStop, Petco, GNC, Newegg...</p>
+</div>
+
+<!-- SLIDE 29: What the output looks like -->
+<div class="slide bg-dark">
+  <span class="tag tag-green">The Result</span>
+  <h3>What you actually see</h3>
+  <div class="terminal-block" style="max-width:900px">
+    <span class="comment"># Seller Spy found this on a tracked storefront:</span><br><br>
+    <span class="output">Product: CeraVe Moisturizing Cream 19oz</span><br>
+    <span class="output">Amazon Price: $18.99 | BSR: 1,247 | FBA Sellers: 4</span><br>
+    <span class="output">Deal Score: <span style="color:#4fff8c; font-weight:bold">78 / 100 (BUY)</span></span><br><br>
+    <span class="comment"># Reverse sourcing found cheaper at:</span><br>
+    <span style="color:#4fff8c">Best Source: CVS &mdash; $11.49</span><br>
+    <span class="output">FBA Fees: $5.12 | Referral: $2.85</span><br>
+    <span style="color:#4fff8c; font-weight:bold">Profit: $4.53/unit | ROI: 39.4%</span><br>
+    <span class="output">Buy Link: cvs.com/shop/cerave-moisturizing...</span>
+  </div>
+</div>
+
+<!-- SLIDE 30: Step 5 — Real-Time Monitoring -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-teal">Step 5</span>
+  <h2 style="text-align:left"><span class="accent-teal">Real-Time</span> Monitoring</h2>
+  <div class="step-list">
+    <div class="step">
+      <div class="step-num" style="color:#4fffd4">1</div>
+      <div class="step-content">
+        <h3>Add sellers to your watch list</h3>
+        <p>System checks every 15 minutes with randomized timing</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="color:#4fffd4">2</div>
+      <div class="step-content">
+        <h3>Seller adds a new product</h3>
+        <p>Stage 1: Instant Discord alert with basic info (ASIN, title, price)</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="color:#4fffd4">3</div>
+      <div class="step-content">
+        <h3>Deep analysis runs automatically</h3>
+        <p>Stage 2: Keepa data + retailer scan + profitability calc (5-10 min)</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="color:#4fffd4">4</div>
+      <div class="step-content">
+        <h3>Final grade delivered</h3>
+        <p>Stage 3: Original alert updated with final verdict + full numbers</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 31: Convergence — The Secret Weapon -->
+<div class="slide bg-blue">
+  <span class="tag tag-blue">Secret Weapon</span>
+  <h1><span class="accent">Convergence</span><br>Detection</h1>
+  <p class="subtitle" style="font-size:26px; margin-top:20px; max-width:800px">If <strong style="color:#fff">3 or more</strong> tracked sellers add the <strong style="color:#fff">same product</strong> within <strong style="color:#fff">24 hours</strong> &mdash; the system flags it as a <strong style="color:#ff4f6a">HOT DEAL</strong>.</p>
+  <p class="subtitle" style="margin-top:20px">Multiple successful sellers adding the same product is not a coincidence. It's a signal.</p>
+</div>
+
+<!-- SLIDE 32: Spy Network Analogy -->
+<div class="slide bg-dark">
+  <div class="quote">"Think of it like a <span class="accent">spy network</span>.<br><br>Each seller you track is an informant.<br><br>When multiple informants report the same thing independently &mdash; <span class="accent-green">you know it's real</span>."</div>
+</div>
+
+<!-- SLIDE 33: Live Demo -->
+<div class="slide bg-purple">
+  <span class="tag tag-purple">Live Demo</span>
+  <h1>Let's See It<br><span class="accent-purple">In Action</span></h1>
+  <p class="subtitle" style="font-size:28px; margin-top:20px">Switching to the Seller Spy dashboard now.</p>
+  <p class="subtitle" style="margin-top:10px">Watch me add a seller and trigger a scan in real time.</p>
+</div>
+
+<!-- SLIDE 34: Student Access Phases -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-green">Rollout</span>
+  <h2 style="text-align:left">Student Access <span class="accent-green">Phases</span></h2>
+  <div class="grid-3">
+    <div class="card" style="border-color: rgba(79,255,140,0.3);">
+      <h3 class="accent-green">Phase 1</h3>
+      <p style="font-size:20px; color:#fff; margin-bottom:8px">Coming First</p>
+      <p>Add seller storefronts to your personal watch list. Get Discord alerts when they add new products. Basic deal scoring.</p>
+    </div>
+    <div class="card" style="border-color: rgba(79,140,255,0.3);">
+      <h3 class="accent">Phase 2</h3>
+      <p style="font-size:20px; color:#fff; margin-bottom:8px">Full Dashboard</p>
+      <p>Your own Seller Spy interface. Deal scores, reverse sourcing results, accuracy tracking. Filter by grade, seller, date.</p>
+    </div>
+    <div class="card" style="border-color: rgba(180,79,255,0.3);">
+      <h3 class="accent-purple">Phase 3</h3>
+      <p style="font-size:20px; color:#fff; margin-bottom:8px">Community Drops</p>
+      <p>When the system finds exceptional deals, they get pushed to a shared Discord channel. The whole group benefits.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 35: Homework -->
+<div class="slide bg-orange content-left">
+  <span class="tag tag-orange">This Week</span>
+  <h2 style="text-align:left">Your <span class="accent-orange">Homework</span></h2>
+  <div class="step-list">
+    <div class="step">
+      <div class="step-num" style="color:#ff9f4f">1</div>
+      <div class="step-content">
+        <h3>Find 5 successful sellers in your niche</h3>
+        <p>Search Amazon &rarr; find top products &rarr; click seller &rarr; copy URL. Drop all 5 in Discord.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="color:#ff9f4f">2</div>
+      <div class="step-content">
+        <h3>Learn to read a listing</h3>
+        <p>For each seller's top product: write down BSR, # of FBA sellers, price, rating, review count.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="color:#ff9f4f">3</div>
+      <div class="step-content">
+        <h3>Watch Nick Saraev's video (optional)</h3>
+        <p>YouTube: "Agentic Workflows" &mdash; even the first 30 min will change how you think about AI.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="color:#ff9f4f">4</div>
+      <div class="step-content">
+        <h3>Install VS Code (optional for now)</h3>
+        <p>Download from code.visualstudio.com. Just install it &mdash; we'll set up together next session.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 36: Common Questions -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-orange">FAQ</span>
+  <h2 style="text-align:left">Let's Address These</h2>
+  <div class="objection-list">
+    <div class="objection">
+      <div class="q">"I'm not technical at all..."</div>
+      <div class="a">You don't need to be. You give instructions, read results. The AI handles the technical part.</div>
+    </div>
+    <div class="objection">
+      <div class="q">"Is this legal?"</div>
+      <div class="a">100% legal. Publicly available information on Amazon. We're just doing it faster and smarter.</div>
+    </div>
+    <div class="objection">
+      <div class="q">"When can I start using Seller Spy?"</div>
+      <div class="a">Phase 1 coming soon. Do your homework now &mdash; find those 5 sellers so we can load them in.</div>
+    </div>
+    <div class="objection">
+      <div class="q">"Does this work for my category?"</div>
+      <div class="a">If there are sellers on Amazon in your category, Seller Spy can track them. Every category works.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 37: Open Q&A -->
+<div class="slide bg-blue">
+  <span class="tag tag-blue">Q&A</span>
+  <h1>Your Turn</h1>
+  <p class="subtitle" style="font-size:28px; max-width:800px; margin-top:20px">What questions do you have?<br><br><strong style="color:#fff">Nothing is too basic. Drop it in chat.</strong></p>
+</div>
+
+<!-- SLIDE 38: Closing Quote -->
+<div class="slide bg-dark">
+  <div class="quote">"The gap between sellers who <span class="accent-red">stay stuck</span> and sellers who <span class="accent-green">scale</span> isn't knowledge &mdash; it's <span class="accent">speed of execution</span>."</div>
+  <p class="subtitle" style="margin-top:30px">AI gives you that speed. Seller Spy gives you that edge.</p>
+</div>
+
+<!-- SLIDE 39: Final CTA -->
+<div class="slide bg-purple">
+  <h1>You're in the<br><span class="accent-purple">Top 1%</span></h1>
+  <p class="subtitle" style="font-size:26px; margin-top:20px; max-width:800px">of Amazon sellers who even know this technology exists.</p>
+  <p class="subtitle" style="margin-top:30px; font-size:22px">The window is open. We're walking through it together.</p>
+  <div class="highlight-box" style="margin-top:40px; border-color:#b44fff; background:rgba(180,79,255,0.1); text-align:center; max-width:600px">
+    <p style="font-size:22px"><strong style="color:#fff">This week:</strong> Find 5 sellers. Drop them in Discord.<br>We'll have them loaded into Seller Spy before the next call.</p>
+  </div>
+</div>
+
+<!-- Progress bar -->
+<div class="progress" id="progress"></div>
+<div class="slide-counter" id="counter"></div>
+<div class="nav-hint">Arrow keys or click to navigate</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let current = 0;
+
+  function showSlide(n) {
+    slides[current].classList.remove('active');
+    current = Math.max(0, Math.min(n, slides.length - 1));
+    slides[current].classList.add('active');
+    document.getElementById('progress').style.width = ((current + 1) / slides.length * 100) + '%';
+    document.getElementById('counter').textContent = (current + 1) + ' / ' + slides.length;
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      showSlide(current + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      showSlide(current - 1);
+    } else if (e.key === 'Home') {
+      showSlide(0);
+    } else if (e.key === 'End') {
+      showSlide(slides.length - 1);
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (e.clientX > window.innerWidth / 2) {
+      showSlide(current + 1);
+    } else {
+      showSlide(current - 1);
+    }
+  });
+
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+  document.addEventListener('touchend', (e) => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      diff > 0 ? showSlide(current + 1) : showSlide(current - 1);
+    }
+  });
+
+  showSlide(0);
+</script>
+
+</body>
+</html>
