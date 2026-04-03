@@ -1790,6 +1790,132 @@ def api_sourcing_health():
     return jsonify(report)
 
 
+# ── Supplier Finder API ──────────────────────────────────────────────────────
+
+@app.route("/api/supplier-search", methods=["POST"])
+def api_supplier_search():
+    """Search for wholesale suppliers by category + optional location."""
+    api_key = request.headers.get("X-API-Key", "")
+    expected = os.environ.get("SOURCING_API_KEY", "")
+    if expected and api_key != expected:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json() or {}
+    category = (data.get("category") or "").strip()
+    if not category:
+        return jsonify({"error": "category is required"}), 400
+
+    keywords = data.get("keywords")
+    location = data.get("location")
+    state = data.get("state")
+    max_results = data.get("max_results", 20)
+    include_nationwide = data.get("include_nationwide", True)
+
+    sys.path.insert(0, os.path.join(app.root_path, "execution"))
+    from wholesale_supplier_finder import search_suppliers, supplier_to_json
+
+    sources = ["google", "thomasnet"]
+    if keywords:
+        # Prepend keywords to category search
+        category = f"{keywords} {category}"
+
+    try:
+        results = search_suppliers(
+            category=category,
+            sources=sources,
+            location=location,
+            state=state,
+            include_nationwide=include_nationwide,
+        )
+        return jsonify({
+            "ok": True,
+            "count": len(results),
+            "suppliers": [supplier_to_json(s) for s in results[:max_results]],
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/supplier-outreach/generate", methods=["POST"])
+def api_supplier_outreach_generate():
+    """Generate personalized outreach emails for suppliers."""
+    api_key = request.headers.get("X-API-Key", "")
+    expected = os.environ.get("SOURCING_API_KEY", "")
+    if expected and api_key != expected:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json() or {}
+    suppliers = data.get("suppliers", [])
+    supplier_ids = data.get("supplier_ids", [])
+    template_type = data.get("template_type", "intro_inquiry")
+
+    sys.path.insert(0, os.path.join(app.root_path, "execution"))
+
+    if supplier_ids and not suppliers:
+        from wholesale_supplier_finder import get_db, supplier_to_json
+        conn = get_db()
+        try:
+            placeholders = ",".join("?" for _ in supplier_ids)
+            rows = conn.execute(
+                f"SELECT * FROM wholesale_suppliers WHERE id IN ({placeholders})",
+                supplier_ids,
+            ).fetchall()
+            suppliers = [supplier_to_json(dict(r)) for r in rows]
+        finally:
+            conn.close()
+
+    if not suppliers:
+        return jsonify({"error": "No suppliers provided"}), 400
+
+    from supplier_outreach_engine import generate_batch_emails
+
+    try:
+        drafts = generate_batch_emails(suppliers, template_type=template_type)
+        return jsonify({
+            "ok": True,
+            "count": len(drafts),
+            "drafts": drafts,
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/supplier-outreach/send", methods=["POST"])
+def api_supplier_outreach_send():
+    """Send draft outreach emails via SMTP. Requires smtp_config."""
+    api_key = request.headers.get("X-API-Key", "")
+    expected = os.environ.get("SOURCING_API_KEY", "")
+    if expected and api_key != expected:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json() or {}
+    drafts = data.get("emails", [])
+    smtp_config = data.get("smtp_config", {})
+    dry_run = data.get("dry_run", False)
+
+    if not drafts:
+        return jsonify({"error": "No emails provided"}), 400
+    if not smtp_config.get("smtp_host") or not smtp_config.get("smtp_user"):
+        return jsonify({"error": "smtp_config with smtp_host and smtp_user required"}), 400
+
+    sys.path.insert(0, os.path.join(app.root_path, "execution"))
+    from supplier_outreach_engine import send_batch
+
+    try:
+        results = send_batch(drafts, smtp_config, dry_run=dry_run)
+        sent = len([r for r in results if r["status"] == "sent"])
+        failed = len([r for r in results if r["status"] == "failed"])
+        return jsonify({
+            "ok": True,
+            "sent": sent,
+            "failed": failed,
+            "total": len(results),
+            "results": results,
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 # ── Storefront Stalker ───────────────────────────────────────────────────────
 
 @app.route("/stalker")
