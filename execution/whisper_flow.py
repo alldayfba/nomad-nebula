@@ -1,30 +1,35 @@
 #!/usr/bin/env python3
 """
-WhisperFlow — Local voice-to-text dictation for macOS (WisprFlow replacement).
+WhisperFlow — Local voice-to-text dictation for macOS.
 
-Records from system mic, transcribes locally with faster-whisper,
-cleans up filler words, pastes into the active text field. Runs as a macOS menubar app.
+Free, local, private. Records from your mic, transcribes with faster-whisper,
+cleans up filler words, pastes into the active text field. Runs as a menubar app.
 
-Usage:
+Quick Start:
+  pip install sounddevice numpy faster-whisper rumps pynput pyobjc-framework-Quartz
   python execution/whisper_flow.py              # Run as menubar app
-  python execution/whisper_flow.py --test-mic   # Test microphone capture
-  python execution/whisper_flow.py --test-paste # Test paste mechanism
-  python execution/whisper_flow.py --test-cleanup "text"  # Test filler cleanup
+  python execution/whisper_flow.py --install    # Auto-start at login
+  python execution/whisper_flow.py --uninstall  # Remove auto-start
 
 Controls:
-  Single tap Left Option (⌥)   — Start/stop recording
-  Double-tap Left Option (⌥)   — Toggle locked recording mode (hands-free)
-  Long-press Right Option (>1s) — Pause/resume recording
-  Click stop button on overlay  — Stop recording
-  Hold middle mouse button 2s   — Toggle recording (alternative)
+  Tap Left Option (⌥)          — Start/stop recording (instant)
+  Double-tap Left Option (⌥)   — Locked recording mode (hands-free)
+  Long-press Left Option (>1s) — Pause/resume recording
+  Click stop button on overlay — Stop recording
+  Hold middle mouse button 2s  — Toggle recording (alternative)
 
-Dependencies:
-  pip install sounddevice numpy faster-whisper rumps pynput pyobjc-framework-Quartz
+Other commands:
+  --test-mic          Test microphone capture
+  --test-paste        Test paste mechanism
+  --dict list         Show dictionary entries
+  --dict reset        Reset corrupted dictionary
+  --dict add X Y      Add correction X → Y
+  --history list      Show transcription history
 
-Permissions required:
-  System Settings > Privacy & Security > Accessibility > Terminal (or IDE)
-  System Settings > Privacy & Security > Input Monitoring > Terminal (or IDE)
-  System Settings > Privacy & Security > Microphone > Terminal (or IDE)
+macOS Permissions (grant to Terminal.app):
+  System Settings > Privacy & Security > Accessibility
+  System Settings > Privacy & Security > Input Monitoring
+  System Settings > Privacy & Security > Microphone
 """
 
 from __future__ import annotations
@@ -61,8 +66,9 @@ SAMPLE_RATE = 16000
 CHANNELS = 1
 DTYPE = "float32"
 
-WHISPER_MODEL = os.getenv("WHISPER_MODEL", "small")
+WHISPER_MODEL = os.getenv("WHISPER_MODEL", "tiny.en")
 WHISPER_COMPUTE_TYPE = os.getenv("WHISPER_COMPUTE_TYPE", "int8")
+WHISPER_CPU_THREADS = int(os.getenv("WHISPER_CPU_THREADS", str(os.cpu_count() or 4)))
 WHISPER_MOUSE_HOLD_SECONDS = float(os.getenv("WHISPER_MOUSE_HOLD_SECONDS", "2.0"))
 WHISPER_CLEANUP_MODE = os.getenv("WHISPER_CLEANUP_MODE", "regex")  # regex | api | none
 WHISPER_HOTKEY_TAP_TIMEOUT = float(os.getenv("WHISPER_HOTKEY_TAP_TIMEOUT", "0.4"))
@@ -70,6 +76,7 @@ WHISPER_DOUBLE_TAP_WINDOW = float(os.getenv("WHISPER_DOUBLE_TAP_WINDOW", "0.6"))
 WHISPER_PAUSE_HOLD_THRESHOLD = float(os.getenv("WHISPER_PAUSE_HOLD_THRESHOLD", "1.0"))
 WHISPER_RESTORE_CLIPBOARD = os.getenv("WHISPER_RESTORE_CLIPBOARD", "true").lower() == "true"
 WHISPER_VAD_FILTER = os.getenv("WHISPER_VAD_FILTER", "true").lower() == "true"
+WHISPER_PREROLL_SECONDS = float(os.getenv("WHISPER_PREROLL_SECONDS", "0.75"))
 
 MIN_RECORDING_SECONDS = 0.5
 
@@ -99,6 +106,22 @@ class WhisperDictionary:
     2. Post-transcription find/replace for misspellings Whisper consistently gets wrong
     """
 
+    # Common English words that should NEVER be auto-correction sources or targets
+    PROTECTED_WORDS = frozenset({
+        "i", "a", "an", "the", "it", "is", "in", "to", "do", "we", "he",
+        "me", "be", "so", "no", "go", "if", "or", "on", "at", "my", "of",
+        "up", "as", "by", "am", "us", "and", "but", "for", "not", "you",
+        "all", "can", "had", "her", "was", "one", "our", "out", "are",
+        "has", "his", "how", "its", "may", "new", "now", "old", "see",
+        "way", "who", "did", "get", "let", "say", "she", "too", "use",
+        "bro", "dude", "like", "just", "that", "this", "with", "have",
+        "from", "they", "been", "said", "each", "what", "then", "them",
+        "will", "when", "make", "time", "very", "your", "here", "know",
+        "sell", "self", "cloud", "more", "some", "also", "than", "into",
+        "over", "such", "take", "year", "come", "could", "good", "most",
+        "need", "does", "back", "work", "only", "well", "about", "would",
+    })
+
     def __init__(self, path: Path = DICTIONARY_PATH):
         self.path = path
         self.corrections: dict[str, str] = {}  # wrong → right (case-insensitive keys)
@@ -120,11 +143,22 @@ class WhisperDictionary:
             "hotwords": self.hotwords,
         }, indent=2, ensure_ascii=False))
 
-    def add_correction(self, wrong: str, right: str) -> str:
-        """Add a spelling correction. Returns notification message."""
+    def add_correction(self, wrong: str, right: str, auto_learned: bool = False) -> str:
+        """Add a spelling correction. Returns notification message.
+
+        auto_learned=True applies stricter validation to prevent garbage entries.
+        """
         key = wrong.lower()
+
+        if auto_learned:
+            if len(key) < 3 or len(right) < 3:
+                return f"Skipped (too short): \"{wrong}\" → \"{right}\""
+            if key in self.PROTECTED_WORDS or right.lower() in self.PROTECTED_WORDS:
+                return f"Skipped (common word): \"{wrong}\" → \"{right}\""
+            if not key.isalpha() or not right.replace("'", "").isalpha():
+                return f"Skipped (not alphabetic): \"{wrong}\" → \"{right}\""
+
         self.corrections[key] = right
-        # Also add the correct spelling as a hotword for Whisper
         if right not in self.hotwords:
             self.hotwords.append(right)
         self._save()
@@ -136,10 +170,15 @@ class WhisperDictionary:
             self.hotwords.append(word)
             self._save()
 
+    def reset(self, keep_entries: dict[str, str] | None = None):
+        """Delete dictionary and recreate with only known-good entries."""
+        self.corrections = keep_entries or {}
+        self.hotwords = list(keep_entries.values()) if keep_entries else []
+        self._save()
+
     def apply(self, text: str) -> str:
         """Apply all corrections to transcribed text."""
         for wrong, right in self.corrections.items():
-            # Case-insensitive replacement preserving word boundaries
             pattern = re.compile(r'\b' + re.escape(wrong) + r'\b', re.IGNORECASE)
             text = pattern.sub(right, text)
         return text
@@ -211,12 +250,15 @@ class CorrectionTracker:
     'Teach Correction...' dialog instead.
     """
 
-    WATCH_SECONDS = 20.0     # how long to monitor after paste
+    WATCH_SECONDS = 10.0     # how long to monitor after paste
     IDLE_TIMEOUT = 1.5       # seconds of no typing = finalize pending correction
+    MIN_WORD_LEN = 3         # ignore fragments shorter than this
     BACKSPACE_KEYCODE = 51
     SPACE_KEYCODE = 49
     ARROW_KEYCODES = {123, 124, 125, 126}   # left, right, down, up
     RETURN_KEYCODES = {36, 76}              # return, numpad enter
+
+    FREQUENCY_THRESHOLD = 3  # must see same correction N times before learning
 
     def __init__(self, dictionary: WhisperDictionary, overlay=None):
         self.dictionary = dictionary
@@ -228,6 +270,7 @@ class CorrectionTracker:
         self._last_keystroke_time = 0.0
         self._watch_timer: threading.Timer | None = None
         self._lock = threading.Lock()
+        self._pending_corrections: dict[str, dict] = {}  # key → {"right": str, "count": int}
 
     def on_paste(self, text: str, engine=None):
         """Start monitoring keystrokes for corrections after a paste."""
@@ -326,22 +369,42 @@ class CorrectionTracker:
         wrong = deleted_words[-1].strip(".,!?;:\"'()")
         right = typed_words[0].strip(".,!?;:\"'()")
 
+        # Guard: both words must be real words (not fragments)
         if (wrong and right
                 and wrong.lower() != right.lower()
-                and len(wrong) > 1 and len(right) > 1):
-            msg = self.dictionary.add_correction(wrong.lower(), right)
-            print(f"[WhisperFlow] Auto-learned: {msg}")
-            # Immediate macOS notification
-            try:
-                subprocess.Popen([
-                    "osascript", "-e",
-                    f'display notification "{msg}" with title "WhisperFlow Dictionary"'
-                ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            except Exception:
-                pass
-            # Also queue for overlay pill on next recording
-            if self.overlay:
-                self.overlay._pending_notification = msg
+                and len(wrong) >= self.MIN_WORD_LEN
+                and len(right) >= self.MIN_WORD_LEN
+                and wrong.lower() not in WhisperDictionary.PROTECTED_WORDS
+                and right.lower() not in WhisperDictionary.PROTECTED_WORDS
+                and wrong.isalpha() and right.isalpha()):
+
+            # Frequency gate: must see same correction multiple times before learning
+            key = wrong.lower()
+            if key in self._pending_corrections and self._pending_corrections[key]["right"] == right:
+                self._pending_corrections[key]["count"] += 1
+            else:
+                self._pending_corrections[key] = {"right": right, "count": 1}
+
+            count = self._pending_corrections[key]["count"]
+            if count >= self.FREQUENCY_THRESHOLD:
+                msg = self.dictionary.add_correction(key, right, auto_learned=True)
+                del self._pending_corrections[key]
+                if msg.startswith("Skipped"):
+                    print(f"[WhisperFlow] {msg}")
+                    return
+                print(f"[WhisperFlow] Auto-learned (confirmed {count}x): {msg}")
+                try:
+                    subprocess.Popen([
+                        "osascript", "-e",
+                        f'display notification "{msg}" with title "WhisperFlow Dictionary"'
+                    ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                except Exception:
+                    pass
+                if self.overlay:
+                    self.overlay._pending_notification = msg
+            else:
+                print(f"[WhisperFlow] Pending correction: {wrong} → {right} ({count}/{self.FREQUENCY_THRESHOLD})")
+
             # Update pasted text to reflect correction
             self._pasted_text = self._pasted_text[:-self._backspace_count] + typed_text
 
@@ -708,6 +771,258 @@ class WaveformOverlay:
             self.panel.orderOut_(None)
 
 
+# ─── Self-Healing Health Monitor ─────────────────────────────────────────────
+
+class HealthMonitor:
+    """Runs every 30s. Detects failures, auto-fixes what it can, alerts the rest.
+
+    Auto-heals:
+      - Ring buffer died → restart it
+      - CGEventTap disabled by macOS → re-enable
+      - Stuck in TRANSCRIBING > 60s → force reset to IDLE
+      - Model not loaded after 30s → retry load
+      - Mic stream producing silence → restart ring buffer
+      - Dictionary JSON corrupted → backup + reset
+    """
+
+    CHECK_INTERVAL = 30.0  # seconds between health checks
+    TRANSCRIBE_TIMEOUT = 60.0  # max seconds in TRANSCRIBING state
+    SILENCE_STREAK_LIMIT = 3  # consecutive silent checks before restart
+    MODEL_LOAD_TIMEOUT = 30.0  # seconds to wait before retrying model load
+
+    def __init__(self):
+        self.engine = None
+        self.app = None
+        self._silence_streak = 0
+        self._model_retry_count = 0
+        self._last_successful_transcription = time.time()
+        self._heals_performed: list[tuple[float, str]] = []  # (timestamp, action)
+        self._state_entered_at: float = time.time()
+
+    def attach(self, engine, app=None):
+        self.engine = engine
+        self.app = app
+        # Hook into state changes to track timing
+        original_set_state = engine._set_state
+        def tracked_set_state(new_state):
+            self._state_entered_at = time.time()
+            if new_state == State.IDLE and engine.state == State.TYPING:
+                self._last_successful_transcription = time.time()
+            original_set_state(new_state)
+        engine._set_state = tracked_set_state
+
+    def check(self):
+        """Run all health checks. Called from rumps Timer on main thread."""
+        if not self.engine:
+            return
+        try:
+            self._check_stuck_state()
+            self._check_ring_buffer()
+            self._check_mic_silence()
+            self._check_mic_switch()
+            self._check_model()
+            self._check_event_tap()
+            self._check_dictionary()
+        except Exception as e:
+            print(f"[HealthMonitor] Check error: {e}", flush=True)
+
+    def _heal(self, action: str):
+        """Log a self-healing action."""
+        self._heals_performed.append((time.time(), action))
+        print(f"[HealthMonitor] HEALED: {action}", flush=True)
+        # Keep last 50 actions
+        if len(self._heals_performed) > 50:
+            self._heals_performed = self._heals_performed[-50:]
+
+    def _notify(self, msg: str):
+        """Show macOS notification for issues that need user attention."""
+        try:
+            subprocess.Popen(
+                ["osascript", "-e",
+                 f'display notification "{msg}" with title "WhisperFlow"'],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            )
+        except Exception:
+            pass
+
+    # ── Individual checks ──
+
+    def _check_stuck_state(self):
+        """Force-reset if stuck in TRANSCRIBING or TYPING too long."""
+        e = self.engine
+        elapsed = time.time() - self._state_entered_at
+        if e.state == State.TRANSCRIBING and elapsed > self.TRANSCRIBE_TIMEOUT:
+            self._heal(f"Force-reset from TRANSCRIBING (stuck {elapsed:.0f}s)")
+            e.main_queue.put("hide")
+            e._recording_active = False
+            e._set_state(State.IDLE)
+            self._notify("Recording was stuck — auto-reset. Try again.")
+        elif e.state == State.TYPING and elapsed > 15.0:
+            self._heal(f"Force-reset from TYPING (stuck {elapsed:.0f}s)")
+            e.main_queue.put("hide")
+            e._set_state(State.IDLE)
+
+    def _check_ring_buffer(self):
+        """Restart ring buffer if it died — even during recording.
+
+        The ring buffer stream IS the recording stream. If it dies mid-recording,
+        audio capture stops (peak=0). Must restart immediately.
+        """
+        e = self.engine
+        if e.state in (State.TRANSCRIBING, State.TYPING):
+            return  # don't touch during transcription
+        # Respect exponential backoff on repeated failures
+        if e._ring_restart_failures > 0:
+            backoff = min(2 ** e._ring_restart_failures, 60.0)
+            if backoff > self.CHECK_INTERVAL:
+                return
+        with e._stream_lock:
+            if e.state in (State.TRANSCRIBING, State.TYPING):
+                return
+            if e._ring_stream is None:
+                self._heal("Ring buffer was dead — restarting")
+                e.start_ring_buffer()
+            elif not e._ring_stream.active:
+                self._heal("Ring buffer stream stopped — restarting")
+                try:
+                    e._ring_stream.close()
+                except Exception:
+                    pass
+                e._ring_stream = None
+                e.start_ring_buffer()
+
+    def _check_mic_silence(self):
+        """Detect if mic is producing silence (permission revoked, device changed)."""
+        e = self.engine
+        if e.state != State.IDLE or e._ring_stream is None:
+            return
+        with e._ring_lock:
+            if e._ring_buf:
+                samples = np.concatenate(e._ring_buf, axis=0)
+                peak = float(np.abs(samples).max())
+            else:
+                peak = 0.0
+        if peak < 0.0001:
+            self._silence_streak += 1
+            if self._silence_streak >= self.SILENCE_STREAK_LIMIT:
+                self._heal(f"Mic silent {self._silence_streak} checks — restarting ring buffer")
+                self._silence_streak = 0
+                with e._stream_lock:
+                    try:
+                        e._ring_stream.stop()
+                        e._ring_stream.close()
+                    except Exception:
+                        pass
+                    e._ring_stream = None
+                    e.start_ring_buffer()
+                self._notify("Mic was silent — restarted. Check mic input device.")
+        else:
+            self._silence_streak = 0
+
+    def _check_mic_switch(self):
+        """Detect if user switched their default mic and follow it automatically."""
+        e = self.engine
+        if e.state != State.IDLE:
+            return  # don't switch mid-recording
+        new_default = e._detect_active_mic()
+        if new_default is None:
+            return
+        try:
+            new_name = sd.query_devices(new_default)['name']
+        except Exception:
+            return
+        if e._current_device_name and new_name != e._current_device_name:
+            self._heal(f"Mic switched: {e._current_device_name} → {new_name}")
+            with e._stream_lock:
+                if e._ring_stream:
+                    try:
+                        e._ring_stream.close()
+                    except Exception:
+                        pass
+                    e._ring_stream = None
+                e.start_ring_buffer()
+
+    def _check_model(self):
+        """Retry model loading if it failed."""
+        e = self.engine
+        if e.model is None and self._model_retry_count < 3:
+            elapsed = time.time() - self._state_entered_at
+            if elapsed > self.MODEL_LOAD_TIMEOUT:
+                self._model_retry_count += 1
+                self._heal(f"Model not loaded — retry #{self._model_retry_count}")
+                def retry():
+                    try:
+                        e.load_model()
+                        if self.app:
+                            self.app.title = ICON_IDLE
+                        self._notify("Model loaded successfully.")
+                    except Exception as ex:
+                        print(f"[HealthMonitor] Model retry failed: {ex}", flush=True)
+                threading.Thread(target=retry, daemon=True).start()
+
+    def _check_event_tap(self):
+        """Re-enable CGEventTap if macOS disabled it."""
+        if not self.app or not hasattr(self.app, 'hotkey_listener'):
+            return
+        tap = self.app.hotkey_listener._tap
+        if tap is not None:
+            try:
+                from Quartz import CGEventTapIsEnabled, CGEventTapEnable
+                if not CGEventTapIsEnabled(tap):
+                    CGEventTapEnable(tap, True)
+                    self._heal("CGEventTap was disabled — re-enabled")
+            except Exception:
+                pass
+        elif tap is None:
+            # Tap never created (permissions issue) — retry up to 3 times, then stop spamming
+            if not hasattr(self, '_tap_retries'):
+                self._tap_retries = 0
+            if self._tap_retries >= 3:
+                return  # stop retrying, user needs to fix permissions
+            self._tap_retries += 1
+            self._heal(f"CGEventTap was never created — retry #{self._tap_retries}/3")
+            result = self.app.hotkey_listener.start()
+            if result is None and self._tap_retries >= 3:
+                self._notify("Hotkey not working. Grant Accessibility permission in System Settings.")
+
+    def _check_dictionary(self):
+        """Verify dictionary file is valid JSON."""
+        if not DICTIONARY_PATH.exists():
+            return
+        try:
+            with open(DICTIONARY_PATH) as f:
+                json.load(f)
+        except (json.JSONDecodeError, ValueError):
+            backup = DICTIONARY_PATH.with_suffix('.json.bak')
+            try:
+                import shutil
+                shutil.copy2(DICTIONARY_PATH, backup)
+                DICTIONARY_PATH.unlink()
+                _dictionary.corrections.clear()
+                _dictionary.hotwords.clear()
+                self._heal(f"Dictionary was corrupted — backed up to {backup.name}, reset")
+                self._notify("Dictionary was corrupted and has been reset.")
+            except Exception as ex:
+                print(f"[HealthMonitor] Dictionary fix failed: {ex}", flush=True)
+
+    def get_status(self) -> str:
+        """Return human-readable health status."""
+        lines = [f"State: {self.engine.state.value if self.engine else 'detached'}"]
+        lines.append(f"Ring buffer: {'active' if self.engine and self.engine._ring_stream and self.engine._ring_stream.active else 'dead'}")
+        lines.append(f"Model: {'loaded' if self.engine and self.engine.model else 'not loaded'}")
+        lines.append(f"Silence streak: {self._silence_streak}")
+        lines.append(f"Heals: {len(self._heals_performed)}")
+        if self._heals_performed:
+            last = self._heals_performed[-1]
+            ago = time.time() - last[0]
+            lines.append(f"Last heal: {last[1]} ({ago:.0f}s ago)")
+        return "\n".join(lines)
+
+
+# Global health monitor instance
+_health_monitor = HealthMonitor()
+
+
 # ─── State Machine ───────────────────────────────────────────────────────────
 
 class State(Enum):
@@ -738,11 +1053,43 @@ class WhisperFlowEngine:
         self.main_queue: queue_mod.Queue = queue_mod.Queue()
         self.toggle_locked = False  # double-tap persistent recording mode
         self._native_rate: int = SAMPLE_RATE  # set properly by _open_mic
+        # Always-on ring buffer: captures audio continuously so recording
+        # starts instantly with pre-roll (no first-word cutoff)
+        self._ring_buf: list[np.ndarray] = []
+        self._ring_lock = threading.Lock()
+        self._ring_max_samples = int(SAMPLE_RATE * WHISPER_PREROLL_SECONDS)
+        self._ring_stream: sd.InputStream | None = None
+        self._recording_active = False  # True while actively recording
+        self._stream_lock = threading.RLock()  # protects ALL stream open/close/restart
+        self._current_device_name: str = ""    # track which mic is active
+        self._ring_restart_failures: int = 0   # exponential backoff counter
+
+    def start_ring_buffer(self):
+        """Start the always-on mic stream. Call once at app startup.
+
+        Audio flows continuously into a ring buffer. When recording starts,
+        the last PREROLL_SECONDS are grabbed instantly — no mic-open delay,
+        no first-word cutoff.
+        """
+        with self._stream_lock:
+            try:
+                self._ring_stream, self._native_rate = self._open_mic()
+                self._ring_stream.start()
+                self._ring_restart_failures = 0
+                print(f"[WhisperFlow] Ring buffer active ({WHISPER_PREROLL_SECONDS}s pre-roll)")
+            except Exception as e:
+                self._ring_restart_failures += 1
+                backoff = min(2 ** self._ring_restart_failures, 60.0)
+                print(f"[WhisperFlow] Ring buffer failed (attempt {self._ring_restart_failures},"
+                      f" backoff {backoff:.0f}s): {e}", flush=True)
 
     def load_model(self):
         from faster_whisper import WhisperModel
         print(f"[WhisperFlow] Loading model '{WHISPER_MODEL}' ({WHISPER_COMPUTE_TYPE})...")
-        self.model = WhisperModel(WHISPER_MODEL, device="cpu", compute_type=WHISPER_COMPUTE_TYPE)
+        self.model = WhisperModel(
+            WHISPER_MODEL, device="cpu", compute_type=WHISPER_COMPUTE_TYPE,
+            cpu_threads=WHISPER_CPU_THREADS,
+        )
         print("[WhisperFlow] Model loaded.")
 
     def _set_state(self, new_state: State):
@@ -750,16 +1097,20 @@ class WhisperFlowEngine:
         self.on_state_change(new_state)
 
     def toggle_recording(self):
+        """Toggle recording state."""
         with self.lock:
-            if self.state == State.IDLE:
-                self._start_recording()
-            elif self.state == State.RECORDING:
-                self._stop_recording()
-            elif self.state == State.PAUSED:
-                self._stop_recording()
-            elif self.state in (State.TRANSCRIBING, State.TYPING):
-                # Force hide overlay if stuck
-                self.main_queue.put("hide")
+            self._toggle_recording_inner()
+
+    def _toggle_recording_inner(self):
+        if self.state == State.IDLE:
+            self._start_recording()
+        elif self.state == State.RECORDING:
+            self._stop_recording()
+        elif self.state == State.PAUSED:
+            self._stop_recording()
+        elif self.state in (State.TRANSCRIBING, State.TYPING):
+            # Force hide overlay if stuck
+            self.main_queue.put("hide")
 
     def pause_or_resume(self):
         """Long-press action: pause if recording, resume if paused."""
@@ -772,7 +1123,11 @@ class WhisperFlowEngine:
     def _audio_callback(self, indata, frames, time_info, status):
         if status:
             print(f"[WhisperFlow] Audio warning: {status}")
-        data = indata
+            if 'error' in str(status).lower():
+                self.main_queue.put("restart_ring_buffer")
+        if indata is None or len(indata) == 0:
+            return
+        data = indata.copy()  # copy early to avoid use-after-free on stream restart
         # Downsample to 16kHz mono if mic is at native rate
         if data.shape[1] > 1:
             data = data.mean(axis=1, keepdims=True)
@@ -780,69 +1135,172 @@ class WhisperFlowEngine:
             ratio = int(round(self._native_rate / SAMPLE_RATE))
             if ratio > 1:
                 data = data[::ratio]
-        self.audio_chunks.append(data.copy())
-        # Use original for amplitude (full-rate = more responsive)
-        rms = float(np.sqrt(np.mean(indata ** 2)))
-        peak = float(np.abs(indata).max())
-        if peak > self._peak_amplitude:
-            self._peak_amplitude = peak
-        amp = min(1.0, (peak * 0.6 + rms * 0.4) * 25.0)
-        self.overlay.update_amplitude(amp)
+        chunk = data.copy()
+
+        if self._recording_active:
+            # Active recording — append to chunks
+            self.audio_chunks.append(chunk)
+            rms = float(np.sqrt(np.mean(indata ** 2)))
+            peak = float(np.abs(indata).max())
+            if peak > self._peak_amplitude:
+                self._peak_amplitude = peak
+            amp = min(1.0, (peak * 0.6 + rms * 0.4) * 25.0)
+            self.overlay.update_amplitude(amp)
+        else:
+            # Idle — feed ring buffer (rolling window of last PREROLL_SECONDS)
+            with self._ring_lock:
+                self._ring_buf.append(chunk)
+                # Trim to max size
+                total = sum(c.shape[0] for c in self._ring_buf)
+                while total > self._ring_max_samples and len(self._ring_buf) > 1:
+                    total -= self._ring_buf[0].shape[0]
+                    self._ring_buf.pop(0)
 
     def _start_recording(self):
         play_sound(SOUND_START)
-        self.audio_chunks = []
         self._peak_amplitude = 0.0
         self.recording_start = time.time()
-        self.toggle_locked = False
+        # NOTE: do NOT reset toggle_locked here — it's set by double-tap
         self.main_queue.put("show")
 
-        try:
-            self.stream, self._native_rate = self._open_mic()
-            self.stream.start()
+        # Grab pre-roll audio from ring buffer (last ~0.75s before key press)
+        with self._ring_lock:
+            preroll = list(self._ring_buf)
+            self._ring_buf.clear()
+        self.audio_chunks = preroll
+
+        if self._ring_stream is not None:
+            # Ring buffer stream already running — just switch to recording mode
+            self._recording_active = True
             self._set_state(State.RECORDING)
-            print("[WhisperFlow] Recording started.")
-        except Exception as e:
-            print(f"[WhisperFlow] ERROR opening mic: {e}", flush=True)
-            self.main_queue.put("hide")
-            self._set_state(State.IDLE)
+            preroll_ms = sum(c.shape[0] for c in preroll) / SAMPLE_RATE * 1000
+            print(f"[WhisperFlow] Recording started (pre-roll: {preroll_ms:.0f}ms)")
+        else:
+            # Fallback: open mic on demand (ring buffer failed to start)
+            with self._stream_lock:
+                try:
+                    self.stream, self._native_rate = self._open_mic()
+                    self.stream.start()
+                    self._recording_active = True
+                    self._set_state(State.RECORDING)
+                    print("[WhisperFlow] Recording started (no pre-roll, fallback mic).")
+                except Exception as e:
+                    print(f"[WhisperFlow] ERROR opening mic: {e}", flush=True)
+                    self.main_queue.put("hide")
+                    self._set_state(State.IDLE)
+
+    def _detect_active_mic(self) -> int | None:
+        """Return the device index of macOS's current default input device."""
+        try:
+            default = sd.query_devices(kind='input')
+            if default and default['max_input_channels'] > 0:
+                all_devs = sd.query_devices()
+                for i in range(len(all_devs)):
+                    if sd.query_devices(i)['name'] == default['name']:
+                        return i
+        except Exception:
+            pass
+        return None
 
     def _open_mic(self):
-        """Open mic stream at native rate, resample later. Falls back on error."""
-        dev_info = sd.query_devices(kind='input')
-        name = dev_info['name']
-        native_rate = int(dev_info['default_samplerate'])
-        max_ch = dev_info['max_input_channels']
+        """Open mic stream at native rate, resample later. Falls back on error.
 
-        # Try configs in order: 16kHz mono (proven working), then native rate fallbacks
-        configs = [
-            (SAMPLE_RATE, 1),
-            (native_rate, 1),
-            (native_rate, min(max_ch, 2)),
-        ]
-        for rate, ch in configs:
+        Prefers the system default input device (follows user's Sound Settings).
+        Falls back to priority scan (USB > built-in > virtual) if default fails.
+        """
+        # Only reinitialize PortAudio if no streams are open
+        # (avoids destroying ring buffer mid-callback — the primary crash cause)
+        if self._ring_stream is None and self.stream is None:
             try:
-                print(f"[WhisperFlow] Mic: {name} — trying {rate}Hz/{ch}ch")
-                stream = sd.InputStream(
-                    samplerate=rate, channels=ch,
-                    dtype=DTYPE, callback=self._audio_callback,
-                )
-                print(f"[WhisperFlow] Mic: {name} — opened at {rate}Hz/{ch}ch")
-                return stream, rate
-            except Exception as e:
-                print(f"[WhisperFlow] Mic config {rate}Hz/{ch}ch failed: {e}")
-                continue
+                sd._terminate()
+                sd._initialize()
+            except Exception:
+                pass
 
-        raise RuntimeError(f"Could not open mic '{name}' with any config")
+        # Build candidate list: (device_index, info_dict)
+        VIRTUAL_KEYWORDS = ('iphone', 'ipad', 'continuity', 'loom', 'zoom', 'virtual', 'aggregate', 'airpods', 'bluetooth', 'bt ', '🎧')
+        raw_candidates = []
+        seen_indices = set()
+
+        try:
+            all_devs = sd.query_devices()
+            for i in range(len(all_devs)):
+                info = sd.query_devices(i)
+                if info['max_input_channels'] > 0 and i not in seen_indices:
+                    raw_candidates.append((i, info))
+                    seen_indices.add(i)
+        except Exception:
+            pass
+
+        # Sort: system default first, then USB > built-in > virtual
+        default_idx = self._detect_active_mic()
+
+        def _mic_priority(item):
+            idx, info = item
+            name = info['name'].lower()
+            if idx == default_idx:
+                return -1  # system default — always try first
+            if any(v in name for v in VIRTUAL_KEYWORDS):
+                return 2  # virtual / phone — last resort
+            if 'built-in' in name or 'macbook' in name or 'internal' in name:
+                return 1  # built-in — good fallback
+            return 0  # USB / external — preferred
+
+        candidates = sorted(raw_candidates, key=_mic_priority)
+
+        if not candidates:
+            raise RuntimeError("No input audio devices found")
+
+        for dev_idx, dev_info in candidates:
+            name = dev_info['name']
+            native_rate = int(dev_info['default_samplerate'])
+            max_ch = dev_info['max_input_channels']
+
+            configs = [
+                (SAMPLE_RATE, 1),
+                (native_rate, 1),
+                (native_rate, min(max_ch, 2)),
+            ]
+            for rate, ch in configs:
+                try:
+                    print(f"[WhisperFlow] Mic: {name} — trying {rate}Hz/{ch}ch")
+                    stream = sd.InputStream(
+                        samplerate=rate, channels=ch, device=dev_idx,
+                        dtype=DTYPE, callback=self._audio_callback,
+                    )
+                    stream.start()
+                    time.sleep(0.3)
+                    with self._ring_lock:
+                        if self._ring_buf:
+                            samples = np.concatenate(self._ring_buf, axis=0)
+                            peak = float(np.abs(samples).max())
+                        else:
+                            peak = 0.0
+                    stream.stop()
+                    if peak < 0.0001:
+                        print(f"[WhisperFlow] Mic {name} {rate}Hz/{ch}ch — silence (peak={peak:.6f}), skipping")
+                        stream.close()
+                        continue
+                    print(f"[WhisperFlow] Mic: {name} — verified at {rate}Hz/{ch}ch (peak={peak:.4f})")
+                    self._current_device_name = name
+                    return stream, rate
+                except Exception as e:
+                    print(f"[WhisperFlow] Mic config {name} {rate}Hz/{ch}ch failed: {e}")
+                    continue
+
+        raise RuntimeError("Could not open any microphone with any config")
 
     def _stop_recording(self):
         play_sound(SOUND_STOP)
-        self.toggle_locked = False
+        self.toggle_locked = False  # clear locked mode on explicit stop
+        self._recording_active = False
 
-        if self.stream:
-            self.stream.stop()
-            self.stream.close()
-            self.stream = None
+        # Close fallback stream if used (ring buffer stream stays alive)
+        with self._stream_lock:
+            if self.stream:
+                self.stream.stop()
+                self.stream.close()
+                self.stream = None
 
         duration = time.time() - self.recording_start
         if duration < MIN_RECORDING_SECONDS:
@@ -859,22 +1317,29 @@ class WhisperFlowEngine:
         threading.Thread(target=self._transcribe_and_paste, args=(duration,), daemon=True).start()
 
     def _pause_recording(self):
-        """Pause: stop the audio stream but keep accumulated chunks."""
+        """Pause: stop capturing but keep accumulated chunks."""
         play_sound(SOUND_STOP)
-        if self.stream:
-            self.stream.stop()
-            self.stream.close()
-            self.stream = None
+        self._recording_active = False
+        with self._stream_lock:
+            if self.stream:
+                self.stream.stop()
+                self.stream.close()
+                self.stream = None
         self.main_queue.put("pause")
         self._set_state(State.PAUSED)
         print("[WhisperFlow] Recording paused.")
 
     def _resume_recording(self):
-        """Resume: open a new stream, append to existing chunks."""
+        """Resume: switch back to recording mode (ring buffer stream still alive)."""
         play_sound(SOUND_START)
         self.main_queue.put("resume")
-        self.stream, self._native_rate = self._open_mic()
-        self.stream.start()
+        if self._ring_stream is not None:
+            self._recording_active = True
+        else:
+            with self._stream_lock:
+                self.stream, self._native_rate = self._open_mic()
+                self.stream.start()
+                self._recording_active = True
         self._set_state(State.RECORDING)
         print("[WhisperFlow] Recording resumed.")
 
@@ -897,6 +1362,16 @@ class WhisperFlowEngine:
                     self.overlay.set_visual_state("recording")
                 elif action == "lock":
                     self.overlay.set_visual_state("locked")
+                elif action == "restart_ring_buffer":
+                    # Restart ring buffer even during recording — audio dies without it
+                    with self._stream_lock:
+                        if self._ring_stream:
+                            try:
+                                self._ring_stream.close()
+                            except Exception:
+                                pass
+                            self._ring_stream = None
+                        self.start_ring_buffer()
         except queue_mod.Empty:
             pass
 
@@ -923,6 +1398,7 @@ class WhisperFlowEngine:
 
             if not text or not text.strip():
                 print("[WhisperFlow] No speech detected.")
+                self.overlay.show_notification("No speech detected", duration=2.0)
                 self.main_queue.put("hide")
                 self._set_state(State.IDLE)
                 return
@@ -969,12 +1445,15 @@ class WhisperFlowEngine:
             self.load_model()
         # Build initial prompt with dictionary hotwords for better recognition
         hotwords = _dictionary.get_hotwords_prompt()
-        prompt = hotwords + "The following is a clear, well-structured dictation."
+        prompt = hotwords + "The following is a clear, professional business dictation. Use standard English words."
         segments, _ = self.model.transcribe(
             audio_path,
-            beam_size=5,
+            beam_size=1,
+            best_of=1,
             vad_filter=WHISPER_VAD_FILTER,
             initial_prompt=prompt,
+            language="en",
+            condition_on_previous_text=False,
         )
         return " ".join(seg.text for seg in segments).strip()
 
@@ -1040,12 +1519,7 @@ def _api_cleanup(text: str) -> str:
 # ─── Text Paste ──────────────────────────────────────────────────────────────
 
 def paste_text(text: str):
-    """Paste text into active field via CGEvent Cmd+V with clipboard save/restore."""
-    from Quartz import (
-        CGEventCreateKeyboardEvent, CGEventPost, CGEventSetFlags,
-        kCGHIDEventTap, kCGEventFlagMaskCommand,
-    )
-
+    """Paste text into active field via AppleScript keystroke Cmd+V."""
     # Save current clipboard
     saved_clipboard = None
     if WHISPER_RESTORE_CLIPBOARD:
@@ -1059,21 +1533,25 @@ def paste_text(text: str):
     # Set clipboard to our text
     proc = subprocess.Popen(["pbcopy"], stdin=subprocess.PIPE)
     proc.communicate(text.encode("utf-8"))
-
-    # Simulate Cmd+V via CGEvent (keycode 9 = 'v')
     time.sleep(0.05)
-    V_KEYCODE = 9
-    event_down = CGEventCreateKeyboardEvent(None, V_KEYCODE, True)
-    CGEventSetFlags(event_down, kCGEventFlagMaskCommand)
-    event_up = CGEventCreateKeyboardEvent(None, V_KEYCODE, False)
-    CGEventSetFlags(event_up, kCGEventFlagMaskCommand)
-    CGEventPost(kCGHIDEventTap, event_down)
-    CGEventPost(kCGHIDEventTap, event_up)
 
-    # Restore clipboard after a brief delay
+    # Paste via AppleScript (works without Accessibility permission)
+    try:
+        result = subprocess.run(
+            ["osascript", "-e", 'tell application "System Events" to keystroke "v" using command down'],
+            timeout=3, capture_output=True, text=True,
+        )
+        if result.returncode != 0:
+            print(f"[WhisperFlow] AppleScript paste error: {result.stderr.strip()}", flush=True)
+        else:
+            print("[WhisperFlow] Pasted via AppleScript", flush=True)
+    except Exception as e:
+        print(f"[WhisperFlow] Paste failed: {e}", flush=True)
+
+    # Restore clipboard after a delay (enough for paste to complete)
     if saved_clipboard is not None:
         def restore():
-            time.sleep(0.5)
+            time.sleep(1.0)
             proc = subprocess.Popen(["pbcopy"], stdin=subprocess.PIPE)
             proc.communicate(saved_clipboard)
         threading.Thread(target=restore, daemon=True).start()
@@ -1085,9 +1563,9 @@ class CGEventTapHotkeyListener:
     """Listens for Left Option key gestures via CGEventTap (no pynput needed).
 
     Gestures:
-      - Single tap (<400ms): toggle recording start/stop
-      - Double-tap (<600ms between taps): toggle locked (persistent) recording mode
-      - Long-press (>1s): pause/resume recording
+      - Single tap (<0.4s press, release): toggle recording start/stop
+      - Double-tap (two taps within 0.6s): toggle locked (persistent) recording mode
+      - Long-press (hold >1s): pause/resume recording
     """
 
     LEFT_OPTION_KEYCODE = 58
@@ -1095,9 +1573,16 @@ class CGEventTapHotkeyListener:
     def __init__(self, engine: WhisperFlowEngine):
         self.engine = engine
         self._ropt_down_time: float = 0
+        self._last_tap_time: float = 0     # time of last tap (for double-tap detection)
         self._other_key_pressed = False
-        self._last_tap_time: float = 0
+        self._long_press_timer: threading.Timer | None = None
         self._tap = None  # CFMachPort reference
+
+    def _on_long_press(self):
+        """Held >1.0s — pause/resume."""
+        self._ropt_down_time = 0  # prevent UP handler from also acting
+        print("[WhisperFlow] LONG PRESS — pause/resume", flush=True)
+        self.engine.pause_or_resume()
 
     def _callback(self, proxy, event_type, event, refcon):
         from Quartz import (
@@ -1115,42 +1600,44 @@ class CGEventTapHotkeyListener:
                 if is_down:
                     self._ropt_down_time = time.time()
                     self._other_key_pressed = False
+                    # Start long-press detection (only while recording/paused)
+                    if self.engine.state in (State.RECORDING, State.PAUSED):
+                        self._long_press_timer = threading.Timer(
+                            WHISPER_PAUSE_HOLD_THRESHOLD, self._on_long_press)
+                        self._long_press_timer.start()
                 else:
                     # Key released
-                    if self._ropt_down_time > 0:
-                        held = time.time() - self._ropt_down_time
-                        self._ropt_down_time = 0
+                    if self._long_press_timer:
+                        self._long_press_timer.cancel()
+                        self._long_press_timer = None
+                    if self._ropt_down_time <= 0:
+                        return event  # long-press already handled
+                    held = time.time() - self._ropt_down_time
+                    self._ropt_down_time = 0
+                    if self._other_key_pressed:
+                        return event  # modifier combo, ignore
+                    if held >= WHISPER_PAUSE_HOLD_THRESHOLD:
+                        return event  # long-press already handled by timer
 
-                        if self._other_key_pressed:
-                            return event  # ignore if other keys were pressed
+                    # It's a tap — act INSTANTLY (no delay)
+                    now = time.time()
+                    is_double = (now - self._last_tap_time) < WHISPER_DOUBLE_TAP_WINDOW
+                    self._last_tap_time = now
 
-                        if held >= WHISPER_PAUSE_HOLD_THRESHOLD:
-                            # Long-press: pause/resume
-                            print(f"[WhisperFlow] LONG PRESS ({held:.2f}s) — pause/resume", flush=True)
-                            self.engine.pause_or_resume()
-                        elif held < WHISPER_HOTKEY_TAP_TIMEOUT:
-                            # Tap detected — check for double-tap
-                            now = time.time()
-                            if now - self._last_tap_time < WHISPER_DOUBLE_TAP_WINDOW:
-                                # Double-tap: toggle locked mode
-                                self._last_tap_time = 0
-                                with self.engine.lock:
-                                    if self.engine.state == State.RECORDING:
-                                        self.engine.toggle_locked = True
-                                        self.engine.main_queue.put("lock")
-                                        print("[WhisperFlow] DOUBLE TAP — locked recording mode", flush=True)
-                                    elif self.engine.state == State.IDLE:
-                                        self.engine.toggle_recording()
-                                        self.engine.toggle_locked = True
-                                        self.engine.main_queue.put("lock")
-                                        print("[WhisperFlow] DOUBLE TAP — started locked recording", flush=True)
-                                    else:
-                                        self.engine.toggle_recording()
-                            else:
-                                # Single tap: toggle
-                                self._last_tap_time = now
-                                print(f"[WhisperFlow] TAP ({held:.2f}s) — toggle", flush=True)
-                                self.engine.toggle_recording()
+                    if is_double:
+                        # Double-tap: if we just started recording, upgrade to locked
+                        if self.engine.state == State.RECORDING:
+                            self.engine.toggle_locked = True
+                            print("[WhisperFlow] DOUBLE-TAP — locked mode ON", flush=True)
+                        elif self.engine.state == State.IDLE:
+                            # Edge case: double-tap while idle = start locked
+                            self.engine.toggle_locked = True
+                            self.engine.toggle_recording()
+                            print("[WhisperFlow] DOUBLE-TAP — locked recording started", flush=True)
+                    else:
+                        # Single tap — toggle immediately
+                        print(f"[WhisperFlow] TAP — toggle ({self.engine.state.value})", flush=True)
+                        self.engine.toggle_recording()
 
         elif event_type == kCGEventKeyDown:
             self._other_key_pressed = True
@@ -1220,12 +1707,97 @@ class CGEventTapHotkeyListener:
         t.start()
         print(
             "[WhisperFlow] CGEventTap hotkey active:\n"
-            "  Tap Left Option (⌥)       → start/stop recording\n"
-            "  Double-tap Right Option     → locked (hands-free) mode\n"
-            "  Long-press Right Option >1s → pause/resume",
+            "  Tap Left Option (⌥)        → start/stop recording\n"
+            "  Double-tap Left Option      → locked (hands-free) mode\n"
+            "  Long-press Left Option >1s  → pause/resume",
             flush=True,
         )
         return t
+
+
+class NSEventHotkeyListener:
+    """Listens for Left Option key via NSEvent global monitor.
+
+    Unlike CGEventTap, this only needs Input Monitoring permission (not Accessibility).
+    Must be started from the main thread (after NSApplication is running, e.g. in a rumps app).
+    Same gesture logic as CGEventTapHotkeyListener: single-tap, double-tap, long-press.
+    """
+
+    LEFT_OPTION_KEYCODE = 58
+
+    def __init__(self, engine: WhisperFlowEngine):
+        self.engine = engine
+        self._down_time: float = 0
+        self._last_tap_time: float = 0
+        self._other_key_pressed = False
+        self._long_press_timer: threading.Timer | None = None
+        self._monitor_flags = None
+        self._monitor_keys = None
+
+    def _on_long_press(self):
+        self._down_time = 0
+        print("[WhisperFlow] LONG PRESS — pause/resume", flush=True)
+        self.engine.pause_or_resume()
+
+    def start(self):
+        from AppKit import NSEvent, NSFlagsChangedMask, NSKeyDownMask
+
+        def on_flags_changed(event):
+            keycode = event.keyCode()
+            if keycode != self.LEFT_OPTION_KEYCODE:
+                return
+            is_down = bool(event.modifierFlags() & (1 << 19))
+
+            if is_down:
+                self._down_time = time.time()
+                self._other_key_pressed = False
+                if self.engine.state in (State.RECORDING, State.PAUSED):
+                    self._long_press_timer = threading.Timer(
+                        WHISPER_PAUSE_HOLD_THRESHOLD, self._on_long_press)
+                    self._long_press_timer.start()
+            else:
+                if self._long_press_timer:
+                    self._long_press_timer.cancel()
+                    self._long_press_timer = None
+                if self._down_time <= 0:
+                    return
+                held = time.time() - self._down_time
+                self._down_time = 0
+                if self._other_key_pressed:
+                    return
+                if held >= WHISPER_PAUSE_HOLD_THRESHOLD:
+                    return
+
+                # Instant tap — same logic as CGEventTap listener
+                now = time.time()
+                is_double = (now - self._last_tap_time) < WHISPER_DOUBLE_TAP_WINDOW
+                self._last_tap_time = now
+
+                if is_double:
+                    if self.engine.state == State.RECORDING:
+                        self.engine.toggle_locked = True
+                        print("[WhisperFlow] DOUBLE-TAP — locked mode ON", flush=True)
+                    elif self.engine.state == State.IDLE:
+                        self.engine.toggle_locked = True
+                        self.engine.toggle_recording()
+                else:
+                    self.engine.toggle_recording()
+
+        def on_key_down(event):
+            self._other_key_pressed = True
+
+        self._monitor_flags = NSEvent.addGlobalMonitorForEventsMatchingMask_handler_(
+            NSFlagsChangedMask, on_flags_changed
+        )
+        self._monitor_keys = NSEvent.addGlobalMonitorForEventsMatchingMask_handler_(
+            NSKeyDownMask, on_key_down
+        )
+        if self._monitor_flags:
+            print("[WhisperFlow] NSEvent hotkey active — Left Option (⌥) tap/double-tap/long-press")
+            return True
+        else:
+            print("[WhisperFlow] NSEvent monitor failed — grant Input Monitoring permission")
+            return None
 
 
 class MouseHoldListener:
@@ -1304,6 +1876,19 @@ def _request_mic_permission():
 
 def run_menubar_app():
     """Run WhisperFlow as a macOS menubar app."""
+    # Redirect stdout/stderr to log file if not already going to a file
+    log_path = TMP_DIR / "whisper_flow.log"
+    if not sys.stdout.isatty():
+        # Already redirected by launchd — just ensure it exists
+        pass
+    else:
+        try:
+            log_file = open(log_path, "a", buffering=1)
+            sys.stdout = log_file
+            sys.stderr = log_file
+        except Exception:
+            pass
+    print(f"[WhisperFlow] Starting...", flush=True)
     import rumps
 
     class WhisperFlowApp(rumps.App):
@@ -1313,6 +1898,7 @@ def run_menubar_app():
                 rumps.MenuItem("Toggle Recording (tap ⌥)", callback=self._toggle),
                 rumps.MenuItem("Teach Correction...", callback=self._teach_correction),
                 rumps.MenuItem("Show Dictionary", callback=self._show_dictionary),
+                rumps.MenuItem("Health Check", callback=self._show_health),
                 None,
                 rumps.MenuItem(f"Model: {WHISPER_MODEL}"),
                 rumps.MenuItem("Status: Idle"),
@@ -1338,6 +1924,9 @@ def run_menubar_app():
             # Load model in background
             threading.Thread(target=self._load_model, daemon=True).start()
 
+            # Start always-on ring buffer immediately (so first recording has pre-roll)
+            self.engine.start_ring_buffer()
+
             # Request mic permission + run audio self-test after run loop starts
             self._mic_perm_timer = rumps.Timer(self._request_mic_perm, 2.0)
             self._mic_perm_timer.start()
@@ -1345,16 +1934,62 @@ def run_menubar_app():
             self._selftest_timer.start()
 
             # Start input listeners
+            # If launched by Swift wrapper (WHISPERFLOW_HOTKEY_MODE=signal),
+            # use signal-based hotkey (SIGUSR1=toggle, SIGUSR2=stop).
+            # Otherwise, use CGEventTap (needs Accessibility permission).
+            # Try hotkey methods in order: CGEventTap → NSEvent monitor → signal
+            hotkey_mode = os.environ.get("WHISPERFLOW_HOTKEY_MODE", "cgeventtap")
+            hotkey_ok = False
+
+            # 1. CGEventTap (needs Accessibility permission)
             self.hotkey_listener = CGEventTapHotkeyListener(self.engine)
-            self.hotkey_listener.start()
-            self.mouse_listener = MouseHoldListener(self.engine)
-            self.mouse_listener.start()
+            if self.hotkey_listener.start() is not None:
+                print("[WhisperFlow] Hotkey mode: CGEventTap")
+                hotkey_ok = True
+
+            # 2. NSEvent global monitor (needs Input Monitoring only)
+            if not hotkey_ok:
+                ns_listener = NSEventHotkeyListener(self.engine)
+                if ns_listener.start() is not None:
+                    hotkey_ok = True
+
+            # 3. Signal from Swift launcher (fallback)
+            if not hotkey_ok and hotkey_mode == "signal":
+                self._setup_signal_hotkey()
+                print("[WhisperFlow] Hotkey mode: signal (managed by Swift launcher)")
+                hotkey_ok = True
+
+            if not hotkey_ok:
+                print("[WhisperFlow] WARNING: No hotkey — use menubar to toggle")
 
             # Poll the engine's main_queue on main thread (every 30ms)
             self._queue_timer = rumps.Timer(self._poll_queue, 0.03)
             self._queue_timer.start()
 
-            print("[WhisperFlow] Menubar app running. Tap Left Option (⌥) to record.")
+            # Self-healing health monitor (every 30s)
+            _health_monitor.attach(self.engine, app=self)
+            self._health_timer = rumps.Timer(self._health_check, HealthMonitor.CHECK_INTERVAL)
+            self._health_timer.start()
+
+            print("[WhisperFlow] Menubar app running. Tap Left Option (⌥) to record. Double-tap for locked mode. Long-press to pause.")
+
+        def _setup_signal_hotkey(self):
+            """Use SIGUSR1/SIGUSR2 from the Swift launcher instead of CGEventTap."""
+            import signal as sig
+
+            # Use a thread-safe queue — signal handlers can't safely call
+            # toggle_recording() (it acquires locks). Instead, flag it and
+            # let the existing main-thread queue timer process it.
+            self._signal_queue = queue_mod.Queue()
+
+            def _on_sigusr1(signum, frame):
+                self._signal_queue.put("toggle")
+
+            def _on_sigusr2(signum, frame):
+                self._signal_queue.put("stop")
+
+            sig.signal(sig.SIGUSR1, _on_sigusr1)
+            sig.signal(sig.SIGUSR2, _on_sigusr2)
 
         def _request_mic_perm(self, _):
             self._mic_perm_timer.stop()
@@ -1365,14 +2000,16 @@ def run_menubar_app():
             threading.Thread(target=self._audio_selftest, daemon=True).start()
 
         def _audio_selftest(self):
-            """Record 0.5s on startup to verify mic actually captures audio (not silent)."""
+            """Check ring buffer for audio to verify mic captures (not silent)."""
             try:
-                test_audio = sd.rec(
-                    int(SAMPLE_RATE * 0.5), samplerate=SAMPLE_RATE,
-                    channels=1, dtype=DTYPE,
-                )
-                sd.wait()
-                peak = float(np.abs(test_audio).max())
+                # Wait a moment for ring buffer to accumulate samples
+                time.sleep(0.5)
+                with self.engine._ring_lock:
+                    if self.engine._ring_buf:
+                        samples = np.concatenate(self.engine._ring_buf, axis=0)
+                        peak = float(np.abs(samples).max())
+                    else:
+                        peak = 0.0
                 if peak < 0.0001:
                     print(
                         "[WhisperFlow] WARNING: Audio self-test got silence (peak=0.0000).\n"
@@ -1387,23 +2024,64 @@ def run_menubar_app():
                 print(f"[WhisperFlow] Audio self-test failed: {e}", flush=True)
                 self.title = "⚠️ MIC"
 
+        def _health_check(self, _):
+            """Run self-healing health check (every 30s)."""
+            _health_monitor.check()
+
+        def _show_health(self, sender):
+            """Show health status in a dialog."""
+            status = _health_monitor.get_status()
+            try:
+                subprocess.Popen(
+                    ["osascript", "-e",
+                     f'display dialog "{status}" with title "WhisperFlow Health" buttons {{"OK"}} default button "OK"'],
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                )
+            except Exception:
+                pass
+
         def _poll_queue(self, _):
-            """Process overlay show/hide actions on the main thread."""
+            """Process overlay show/hide + signal hotkey actions on main thread."""
             self.engine.process_main_queue()
+            # Process signal-based hotkey events (SIGUSR1/SIGUSR2 from Swift launcher)
+            if hasattr(self, '_signal_queue'):
+                try:
+                    while True:
+                        action = self._signal_queue.get_nowait()
+                        if action == "toggle":
+                            print("[WhisperFlow] Signal: toggle recording", flush=True)
+                            self.engine.toggle_recording()
+                        elif action == "stop":
+                            if self.engine.state == State.RECORDING:
+                                print("[WhisperFlow] Signal: stop recording", flush=True)
+                                self.engine.toggle_recording()
+                except queue_mod.Empty:
+                    pass
+            # Process pending title updates from background threads
+            if hasattr(self, '_title_queue'):
+                try:
+                    while True:
+                        self.title = self._title_queue.get_nowait()
+                except queue_mod.Empty:
+                    pass
+
+        def _set_title_safe(self, title):
+            """Thread-safe title update — queues for main thread."""
+            if not hasattr(self, '_title_queue'):
+                self._title_queue = queue_mod.Queue()
+            self._title_queue.put(title)
 
         def _load_model(self):
-            self.title = "⏳ Loading..."
+            self._set_title_safe("⏳ Loading...")
             try:
                 self.engine.load_model()
-                self.title = ICON_IDLE
+                self._set_title_safe(ICON_IDLE)
             except Exception as e:
-                self.title = "❌ ERR"
+                self._set_title_safe("❌ ERR")
                 rumps.notification("WhisperFlow Error", "Failed to load model", str(e))
 
         def _on_state_change(self, new_state: State):
-            self.title = STATE_ICONS.get(new_state, ICON_IDLE)
-            if self.status_item:
-                self.status_item.title = f"Status: {new_state.value.capitalize()}"
+            self._set_title_safe(STATE_ICONS.get(new_state, ICON_IDLE))
 
         def _toggle(self, sender):
             self.engine.toggle_recording()
@@ -1514,9 +2192,11 @@ def dict_cmd():
       --dict hotword "Sabbo"        — Add hotword (proper noun)
       --dict list                   — Show all entries
       --dict remove "savo"          — Remove a correction
+      --dict reset                  — Nuke dictionary, keep only known-good entries
+      --dict show                   — Quick view of current state
     """
     if len(sys.argv) < 3:
-        print("Usage: whisper_flow.py --dict [add|hotword|list|remove] [args...]")
+        print("Usage: whisper_flow.py --dict [add|hotword|list|remove|reset|show] [args...]")
         return
 
     action = sys.argv[2]
@@ -1530,7 +2210,7 @@ def dict_cmd():
         word = sys.argv[3]
         d.add_hotword(word)
         print(f"[Dictionary] Added hotword: {word}")
-    elif action == "list":
+    elif action in ("list", "show"):
         print(f"[Dictionary] File: {d.path}")
         if d.corrections:
             print("  Corrections:")
@@ -1550,6 +2230,12 @@ def dict_cmd():
             print(f"[Dictionary] Removed: {key}")
         else:
             print(f"[Dictionary] Not found: {key}")
+    elif action == "reset":
+        known_good = {"savo": "Sabbo"}
+        d.reset(known_good)
+        print(f"[Dictionary] Reset with {len(known_good)} known-good entries:")
+        for wrong, right in known_good.items():
+            print(f"    \"{wrong}\" → \"{right}\"")
     else:
         print(dict_cmd.__doc__)
 
@@ -1573,6 +2259,80 @@ def history_cmd():
         print("Usage: --history [list|search <query>|stats]")
 
 
+# ─── Install (auto-start at login) ──────────────────────────────────────────
+
+def install_cmd():
+    """Install WhisperFlow to auto-start at login via launchd + Terminal.app.
+
+    Creates:
+      ~/Library/LaunchAgents/com.sabbo.whisper-flow.plist
+    Requires:
+      Terminal.app must have Accessibility + Input Monitoring permissions
+      (System Settings > Privacy & Security > Accessibility / Input Monitoring)
+    """
+    import plistlib
+
+    launch_script = PROJECT_ROOT / "execution" / "launch_whisperflow.sh"
+    if not launch_script.exists():
+        print(f"[Install] ERROR: {launch_script} not found")
+        sys.exit(1)
+
+    plist_dir = Path.home() / "Library" / "LaunchAgents"
+    plist_dir.mkdir(parents=True, exist_ok=True)
+    plist_path = plist_dir / "com.sabbo.whisper-flow.plist"
+
+    plist_data = {
+        "Label": "com.sabbo.whisper-flow",
+        "ProgramArguments": [
+            "/usr/bin/open", "-a", "Terminal",
+            str(launch_script),
+        ],
+        "RunAtLoad": True,
+        "KeepAlive": False,
+        "LimitLoadToSessionType": "Aqua",
+    }
+
+    # Unload existing if present
+    subprocess.run(
+        ["launchctl", "unload", str(plist_path)],
+        capture_output=True,
+    )
+
+    with open(plist_path, "wb") as f:
+        plistlib.dump(plist_data, f)
+
+    # Load the new agent
+    result = subprocess.run(
+        ["launchctl", "load", "-w", str(plist_path)],
+        capture_output=True, text=True,
+    )
+
+    if result.returncode == 0:
+        print(f"[Install] Installed: {plist_path}")
+        print(f"[Install] WhisperFlow will auto-start at login via Terminal.app")
+        print(f"[Install] Make sure Terminal.app has these permissions:")
+        print(f"  System Settings > Privacy & Security > Accessibility > Terminal ✓")
+        print(f"  System Settings > Privacy & Security > Input Monitoring > Terminal ✓")
+        print(f"  System Settings > Privacy & Security > Microphone > Terminal ✓")
+    else:
+        print(f"[Install] WARNING: launchctl load failed: {result.stderr.strip()}")
+        print(f"[Install] Plist written to {plist_path} — try loading manually")
+
+
+def uninstall_cmd():
+    """Remove WhisperFlow auto-start."""
+    plist_path = Path.home() / "Library" / "LaunchAgents" / "com.sabbo.whisper-flow.plist"
+    if plist_path.exists():
+        subprocess.run(["launchctl", "unload", str(plist_path)], capture_output=True)
+        plist_path.unlink()
+        print(f"[Uninstall] Removed: {plist_path}")
+    else:
+        print("[Uninstall] Not installed.")
+    # Kill running instance
+    subprocess.run(["pkill", "-f", "python.*whisper_flow.py"], capture_output=True)
+    print("[Uninstall] Stopped WhisperFlow.")
+
+
 # ─── Main ────────────────────────────────────────────────────────────────────
 
 def main():
@@ -1585,12 +2345,15 @@ def main():
             "--test-cleanup": test_cleanup,
             "--dict": dict_cmd,
             "--history": history_cmd,
+            "--install": install_cmd,
+            "--uninstall": uninstall_cmd,
             "--help": lambda: print(__doc__),
         }
         if cmd in cmds:
             cmds[cmd]()
         else:
-            print(f"Unknown: {cmd}\nUsage: whisper_flow.py [--test-mic | --test-paste | --test-transcribe | --test-cleanup]")
+            print(f"Unknown: {cmd}")
+            print("Usage: whisper_flow.py [--install | --uninstall | --test-mic | --test-paste | --dict | --history | --help]")
             sys.exit(1)
     else:
         run_menubar_app()
