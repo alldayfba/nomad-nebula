@@ -1,0 +1,139 @@
+{
+  "id": 103,
+  "hypothesis": "Fix 40 skill system issues to improve execution quality",
+  "challenger": {
+    "hypothesis": "Fix 40 skill system issues to improve execution quality",
+    "issues": [
+      {
+        "type": "missing_directive",
+        "skill": "pipeline.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "build-site.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "memory.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "agent-training-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "agent-communication-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "api-cost-management-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "training-officer-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "multi-agent-mcp-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "context-management-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "bidirectional-sync-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "prompt-contracts-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "asset-generation-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "automation-builder-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "whisper-flow-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "testimonial-engine-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "icp-filter-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "approval-gate-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "search-routing-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "sales-manager-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "codesec-sop.md",
+        "fix": "Create a skill that references this directive"
+      }
+    ],
+    "total_issues": 40
+  },
+  "baseline_metric": 89.35,
+  "challenger_metric": 89.35,
+  "status": "discard",
+  "details": {
+    "ref": "{\"fixed\": [], \"queued\": [\"Directive 'agent-training-sop.md' has no linked skill\", \"Directive 'agent-communication-sop.md' has no linked skill\", \"Directive 'api-cost-management-sop.md' has no linked skill\", \"Directive 'training-officer-sop.md' has no linked skill\", \"Directive 'multi-agent-mcp-sop.md' has no linked skill\", \"Directive 'context-management-sop.md' has no linked skill\", \"Directive 'bidirectional-sync-sop.md' has no linked skill\", \"Directive 'prompt-contracts-sop.md' has no linked skill\", \"Directive 'asset-generation-sop.md' has no linked skill\", \"Directive 'automation-builder-sop.md' has no linked skill\", \"Directive 'whisper-flow-sop.md' has no linked skill\", \"Directive 'testimonial-engine-sop.md' has no linked skill\", \"Directive 'icp-filter-sop.md' has no linked skill\", \"Directive 'approval-gate-sop.md' has no linked skill\", \"Directive 'search-routing-sop.md' has no linked skill\", \"Directive 'sales-manager-sop.md' has no linked skill\", \"Directive 'codesec-sop.md' has no linked skill\"], \"skipped\": [\"Skill 'pipeline.md' already has ## Directive section\", \"Skill 'build-site.md' intentionally has no directive\", \"Skill 'memory.md' intentionally has no directive\"]}",
+    "metric": 89.35,
+    "fixed_count": 0,
+    "queued_count": 17,
+    "queued": [
+      "Directive 'agent-training-sop.md' has no linked skill",
+      "Directive 'agent-communication-sop.md' has no linked skill",
+      "Directive 'api-cost-management-sop.md' has no linked skill",
+      "Directive 'training-officer-sop.md' has no linked skill",
+      "Directive 'multi-agent-mcp-sop.md' has no linked skill",
+      "Directive 'context-management-sop.md' has no linked skill",
+      "Directive 'bidirectional-sync-sop.md' has no linked skill",
+      "Directive 'prompt-contracts-sop.md' has no linked skill",
+      "Directive 'asset-generation-sop.md' has no linked skill",
+      "Directive 'automation-builder-sop.md' has no linked skill",
+      "Directive 'whisper-flow-sop.md' has no linked skill",
+      "Directive 'testimonial-engine-sop.md' has no linked skill",
+      "Directive 'icp-filter-sop.md' has no linked skill",
+      "Directive 'approval-gate-sop.md' has no linked skill",
+      "Directive 'search-routing-sop.md' has no linked skill",
+      "Directive 'sales-manager-sop.md' has no linked skill",
+      "Directive 'codesec-sop.md' has no linked skill"
+    ]
+  },
+  "created_at": "2026-03-26T08:00:31.296728"
+}

@@ -1,0 +1,26 @@
+{
+  "id": 191,
+  "hypothesis": "If we no actionable improvements found \u2014 system is clean, recall precision should improve",
+  "challenger": {
+    "hypothesis": "If we no actionable improvements found \u2014 system is clean, recall precision should improve",
+    "actions": [],
+    "diagnostics": {
+      "general_count": 2,
+      "recategorize_candidates": [],
+      "duplicate_groups": {},
+      "dead_weight": [],
+      "no_tags_count": 0
+    }
+  },
+  "baseline_metric": 99.91,
+  "challenger_metric": 99.91,
+  "status": "discard",
+  "details": {
+    "ref": "{\"applied\": [], \"errors\": []}",
+    "metric": 99.91,
+    "applied_count": 0,
+    "error_count": 0,
+    "applied": []
+  },
+  "created_at": "2026-03-30T02:00:37.818244"
+}

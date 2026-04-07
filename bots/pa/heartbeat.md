@@ -59,4 +59,4 @@
 
 ---
 
-*Last updated: not yet — runs on session start*
+*Last updated: 2026-03-26*

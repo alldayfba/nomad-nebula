@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code + AI for Amazon Sellers — Group Call</title>
+<style>
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .slide {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    padding: 60px 80px;
+    position: relative;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .slide.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Slide backgrounds */
+  .bg-dark { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%); }
+  .bg-blue { background: linear-gradient(135deg, #0a0a1a 0%, #0d1b3e 50%, #1a0a2e 100%); }
+  .bg-green { background: linear-gradient(135deg, #0a1a0a 0%, #0d2e1b 50%, #1a2e0a 100%); }
+  .bg-red { background: linear-gradient(135deg, #1a0a0a 0%, #2e0d0d 50%, #2e1a0a 100%); }
+  .bg-purple { background: linear-gradient(135deg, #0a0a1a 0%, #1a0d2e 50%, #2e0a2e 100%); }
+  .bg-orange { background: linear-gradient(135deg, #1a0f0a 0%, #2e1a0d 50%, #2e200a 100%); }
+  .bg-teal { background: linear-gradient(135deg, #0a1a1a 0%, #0d2e2e 50%, #0a2e1a 100%); }
+
+  h1 {
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1.1;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  h2 {
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.15;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+
+  h3 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle {
+    font-size: 24px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    max-width: 700px;
+  }
+
+  .accent { color: #4f8cff; }
+  .accent-green { color: #4fff8c; }
+  .accent-orange { color: #ff9f4f; }
+  .accent-red { color: #ff4f6a; }
+  .accent-purple { color: #b44fff; }
+  .accent-teal { color: #4fffd4; }
+
+  .content-left {
+    align-items: flex-start;
+    text-align: left;
+    padding: 60px 100px;
+  }
+
+  p, li {
+    font-size: 22px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.85);
+  }
+
+  ul {
+    list-style: none;
+    margin-top: 10px;
+  }
+
+  ul li {
+    padding: 10px 0;
+    padding-left: 30px;
+    position: relative;
+  }
+
+  ul li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 18px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #4f8cff;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    width: 100%;
+    max-width: 1100px;
+    margin-top: 20px;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 30px;
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 20px;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 30px;
+    backdrop-filter: blur(20px);
+  }
+
+  .card h3 {
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+
+  .card p {
+    font-size: 18px;
+    color: rgba(255,255,255,0.65);
+  }
+
+  .big-number {
+    font-size: 120px;
+    font-weight: 900;
+    letter-spacing: -5px;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+
+  .big-stat {
+    font-size: 80px;
+    font-weight: 900;
+    letter-spacing: -3px;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+
+  .quote {
+    font-size: 32px;
+    font-weight: 600;
+    font-style: italic;
+    text-align: center;
+    max-width: 900px;
+    line-height: 1.4;
+    color: rgba(255,255,255,0.9);
+  }
+
+  .quote-attr {
+    font-size: 18px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 20px;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+  }
+
+  .tag-blue { background: rgba(79,140,255,0.2); color: #4f8cff; }
+  .tag-green { background: rgba(79,255,140,0.2); color: #4fff8c; }
+  .tag-orange { background: rgba(255,159,79,0.2); color: #ff9f4f; }
+  .tag-red { background: rgba(255,79,106,0.2); color: #ff4f6a; }
+  .tag-purple { background: rgba(180,79,255,0.2); color: #b44fff; }
+  .tag-teal { background: rgba(79,255,212,0.2); color: #4fffd4; }
+
+  .versus-table {
+    width: 100%;
+    max-width: 1000px;
+    margin-top: 20px;
+  }
+
+  .versus-row {
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr;
+    gap: 0;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .versus-row:last-child { border-bottom: none; }
+
+  .vs-old {
+    text-align: right;
+    color: rgba(255,255,255,0.35);
+    font-size: 20px;
+    text-decoration: line-through;
+  }
+
+  .vs-arrow {
+    text-align: center;
+    color: #4fff8c;
+    font-size: 20px;
+  }
+
+  .vs-new {
+    text-align: left;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .step-list {
+    counter-reset: steps;
+    max-width: 800px;
+    width: 100%;
+  }
+
+  .step {
+    counter-increment: steps;
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .step:last-child { border-bottom: none; }
+
+  .step-num {
+    font-size: 36px;
+    font-weight: 900;
+    color: #4f8cff;
+    min-width: 50px;
+  }
+
+  .step-content h3 {
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
+
+  .step-content p {
+    font-size: 18px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .terminal-block {
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(79,140,255,0.3);
+    border-radius: 12px;
+    padding: 24px 30px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 18px;
+    color: #4fff8c;
+    max-width: 800px;
+    width: 100%;
+    margin-top: 20px;
+    line-height: 1.8;
+  }
+
+  .terminal-block .prompt { color: #4f8cff; }
+  .terminal-block .comment { color: rgba(255,255,255,0.3); }
+  .terminal-block .output { color: rgba(255,255,255,0.7); }
+
+  .life-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+    max-width: 1000px;
+    margin-top: 20px;
+  }
+
+  .life-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .life-icon {
+    font-size: 28px;
+    min-width: 36px;
+    text-align: center;
+  }
+
+  .life-card h4 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .life-card p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .objection-list {
+    max-width: 900px;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .objection {
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .objection:last-child { border-bottom: none; }
+
+  .objection .q {
+    font-size: 22px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 6px;
+  }
+
+  .objection .a {
+    font-size: 22px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  /* Progress bar */
+  .progress {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #4f8cff, #b44fff);
+    transition: width 0.3s ease;
+    z-index: 100;
+  }
+
+  /* Slide counter */
+  .slide-counter {
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.25);
+    z-index: 100;
+  }
+
+  /* Nav hint */
+  .nav-hint {
+    position: fixed;
+    bottom: 20px;
+    left: 30px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.15);
+    z-index: 100;
+  }
+
+  .highlight-box {
+    background: rgba(79,140,255,0.1);
+    border-left: 4px solid #4f8cff;
+    padding: 20px 28px;
+    border-radius: 0 12px 12px 0;
+    margin-top: 20px;
+    max-width: 800px;
+    width: 100%;
+  }
+
+  .highlight-box p {
+    font-size: 20px;
+    color: rgba(255,255,255,0.8);
+  }
+
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: Title -->
+<div class="slide active bg-dark">
+  <span class="tag tag-blue">Group Training</span>
+  <h1>AI + Claude Code<br>for <span class="accent">Amazon Sellers</span></h1>
+  <p class="subtitle">How to set up Claude Code and use AI every day — in your business and your life</p>
+</div>
+
+<!-- SLIDE 2: The Problem -->
+<div class="slide bg-red content-left">
+  <span class="tag tag-red">The Problem</span>
+  <h2 style="text-align:left">You're spending <span class="accent-red">3-4 hours a day</span> on tasks a machine can do in minutes.</h2>
+  <ul>
+    <li>Scrolling through retailer sites looking for deals</li>
+    <li>Manually checking Amazon prices, fees, and ROI</li>
+    <li>Writing listings from scratch every time</li>
+    <li>Staring at PPC Campaign Manager not sure what to change</li>
+    <li>Copy-pasting supplier emails over and over</li>
+  </ul>
+</div>
+
+<!-- SLIDE 3: What if -->
+<div class="slide bg-blue">
+  <h2>What if that was<br><span class="accent" style="font-size:64px">30 minutes?</span></h2>
+  <p class="subtitle" style="margin-top:20px">AI isn't replacing sellers.<br>It's replacing the <strong style="color:#fff">manual grind</strong> so you can focus on <strong style="color:#fff">decisions</strong>.</p>
+</div>
+
+<!-- SLIDE 4: What is Claude Code -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-blue">The Tool</span>
+  <h2 style="text-align:left">What is <span class="accent">Claude Code?</span></h2>
+  <div class="versus-table">
+    <div class="versus-row">
+      <div class="vs-old">ChatGPT: you type, it talks back</div>
+      <div class="vs-arrow">&rarr;</div>
+      <div class="vs-new">Claude Code: you type, it <em>does things</em></div>
+    </div>
+    <div class="versus-row">
+      <div class="vs-old">Copy-paste results into spreadsheets</div>
+      <div class="vs-arrow">&rarr;</div>
+      <div class="vs-new">Reads, writes, and organizes your files</div>
+    </div>
+    <div class="versus-row">
+      <div class="vs-old">Forgets everything next session</div>
+      <div class="vs-arrow">&rarr;</div>
+      <div class="vs-new">Remembers your business across sessions</div>
+    </div>
+    <div class="versus-row">
+      <div class="vs-old">Can't touch your computer</div>
+      <div class="vs-arrow">&rarr;</div>
+      <div class="vs-new">Runs scripts, searches the web, builds tools</div>
+    </div>
+    <div class="versus-row">
+      <div class="vs-old">Generic responses for everyone</div>
+      <div class="vs-arrow">&rarr;</div>
+      <div class="vs-new">Learns YOUR business, YOUR criteria, YOUR voice</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5: Think of it as -->
+<div class="slide bg-purple">
+  <div class="big-stat" style="color:#b44fff">24/7</div>
+  <h2>A senior employee that<br><span class="accent-purple">never sleeps</span>, <span class="accent-purple">never forgets</span>,<br>and gets <span class="accent-purple">better every day</span></h2>
+</div>
+
+<!-- SLIDE 6: 5 Daily Use Cases header -->
+<div class="slide bg-blue">
+  <span class="tag tag-green">Daily Workflow</span>
+  <h1><span class="accent-green">5</span> Use Cases<br>You'll Use <span class="accent">Every Day</span></h1>
+</div>
+
+<!-- SLIDE 7: Use Case 1 — Sourcing -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-green">Use Case 1</span>
+  <h2 style="text-align:left"><span class="accent-green">Product Sourcing</span></h2>
+  <div class="grid-2">
+    <div class="card">
+      <h3 class="accent-red">Without Claude</h3>
+      <p>Manually checking retailer sites one by one. Comparing prices on Amazon. Calculating fees in a spreadsheet. Hours of work for a handful of leads.</p>
+    </div>
+    <div class="card" style="border-color: rgba(79,255,140,0.3);">
+      <h3 class="accent-green">With Claude</h3>
+      <p>Scans 300+ retailer websites. Calculates ROI, fees, and profit automatically. Filters by YOUR buy criteria. Delivers a shortlist of winners.</p>
+    </div>
+  </div>
+  <div class="highlight-box" style="margin-top:30px">
+    <p>"Set your buy criteria once. Claude finds matches while you sleep."</p>
+  </div>
+</div>
+
+<!-- SLIDE 8: Sourcing Demo Terminal -->
+<div class="slide bg-dark">
+  <span class="tag tag-blue">Live Demo</span>
+  <h3>What it looks like in the terminal</h3>
+  <div class="terminal-block">
+    <span class="prompt">$</span> claude<br>
+    <span class="output">> Find me clearance deals under $15 with 40%+ ROI on Amazon</span><br><br>
+    <span class="comment"># Claude scans Target, Walmart, CVS, Walgreens...</span><br>
+    <span class="comment"># Checks Amazon prices via Keepa...</span><br>
+    <span class="comment"># Calculates fees, ROI, profit per unit...</span><br><br>
+    <span class="output">Found 12 products matching your criteria:</span><br>
+    <span class="output">1. Jellycat Plush (Target $8.99 &rarr; Amazon $24.99) ROI: 67%</span><br>
+    <span class="output">2. CeraVe Bundle (CVS $11.50 &rarr; Amazon $28.00) ROI: 52%</span><br>
+    <span class="output">3. ...</span>
+  </div>
+  <p style="margin-top:20px; color:rgba(255,255,255,0.4); font-size:16px">90 seconds vs. 1+ hour on Tactical Arbitrage</p>
+</div>
+
+<!-- SLIDE 9: Use Case 2 — Listings -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-orange">Use Case 2</span>
+  <h2 style="text-align:left"><span class="accent-orange">Listing Optimization</span></h2>
+  <div class="grid-2">
+    <div class="card">
+      <h3 class="accent-red">Without Claude</h3>
+      <p>Guessing at keywords. Writing bullets that sound like everyone else. No idea what's actually converting for competitors.</p>
+    </div>
+    <div class="card" style="border-color: rgba(255,159,79,0.3);">
+      <h3 class="accent-orange">With Claude</h3>
+      <p>Analyzes top 10 competitors. Extracts winning keywords. Writes SEO-optimized title, bullets, and description matching current A10 algorithm.</p>
+    </div>
+  </div>
+  <div class="highlight-box" style="border-color:#ff9f4f; background:rgba(255,159,79,0.1); margin-top:30px">
+    <p>"Your listing is your storefront. Claude writes it like a $500 copywriter."</p>
+  </div>
+</div>
+
+<!-- SLIDE 10: Use Case 3 — PPC -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-red">Use Case 3</span>
+  <h2 style="text-align:left"><span class="accent-red">PPC Analysis</span></h2>
+  <div class="grid-2">
+    <div class="card">
+      <h3 class="accent-red">Without Claude</h3>
+      <p>Staring at Campaign Manager. Not sure what to cut or scale. Bleeding money on bad search terms without knowing it.</p>
+    </div>
+    <div class="card" style="border-color: rgba(255,79,106,0.3);">
+      <h3 class="accent-green">With Claude</h3>
+      <p>Upload your search term report. Claude flags money-wasters, identifies winners, and suggests exact bid adjustments with reasoning.</p>
+    </div>
+  </div>
+  <div class="highlight-box" style="border-color:#ff4f6a; background:rgba(255,79,106,0.1); margin-top:30px">
+    <p>"Stop guessing on PPC. Let Claude audit your campaigns weekly."</p>
+  </div>
+</div>
+
+<!-- SLIDE 11: Use Case 4 — Suppliers -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-purple">Use Case 4</span>
+  <h2 style="text-align:left"><span class="accent-purple">Supplier Communication</span></h2>
+  <div class="grid-2">
+    <div class="card">
+      <h3 class="accent-red">Without Claude</h3>
+      <p>Spending 30 min drafting one email to a supplier. Sounding like a beginner. No follow-up system. Losing deals because you're slow.</p>
+    </div>
+    <div class="card" style="border-color: rgba(180,79,255,0.3);">
+      <h3 class="accent-purple">With Claude</h3>
+      <p>Drafts professional outreach, follow-ups, and negotiation emails in your voice. Sounds like a seasoned buyer from day one.</p>
+    </div>
+  </div>
+  <div class="highlight-box" style="border-color:#b44fff; background:rgba(180,79,255,0.1); margin-top:30px">
+    <p>"Sound like a seasoned buyer from day one — even if it's your first supplier email."</p>
+  </div>
+</div>
+
+<!-- SLIDE 12: Use Case 5 — Daily Ops -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-teal">Use Case 5</span>
+  <h2 style="text-align:left"><span class="accent-teal">Daily Operations</span></h2>
+  <div class="grid-2">
+    <div class="card">
+      <h3 class="accent-red">Without Claude</h3>
+      <p>10 tabs open. Checking inventory here, reorder dates there, margins in a spreadsheet. No system. Reactive all day.</p>
+    </div>
+    <div class="card" style="border-color: rgba(79,255,212,0.3);">
+      <h3 class="accent-teal">With Claude</h3>
+      <p>Morning briefing with your numbers. Flags what needs attention. Tracks inventory, reorders, margins. You start every day knowing exactly what to focus on.</p>
+    </div>
+  </div>
+  <div class="highlight-box" style="border-color:#4fffd4; background:rgba(79,255,212,0.1); margin-top:30px">
+    <p>"Start every day knowing exactly what to focus on. No tab chaos."</p>
+  </div>
+</div>
+
+<!-- SLIDE 13: Beyond Amazon header -->
+<div class="slide bg-purple">
+  <span class="tag tag-purple">Beyond Amazon</span>
+  <h1>Claude in<br><span class="accent-purple">Your Entire Life</span></h1>
+  <p class="subtitle">This isn't just an Amazon tool. It's a thinking partner for everything.</p>
+</div>
+
+<!-- SLIDE 14: Life Use Cases -->
+<div class="slide bg-dark">
+  <h3 style="margin-bottom:30px">Use it for <span class="accent">everything</span></h3>
+  <div class="life-grid">
+    <div class="life-card">
+      <div class="life-icon">$</div>
+      <div>
+        <h4>Finances</h4>
+        <p>"Analyze my last 3 months of expenses and find where I'm bleeding money"</p>
+      </div>
+    </div>
+    <div class="life-card">
+      <div class="life-icon">^</div>
+      <div>
+        <h4>Learning</h4>
+        <p>Paste a YouTube transcript — get structured notes with action items in 30 seconds</p>
+      </div>
+    </div>
+    <div class="life-card">
+      <div class="life-icon">&gt;</div>
+      <div>
+        <h4>Travel</h4>
+        <p>"Plan a 5-day trip to Bali, budget $2K, I like adventure + good food"</p>
+      </div>
+    </div>
+    <div class="life-card">
+      <div class="life-icon">#</div>
+      <div>
+        <h4>Content</h4>
+        <p>"Write me 7 IG captions about my Amazon journey this week"</p>
+      </div>
+    </div>
+    <div class="life-card">
+      <div class="life-icon">@</div>
+      <div>
+        <h4>Email</h4>
+        <p>"Draft a reply to this client — professional but firm on the deadline"</p>
+      </div>
+    </div>
+    <div class="life-card">
+      <div class="life-icon">+</div>
+      <div>
+        <h4>Health</h4>
+        <p>"Build me a meal prep plan — high protein, under $80/week groceries"</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 15: Key Message -->
+<div class="slide bg-blue">
+  <div class="quote">"The students who win biggest are the ones who make Claude part of their <span class="accent">daily workflow</span> — not just their sourcing."</div>
+</div>
+
+<!-- SLIDE 16: Setup header -->
+<div class="slide bg-green">
+  <span class="tag tag-green">Setup</span>
+  <h1>How to Get<br><span class="accent-green">Set Up</span></h1>
+  <p class="subtitle">4 steps. 10 minutes. No coding required.</p>
+</div>
+
+<!-- SLIDE 17: Setup Steps -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-green">Setup</span>
+  <h2 style="text-align:left">4 Steps to Get Started</h2>
+  <div class="step-list">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h3>Get Claude Pro or Max</h3>
+        <p>Go to claude.ai &rarr; Subscribe ($20/mo Pro or $100/mo Max)</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h3>Install Claude Code</h3>
+        <p>Open Terminal &rarr; npm install -g @anthropic-ai/claude-code</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h3>Launch It</h3>
+        <p>Type "claude" in terminal &rarr; Authenticate with your account</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h3>Start Talking</h3>
+        <p>No setup files. No config. Just ask it things in plain English.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 18: Terminal Setup Demo -->
+<div class="slide bg-dark">
+  <h3>It's this simple</h3>
+  <div class="terminal-block">
+    <span class="comment"># Step 1: Install (one time)</span><br>
+    <span class="prompt">$</span> npm install -g @anthropic-ai/claude-code<br><br>
+    <span class="comment"># Step 2: Launch</span><br>
+    <span class="prompt">$</span> claude<br><br>
+    <span class="comment"># Step 3: Ask it anything</span><br>
+    <span class="output">> Hey Claude, I sell on Amazon FBA. My niche is baby products.</span><br>
+    <span class="output">> My buy criteria: 40%+ ROI, under $20 buy price, BSR under 50K.</span><br>
+    <span class="output">> Find me 10 products to source this week.</span><br><br>
+    <span class="comment"># Claude remembers this forever. Next time just say "find products"</span>
+  </div>
+</div>
+
+<!-- SLIDE 19: Power User Tips -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-blue">Power Tips</span>
+  <h2 style="text-align:left">Level Up Your Setup</h2>
+  <div class="grid-3">
+    <div class="card">
+      <h3 class="accent">Memory</h3>
+      <p>Claude remembers across sessions. Tell it your business details once — products, margins, goals — and it knows forever.</p>
+    </div>
+    <div class="card">
+      <h3 class="accent-green">CLAUDE.md</h3>
+      <p>Create a file with your business context. Claude reads it every session. Your custom instruction set.</p>
+    </div>
+    <div class="card">
+      <h3 class="accent-purple">Skills</h3>
+      <p>Teach it repeatable workflows. Next time you just say "go" and it runs the whole thing automatically.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 20: Objections -->
+<div class="slide bg-dark content-left">
+  <span class="tag tag-orange">Common Questions</span>
+  <h2 style="text-align:left">Let's Address These</h2>
+  <div class="objection-list">
+    <div class="objection">
+      <div class="q">"I'm not technical..."</div>
+      <div class="a">You talk to it in English. If you can text, you can use Claude.</div>
+    </div>
+    <div class="objection">
+      <div class="q">"Is my data safe?"</div>
+      <div class="a">Everything runs locally on your computer. Your data stays yours.</div>
+    </div>
+    <div class="objection">
+      <div class="q">"Will it replace me?"</div>
+      <div class="a">No. It replaces the grunt work. You still make every decision.</div>
+    </div>
+    <div class="objection">
+      <div class="q">"I already use ChatGPT..."</div>
+      <div class="a">ChatGPT talks. Claude Code does. It reads your files, runs your tools, and remembers your business.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 21: Live Q&A -->
+<div class="slide bg-blue">
+  <span class="tag tag-blue">Live Demo</span>
+  <h1>Your Turn</h1>
+  <p class="subtitle" style="font-size:28px; max-width:800px; margin-top:20px">What's one task in your Amazon business that takes too long?<br><br><strong style="color:#fff">Drop it in chat — I'll solve it live.</strong></p>
+</div>
+
+<!-- SLIDE 22: Closing -->
+<div class="slide bg-dark">
+  <div class="quote">"The gap between sellers who scale and sellers who stay stuck isn't <span class="accent-red">knowledge</span> — it's <span class="accent-green">speed of execution</span>."</div>
+  <p class="subtitle" style="margin-top:30px">Claude gives you that speed.</p>
+</div>
+
+<!-- SLIDE 23: CTA -->
+<div class="slide bg-purple">
+  <h1>Start Using It<br><span class="accent-purple">Today.</span></h1>
+  <p class="subtitle" style="margin-top:20px; font-size:26px">Not tomorrow. Not next week. Today.</p>
+  <div class="terminal-block" style="margin-top:40px; max-width:500px; text-align:center;">
+    <span class="prompt">$</span> npm install -g @anthropic-ai/claude-code<br>
+    <span class="prompt">$</span> claude
+  </div>
+  <p style="margin-top:30px; color:rgba(255,255,255,0.4); font-size:16px">Setup guide + quick start PDF dropping in Discord after this call</p>
+</div>
+
+<!-- Progress bar -->
+<div class="progress" id="progress"></div>
+<div class="slide-counter" id="counter"></div>
+<div class="nav-hint">Arrow keys or click to navigate</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let current = 0;
+
+  function showSlide(n) {
+    slides[current].classList.remove('active');
+    current = Math.max(0, Math.min(n, slides.length - 1));
+    slides[current].classList.add('active');
+    document.getElementById('progress').style.width = ((current + 1) / slides.length * 100) + '%';
+    document.getElementById('counter').textContent = (current + 1) + ' / ' + slides.length;
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      showSlide(current + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      showSlide(current - 1);
+    } else if (e.key === 'Home') {
+      showSlide(0);
+    } else if (e.key === 'End') {
+      showSlide(slides.length - 1);
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (e.clientX > window.innerWidth / 2) {
+      showSlide(current + 1);
+    } else {
+      showSlide(current - 1);
+    }
+  });
+
+  // Touch support
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+  document.addEventListener('touchend', (e) => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      diff > 0 ? showSlide(current + 1) : showSlide(current - 1);
+    }
+  });
+
+  showSlide(0);
+</script>
+
+</body>
+</html>

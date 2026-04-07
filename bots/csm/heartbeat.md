@@ -16,7 +16,7 @@
 | Continuation Subscribers | — | — | — |
 | Pending Testimonials | — | — | — |
 
-*Last updated: not yet — run `student_health_monitor.py daily-scan` to populate*
+*Last updated: 2026-03-26*
 
 ---
 

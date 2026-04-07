@@ -1,0 +1,49 @@
+{
+  "id": 234,
+  "hypothesis": "If we recategorize 1 memories from 'general', recall precision should improve",
+  "challenger": {
+    "hypothesis": "If we recategorize 1 memories from 'general', recall precision should improve",
+    "actions": [
+      [
+        "recategorize",
+        [
+          {
+            "id": 619,
+            "title": "Instagram handle for Amazon OS is @allday.fba, NOT @sabbojb",
+            "from": "general",
+            "to": "sourcing",
+            "score": 2
+          }
+        ]
+      ]
+    ],
+    "diagnostics": {
+      "general_count": 3,
+      "recategorize_candidates": [
+        {
+          "id": 619,
+          "title": "Instagram handle for Amazon OS is @allday.fba, NOT @sabbojb",
+          "from": "general",
+          "to": "sourcing",
+          "score": 2
+        }
+      ],
+      "duplicate_groups": {},
+      "dead_weight": [],
+      "no_tags_count": 0
+    }
+  },
+  "baseline_metric": 99.87,
+  "challenger_metric": 99.91,
+  "status": "keep",
+  "details": {
+    "ref": "{\"applied\": [\"Recategorized #619 'Instagram handle for Amazon OS is @allda' \\u2192 sourcing\"], \"errors\": []}",
+    "metric": 99.91,
+    "applied_count": 1,
+    "error_count": 0,
+    "applied": [
+      "Recategorized #619 'Instagram handle for Amazon OS is @allda' \u2192 sourcing"
+    ]
+  },
+  "created_at": "2026-04-01T13:42:41.312927"
+}

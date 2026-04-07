@@ -51,3 +51,4 @@ execution/remotion/
 service_account.json
 .vercel
 .tmp/financial-audit/
+.claude/worktrees/

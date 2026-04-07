@@ -167,6 +167,7 @@ async def main():
         "execution.discord_bot.csm_cog",
         "execution.discord_bot.profile_cog",
         "execution.discord_bot.engagement_cog",
+        "execution.discord_bot.relay_cog",
     ]
 
     for cog in cog_modules:

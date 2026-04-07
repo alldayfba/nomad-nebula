@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>24/7 Profits — Done-For-You Amazon Business</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .slide {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    padding: 60px 80px;
+    position: relative;
+    animation: fadeIn 0.45s ease;
+  }
+
+  .slide.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Backgrounds */
+  .bg-dark { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%); }
+  .bg-purple { background: linear-gradient(135deg, #0a0a1a 0%, #1a0d2e 50%, #2e0a2e 100%); }
+  .bg-deep { background: linear-gradient(135deg, #1A0A2E 0%, #0d0520 50%, #0a0a1a 100%); }
+  .bg-gold { background: linear-gradient(135deg, #0a0a0a 0%, #1a1508 50%, #1a1a0a 100%); }
+  .bg-green { background: linear-gradient(135deg, #0a1a0a 0%, #0d2e1b 50%, #1a2e0a 100%); }
+  .bg-blue { background: linear-gradient(135deg, #0a0a1a 0%, #0d1b3e 50%, #1a0a2e 100%); }
+
+  .content-left {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  h1 {
+    font-size: clamp(40px, 5vw, 68px);
+    font-weight: 900;
+    letter-spacing: -2.5px;
+    line-height: 1.08;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .content-left h1,
+  .content-left h2 { text-align: left; }
+
+  h2 {
+    font-size: clamp(32px, 3.5vw, 52px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.12;
+    margin-bottom: 28px;
+  }
+
+  h3 {
+    font-size: clamp(22px, 2.5vw, 34px);
+    font-weight: 700;
+    margin-bottom: 18px;
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle {
+    font-size: clamp(18px, 2vw, 26px);
+    font-weight: 400;
+    color: rgba(255,255,255,0.55);
+    text-align: center;
+    max-width: 750px;
+    line-height: 1.5;
+  }
+
+  .content-left .subtitle { text-align: left; }
+
+  p, li {
+    font-size: clamp(16px, 1.5vw, 22px);
+    color: rgba(255,255,255,0.8);
+    line-height: 1.65;
+  }
+
+  ul { list-style: none; padding: 0; max-width: 900px; }
+  ul li { padding: 10px 0; }
+  ul li::before { content: "\2192\00a0"; color: #FFD700; font-weight: 700; }
+
+  .gold { color: #FFD700; }
+  .purple { color: #B794E0; }
+  .green { color: #4ADE80; }
+  .red { color: #FF6B6B; }
+  .accent { color: #6B2FA0; }
+  .white { color: #fff; }
+  .bold { font-weight: 700; color: #fff; }
+
+  .tag {
+    display: inline-block;
+    background: rgba(255,215,0,0.12);
+    border: 1px solid rgba(255,215,0,0.3);
+    border-radius: 8px;
+    padding: 6px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #FFD700;
+    margin-bottom: 20px;
+  }
+
+  .tag-purple {
+    background: rgba(107,47,160,0.15);
+    border-color: rgba(183,148,224,0.3);
+    color: #B794E0;
+  }
+
+  .tag-green {
+    background: rgba(74,222,128,0.1);
+    border-color: rgba(74,222,128,0.25);
+    color: #4ADE80;
+  }
+
+  .tag-red {
+    background: rgba(255,107,107,0.1);
+    border-color: rgba(255,107,107,0.25);
+    color: #FF6B6B;
+  }
+
+  /* Images */
+  .img-round {
+    border-radius: 16px;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.1);
+  }
+
+  .img-glow {
+    box-shadow: 0 0 40px rgba(107,47,160,0.25), 0 0 80px rgba(107,47,160,0.1);
+  }
+
+  .hero-img {
+    max-height: 280px;
+    border-radius: 20px;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.08);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+
+  .proof-img {
+    width: 100%;
+    max-width: 420px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  .logo-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+  }
+
+  .sabbo-img {
+    max-height: 320px;
+    border-radius: 20px;
+    object-fit: cover;
+    border: 2px solid rgba(255,215,0,0.2);
+    box-shadow: 0 8px 48px rgba(107,47,160,0.3);
+  }
+
+  /* Split layout */
+  .split {
+    display: flex;
+    gap: 48px;
+    align-items: center;
+    max-width: 1100px;
+    width: 100%;
+  }
+
+  .split-text { flex: 1; }
+  .split-img { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+
+  /* Cards */
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 24px 0;
+    max-width: 1100px;
+    width: 100%;
+  }
+
+  .card-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px;
+    padding: 32px;
+  }
+
+  .card h3 { font-size: 22px; margin-bottom: 12px; }
+  .card p { font-size: 17px; }
+  .card-full { grid-column: 1 / -1; }
+
+  /* Proof grid */
+  .proof-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    max-width: 1100px;
+    width: 100%;
+    margin: 20px 0;
+  }
+
+  .proof-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .proof-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  .proof-card .proof-caption {
+    padding: 16px;
+  }
+
+  .proof-card .proof-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .proof-card .proof-stat {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Comparison */
+  .vs-grid {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 0;
+    max-width: 1000px;
+    width: 100%;
+    align-items: start;
+    margin: 20px 0;
+  }
+
+  .vs-col { padding: 28px; }
+  .vs-col h3 { font-size: 24px; margin-bottom: 20px; }
+
+  .vs-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 900;
+    color: rgba(255,255,255,0.2);
+    padding-top: 28px;
+  }
+
+  .vs-col.old li::before { content: "\2717\00a0"; color: #FF6B6B; }
+  .vs-col.new li::before { content: "\2713\00a0"; color: #4ADE80; }
+
+  /* Price card */
+  .price-card {
+    background: linear-gradient(135deg, rgba(107,47,160,0.15) 0%, rgba(255,215,0,0.08) 100%);
+    border: 2px solid rgba(255,215,0,0.3);
+    border-radius: 24px;
+    padding: 48px 56px;
+    text-align: center;
+    max-width: 700px;
+    width: 100%;
+    margin: 20px 0;
+  }
+
+  .price-big {
+    font-size: clamp(52px, 6vw, 80px);
+    font-weight: 900;
+    letter-spacing: -3px;
+    color: #FFD700;
+    line-height: 1;
+  }
+
+  .price-sub {
+    font-size: 22px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 8px;
+  }
+
+  .price-detail {
+    font-size: 20px;
+    color: rgba(255,255,255,0.75);
+    margin-top: 20px;
+    line-height: 1.7;
+  }
+
+  /* Timeline */
+  .timeline {
+    display: flex;
+    gap: 0;
+    max-width: 1100px;
+    width: 100%;
+    margin: 20px 0;
+  }
+
+  .phase {
+    flex: 1;
+    padding: 24px 20px;
+    position: relative;
+    border-top: 3px solid rgba(255,215,0,0.3);
+  }
+
+  .phase:first-child { border-top-color: #FFD700; }
+  .phase:nth-child(2) { border-top-color: #B794E0; }
+  .phase:nth-child(3) { border-top-color: #4ADE80; }
+  .phase:nth-child(4) { border-top-color: #4f8cff; }
+  .phase:nth-child(5) { border-top-color: #FFD700; }
+
+  .phase-num {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 8px;
+  }
+
+  .phase h4 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .phase p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.5;
+  }
+
+  /* Guarantee box */
+  .guarantee-box {
+    background: rgba(255,215,0,0.06);
+    border: 2px solid rgba(255,215,0,0.35);
+    border-radius: 20px;
+    padding: 40px 48px;
+    text-align: center;
+    max-width: 750px;
+    width: 100%;
+    margin: 20px 0;
+  }
+
+  .guarantee-box h3 { color: #FFD700; }
+
+  /* Qual grid */
+  .qual-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    max-width: 1000px;
+    width: 100%;
+    margin: 20px 0;
+  }
+
+  .qual-col h3 { font-size: 24px; margin-bottom: 16px; }
+  .qual-col.yes li::before { content: "\2713\00a0"; color: #4ADE80; font-weight: 700; }
+  .qual-col.no li::before { content: "\2717\00a0"; color: #FF6B6B; font-weight: 700; }
+
+  /* Stat row */
+  .stat-row {
+    display: flex;
+    gap: 48px;
+    margin: 24px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .stat { text-align: center; }
+
+  .stat-number {
+    font-size: clamp(36px, 4vw, 56px);
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 8px;
+  }
+
+  /* Quote */
+  .quote {
+    font-size: clamp(18px, 1.8vw, 24px);
+    font-style: italic;
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    max-width: 700px;
+    margin-top: 30px;
+    line-height: 1.6;
+  }
+
+  /* Pillars image */
+  .pillars-img {
+    max-width: 600px;
+    width: 100%;
+    margin: 24px 0;
+    border-radius: 16px;
+  }
+
+  /* Footer */
+  .slide-footer {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255,255,255,0.15);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* Nav */
+  .nav {
+    position: fixed;
+    bottom: 30px;
+    right: 40px;
+    display: flex;
+    gap: 12px;
+    z-index: 100;
+  }
+
+  .nav button {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .nav button:hover { background: rgba(255,255,255,0.2); }
+
+  .slide-counter {
+    position: fixed;
+    bottom: 35px;
+    left: 40px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.3);
+    font-weight: 500;
+    z-index: 100;
+  }
+
+  /* Responsive */
+  @media (max-width: 800px) {
+    .slide { padding: 40px 28px; }
+    .card-grid, .card-grid-3 { grid-template-columns: 1fr; }
+    .vs-grid { grid-template-columns: 1fr; }
+    .vs-divider { padding: 10px 0; }
+    .timeline { flex-direction: column; }
+    .qual-grid { grid-template-columns: 1fr; }
+    .stat-row { gap: 24px; }
+    .split { flex-direction: column; gap: 24px; }
+    .proof-grid { grid-template-columns: 1fr; }
+    .sabbo-img { max-height: 200px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== SLIDE 1: COVER ========== -->
+<div class="slide active bg-deep" id="slide-1">
+  <img src="images/logo.png" alt="24/7 Profits" class="logo-img">
+  <div class="tag">Exclusive Offer — By Invitation Only</div>
+  <h1>Done-For-You<br><span class="gold">Amazon Business</span></h1>
+  <p class="subtitle">We build it. We run it. You profit.</p>
+  <div class="stat-row" style="margin-top:40px;">
+    <div class="stat">
+      <div class="stat-number gold">$50M+</div>
+      <div class="stat-label">Student Amazon Sales</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number purple">700+</div>
+      <div class="stat-label">Active Sellers</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number green">AI-Powered</div>
+      <div class="stat-label">Proprietary Tools</div>
+    </div>
+  </div>
+  <div class="slide-footer">24/7 Profits — Done-For-You Amazon Business</div>
+</div>
+
+<!-- ========== SLIDE 2: THE PROBLEM ========== -->
+<div class="slide bg-dark content-left" id="slide-2">
+  <div class="tag tag-red">The Reality</div>
+  <h2>Amazon Is a <span class="gold">Real Business.</span><br>Most People Treat It Like a Side Hustle.</h2>
+  <ul>
+    <li>You bought a course. Watched the videos. Got stuck halfway through.</li>
+    <li>You don't have 20+ hours a week to learn sourcing, listings, shipping, and account management.</li>
+    <li>You have the capital — but not the time or expertise to execute.</li>
+    <li>You've seen people make $10K, $30K, $50K/month — and you know it's real. But you need the <span class="bold">right team</span> behind you.</li>
+  </ul>
+  <p class="quote">"The people winning on Amazon aren't doing it alone. They have operators."</p>
+  <div class="slide-footer">24/7 Profits — Done-For-You Amazon Business</div>
+</div>
+
+<!-- ========== SLIDE 3: THE SHIFT ========== -->
+<div class="slide bg-purple content-left" id="slide-3">
+  <div class="tag">The Shift</div>
+  <h2>Stop Trying to <span class="red">Figure It Out.</span><br>Let the Best in the Game <span class="gold">Run It For You.</span></h2>
+  <div class="vs-grid">
+    <div class="vs-col old">
+      <h3 class="red">The Old Way</h3>
+      <ul>
+        <li>Buy a course, figure it out yourself</li>
+        <li>Spend months learning before your first sale</li>
+        <li>Make expensive mistakes with your capital</li>
+        <li>Get stuck with no one to fix it</li>
+        <li>Quit after 3 months like 95% of sellers</li>
+      </ul>
+    </div>
+    <div class="vs-divider">VS</div>
+    <div class="vs-col new">
+      <h3 class="green">Done-For-You</h3>
+      <ul>
+        <li>Operators build and run everything for you</li>
+        <li>First products sourced and listed within weeks</li>
+        <li>Your capital deployed by experienced sellers</li>
+        <li>AI tools + daily oversight = maximum ROI</li>
+        <li>You learn the business while we operate it</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-footer">24/7 Profits — Done-For-You Amazon Business</div>
+</div>
+
+<!-- ========== SLIDE 4: WHAT YOU GET ========== -->
+<div class="slide bg-dark content-left" id="slide-4">
+  <div class="tag tag-purple">What's Included</div>
+  <h2>Full Account Management<br>+ <span class="gold">1-on-1 Coaching</span></h2>
+  <div class="card-grid">
+    <div class="card">
+      <h3 class="gold">We Run Your Amazon Business</h3>
+      <p>Product sourcing, supplier negotiation, listing creation, inventory management, account health — all handled by our team daily.</p>
+    </div>
+    <div class="card">
+      <h3 class="purple">You Learn Everything</h3>
+      <p>1-on-1 coaching sessions with Sabbo + access to all group calls. You understand every decision we make — it's your business.</p>
+    </div>
+    <div class="card">
+      <h3 class="green">AI-Powered Product Discovery</h3>
+      <p>Proprietary AI tools scan thousands of products daily. We find opportunities other sellers will never see — and source them for you.</p>
+    </div>
+    <div class="card">
+      <h3 style="color:#4f8cff;">Complete Inner Circle Access</h3>
+      <p>Everything in the $10K coaching program is included — course, community, daily leads, prep center, funding systems, supplier database.</p>
+    </div>
+  </div>
+  <img src="images/slide-p4-img0.png" alt="Mentorship, Done-For-You Systems, Community" class="pillars-img" style="margin-top:16px;">
+  <div class="slide-footer">24/7 Profits — Done-For-You Amazon Business</div>
+</div>
+
+<!-- ========== SLIDE 5: THE TEAM ========== -->
+<div class="slide bg-blue" id="slide-5">
+  <div class="tag">Your Team</div>
+  <div class="split">
+    <div class="split-text">
+      <h2 style="text-align:left;">Operators — Not <span class="purple">Account Managers.</span><br>Active Sellers <span class="gold">Running Your Business.</span></h2>
+      <div class="card" style="margin-bottom:16px; border-color:rgba(255,215,0,0.25);">
+        <h3 class="gold">Sabbo Jean-Baptiste</h3>
+        <p>Founder, 24/7 Profits. Active Amazon seller. Built the AI sourcing tools. Personally oversees every DFY account.</p>
+      </div>
+      <div class="card" style="border-color:rgba(183,148,224,0.25);">
+        <h3 class="purple">Specialist Coaches</h3>
+        <p>3 coaches actively selling $20K–$50K/month on Amazon. Sourcing, listings, account management — they do it daily.</p>
+      </div>
+    </div>
+    <div class="split-img">
+      <img src="images/slide-p12-img1.png" alt="Sabbo with FBA boxes" class="sabbo-img">
+    </div>
+  </div>
+  <div class="slide-footer">24/7 Profits — Done-For-You Amazon Business</div>
+</div>
+
+<!-- ========== SLIDE 6: THE SYSTEM ========== -->
+<div class="slide bg-dark content-left" id="slide-6">
+  <div class="tag tag-green">The System</div>
+  <h2>5 Phases to a <span class="gold">$100K Amazon Business</span></h2>
+  <div class="timeline">
+    <div class="phase">
+      <div class="phase-num">Phase 1</div>
+      <h4 class="gold">Foundation</h4>
+      <p>Account setup, business entity, compliance, funding systems, prep center</p>
+    </div>
+    <div class="phase">
+      <div class="phase-num">Phase 2</div>
+      <h4 class="purple">Sourcing</h4>
+      <p>AI-driven product research, supplier negotiation, first inventory orders</p>
+    </div>
+    <div class="phase">
+      <div class="phase-num">Phase 3</div>
+      <h4 class="green">Launch</h4>
+      <p>Listings live, inventory shipped, first sales within weeks</p>
+    </div>
+    <div class="phase">
+      <div class="phase-num">Phase 4</div>
+      <h4 style="color:#4f8cff;">Scale</h4>
+      <p>Expand product catalog, optimize margins, grow revenue monthly</p>
+    </div>
+    <div class="phase">
+      <div class="phase-num">Phase 5</div>
+      <h4 class="gold">$100K+</h4>
+      <p>Hit $100K revenue milestone, transition to ongoing management or independence</p>
+    </div>
+  </div>
+  <p class="quote">"We don't stop at setup. We operate until you're profitable — and beyond."</p>
+  <div class="slide-footer">24/7 Profits — Done-For-You Amazon Business</div>
+</div>
+
+<!-- ========== SLIDE 7: AI ADVANTAGE ========== -->
+<div class="slide bg-purple content-left" id="slide-7">
+  <div class="tag">The AI Edge</div>
+  <h2>Proprietary AI Tools<br><span class="gold">Working For You 24/7</span></h2>
+  <div class="card-grid">
+    <div class="card">
+      <h3 class="gold">AI Product Scanner</h3>
+      <p>Scans thousands of products across 300+ retailers. Finds profitable opportunities while other sellers are still scrolling manually.</p>
+    </div>
+    <div class="card">
+      <h3 class="green">Daily Curated Leads</h3>
+      <p>Our team + AI deliver vetted product leads every morning. We pick the winners and source them for your account.</p>
+    </div>
+    <div class="card">
+      <h3 class="purple">Data-Driven Decisions</h3>
+      <p>Price history, sales velocity, competition density, profit margins — every decision backed by real-time Amazon data.</p>
+    </div>
+    <div class="card">
+      <h3 style="color:#4f8cff;">10x Faster Execution</h3>
+      <p>What takes manual sellers 10+ hours/week, our AI systems handle in under an hour. Your business moves at machine speed.</p>
+    </div>
+  </div>
+  <div class="slide-footer">24/7 Profits — Done-For-You Amazon Business</div>
+</div>
+
+<!-- ========== SLIDE 8: RESULTS — SCREENSHOTS ========== -->
+<div class="slide bg-dark" id="slide-8">
+  <div class="tag tag-green">Proof</div>
+  <h2>Real Students. <span class="gold">Real Results.</span></h2>
+  <div class="proof-grid">
+    <div class="proof-card">
+      <img src="images/slide-p8-img0.png" alt="Xavier — $10K in 7 days selling crayons">
+      <div class="proof-caption">
+        <div class="proof-name gold">Xavier</div>
+        <div class="proof-stat">$0 → $10K in 7 Days</div>
+      </div>
+    </div>
+    <div class="proof-card">
+      <img src="images/brandon.png" alt="Brandon — $48K/month">
+      <div class="proof-caption">
+        <div class="proof-name green">Brandon</div>
+        <div class="proof-stat">$48K/mo — Loading for $500K</div>
+      </div>
+    </div>
+    <div class="proof-card">
+      <img src="images/jeff.png" alt="Jeff — $188K in under a year">
+      <div class="proof-caption">
+        <div class="proof-name purple">Jeff</div>
+        <div class="proof-stat">Almost $200K — Under 1 Year</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">24/7 Profits — Done-For-You Amazon Business</div>
+</div>
+
+<!-- ========== SLIDE 9: MORE RESULTS ========== -->
+<div class="slide bg-blue" id="slide-9">
+  <div class="tag tag-green">More Proof</div>
+  <h2>This Works for <span class="gold">Everyone</span> Who Follows the System.</h2>
+  <div class="proof-grid">
+    <div class="proof-card">
+      <img src="images/slide-p8-img2.png" alt="Grace — First sale after 2 years stuck">
+      <div class="proof-caption">
+        <div class="proof-name green">Grace</div>
+        <div class="proof-stat">2 Years No Sales → $70 First Day</div>
+      </div>
+    </div>
+    <div class="proof-card">
+      <img src="images/diaz.png" alt="Diaz — $52K in 9 days">
+      <div class="proof-caption">
+        <div class="proof-name" style="color:#4f8cff;">Diaz</div>
+        <div class="proof-stat">$52K in 9 Days</div>
+      </div>
+    </div>
+    <div class="proof-card">
+      <img src="images/20k-day.jpg" alt="$20K in a single day">
+      <div class="proof-caption">
+        <div class="proof-name gold">Store 1</div>
+        <div class="proof-stat">$20K Day — Single Store</div>
+      </div>
+    </div>
+  </div>
+  <p class="quote">"These are coaching results. Imagine what happens when we run the entire business for you."</p>
+  <div class="slide-footer">24/7 Profits — Done-For-You Amazon Business</div>
+</div>
+
+<!-- ========== SLIDE 10: THE INVESTMENT ========== -->
+<div class="slide bg-gold" id="slide-10">
+  <div class="tag">The Investment</div>
+  <h2>Performance-Based Pricing.<br><span class="gold">We Win When You Win.</span></h2>
+  <div class="price-card">
+    <div class="price-sub" style="margin-bottom:8px;">Done-For-You Amazon Business</div>
+    <div class="price-big">$20,000</div>
+    <div class="price-detail">
+      <strong style="color:#fff;">$10,000 upfront</strong> — to get started<br>
+      <strong style="color:#fff;">$10,000 after $100K revenue</strong> — you only pay the rest after we produce results
+    </div>
+  </div>
+  <p style="font-size:20px; color:rgba(255,255,255,0.6); margin-top:16px; text-align:center;">
+    After $100K milestone: <strong class="gold">10% of profits</strong> for ongoing management — or take over and run it yourself.
+  </p>
+  <div class="slide-footer">24/7 Profits — Done-For-You Amazon Business</div>
+</div>
+
+<!-- ========== SLIDE 11: WHY THIS STRUCTURE ========== -->
+<div class="slide bg-purple content-left" id="slide-11">
+  <div class="tag">Why This Works</div>
+  <h2>We Put Our Money<br>Where Our <span class="gold">Mouth Is.</span></h2>
+  <div class="card-grid">
+    <div class="card" style="border-color:rgba(255,215,0,0.25);">
+      <h3 class="gold">Performance-Based</h3>
+      <p>Half of our fee is tied to YOUR results. We don't get paid the second $10K until we've generated $100K for you. That's alignment.</p>
+    </div>
+    <div class="card" style="border-color:rgba(74,222,128,0.25);">
+      <h3 class="green">You Still Own Everything</h3>
+      <p>It's your Amazon account. Your business entity. Your inventory. Your profits. We operate it — you own it. Always.</p>
+    </div>
+    <div class="card" style="border-color:rgba(183,148,224,0.25);">
+      <h3 class="purple">Exit Anytime</h3>
+      <p>After $100K, you decide: keep us on at 10% of profits for ongoing management, or take the wheel yourself with full knowledge of how it all works.</p>
+    </div>
+    <div class="card" style="border-color:rgba(79,140,255,0.25);">
+      <h3 style="color:#4f8cff;">You Learn While We Build</h3>
+      <p>This isn't a black box. 1-on-1 coaching, group calls, full transparency. You understand every move — because it's your business.</p>
+    </div>
+  </div>
+  <div class="slide-footer">24/7 Profits — Done-For-You Amazon Business</div>
+</div>
+
+<!-- ========== SLIDE 12: QUALIFICATION ========== -->
+<div class="slide bg-dark content-left" id="slide-12">
+  <div class="tag tag-purple">Is This For You?</div>
+  <h2>This Offer Is <span class="gold">Not For Everyone.</span></h2>
+  <div class="qual-grid">
+    <div class="qual-col yes">
+      <h3 class="green">This IS For You If:</h3>
+      <ul>
+        <li>You have <span class="bold">$20K+ capital</span> to invest in building a real asset</li>
+        <li>You want a <span class="bold">hands-off business</span> run by the best operators in the space</li>
+        <li>You trust the process and are in it for the long game</li>
+        <li>You want to <span class="bold">learn the business</span> while someone else handles execution</li>
+      </ul>
+    </div>
+    <div class="qual-col no">
+      <h3 class="red">This Is NOT For You If:</h3>
+      <ul>
+        <li>You have less than $20K in total capital</li>
+        <li>You want "passive income" with zero involvement</li>
+        <li>You're looking for a get-rich-quick scheme</li>
+        <li>You're not serious about building a real business</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-footer">24/7 Profits — Done-For-You Amazon Business</div>
+</div>
+
+<!-- ========== SLIDE 13: GUARANTEE + CTA ========== -->
+<div class="slide bg-deep" id="slide-13">
+  <img src="images/logo.png" alt="24/7 Profits" class="logo-img" style="width:80px; height:80px; margin-bottom:16px;">
+  <div class="tag">The Guarantee</div>
+  <h2>We Don't Stop Until You Hit <span class="gold">$100K.</span></h2>
+  <div class="guarantee-box">
+    <h3>THE 24/7 PROFITS DFY GUARANTEE</h3>
+    <p style="font-size:20px; color:rgba(255,255,255,0.85); margin-top:16px; line-height:1.7;">
+      We operate your Amazon business until you hit $100,000 in revenue. If it takes longer than expected — we keep working. No additional fees. No excuses. We succeed when you succeed.
+    </p>
+  </div>
+  <p style="font-size:28px; font-weight:800; margin-top:24px; letter-spacing:-0.5px; text-align:center;">
+    Ready to Build Your <span class="gold">Amazon Empire?</span>
+  </p>
+  <p style="font-size:18px; color:rgba(255,255,255,0.5); margin-top:12px; text-align:center;">
+    This offer is by invitation only. Limited to a small number of DFY clients at any time.
+  </p>
+  <div class="slide-footer">24/7 Profits — Done-For-You Amazon Business</div>
+</div>
+
+<!-- NAV -->
+<div class="slide-counter">
+  <span id="current-slide">1</span> / <span id="total-slides">13</span>
+</div>
+
+<div class="nav">
+  <button onclick="prevSlide()">&#8592; Back</button>
+  <button onclick="nextSlide()">Next &#8594;</button>
+</div>
+
+<script>
+  let current = 0;
+  const slides = document.querySelectorAll('.slide');
+  const totalEl = document.getElementById('total-slides');
+  const currentEl = document.getElementById('current-slide');
+  totalEl.textContent = slides.length;
+
+  function showSlide(n) {
+    slides[current].classList.remove('active');
+    current = (n + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    currentEl.textContent = current + 1;
+  }
+
+  function nextSlide() { showSlide(current + 1); }
+  function prevSlide() { showSlide(current - 1); }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+    if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 > **CRM:** GoHighLevel (GHL)
 > **Merge Fields:** {{first_name}}, {{webinar_link}}, {{replay_link}}, {{application_link}}, {{calendar_link}}
 > **Brand:** 24/7 Profits — AI Amazon Scaling
-> **Last Updated:** 2026-03-23
+> **Last Updated:** 2026-04-05
 
 ---
 
@@ -20,7 +20,7 @@
 
 Hey {{first_name}},
 
-You're registered. Wednesday at 8PM EST — mark it down.
+You're registered. Wednesday, April 8th at 7PM EST — mark it down.
 
 Here's what I'll cover live:
 
@@ -74,7 +74,7 @@ I'll show you exactly how this works on Wednesday night — including a live dem
 
 Make sure you're there: {{webinar_link}}
 
-Wednesday. 8PM EST.
+Wednesday, April 8th. 7PM EST.
 
 — Sabbo
 
@@ -109,7 +109,7 @@ That's the difference between DIY Amazon and what we do.
 
 I'll show you the exact system Wednesday night.
 
-{{webinar_link}} — 8PM EST.
+{{webinar_link}} — 7PM EST.
 
 — Sabbo
 
@@ -141,7 +141,7 @@ Courses give you videos and say "good luck." We give you AI tools, live coaching
 
 One thing I should mention: I'm only covering this live. I'm not going to send the replay to every person who registered. If you want to see this, be there.
 
-Wednesday. 8PM EST. Be there: {{webinar_link}}
+Wednesday, April 8th. 7PM EST. Be there: {{webinar_link}}
 
 — Sabbo
 
@@ -164,7 +164,7 @@ To get the most out of it, here's what I want you to do before we start:
 
 **2. Think about your biggest question about Amazon FBA.** I'll be taking questions live. Come with yours ready.
 
-**3. Clear your schedule from 8:00 - 9:15 PM EST.** No distractions. This isn't background noise content — it's a training that could genuinely change your financial trajectory. Give it your full attention.
+**3. Clear your schedule from 7:00 - 8:15 PM EST.** No distractions. This isn't background noise content — it's a training that could genuinely change your financial trajectory. Give it your full attention.
 
 Also — if you have a business partner or spouse who should hear this, invite them. It's easier to make big decisions together. And the training is free for them too.
 
@@ -185,7 +185,7 @@ See you tomorrow night.
 
 {{first_name}},
 
-Tomorrow at 8PM EST, I'm going to show you the exact system our students use to build profitable Amazon businesses in 90 days using AI.
+Tomorrow at 7PM EST, I'm going to show you the exact system our students use to build profitable Amazon businesses in 90 days using AI.
 
 Not theory. Not hype. The system.
 
@@ -204,7 +204,7 @@ Tomorrow night, I'll show you everything:
 
 Don't miss this: {{webinar_link}}
 
-8PM EST. Tomorrow.
+7PM EST. Tomorrow.
 
 — Sabbo
 
@@ -216,7 +216,7 @@ Don't miss this: {{webinar_link}}
 
 ### B1 — 9:00 AM EST
 
-**Subject:** Tonight at 8PM — AI Amazon Scaling masterclass
+**Subject:** Tonight at 7PM — AI Amazon Scaling masterclass
 **Send Timing:** 9:00 AM EST on webinar day
 
 ---
@@ -225,7 +225,7 @@ Don't miss this: {{webinar_link}}
 
 Quick reminder — tonight's the night.
 
-8PM EST. The link is below.
+7PM EST. The link is below.
 
 I'll be showing you the full AI Amazon system live — including things I've never put in a YouTube video. This is the same system that's produced students doing $10K, $30K, even $48K/month on Amazon.
 
@@ -233,16 +233,16 @@ Bring a notebook. Bring your questions. Bring your partner if they need to hear 
 
 Join here tonight: {{webinar_link}}
 
-See you at 8.
+See you at 7.
 
 — Sabbo
 
 ---
 
-### B2 — 6:00 PM EST (2 Hours Before)
+### B2 — 5:00 PM EST (2 Hours Before)
 
 **Subject:** Starting in 2 hours — grab your seat
-**Send Timing:** 6:00 PM EST on webinar day
+**Send Timing:** 5:00 PM EST on webinar day
 
 ---
 
@@ -260,16 +260,16 @@ Here's what's on the agenda:
 
 This is your link: {{webinar_link}}
 
-8PM EST. See you in there.
+7PM EST. See you in there.
 
 — Sabbo
 
 ---
 
-### B3 — 7:45 PM EST (15 Minutes Before)
+### B3 — 6:45 PM EST (15 Minutes Before)
 
 **Subject:** We're going live in 15 minutes
-**Send Timing:** 7:45 PM EST on webinar day
+**Send Timing:** 6:45 PM EST on webinar day
 
 ---
 
@@ -573,7 +573,7 @@ After tomorrow, it's gone.
 
 {{first_name}},
 
-The replay is gone, but I'm running the training again on **{{next_webinar_date}} at 8PM EST.**
+The replay is gone, but I'm running the training again on **{{next_webinar_date}} at 7PM EST.**
 
 If you missed it last time, here's what you'll learn:
 
@@ -605,7 +605,7 @@ See you there.
 | `{{application_link}}` | Post-webinar application | "https://247profits.org/webinar/apply" |
 | `{{calendar_link}}` | Strategy call booking | "https://cal.com/247profits" |
 | `{{month}}` | Current month name | "March" |
-| `{{next_webinar_date}}` | Next webinar date | "Wednesday, April 2nd" |
+| `{{next_webinar_date}}` | Next webinar date | "Wednesday, April 8th" |
 
 ---
 
@@ -614,7 +614,7 @@ See you there.
 ```
 Registration --> A1 (immediate) -> A2 (+1d) -> A3 (+2d) -> A4 (+4d) -> A5 (+5d) -> A6 (+6d)
                                                                                       |
-Day Of --------------------------------------------------------- B1 (9am) -> B2 (6pm) -> B3 (7:45pm)
+Day Of --------------------------------------------------------- B1 (9am) -> B2 (5pm) -> B3 (6:45pm)
                                                                                       |
                                                     +------ ATTENDED ------+  +-- NO-SHOW --+
 Post-Webinar ---------------------------------------- C1 (+1hr)              D1 (+1hr)

@@ -6,8 +6,8 @@
 ## Current Status
 
 ```
-Status: NOT ACTIVE — bot in setup phase
-Last heartbeat: N/A
+Status: IDLE
+Last heartbeat: 2026-03-26
 ```
 
 ---
@@ -23,4 +23,4 @@ Before this bot goes live, complete:
 
 ---
 
-*Activate after ads-copy bot is fully operational.*
+*Last updated: 2026-03-26*

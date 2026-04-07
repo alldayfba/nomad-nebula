@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDR Onboarding — 247 Growth</title>
+<style>
+  
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .slide {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    padding: 60px 80px;
+    position: relative;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .slide.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Slide backgrounds */
+  .bg-dark { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%); }
+  .bg-blue { background: linear-gradient(135deg, #0a0a1a 0%, #0d1b3e 50%, #1a0a2e 100%); }
+  .bg-green { background: linear-gradient(135deg, #0a1a0a 0%, #0d2e1b 50%, #1a2e0a 100%); }
+  .bg-red { background: linear-gradient(135deg, #1a0a0a 0%, #2e0d0d 50%, #2e1a0a 100%); }
+  .bg-purple { background: linear-gradient(135deg, #0a0a1a 0%, #1a0d2e 50%, #2e0a2e 100%); }
+
+  h1 {
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1.1;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  h2 {
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.15;
+    margin-bottom: 30px;
+  }
+
+  h3 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle {
+    font-size: 24px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    max-width: 700px;
+  }
+
+  .accent { color: #4f8cff; }
+  .accent-green { color: #4fff8c; }
+  .accent-red { color: #ff4f4f; }
+  .accent-yellow { color: #ffd54f; }
+  .accent-orange { color: #ff8c4f; }
+
+  .content-left {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 20px;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 30px;
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 20px;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 30px;
+    backdrop-filter: blur(20px);
+  }
+
+  .card h3 { font-size: 22px; margin-bottom: 12px; }
+  .card p, .card li {
+    font-size: 18px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.8);
+  }
+
+  .card ul { list-style: none; padding: 0; }
+  .card ul li { padding: 6px 0; }
+  .card ul li::before { content: "→ "; color: #4f8cff; font-weight: 600; }
+
+  .big-number {
+    font-size: 96px;
+    font-weight: 900;
+    letter-spacing: -4px;
+    line-height: 1;
+  }
+
+  .big-number-label {
+    font-size: 20px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-top: 8px;
+  }
+
+  .stat-row {
+    display: flex;
+    gap: 60px;
+    margin-top: 30px;
+  }
+
+  .stat-item { text-align: center; }
+
+  .bullet-list {
+    list-style: none;
+    padding: 0;
+    max-width: 900px;
+    width: 100%;
+  }
+
+  .bullet-list li {
+    font-size: 24px;
+    line-height: 1.5;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.85);
+  }
+
+  .bullet-list li:last-child { border-bottom: none; }
+  .bullet-list li strong { color: #fff; }
+
+  .script-box {
+    background: rgba(79,140,255,0.08);
+    border: 1px solid rgba(79,140,255,0.25);
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 1000px;
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  .script-box p {
+    font-size: 26px;
+    line-height: 1.6;
+    font-style: italic;
+    color: rgba(255,255,255,0.9);
+  }
+
+  .script-label {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #4f8cff;
+    margin-bottom: 16px;
+  }
+
+  .warning-box {
+    background: rgba(255,79,79,0.08);
+    border: 1px solid rgba(255,79,79,0.25);
+    border-radius: 16px;
+    padding: 30px 40px;
+    max-width: 1000px;
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  .warning-box p {
+    font-size: 22px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .phase-flow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 30px 0;
+  }
+
+  .phase-pill {
+    background: rgba(79,140,255,0.15);
+    border: 1px solid rgba(79,140,255,0.3);
+    border-radius: 40px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .phase-arrow {
+    font-size: 20px;
+    color: rgba(255,255,255,0.3);
+  }
+
+  .timeline {
+    max-width: 900px;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .timeline-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .timeline-time {
+    font-size: 18px;
+    font-weight: 700;
+    color: #4f8cff;
+    min-width: 110px;
+    text-align: right;
+  }
+
+  .timeline-label {
+    font-size: 20px;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .timeline-label strong { color: #fff; }
+
+  .dial-block {
+    background: rgba(79,255,140,0.08);
+    border: 1px solid rgba(79,255,140,0.2);
+    border-radius: 12px;
+    padding: 14px 20px;
+  }
+
+  .table-wrap {
+    width: 100%;
+    max-width: 1000px;
+    margin-top: 20px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th {
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.4);
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+  }
+
+  td {
+    font-size: 20px;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.85);
+  }
+
+  td:first-child { font-weight: 600; color: #fff; }
+
+  .nav {
+    position: fixed;
+    bottom: 30px;
+    right: 40px;
+    display: flex;
+    gap: 12px;
+    z-index: 100;
+  }
+
+  .nav button {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .nav button:hover { background: rgba(255,255,255,0.2); }
+
+  .slide-counter {
+    position: fixed;
+    bottom: 35px;
+    left: 40px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.3);
+    font-weight: 500;
+    z-index: 100;
+  }
+
+  .tag {
+    display: inline-block;
+    background: rgba(79,140,255,0.15);
+    border: 1px solid rgba(79,140,255,0.3);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #4f8cff;
+    margin-bottom: 16px;
+  }
+
+  .tag-red {
+    background: rgba(255,79,79,0.15);
+    border-color: rgba(255,79,79,0.3);
+    color: #ff4f4f;
+  }
+
+  .tag-green {
+    background: rgba(79,255,140,0.15);
+    border-color: rgba(79,255,140,0.3);
+    color: #4fff8c;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  .do-dont {
+    padding: 30px;
+    border-radius: 16px;
+  }
+
+  .do-box {
+    background: rgba(79,255,140,0.06);
+    border: 1px solid rgba(79,255,140,0.2);
+  }
+
+  .dont-box {
+    background: rgba(255,79,79,0.06);
+    border: 1px solid rgba(255,79,79,0.2);
+  }
+
+  .do-dont h3 { font-size: 20px; margin-bottom: 16px; }
+  .do-dont li {
+    font-size: 18px;
+    line-height: 1.6;
+    padding: 4px 0;
+    color: rgba(255,255,255,0.8);
+    list-style: none;
+  }
+
+  .hook-table {
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  .hook-table td { font-size: 18px; vertical-align: top; }
+  .hook-table td:first-child { min-width: 200px; color: #4f8cff; font-weight: 600; }
+
+  .objection-row {
+    display: flex;
+    gap: 20px;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    max-width: 1100px;
+    width: 100%;
+  }
+
+  .objection-q {
+    min-width: 250px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #ff8c4f;
+  }
+
+  .objection-a {
+    font-size: 18px;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.5;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============== SLIDE 1: TITLE ============== -->
+<div class="slide active bg-dark" id="slide-1">
+  <div class="tag">SDR Onboarding</div>
+  <h1>Welcome to <span class="accent">247 Growth</span></h1>
+  <p class="subtitle">Setter Team Onboarding — Everything you need to know to start booking calls today.</p>
+</div>
+
+<!-- ============== SLIDE 2: WHO WE ARE ============== -->
+<div class="slide bg-blue content-left" id="slide-2">
+  <div class="tag">About Us</div>
+  <h2>Who We Are</h2>
+  <div class="grid-2">
+    <div class="card">
+      <h3 class="accent">What We Do</h3>
+      <p>We build and operate <strong>full-stack growth systems</strong> for founder-led businesses.</p>
+      <br>
+      <ul>
+        <li><strong>Websites</strong> — high-converting sites that actually generate leads</li>
+        <li><strong>Paid Ads</strong> — Meta, Google, TikTok — managed + optimized</li>
+        <li><strong>AI Automation</strong> — streamline their entire operation</li>
+        <li><strong>Full Growth Engine</strong> — acquisition, conversion, retention</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 class="accent">Why We're Different</h3>
+      <p>We're <strong>operators, not account managers.</strong></p>
+      <br>
+      <ul>
+        <li>Senior talent embedded in the business</li>
+        <li>We don't hand off to juniors after the sale</li>
+        <li>We install the system in 30 days</li>
+        <li>Then operate it month over month</li>
+        <li>$5K – $25K/mo retainers</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============== SLIDE 3: WHAT WE'RE SELLING RIGHT NOW ============== -->
+<div class="slide bg-green content-left" id="slide-3">
+  <div class="tag-green tag">Current Focus</div>
+  <h2>What You're Pitching <span class="accent-green">Right Now</span></h2>
+  <div class="grid-2">
+    <div class="card" style="border-color: rgba(79,255,140,0.3);">
+      <h3 class="accent-green">1. Websites</h3>
+      <p style="font-size:20px; line-height:1.6;">Most businesses you call have a <strong>terrible website</strong> or no website at all. They're posting on social media but it's not converting because there's no system behind it.</p>
+      <br>
+      <p style="font-size:18px; color:rgba(255,255,255,0.6);"><em>"I see you're trying to post on social media, but you're not really getting traffic or converting it. The issue isn't content — it's that there's nowhere to send people."</em></p>
+    </div>
+    <div class="card" style="border-color: rgba(79,255,140,0.3);">
+      <h3 class="accent-green">2. Running Ads</h3>
+      <p style="font-size:20px; line-height:1.6;">Founders are either <strong>not running ads at all</strong> (leaving money on the table) or running them poorly (burning cash with no system).</p>
+      <br>
+      <p style="font-size:18px; color:rgba(255,255,255,0.6);"><em>"You've got a great product but no predictable way to get in front of new customers every single day. That's what ads solve — when done right."</em></p>
+    </div>
+  </div>
+  <div class="warning-box" style="margin-top:30px; border-color:rgba(79,255,140,0.25); background:rgba(79,255,140,0.05);">
+    <p><strong>You don't need to be an expert on websites or ads.</strong> You just need to identify the pain and book the call. The closer handles the rest.</p>
+  </div>
+</div>
+
+<!-- ============== SLIDE 4: YOUR ROLE ============== -->
+<div class="slide bg-dark content-left" id="slide-4">
+  <div class="tag">Your Role</div>
+  <h2>You Are a <span class="accent">Filter</span>, Not a Pitcher</h2>
+  <ul class="bullet-list">
+    <li><strong>Your ONLY job:</strong> Get qualified founders on a strategy call with a closer</li>
+    <li><strong>You don't pitch the offer.</strong> You don't talk pricing. You don't try to close.</li>
+    <li><strong>You find pain</strong>, confirm fit, and <strong>book the call</strong></li>
+    <li><strong>Strategy session</strong> — NEVER say "sales call" or "pitch"</li>
+    <li><strong>30-45 minute</strong> call with a closer who diagnoses their growth bottleneck</li>
+  </ul>
+  <div class="warning-box" style="margin-top:30px;">
+    <p><span class="accent-red"><strong>3 qualified bookings</strong></span> beat 8 unqualified ones. Close rate on bad leads: <strong>0%</strong>. Close rate on good leads: <strong>40-60%</strong>. Every bad booking costs the closer an hour of momentum.</p>
+  </div>
+</div>
+
+<!-- ============== SLIDE 5: WHO YOU'RE CALLING ============== -->
+<div class="slide bg-blue content-left" id="slide-5">
+  <div class="tag">ICP</div>
+  <h2>Who You're Calling</h2>
+  <div class="two-col">
+    <div class="do-dont do-box">
+      <h3 class="accent-green">BOOK ✓</h3>
+      <ul>
+        <li>Revenue $1M+/year</li>
+        <li>Has product-market fit</li>
+        <li>Spending on marketing (even poorly)</li>
+        <li>Frustrated — wants to fix growth</li>
+        <li>Founder is the decision maker</li>
+        <li>Can invest $5K-$25K/mo if fit is right</li>
+      </ul>
+    </div>
+    <div class="do-dont dont-box">
+      <h3 class="accent-red">DROP ✗</h3>
+      <ul>
+        <li>Under $1M or pre-revenue</li>
+        <li>No clear product or market</li>
+        <li>"We don't really do marketing"</li>
+        <li>Wants "cheap help" or discounts</li>
+        <li>Needs board approval just to talk</li>
+        <li>No budget, unfunded startup</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============== SLIDE 6: PRE-CALL RESEARCH ============== -->
+<div class="slide bg-dark content-left" id="slide-6">
+  <div class="tag">Before Every Dial</div>
+  <h2>60-Second Research <span class="accent">(Mandatory)</span></h2>
+  <p style="font-size:22px; color:rgba(255,255,255,0.6); margin-bottom:30px;">Leads with context convert 3-4x higher. Do this for EVERY lead.</p>
+  <ul class="bullet-list">
+    <li><strong>1. Open their website</strong> — What do they sell? Who do they sell to? Is the site trash?</li>
+    <li><strong>2. Check LinkedIn or Instagram</strong> — How big? Running ads? Posting content?</li>
+    <li><strong>3. Spot obvious gaps</strong> — No email capture? Weak landing page? No funnel? Bad design?</li>
+    <li><strong>4. Find ONE thing to reference</strong> — "I saw you're running Facebook ads..." / "I noticed your site doesn't have..."</li>
+  </ul>
+  <div class="warning-box" style="margin-top:20px;">
+    <p><strong>This is NOT optional.</strong> If you skip research, your connect-to-booking rate drops to near zero. 60 seconds of prep = 4x better results.</p>
+  </div>
+</div>
+
+<!-- ============== SLIDE 7: THE CALL FLOW ============== -->
+<div class="slide bg-purple content-left" id="slide-7">
+  <div class="tag">The Script</div>
+  <h2>The 6-Phase Call Flow</h2>
+  <p style="font-size:22px; color:rgba(255,255,255,0.5); margin-bottom:20px;">Total call time: 2-3 minutes. That's it.</p>
+  <div class="phase-flow">
+    <div class="phase-pill">1. Pattern Interrupt<br><small style="color:rgba(255,255,255,0.4);">10 sec</small></div>
+    <span class="phase-arrow">→</span>
+    <div class="phase-pill">2. The Hook<br><small style="color:rgba(255,255,255,0.4);">15-20 sec</small></div>
+    <span class="phase-arrow">→</span>
+    <div class="phase-pill">3. Dig Into Pain<br><small style="color:rgba(255,255,255,0.4);">60-90 sec</small></div>
+    <span class="phase-arrow">→</span>
+    <div class="phase-pill">4. The Bridge<br><small style="color:rgba(255,255,255,0.4);">15-20 sec</small></div>
+    <span class="phase-arrow">→</span>
+    <div class="phase-pill">5. Book the Call<br><small style="color:rgba(255,255,255,0.4);">30-45 sec</small></div>
+    <span class="phase-arrow">→</span>
+    <div class="phase-pill">6. Protect the Show<br><small style="color:rgba(255,255,255,0.4);">After hang-up</small></div>
+  </div>
+</div>
+
+<!-- ============== SLIDE 8: OPENER STYLES ============== -->
+<div class="slide bg-dark content-left" id="slide-8">
+  <div class="tag">Phase 1 — Pick Your Style</div>
+  <h2>6 Opener Styles</h2>
+  <p style="font-size:18px; color:rgba(255,255,255,0.4); margin-bottom:20px;">Pick the one that fits the lead. Master all 6 over time.</p>
+  <div class="grid-3" style="max-width:1200px;">
+    <div class="card" style="border-color:rgba(79,140,255,0.3);">
+      <h3 style="font-size:16px;"><span class="accent">1.</span> Customer Approach</h3>
+      <p style="font-size:15px; font-style:italic; color:rgba(255,255,255,0.8); line-height:1.5;">"Hey, I was trying to look for a [listing/appointment] but couldn't find one on your site. I ended up going with someone else — but I think we could help you fix that so you don't lose future customers."</p>
+      <p style="font-size:12px; color:rgba(255,255,255,0.3); margin-top:8px;">Best for: Bad/no website. You sound like a real customer.</p>
+    </div>
+    <div class="card" style="border-color:rgba(79,255,140,0.3);">
+      <h3 style="font-size:16px;"><span class="accent-green">2.</span> Familiarity Play</h3>
+      <p style="font-size:15px; font-style:italic; color:rgba(255,255,255,0.8); line-height:1.5;">"[Name]? What's up! This is [You]. We spoke a while back about getting you more clients — does that sound familiar?"</p>
+      <p style="font-size:13px; color:rgba(255,255,255,0.5); margin-top:4px;">They say "who?" → "Yeah no worries — is getting more clients something you're still looking into?"</p>
+      <p style="font-size:12px; color:rgba(255,255,255,0.3); margin-top:8px;">Best for: Any lead. Creates instant rapport.</p>
+    </div>
+    <div class="card" style="border-color:rgba(255,213,79,0.3);">
+      <h3 style="font-size:16px;"><span class="accent-yellow">3.</span> Website Gap</h3>
+      <p style="font-size:15px; font-style:italic; color:rgba(255,255,255,0.8); line-height:1.5;">"Hey, I was trying to see where I could schedule [service] with you but there was no website. I'm all good now, but do you still need a website? Because that's what we do."</p>
+      <p style="font-size:12px; color:rgba(255,255,255,0.3); margin-top:8px;">Best for: No website at all. Direct and helpful.</p>
+    </div>
+    <div class="card" style="border-color:rgba(255,140,79,0.3);">
+      <h3 style="font-size:16px;"><span class="accent-orange">4.</span> Direct Cold Open</h3>
+      <p style="font-size:15px; font-style:italic; color:rgba(255,255,255,0.8); line-height:1.5;">"Hey [Name], this is [You] — I know this is out of the blue, do you have 30 seconds?"</p>
+      <p style="font-size:12px; color:rgba(255,255,255,0.3); margin-top:8px;">Best for: When you have strong research. Honest, no games.</p>
+    </div>
+    <div class="card" style="border-color:rgba(224,64,251,0.3);">
+      <h3 style="font-size:16px;"><span style="color:#e040fb;">5.</span> Social Media Observer</h3>
+      <p style="font-size:15px; font-style:italic; color:rgba(255,255,255,0.8); line-height:1.5;">"Hey [Name], I was scrolling through your Instagram — your content is really solid. But I noticed you don't have anywhere to send people when they want to work with you. Is that something you've been meaning to fix?"</p>
+      <p style="font-size:12px; color:rgba(255,255,255,0.3); margin-top:8px;">Best for: Active on IG/FB but no website or funnel.</p>
+    </div>
+    <div class="card" style="border-color:rgba(79,200,255,0.3);">
+      <h3 style="font-size:16px;"><span style="color:#4fc8ff;">6.</span> Referral Frame</h3>
+      <p style="font-size:15px; font-style:italic; color:rgba(255,255,255,0.8); line-height:1.5;">"Hey [Name], your name came up when I was talking to someone in [industry] in [city]. Quick question: are you guys actively looking to grow right now, or are you at capacity?"</p>
+      <p style="font-size:12px; color:rgba(255,255,255,0.3); margin-top:8px;">Best for: Any lead. Builds trust through implied referral.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============== SLIDE 8b: HOOK AFTER OPENER ============== -->
+<div class="slide bg-blue content-left" id="slide-8b">
+  <div class="tag">Phase 2 — After They Engage</div>
+  <h2>The Hook <span class="accent">(Once They're Talking)</span></h2>
+  <p style="font-size:18px; color:rgba(255,255,255,0.4); margin-bottom:24px;">No matter which opener you used, transition into one of these hooks. Either/or questions get 4x the response rate.</p>
+  <div class="script-box" style="max-width:1100px;">
+    <div class="script-label">Primary Hook</div>
+    <p style="font-size:22px;">"I was looking at [Company] — looks like you've built something solid. Quick question: is your growth right now more systematic, or is it more like... you're figuring it out as you go?"</p>
+  </div>
+  <div style="margin-top:24px; max-width:1100px;">
+    <div class="script-label" style="color:#ffd54f;">Situation-Specific Hooks</div>
+    <div style="display:grid; grid-template-columns:200px 1fr; gap:12px 20px; font-size:18px; margin-top:12px;">
+      <div style="color:#4f8cff; font-weight:600;">Bad/no website</div>
+      <div style="color:rgba(255,255,255,0.7); font-style:italic;">"So right now, where are most of your customers actually finding you? Because online isn't working for you yet."</div>
+      <div style="color:#4f8cff; font-weight:600;">Running ads poorly</div>
+      <div style="color:rgba(255,255,255,0.7); font-style:italic;">"Are you happy with what you're getting back from that ad spend, or does it feel like you're kind of guessing?"</div>
+      <div style="color:#4f8cff; font-weight:600;">Posting content</div>
+      <div style="color:rgba(255,255,255,0.7); font-style:italic;">"I see you're putting out content — but are you seeing actual customers come from it, or is it more hope-and-pray?"</div>
+      <div style="color:#4f8cff; font-weight:600;">No online presence</div>
+      <div style="color:rgba(255,255,255,0.7); font-style:italic;">"How are people finding you right now? Is it all referrals and word-of-mouth, or do you have something driving new leads?"</div>
+    </div>
+  </div>
+  <div style="margin-top:24px; max-width:1100px;">
+    <p style="font-size:20px; font-weight:700;">After you ask — <span class="accent-red">SHUT UP.</span> Let them talk. Listen 70%, talk 30%.</p>
+  </div>
+</div>
+
+<!-- ============== SLIDE 9: PHASE 3 ============== -->
+<div class="slide bg-blue content-left" id="slide-9">
+  <div class="tag">Phase 3</div>
+  <h2>Dig Into the Pain</h2>
+  <p style="font-size:20px; color:rgba(255,255,255,0.5); margin-bottom:20px;">Listen 70%, talk 30%. Pick 2-3 of these based on conversation flow.</p>
+  <div class="script-box">
+    <div class="script-label">Questions to Ask</div>
+    <p style="font-size:22px; margin-bottom:16px;">"What does your customer acquisition look like right now — where do most of your clients come from?"</p>
+    <p style="font-size:22px; margin-bottom:16px;">"Do you have a marketing team or person handling this, or is it on you?"</p>
+    <p style="font-size:22px; margin-bottom:16px;">"What have you tried that hasn't worked?"</p>
+    <p style="font-size:22px; margin-bottom:16px;">"What would it look like if this was actually dialed in? What would change?"</p>
+    <p style="font-size:22px;">"What's the cost of NOT fixing this? How much are you leaving on the table every month?"</p>
+  </div>
+  <div style="margin-top:24px; max-width:1000px;">
+    <div class="script-label" style="color:#4fff8c;">Then Recap Their Pain</div>
+    <p style="font-size:22px; font-style:italic; color:rgba(255,255,255,0.7);">"So it sounds like the main issue is [X], and that's costing you roughly [Y] a month — is that right?"</p>
+  </div>
+</div>
+
+<!-- ============== SLIDE 10: PHASE 4 & 5 ============== -->
+<div class="slide bg-dark content-left" id="slide-10">
+  <div class="tag">Phases 4 & 5</div>
+  <h2>Bridge + Book</h2>
+  <div class="grid-2">
+    <div>
+      <h3 class="accent" style="font-size:20px;">PHASE 4: THE BRIDGE</h3>
+      <div class="script-box" style="margin-top:12px;">
+        <div class="script-label">Say This</div>
+        <p style="font-size:20px;">"Look, this is exactly the kind of thing we help with. We work with founder-led businesses and build out the entire growth engine — not just run ads, but install the full system so it's predictable. I think it'd be worth a conversation. Not a pitch — just a strategy session to see if there's a fit."</p>
+      </div>
+      <ul style="margin-top:16px; list-style:none; padding:0;">
+        <li style="font-size:16px; color:rgba(255,255,255,0.5); padding:4px 0;">→ Do NOT explain the offer in detail</li>
+        <li style="font-size:16px; color:rgba(255,255,255,0.5); padding:4px 0;">→ Say "strategy session" NEVER "sales call"</li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="accent" style="font-size:20px;">PHASE 5: BOOK THE CALL</h3>
+      <div class="script-box" style="margin-top:12px;">
+        <div class="script-label">Say This</div>
+        <p style="font-size:20px;">"I've got time on [Day] at [Time] or [Day] at [Time] — which works better for you?"</p>
+      </div>
+      <div style="margin-top:20px;">
+        <div class="script-label" style="color:#ffd54f;">Tie-Downs (Before You Hang Up)</div>
+        <p style="font-size:18px; color:rgba(255,255,255,0.7); margin:8px 0;">"If you liked what you heard, is there anyone else who'd need to be involved in the decision?"</p>
+        <p style="font-size:18px; color:rgba(255,255,255,0.7); margin:8px 0;">"Our clients typically invest $5K-$25K/mo — is that realistic if the fit is right?"</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============== SLIDE 11: SHOW RATE SYSTEM ============== -->
+<div class="slide bg-green content-left" id="slide-11">
+  <div class="tag-green tag">Phase 6</div>
+  <h2>Protect the Show <span class="accent-green">(6 Touchpoints)</span></h2>
+  <p style="font-size:20px; color:rgba(255,255,255,0.5); margin-bottom:20px;">Booking is step 1. Getting them to SHOW UP is the actual job. Target: 80%+</p>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-time">Within 5 min</div>
+      <div class="timeline-label"><strong>1.</strong> Send calendar invite + <strong>2.</strong> Text: "Hey [Name], just sent the link for [Day] at [Time]. Looking forward to it."</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-time">Within 1 hr</div>
+      <div class="timeline-label"><strong>3.</strong> Send pre-call video matched to their pain point</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-time">24 hrs before</div>
+      <div class="timeline-label"><strong>4.</strong> Text: "Quick reminder — you've got your call tomorrow at [Time]. Still good?" — No reply? <strong>Call them.</strong></div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-time">Morning of</div>
+      <div class="timeline-label"><strong>5.</strong> Text: "[Name]!" ...then 30 sec later: "It's [You] from 247 Growth. We still good for [Time] today?"</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-time" style="color:#ff4f4f;">If no-show</div>
+      <div class="timeline-label"><strong>6.</strong> Call twice → Voicemail → Email: subject "^ bumping this" — short, no guilt trip</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============== SLIDE 12: ALTERNATIVE HOOKS ============== -->
+<div class="slide bg-purple content-left" id="slide-12">
+  <div class="tag">Hooks by Situation</div>
+  <h2>Pick the Right Hook</h2>
+  <p style="font-size:20px; color:rgba(255,255,255,0.5); margin-bottom:24px;">Based on your 60-second research, use the hook that fits.</p>
+  <div class="table-wrap">
+    <table class="hook-table">
+      <tr>
+        <td style="color:#4f8cff; font-weight:600; min-width:220px;">Bad website / no website</td>
+        <td style="font-style:italic; color:rgba(255,255,255,0.8);">"I was looking at your website and it's clear you've got a great product — but honestly, the site isn't doing it justice. Are you happy with the leads coming from it, or is most of your business coming from referrals?"</td>
+      </tr>
+      <tr>
+        <td style="color:#4f8cff; font-weight:600;">Running ads poorly</td>
+        <td style="font-style:italic; color:rgba(255,255,255,0.8);">"I noticed you're running ads — are you happy with what you're getting back from that spend, or does it feel like you're kind of guessing?"</td>
+      </tr>
+      <tr>
+        <td style="color:#4f8cff; font-weight:600;">Big following, no funnel</td>
+        <td style="font-style:italic; color:rgba(255,255,255,0.8);">"You've got a solid following — are you actually converting that into revenue systematically, or is it more word-of-mouth?"</td>
+      </tr>
+      <tr>
+        <td style="color:#4f8cff; font-weight:600;">Posting on social, no results</td>
+        <td style="font-style:italic; color:rgba(255,255,255,0.8);">"I see you're putting out content which is great — but are you seeing actual customers come from it, or is it more of a hope-and-pray situation?"</td>
+      </tr>
+      <tr>
+        <td style="color:#4f8cff; font-weight:600;">Had/fired an agency</td>
+        <td style="font-style:italic; color:rgba(255,255,255,0.8);">"I saw you were working with [agency]. Are you still with them, or are you looking for something different?"</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ============== SLIDE 13: OBJECTION HANDLING ============== -->
+<div class="slide bg-red content-left" id="slide-13">
+  <div class="tag-red tag">Objections</div>
+  <h2>When They Push Back</h2>
+  <p style="font-size:18px; color:rgba(255,255,255,0.5); margin-bottom:20px;">Handle and redirect. Don't argue. Don't debate. Acknowledge, redirect, move forward.</p>
+  <div style="max-width:1100px; width:100%;">
+    <div class="objection-row">
+      <div class="objection-q">"I'm not interested."</div>
+      <div class="objection-a">"Totally respect that. Out of curiosity — is that because growth is already dialed in, or is it more of a timing thing?"</div>
+    </div>
+    <div class="objection-row">
+      <div class="objection-q">"Just send me an email."</div>
+      <div class="objection-a">"Happy to — what's the best email? And just so I send something relevant, what's the biggest marketing challenge you're dealing with right now?"</div>
+    </div>
+    <div class="objection-row">
+      <div class="objection-q">"We already have an agency."</div>
+      <div class="objection-a">"Nice — are you happy with the results? I only ask because a lot of founders I talk to have a team but still feel like growth is unpredictable."</div>
+    </div>
+    <div class="objection-row">
+      <div class="objection-q">"What do you guys do?"</div>
+      <div class="objection-a">"Short version — we install a full growth system for founder-led businesses. But honestly, the call is where we'd dig into whether it makes sense for you."</div>
+    </div>
+    <div class="objection-row">
+      <div class="objection-q">"I don't have time."</div>
+      <div class="objection-a">"Totally get it — you're busy, that's exactly why this might be worth it. The call is 30 min and it's specifically about getting your time back from marketing."</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============== SLIDE 14: TODAY'S PROCESS ============== -->
+<div class="slide bg-dark content-left" id="slide-14">
+  <div class="tag-green tag">Today</div>
+  <h2>How Today Works</h2>
+  <ul class="bullet-list">
+    <li><strong>You'll get a Google Sheet</strong> with ~100 leads (name, phone, business, website)</li>
+    <li><strong>Do 60-second research</strong> on each lead before you dial</li>
+    <li><strong>Follow the script</strong> — 6 phases, 2-3 minutes per call</li>
+    <li><strong>Log every call</strong> in the sheet — outcome, notes, next step</li>
+    <li><strong>Book calls directly</strong> — send calendar link immediately</li>
+    <li><strong>Run the 6-touchpoint show rate system</strong> on every booking</li>
+    <li><strong>Report your numbers at end of day</strong> — dials, connects, bookings</li>
+  </ul>
+  <div class="warning-box" style="margin-top:20px; border-color:rgba(79,255,140,0.25); background:rgba(79,255,140,0.05);">
+    <p><strong>GHL is temporarily down</strong> — so your lead list is on Google Sheets. Same process, just log there instead of CRM. When GHL is back up, we migrate.</p>
+  </div>
+</div>
+
+<!-- ============== SLIDE 15: DAILY SCHEDULE ============== -->
+<div class="slide bg-blue content-left" id="slide-15">
+  <div class="tag">Daily Schedule</div>
+  <h2>Your Day</h2>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-time">9:00 AM</div>
+      <div class="timeline-label"><strong>Pipeline review</strong> — Who's booked? Who needs follow-up?</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-time">9:30 AM</div>
+      <div class="timeline-label"><strong>Pre-call research block</strong> — Batch prep your dial list (60 sec per lead)</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-time" style="color:#4fff8c;">10:00 AM</div>
+      <div class="timeline-label dial-block"><strong>DIAL BLOCK 1</strong> — New cold outreach. 50+ dials minimum. Everyone in voice chat.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-time">12:00 PM</div>
+      <div class="timeline-label"><strong>Lunch</strong> + follow-up texts/emails to warm leads</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-time" style="color:#4fff8c;">1:00 PM</div>
+      <div class="timeline-label dial-block"><strong>DIAL BLOCK 2</strong> — Remaining cold dials + re-engagement. Voice chat. 50+ dials.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-time">3:00 PM</div>
+      <div class="timeline-label"><strong>Follow-up block</strong> — Nurture warm leads, send pre-call videos</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-time">4:00 PM</div>
+      <div class="timeline-label"><strong>Log + report</strong> — Update sheet, prep tomorrow's list, submit EOD</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============== SLIDE 16: KPIs ============== -->
+<div class="slide bg-dark" id="slide-16">
+  <div class="tag">KPIs</div>
+  <h2>Your Numbers</h2>
+  <div class="stat-row">
+    <div class="stat-item">
+      <div class="big-number accent">100+</div>
+      <div class="big-number-label">Dials / Day</div>
+    </div>
+    <div class="stat-item">
+      <div class="big-number accent-green">2-4</div>
+      <div class="big-number-label">Bookings / Day</div>
+    </div>
+    <div class="stat-item">
+      <div class="big-number accent-yellow">80%+</div>
+      <div class="big-number-label">Show Rate</div>
+    </div>
+  </div>
+  <div class="table-wrap" style="margin-top:40px;">
+    <table>
+      <tr><th>Metric</th><th>Daily Target</th></tr>
+      <tr><td>Cold dials</td><td>100+</td></tr>
+      <tr><td>Qualified conversations</td><td>5-10</td></tr>
+      <tr><td>Calls booked</td><td>2-4</td></tr>
+      <tr><td>Show rate on your bookings</td><td>80%+</td></tr>
+      <tr><td>EOD report submitted</td><td>Every day by 4:30 PM</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ============== SLIDE 17: THE MATH ============== -->
+<div class="slide bg-purple" id="slide-17">
+  <div class="tag">The Math</div>
+  <h2>Why This Works</h2>
+  <div class="phase-flow" style="gap:20px; margin-top:40px;">
+    <div style="text-align:center;">
+      <div class="big-number" style="font-size:56px;">100</div>
+      <div class="big-number-label">Dials</div>
+    </div>
+    <span class="phase-arrow" style="font-size:30px;">→</span>
+    <div style="text-align:center;">
+      <div class="big-number" style="font-size:56px;">20</div>
+      <div class="big-number-label">Conversations</div>
+    </div>
+    <span class="phase-arrow" style="font-size:30px;">→</span>
+    <div style="text-align:center;">
+      <div class="big-number" style="font-size:56px;">6</div>
+      <div class="big-number-label">Qualified</div>
+    </div>
+    <span class="phase-arrow" style="font-size:30px;">→</span>
+    <div style="text-align:center;">
+      <div class="big-number accent-green" style="font-size:56px;">4</div>
+      <div class="big-number-label">Booked</div>
+    </div>
+    <span class="phase-arrow" style="font-size:30px;">→</span>
+    <div style="text-align:center;">
+      <div class="big-number accent-yellow" style="font-size:56px;">1.5</div>
+      <div class="big-number-label">Shows</div>
+    </div>
+  </div>
+  <p style="font-size:22px; color:rgba(255,255,255,0.5); margin-top:40px; text-align:center;">Do this every day and the numbers take care of themselves.</p>
+  <div class="script-box" style="margin-top:30px; text-align:center;">
+    <p style="font-size:24px;">5 setters × 4 bookings/day × 80% show = <strong class="accent-green">16 strategy calls per day</strong></p>
+    <p style="font-size:20px; color:rgba(255,255,255,0.5); margin-top:8px;">At 40% close rate × $5K minimum = <strong>$16K+/day potential revenue</strong></p>
+  </div>
+</div>
+
+<!-- ============== SLIDE 18: EXPECTATIONS ============== -->
+<div class="slide bg-red content-left" id="slide-18">
+  <div class="tag-red tag">Expectations</div>
+  <h2>The Standard</h2>
+  <ul class="bullet-list">
+    <li><strong>This is performance-based.</strong> You either produce or you don't. There's no "I tried."</li>
+    <li><strong>100+ dials per day.</strong> Not 50. Not "I got distracted." One hundred. Minimum.</li>
+    <li><strong>If you can't get through your list today — this isn't the right fit.</strong></li>
+    <li><strong>EOD report every single day.</strong> Miss one = conversation with me.</li>
+    <li><strong>Be in the voice chat during dial blocks.</strong> No exceptions. No "I work better alone."</li>
+    <li><strong>Quality over quantity on bookings.</strong> Bad leads waste everyone's time and money.</li>
+    <li><strong>Follow the script.</strong> Don't freelance. Don't "make it your own" in week 1. Earn that right.</li>
+  </ul>
+  <div class="warning-box" style="margin-top:20px;">
+    <p>We need <strong>quality</strong>. We need as many <strong>bookings on the calendar</strong> as possible. The people who perform get more leads, better shifts, and move up fast. The people who don't — we part ways quickly. No hard feelings.</p>
+  </div>
+</div>
+
+<!-- ============== SLIDE 19: COMP ============== -->
+<div class="slide bg-dark content-left" id="slide-19">
+  <div class="tag">Compensation</div>
+  <h2>How You Get Paid</h2>
+  <p style="font-size:20px; color:rgba(255,255,255,0.5); margin-bottom:30px;">You get paid on <strong style="color:#fff;">cash collected</strong> — when the client actually pays, you eat.</p>
+  <div class="grid-3">
+    <div class="card" style="border-color:rgba(79,255,140,0.3);">
+      <h3 class="accent-green" style="font-size:48px; margin-bottom:4px;">$20</h3>
+      <p style="font-size:14px; text-transform:uppercase; letter-spacing:2px; color:rgba(255,255,255,0.4); margin-bottom:16px;">Per Shown Call</p>
+      <p style="font-size:18px; color:rgba(255,255,255,0.7);">Every qualified lead that <strong>shows up</strong> to the strategy call = $20 in your pocket. Not bookings. <strong>Shows.</strong></p>
+    </div>
+    <div class="card" style="border-color:rgba(79,140,255,0.3);">
+      <h3 class="accent" style="font-size:48px; margin-bottom:4px;">7%</h3>
+      <p style="font-size:14px; text-transform:uppercase; letter-spacing:2px; color:rgba(255,255,255,0.4); margin-bottom:16px;">Of Cash Collected</p>
+      <p style="font-size:18px; color:rgba(255,255,255,0.7);">When your lead closes and the client pays, you get <strong>7% of every dollar collected.</strong> $5K deal = $350. $10K deal = $700.</p>
+    </div>
+    <div class="card" style="border-color:rgba(255,213,79,0.3);">
+      <h3 class="accent-yellow" style="font-size:24px; margin-bottom:12px;">Growth Path</h3>
+      <ul>
+        <li>Setter → Senior Setter</li>
+        <li>Senior Setter → Team Lead</li>
+        <li>Team Lead → Closer</li>
+        <li>Top performers get <strong>more leads + priority</strong></li>
+      </ul>
+    </div>
+  </div>
+  <div class="script-box" style="margin-top:30px; text-align:center;">
+    <p style="font-size:22px;"><strong>Example:</strong> You book 2 calls/day × 80% show = 8 shows/week = <span class="accent-green"><strong>$160/week in show bonuses</strong></span></p>
+    <p style="font-size:22px; margin-top:8px;">+ If 2 of those close at $5K avg = <span class="accent"><strong>$700/week in commission</strong></span> = <span class="accent-yellow"><strong>$860/week</strong></span></p>
+  </div>
+</div>
+
+<!-- ============== SLIDE 20: QUICK REFERENCE ============== -->
+<div class="slide bg-blue content-left" id="slide-20">
+  <div class="tag">Quick Reference</div>
+  <h2>Print This. Keep It Next to Your Phone.</h2>
+  <div class="script-box" style="max-width:1100px;">
+    <div style="display:grid; grid-template-columns: 120px 1fr; gap:12px 20px; font-size:20px;">
+      <div style="color:#4f8cff; font-weight:700;">OPENER</div>
+      <div><strong>1.Customer:</strong> "I tried to find a listing but couldn't..." / <strong>2.Familiar:</strong> "We spoke a while back..." / <strong>3.Gap:</strong> "There was no website..." / <strong>4.Direct:</strong> "Do you have 30 seconds?" / <strong>5.Social:</strong> "Your IG content is solid but..." / <strong>6.Referral:</strong> "Your name came up when I was talking to..."</div>
+
+      <div style="color:#4f8cff; font-weight:700;">HOOK</div>
+      <div>"Is your growth right now more systematic, or more like you're figuring it out as you go?"</div>
+
+      <div style="color:#4f8cff; font-weight:700;">DIG</div>
+      <div>"What does customer acquisition look like?" / "What have you tried?" / "What's the cost of NOT fixing this?"</div>
+
+      <div style="color:#4f8cff; font-weight:700;">RECAP</div>
+      <div>"So the main issue is [X], costing you roughly [Y] a month — is that right?"</div>
+
+      <div style="color:#4f8cff; font-weight:700;">BRIDGE</div>
+      <div>"This is exactly what we help with. Would it make sense to get on a 30-min strategy session?"</div>
+
+      <div style="color:#4f8cff; font-weight:700;">BOOK</div>
+      <div>"I've got [Day] at [Time] or [Day] at [Time] — which works better?"</div>
+
+      <div style="color:#4f8cff; font-weight:700;">TIE-DOWN</div>
+      <div>"Anyone else involved in the decision?" / "Our clients invest $5K-$25K/mo — realistic?"</div>
+
+      <div style="color:#4f8cff; font-weight:700;">AFTER</div>
+      <div>Text in 5 min. Video in 1 hr. Text 24hr before. Text morning of. Call 2x if no-show.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============== SLIDE 21: MINDSET ============== -->
+<div class="slide bg-dark" id="slide-21">
+  <div class="tag">Mindset</div>
+  <h2>Before You Pick Up the Phone</h2>
+  <div style="max-width:900px; width:100%;">
+    <ul class="bullet-list" style="text-align:left;">
+      <li><strong>You are a filter, not a pitcher.</strong> Find the right people. Get them in the room.</li>
+      <li><strong>Tonality > words.</strong> Sound confident and calm — not a script reader. Be consultative.</li>
+      <li><strong>Rejection is data.</strong> Every "no" sharpens your targeting. Don't argue. Next dial.</li>
+      <li><strong>Show rate is YOUR number.</strong> If they don't show, that's on you. Follow up harder.</li>
+      <li><strong>Energy is everything.</strong> Bored = hang up. Desperate = hang up. Sound like someone who has something valuable.</li>
+      <li><strong>The math is simple.</strong> 100 dials → 20 conversations → 6 qualified → 4 booked. Every day. The numbers work.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============== SLIDE 22: LET'S GO ============== -->
+<div class="slide bg-dark" id="slide-22">
+  <h1>Questions?</h1>
+  <br>
+  <p class="subtitle" style="font-size:28px;">Then let's get dialing.</p>
+  <br>
+  <div style="margin-top:40px; text-align:center;">
+    <p style="font-size:20px; color:rgba(255,255,255,0.4);">Your lead sheet is in Google Sheets. Script is in front of you.</p>
+    <p style="font-size:20px; color:rgba(255,255,255,0.4);">100 dials. 4+ bookings. Report at end of day.</p>
+    <br>
+    <p style="font-size:32px; font-weight:800;" class="accent-green">Let's make money.</p>
+  </div>
+</div>
+
+<!-- ============== NAVIGATION ============== -->
+<div class="slide-counter">
+  <span id="current-slide">1</span> / <span id="total-slides">22</span>
+</div>
+
+<div class="nav">
+  <button onclick="prevSlide()">← Back</button>
+  <button onclick="nextSlide()">Next →</button>
+</div>
+
+<script>
+  let current = 0;
+  const slides = document.querySelectorAll('.slide');
+  const totalEl = document.getElementById('total-slides');
+  const currentEl = document.getElementById('current-slide');
+  totalEl.textContent = slides.length;
+
+  function showSlide(n) {
+    slides[current].classList.remove('active');
+    current = (n + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    currentEl.textContent = current + 1;
+  }
+
+  function nextSlide() { showSlide(current + 1); }
+  function prevSlide() { showSlide(current - 1); }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+    if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+</script>
+</body>
+</html>

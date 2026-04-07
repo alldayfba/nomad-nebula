@@ -157,9 +157,302 @@ def pause_object(object_id: str) -> dict:
     return _post(object_id, {"status": "PAUSED"})
 
 
+def activate_object(object_id: str) -> dict:
+    """Activate (unpause) a campaign, ad set, or ad."""
+    return _post(object_id, {"status": "ACTIVE"})
+
+
 def update_budget(adset_id: str, daily_budget_cents: int) -> dict:
     """Update daily budget on an ad set (amount in cents, e.g. 5000 = $50)."""
     return _post(adset_id, {"daily_budget": str(daily_budget_cents)})
+
+
+def create_campaign(account_id: str, name: str, objective: str = "OUTCOME_TRAFFIC",
+                    buying_type: str = "AUCTION", special_ad_categories: list | None = None,
+                    status: str = "PAUSED") -> dict:
+    """Create a new campaign. Returns {'id': '...'}.
+    Objective should be OUTCOME_TRAFFIC for profile funnel."""
+    data = {
+        "name": name,
+        "objective": objective,
+        "buying_type": buying_type,
+        "special_ad_categories": json.dumps(special_ad_categories or []),
+        "status": status,
+    }
+    return _post(f"{account_id}/campaigns", data)
+
+
+def create_adset(account_id: str, campaign_id: str, name: str,
+                 daily_budget_cents: int, optimization_goal: str = "LINK_CLICKS",
+                 billing_event: str = "IMPRESSIONS",
+                 targeting: dict | None = None,
+                 promoted_object: dict | None = None,
+                 status: str = "PAUSED") -> dict:
+    """Create a new ad set under a campaign. Returns {'id': '...'}.
+
+    For profile funnel:
+    - optimization_goal: LINK_CLICKS (drives profile visits)
+    - targeting: age 23-40, male, IG placements only
+    - promoted_object: {"page_id": "195292677006314"}
+    """
+    default_targeting = {
+        "age_min": 23,
+        "age_max": 40,
+        "genders": [1],  # Male
+        "geo_locations": {"countries": ["US"]},
+        "publisher_platforms": ["instagram"],
+        "instagram_positions": ["stream", "story", "reels", "profile_reels"],
+    }
+    data = {
+        "campaign_id": campaign_id,
+        "name": name,
+        "daily_budget": str(daily_budget_cents),
+        "optimization_goal": optimization_goal,
+        "billing_event": billing_event,
+        "targeting": json.dumps(targeting or default_targeting),
+        "status": status,
+    }
+    if promoted_object:
+        data["promoted_object"] = json.dumps(promoted_object)
+    return _post(f"{account_id}/adsets", data)
+
+
+def create_ad(account_id: str, adset_id: str, name: str,
+              creative_id: str = "", post_id: str = "",
+              status: str = "PAUSED") -> dict:
+    """Create a new ad in an ad set.
+
+    Use EITHER creative_id (existing creative) or post_id (organic post → ad).
+    For profile funnel: use post_id from organic IG reel/post.
+    """
+    creative = {}
+    if post_id:
+        # Use an existing IG post as the ad creative
+        creative = {"object_story_id": post_id}
+    elif creative_id:
+        creative = {"creative_id": creative_id}
+
+    data = {
+        "adset_id": adset_id,
+        "name": name,
+        "creative": json.dumps(creative),
+        "status": status,
+    }
+    return _post(f"{account_id}/ads", data)
+
+
+def create_nik_abo_campaign(account_id: str, creative_name: str,
+                            post_id: str = "", creative_id: str = "",
+                            daily_budget_cents: int = 2500,
+                            interests: list | None = None) -> dict:
+    """Create a full Nik Setting ABO test campaign with 3 ad sets.
+
+    Structure:
+    - Campaign: [ABO TEST] {creative_name} — Traffic objective
+    - Ad Set 1: Broad (no interests) — $25/day
+    - Ad Set 2: Interest-based — $25/day
+    - Ad Set 3: Retargeting (IG engagers 180d) — $25/day
+    - 1 ad per ad set using the same creative
+
+    Returns dict with campaign_id, adset_ids, ad_ids.
+    """
+    page_id = "195292677006314"
+
+    # 1. Create campaign
+    campaign = create_campaign(
+        account_id,
+        name=f"[ABO TEST] {creative_name}",
+        objective="OUTCOME_TRAFFIC",
+        status="PAUSED"
+    )
+    campaign_id = campaign["id"]
+
+    # Base targeting
+    base = {
+        "age_min": 23, "age_max": 40, "genders": [1],
+        "geo_locations": {"countries": ["US"]},
+        "publisher_platforms": ["instagram"],
+        "instagram_positions": ["stream", "story", "reels", "profile_reels"],
+    }
+
+    # Ad Set 1: Broad
+    broad_targeting = {**base}
+    adset_broad = create_adset(
+        account_id, campaign_id,
+        name=f"Broad — {creative_name}",
+        daily_budget_cents=daily_budget_cents,
+        targeting=broad_targeting,
+        promoted_object={"page_id": page_id},
+        status="PAUSED"
+    )
+
+    # Ad Set 2: Interest-based
+    default_interests = interests or [
+        {"id": "6003012455243", "name": "Entrepreneurship"},
+        {"id": "6003384274667", "name": "E-commerce"},
+        {"id": "6003107902433", "name": "Investment"},
+        {"id": "6003029684094", "name": "Business"},
+    ]
+    interest_targeting = {
+        **base,
+        "flexible_spec": [{"interests": default_interests}],
+    }
+    adset_interest = create_adset(
+        account_id, campaign_id,
+        name=f"Interest — {creative_name}",
+        daily_budget_cents=daily_budget_cents,
+        targeting=interest_targeting,
+        promoted_object={"page_id": page_id},
+        status="PAUSED"
+    )
+
+    # Ad Set 3: Retargeting (IG engagers 180 days)
+    # Note: Custom audiences need to be created separately in Business Manager
+    # For now, use broad + exclude existing followers approach
+    retarget_targeting = {
+        **base,
+        "age_min": 23, "age_max": 45,  # Slightly wider for retargeting
+    }
+    adset_retarget = create_adset(
+        account_id, campaign_id,
+        name=f"Retarget — {creative_name}",
+        daily_budget_cents=daily_budget_cents,
+        targeting=retarget_targeting,
+        promoted_object={"page_id": page_id},
+        status="PAUSED"
+    )
+
+    # Create 1 ad per ad set
+    results = {"campaign_id": campaign_id, "adsets": [], "ads": []}
+    for adset in [adset_broad, adset_interest, adset_retarget]:
+        adset_id = adset["id"]
+        results["adsets"].append(adset_id)
+        ad = create_ad(
+            account_id, adset_id,
+            name=creative_name,
+            post_id=post_id,
+            creative_id=creative_id,
+            status="PAUSED"
+        )
+        results["ads"].append(ad["id"])
+
+    return results
+
+
+def create_nik_cbo_campaign(account_id: str, creative_name: str,
+                            post_id: str = "", creative_id: str = "",
+                            daily_budget_cents: int = 10000) -> dict:
+    """Create a Nik Setting CBO scale campaign.
+
+    Structure:
+    - Campaign: [CBO SCALE] {creative_name} — Traffic, CBO at $100+/day
+    - 1 Ad Set: Broad targeting
+    - 1 Ad: Winner creative via post ID
+    """
+    page_id = "195292677006314"
+
+    # CBO campaign — budget at campaign level
+    data = {
+        "name": f"[CBO SCALE] {creative_name}",
+        "objective": "OUTCOME_TRAFFIC",
+        "buying_type": "AUCTION",
+        "special_ad_categories": json.dumps([]),
+        "status": "PAUSED",
+        "daily_budget": str(daily_budget_cents),  # CBO: budget on campaign
+    }
+    campaign = _post(f"{account_id}/campaigns", data)
+    campaign_id = campaign["id"]
+
+    # Single broad ad set (no daily budget — inherits from campaign CBO)
+    targeting = {
+        "age_min": 23, "age_max": 40, "genders": [1],
+        "geo_locations": {"countries": ["US"]},
+        "publisher_platforms": ["instagram"],
+        "instagram_positions": ["stream", "story", "reels", "profile_reels"],
+    }
+    adset = _post(f"{account_id}/adsets", {
+        "campaign_id": campaign_id,
+        "name": f"Broad — {creative_name}",
+        "optimization_goal": "LINK_CLICKS",
+        "billing_event": "IMPRESSIONS",
+        "targeting": json.dumps(targeting),
+        "promoted_object": json.dumps({"page_id": page_id}),
+        "status": "PAUSED",
+        "access_token": TOKEN,
+    })
+    adset_id = adset["id"]
+
+    # Single ad
+    ad = create_ad(account_id, adset_id, creative_name,
+                   post_id=post_id, creative_id=creative_id, status="PAUSED")
+
+    return {"campaign_id": campaign_id, "adset_id": adset_id, "ad_id": ad["id"]}
+
+
+def create_nik_story_campaign(account_id: str, creative_name: str,
+                              image_hash: str = "",
+                              daily_budget_cents: int = 1500) -> dict:
+    """Create a Nik Setting Story Ads campaign.
+
+    Story ads = image/text ONLY (no video).
+    Destination: Instagram profile.
+    """
+    page_id = "195292677006314"
+    ig_user_id = "17841453828932155"
+
+    campaign = create_campaign(
+        account_id,
+        name=f"[STORY ADS] {creative_name}",
+        objective="OUTCOME_TRAFFIC",
+        status="PAUSED"
+    )
+    campaign_id = campaign["id"]
+
+    targeting = {
+        "age_min": 23, "age_max": 40, "genders": [1],
+        "geo_locations": {"countries": ["US"]},
+        "publisher_platforms": ["instagram"],
+        "instagram_positions": ["story"],
+    }
+    adset = create_adset(
+        account_id, campaign_id,
+        name=f"Story — {creative_name}",
+        daily_budget_cents=daily_budget_cents,
+        targeting=targeting,
+        promoted_object={"page_id": page_id},
+        status="PAUSED"
+    )
+
+    # For story ads, we create an ad creative with image + "View Profile" CTA
+    creative_spec = {
+        "object_story_spec": {
+            "page_id": page_id,
+            "instagram_user_id": ig_user_id,
+            "link_data": {
+                "link": "http://instagram.com/allday.fba",
+                "message": "Follow @allday.fba to learn more",
+                "call_to_action": {
+                    "type": "VIEW_INSTAGRAM_PROFILE",
+                    "value": {
+                        "app_link": "instagram://user?username=allday.fba&userid=53937242297",
+                        "link": "http://instagram.com/allday.fba"
+                    }
+                }
+            }
+        }
+    }
+    if image_hash:
+        creative_spec["object_story_spec"]["link_data"]["image_hash"] = image_hash
+
+    ad = _post(f"{account_id}/ads", {
+        "adset_id": adset["id"],
+        "name": creative_name,
+        "creative": json.dumps(creative_spec),
+        "status": "PAUSED",
+        "access_token": TOKEN,
+    })
+
+    return {"campaign_id": campaign_id, "adset_id": adset["id"], "ad_id": ad["id"]}
 
 
 def list_rules(account_id: str) -> list[dict]:
@@ -493,7 +786,9 @@ def main():
     parser = argparse.ArgumentParser(description="Meta Ads Client — MediaBuyer execution layer")
     parser.add_argument("command", choices=[
         "accounts", "campaigns", "adsets", "ads", "insights", "audit",
-        "pause", "budget", "rules"
+        "pause", "activate", "budget", "rules",
+        "create-campaign", "create-adset", "create-ad",
+        "create-abo", "create-cbo", "create-story",
     ])
     parser.add_argument("--account", default=DEFAULT_ACCOUNT, help="Ad account ID (act_XXX)")
     parser.add_argument("--campaign", help="Campaign ID for adsets/ads")
@@ -503,6 +798,14 @@ def main():
     parser.add_argument("--amount", type=int, help="Budget amount in cents (e.g. 5000 = $50)")
     parser.add_argument("--list", action="store_true", help="List rules")
     parser.add_argument("--create-kill-rules", action="store_true", help="Create standard kill rules")
+    # Campaign/adset/ad creation args
+    parser.add_argument("--name", help="Name for campaign/adset/ad")
+    parser.add_argument("--objective", default="OUTCOME_TRAFFIC", help="Campaign objective")
+    parser.add_argument("--post-id", help="Organic IG post ID to use as ad creative")
+    parser.add_argument("--creative-id", help="Existing creative ID")
+    parser.add_argument("--image-hash", help="Image hash for story ads")
+    parser.add_argument("--adset", help="Ad set ID for ad creation")
+    parser.add_argument("--status", default="PAUSED", help="Initial status (PAUSED or ACTIVE)")
     args = parser.parse_args()
 
     if not TOKEN:
@@ -557,12 +860,79 @@ def main():
         result = pause_object(args.id)
         print(f"Paused {args.id}: {result}")
 
+    elif args.command == "activate":
+        if not args.id:
+            print("ERROR: --id required")
+            sys.exit(1)
+        result = activate_object(args.id)
+        print(f"Activated {args.id}: {result}")
+
     elif args.command == "budget":
         if not args.id or not args.amount:
             print("ERROR: --id and --amount required")
             sys.exit(1)
         result = update_budget(args.id, args.amount)
         print(f"Updated budget for {args.id}: {result}")
+
+    elif args.command == "create-campaign":
+        if not args.name:
+            print("ERROR: --name required")
+            sys.exit(1)
+        result = create_campaign(account, args.name, args.objective, status=args.status)
+        print(json.dumps(result, indent=2))
+
+    elif args.command == "create-adset":
+        if not args.campaign or not args.name or not args.amount:
+            print("ERROR: --campaign, --name, --amount required")
+            sys.exit(1)
+        result = create_adset(account, args.campaign, args.name,
+                              daily_budget_cents=args.amount, status=args.status)
+        print(json.dumps(result, indent=2))
+
+    elif args.command == "create-ad":
+        if not args.adset or not args.name:
+            print("ERROR: --adset, --name required")
+            sys.exit(1)
+        result = create_ad(account, args.adset, args.name,
+                           creative_id=args.creative_id or "",
+                           post_id=args.post_id or "",
+                           status=args.status)
+        print(json.dumps(result, indent=2))
+
+    elif args.command == "create-abo":
+        if not args.name:
+            print("ERROR: --name required (creative name)")
+            sys.exit(1)
+        result = create_nik_abo_campaign(
+            account, args.name,
+            post_id=args.post_id or "",
+            creative_id=args.creative_id or "",
+            daily_budget_cents=args.amount or 2500,
+        )
+        print(json.dumps(result, indent=2))
+
+    elif args.command == "create-cbo":
+        if not args.name:
+            print("ERROR: --name required (creative name)")
+            sys.exit(1)
+        result = create_nik_cbo_campaign(
+            account, args.name,
+            post_id=args.post_id or "",
+            creative_id=args.creative_id or "",
+            daily_budget_cents=args.amount or 10000,
+        )
+        print(json.dumps(result, indent=2))
+
+    elif args.command == "create-story":
+        if not args.name:
+            print("ERROR: --name required (creative name)")
+            sys.exit(1)
+        result = create_nik_story_campaign(
+            account, args.name,
+            image_hash=args.image_hash or "",
+            daily_budget_cents=args.amount or 1500,
+        )
+        print(json.dumps(result, indent=2))
 
     elif args.command == "rules":
         if args.create_kill_rules:

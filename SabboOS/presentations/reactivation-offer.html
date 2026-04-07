@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>24/7 Profits — Amazon Account Reactivation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .slide {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    padding: 60px 80px;
+    position: relative;
+    animation: fadeIn 0.45s ease;
+  }
+
+  .slide.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .bg-dark { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%); }
+  .bg-red { background: linear-gradient(135deg, #0a0a0a 0%, #2e0d0d 50%, #1a0a0a 100%); }
+  .bg-purple { background: linear-gradient(135deg, #0a0a1a 0%, #1a0d2e 50%, #2e0a2e 100%); }
+  .bg-deep { background: linear-gradient(135deg, #1A0A2E 0%, #0d0520 50%, #0a0a1a 100%); }
+  .bg-green { background: linear-gradient(135deg, #0a0a0a 0%, #0d1a0d 50%, #0a1a0a 100%); }
+  .bg-blue { background: linear-gradient(135deg, #0a0a1a 0%, #0d1b3e 50%, #1a0a2e 100%); }
+  .bg-gold { background: linear-gradient(135deg, #0a0a0a 0%, #1a1508 50%, #1a1a0a 100%); }
+
+  .content-left {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  h1 {
+    font-size: clamp(40px, 5vw, 68px);
+    font-weight: 900;
+    letter-spacing: -2.5px;
+    line-height: 1.08;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .content-left h1,
+  .content-left h2 { text-align: left; }
+
+  h2 {
+    font-size: clamp(32px, 3.5vw, 52px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.12;
+    margin-bottom: 28px;
+  }
+
+  h3 {
+    font-size: clamp(22px, 2.5vw, 34px);
+    font-weight: 700;
+    margin-bottom: 18px;
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle {
+    font-size: clamp(18px, 2vw, 26px);
+    font-weight: 400;
+    color: rgba(255,255,255,0.55);
+    text-align: center;
+    max-width: 800px;
+    line-height: 1.5;
+  }
+
+  p, li {
+    font-size: clamp(16px, 1.5vw, 22px);
+    color: rgba(255,255,255,0.8);
+    line-height: 1.65;
+  }
+
+  ul { list-style: none; padding: 0; max-width: 900px; }
+  ul li { padding: 10px 0; }
+
+  .gold { color: #FFD700; }
+  .purple { color: #B794E0; }
+  .green { color: #4ADE80; }
+  .red { color: #FF6B6B; }
+  .orange { color: #FF8C4F; }
+  .white { color: #fff; }
+  .bold { font-weight: 700; color: #fff; }
+
+  .tag {
+    display: inline-block;
+    border-radius: 8px;
+    padding: 6px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+    background: rgba(255,215,0,0.12);
+    border: 1px solid rgba(255,215,0,0.3);
+    color: #FFD700;
+  }
+
+  .tag-red { background: rgba(255,107,107,0.1); border-color: rgba(255,107,107,0.25); color: #FF6B6B; }
+  .tag-green { background: rgba(74,222,128,0.1); border-color: rgba(74,222,128,0.25); color: #4ADE80; }
+  .tag-purple { background: rgba(107,47,160,0.15); border-color: rgba(183,148,224,0.3); color: #B794E0; }
+  .tag-orange { background: rgba(255,140,79,0.1); border-color: rgba(255,140,79,0.25); color: #FF8C4F; }
+
+  .logo-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+
+  /* Urgency counter */
+  .urgency-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    max-width: 900px;
+    width: 100%;
+    margin: 28px 0;
+  }
+
+  .urgency-card {
+    background: rgba(255,107,107,0.06);
+    border: 1px solid rgba(255,107,107,0.2);
+    border-radius: 16px;
+    padding: 28px 20px;
+    text-align: center;
+  }
+
+  .urgency-number {
+    font-size: 48px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1;
+    color: #FF6B6B;
+  }
+
+  .urgency-label {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 10px;
+  }
+
+  /* Damage list */
+  .damage-list li::before { content: "\26A0\00a0"; color: #FF6B6B; font-weight: 700; }
+
+  /* Check list */
+  .check-list li::before { content: "\2713\00a0"; color: #4ADE80; font-weight: 700; }
+
+  /* X list */
+  .x-list li::before { content: "\2717\00a0"; color: #FF6B6B; font-weight: 700; }
+
+  /* Arrow list */
+  .arrow-list li::before { content: "\2192\00a0"; color: #FFD700; font-weight: 700; }
+
+  /* Tier cards */
+  .tier-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    max-width: 1100px;
+    width: 100%;
+    margin: 20px 0;
+  }
+
+  .tier-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .tier-card.featured {
+    border: 2px solid rgba(255,215,0,0.4);
+    background: linear-gradient(135deg, rgba(107,47,160,0.08) 0%, rgba(255,215,0,0.05) 100%);
+    transform: scale(1.03);
+  }
+
+  .tier-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #6B2FA0, #FFD700);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding: 5px 16px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .tier-name {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+
+  .tier-price {
+    font-size: 40px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    margin-bottom: 4px;
+  }
+
+  .tier-split {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .tier-features {
+    list-style: none;
+    padding: 0;
+    flex: 1;
+  }
+
+  .tier-features li {
+    padding: 7px 0;
+    font-size: 15px;
+    color: rgba(255,255,255,0.75);
+  }
+
+  .tier-features li.included::before { content: "\2713\00a0"; color: #4ADE80; font-weight: 700; }
+  .tier-features li.excluded::before { content: "\2014\00a0"; color: rgba(255,255,255,0.2); font-weight: 400; }
+  .tier-features li.excluded { color: rgba(255,255,255,0.3); }
+
+  /* Cards */
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 24px 0;
+    max-width: 1000px;
+    width: 100%;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px;
+    padding: 32px;
+  }
+
+  .card h3 { font-size: 22px; margin-bottom: 12px; }
+  .card p { font-size: 17px; }
+
+  /* Stat row */
+  .stat-row {
+    display: flex;
+    gap: 48px;
+    margin: 24px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .stat { text-align: center; }
+
+  .stat-number {
+    font-size: clamp(36px, 4vw, 56px);
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 8px;
+  }
+
+  /* Quote */
+  .quote {
+    font-size: clamp(18px, 1.8vw, 24px);
+    font-style: italic;
+    color: rgba(255,255,255,0.55);
+    text-align: center;
+    max-width: 700px;
+    margin-top: 28px;
+    line-height: 1.6;
+  }
+
+  /* Guarantee box */
+  .guarantee-box {
+    background: rgba(74,222,128,0.06);
+    border: 2px solid rgba(74,222,128,0.3);
+    border-radius: 20px;
+    padding: 36px 44px;
+    text-align: center;
+    max-width: 700px;
+    width: 100%;
+    margin: 20px 0;
+  }
+
+  .guarantee-box h3 { color: #4ADE80; }
+
+  /* Cost comparison */
+  .cost-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    max-width: 800px;
+    width: 100%;
+    margin: 12px 0;
+  }
+
+  .cost-label {
+    flex: 0 0 280px;
+    font-size: 18px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+    text-align: right;
+  }
+
+  .cost-bar {
+    flex: 1;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding-left: 14px;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  /* Footer */
+  .slide-footer {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255,255,255,0.15);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* Nav */
+  .nav {
+    position: fixed;
+    bottom: 30px;
+    right: 40px;
+    display: flex;
+    gap: 12px;
+    z-index: 100;
+  }
+
+  .nav button {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .nav button:hover { background: rgba(255,255,255,0.2); }
+
+  .slide-counter {
+    position: fixed;
+    bottom: 35px;
+    left: 40px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.3);
+    font-weight: 500;
+    z-index: 100;
+  }
+
+  @media (max-width: 800px) {
+    .slide { padding: 40px 28px; }
+    .urgency-grid { grid-template-columns: 1fr 1fr; }
+    .tier-grid { grid-template-columns: 1fr; }
+    .tier-card.featured { transform: none; }
+    .card-grid { grid-template-columns: 1fr; }
+    .stat-row { gap: 24px; }
+    .cost-row { flex-direction: column; gap: 4px; }
+    .cost-label { text-align: left; flex: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== SLIDE 1: COVER ========== -->
+<div class="slide active bg-red" id="slide-1">
+  <img src="images/logo.png" alt="24/7 Profits" class="logo-img">
+  <div class="tag tag-red">Account Suspended?</div>
+  <h1>Get Your Amazon Account<br><span class="gold">Back Online.</span></h1>
+  <p class="subtitle">We've helped sellers recover suspended accounts and get back to generating revenue. Here's how we can help you.</p>
+  <div class="slide-footer">24/7 Profits — Amazon Account Reactivation</div>
+</div>
+
+<!-- ========== SLIDE 2: THE DAMAGE — URGENCY ========== -->
+<div class="slide bg-dark content-left" id="slide-2">
+  <div class="tag tag-red">The Cost of Waiting</div>
+  <h2>Every Day Your Account Is Down,<br>You're <span class="red">Losing Money.</span></h2>
+  <div class="urgency-grid">
+    <div class="urgency-card">
+      <div class="urgency-number">11</div>
+      <div class="urgency-label">Months Suspended</div>
+    </div>
+    <div class="urgency-card">
+      <div class="urgency-number">$0</div>
+      <div class="urgency-label">Revenue Generated</div>
+    </div>
+    <div class="urgency-card">
+      <div class="urgency-number" style="color:#FF8C4F;">330+</div>
+      <div class="urgency-label">Days of Lost Sales</div>
+    </div>
+    <div class="urgency-card">
+      <div class="urgency-number" style="color:#FFD700;">?</div>
+      <div class="urgency-label">Sitting in Dead Inventory</div>
+    </div>
+  </div>
+  <ul class="damage-list">
+    <li>Amazon storage fees still hitting your account every month</li>
+    <li>Inventory aging out — losing value every single day</li>
+    <li>Your competitors are selling the products YOU should be selling</li>
+    <li>The longer you wait, the harder reinstatement gets — Amazon flags old cases</li>
+  </ul>
+  <div class="slide-footer">24/7 Profits — Amazon Account Reactivation</div>
+</div>
+
+<!-- ========== SLIDE 3: WHY DIY FAILED ========== -->
+<div class="slide bg-purple content-left" id="slide-3">
+  <div class="tag tag-orange">Why You're Still Suspended</div>
+  <h2>Doing It Yourself <span class="red">Got You Here.</span><br>It Won't Get You <span class="gold">Out.</span></h2>
+  <div class="card-grid">
+    <div class="card" style="border-color:rgba(255,107,107,0.2);">
+      <h3 class="red">What Went Wrong</h3>
+      <p>Suppliers couldn't provide supply chain documents. Amazon asked for proof of authenticity. Without the right paperwork, your account got flagged and shut down.</p>
+    </div>
+    <div class="card" style="border-color:rgba(255,215,0,0.2);">
+      <h3 class="gold">What Amazon Actually Wants</h3>
+      <p>A professional Plan of Action, proper invoices from authorized distributors, a clear explanation of what changed, and proof it won't happen again.</p>
+    </div>
+  </div>
+  <p class="quote">"You said it yourself — 'I wanted to try on my own, but I didn't know my account could get suspended so easily.' Now you know. Let professionals handle the recovery."</p>
+  <div class="slide-footer">24/7 Profits — Amazon Account Reactivation</div>
+</div>
+
+<!-- ========== SLIDE 4: WHAT WE DO ========== -->
+<div class="slide bg-dark content-left" id="slide-4">
+  <div class="tag tag-green">The Fix</div>
+  <h2>We Handle <span class="gold">Everything.</span><br>You Get Your Account <span class="green">Back.</span></h2>
+  <ul class="check-list">
+    <li><span class="bold">Full Suspension Diagnosis</span> — we review your deactivation notice, account health, and root cause</li>
+    <li><span class="bold">Professional Plan of Action</span> — the appeal letter Amazon's Seller Performance team needs to see</li>
+    <li><span class="bold">Supply Chain Documentation</span> — we help source and format the invoices and authorization letters Amazon requires</li>
+    <li><span class="bold">Appeal Submission + Follow-Up</span> — we submit, manage, and handle all back-and-forth with Amazon until resolved</li>
+    <li><span class="bold">Account Health Audit</span> — once reinstated, full review so this never happens again</li>
+  </ul>
+  <p class="quote">"We've seen every type of suspension. Supply chain issues like yours are one of the most common — and most fixable."</p>
+  <div class="slide-footer">24/7 Profits — Amazon Account Reactivation</div>
+</div>
+
+<!-- ========== SLIDE 5: COST OF INACTION ========== -->
+<div class="slide bg-red content-left" id="slide-5">
+  <div class="tag tag-red">Reality Check</div>
+  <h2>What Another Year <span class="red">Suspended</span><br>Actually Costs You.</h2>
+
+  <div class="cost-row">
+    <div class="cost-label">Lost revenue (conservative)</div>
+    <div class="cost-bar" style="background:rgba(255,107,107,0.2); width:100%; color:#FF6B6B;">$30,000 – $100,000+</div>
+  </div>
+  <div class="cost-row">
+    <div class="cost-label">Amazon storage fees</div>
+    <div class="cost-bar" style="background:rgba(255,140,79,0.2); width:40%; color:#FF8C4F;">$500 – $2,000+</div>
+  </div>
+  <div class="cost-row">
+    <div class="cost-label">Dead inventory depreciation</div>
+    <div class="cost-bar" style="background:rgba(255,140,79,0.2); width:50%; color:#FF8C4F;">$1,000 – $5,000+</div>
+  </div>
+  <div class="cost-row">
+    <div class="cost-label">Opportunity cost (what you COULD be making)</div>
+    <div class="cost-bar" style="background:rgba(255,107,107,0.25); width:100%; color:#FF6B6B;">Priceless</div>
+  </div>
+  <div class="cost-row" style="margin-top:24px;">
+    <div class="cost-label bold" style="color:#4ADE80;">Cost to fix it today</div>
+    <div class="cost-bar" style="background:rgba(74,222,128,0.15); width:20%; color:#4ADE80; font-size:20px;">$2,000</div>
+  </div>
+
+  <p class="quote">"You're bleeding money every month your account sits dead. The question isn't whether you can afford to fix it — it's whether you can afford not to."</p>
+  <div class="slide-footer">24/7 Profits — Amazon Account Reactivation</div>
+</div>
+
+<!-- ========== SLIDE 6: THE PACKAGES ========== -->
+<div class="slide bg-deep" id="slide-6">
+  <div class="tag">Choose Your Path</div>
+  <h2>Three Ways to <span class="gold">Get Back On Amazon</span></h2>
+  <div class="tier-grid">
+
+    <!-- TIER 1 -->
+    <div class="tier-card">
+      <div class="tier-name white">Reactivation Only</div>
+      <div class="tier-price gold">$2,500</div>
+      <div class="tier-split">Pay in full</div>
+      <ul class="tier-features">
+        <li class="included">Suspension diagnosis</li>
+        <li class="included">Professional Plan of Action</li>
+        <li class="included">Supply chain documentation</li>
+        <li class="included">Appeal submission</li>
+        <li class="included">Amazon back-and-forth</li>
+        <li class="excluded">Account health audit</li>
+        <li class="excluded">Compliance system</li>
+        <li class="excluded">Supplier vetting</li>
+        <li class="excluded">90-day coaching</li>
+        <li class="excluded">AI sourcing tools</li>
+        <li class="excluded">Community access</li>
+      </ul>
+    </div>
+
+    <!-- TIER 2 — FEATURED -->
+    <div class="tier-card featured">
+      <div class="tier-badge">Most Popular</div>
+      <div class="tier-name gold">Reactivation + Protection</div>
+      <div class="tier-price gold">$3,500</div>
+      <div class="tier-split">$2,000 now / $1,500 on reinstatement</div>
+      <ul class="tier-features">
+        <li class="included">Suspension diagnosis</li>
+        <li class="included">Professional Plan of Action</li>
+        <li class="included">Supply chain documentation</li>
+        <li class="included">Appeal submission</li>
+        <li class="included">Amazon back-and-forth</li>
+        <li class="included">Account health audit</li>
+        <li class="included">Compliance system (never suspended again)</li>
+        <li class="included">Supplier vetting (docs always ready)</li>
+        <li class="excluded">90-day coaching</li>
+        <li class="excluded">AI sourcing tools</li>
+        <li class="excluded">Community access</li>
+      </ul>
+    </div>
+
+    <!-- TIER 3 -->
+    <div class="tier-card">
+      <div class="tier-name purple">Full Restart</div>
+      <div class="tier-price purple">$7,500</div>
+      <div class="tier-split">$4,000 now / $3,500 on reinstatement</div>
+      <ul class="tier-features">
+        <li class="included">Suspension diagnosis</li>
+        <li class="included">Professional Plan of Action</li>
+        <li class="included">Supply chain documentation</li>
+        <li class="included">Appeal submission</li>
+        <li class="included">Amazon back-and-forth</li>
+        <li class="included">Account health audit</li>
+        <li class="included">Compliance system</li>
+        <li class="included">Supplier vetting</li>
+        <li class="included">90-day coaching with Sabbo</li>
+        <li class="included">AI sourcing tool access</li>
+        <li class="included">Inner Circle community (700+)</li>
+      </ul>
+    </div>
+
+  </div>
+  <div class="slide-footer">24/7 Profits — Amazon Account Reactivation</div>
+</div>
+
+<!-- ========== SLIDE 7: GUARANTEE + CTA ========== -->
+<div class="slide bg-green" id="slide-7">
+  <div class="tag tag-green">The Guarantee</div>
+  <h2>If We Can't Reactivate Your Account,<br><span class="gold">You Don't Pay the Second Half.</span></h2>
+  <div class="guarantee-box">
+    <h3>THE 24/7 PROFITS REACTIVATION GUARANTEE</h3>
+    <p style="font-size:20px; color:rgba(255,255,255,0.85); margin-top:16px; line-height:1.7;">
+      We submit your appeal and handle all communication with Amazon. If we cannot get your account reinstated, the second payment is waived. You only pay in full when you're back online and selling.
+    </p>
+  </div>
+  <div class="stat-row" style="margin-top:28px;">
+    <div class="stat">
+      <div class="stat-number red">11</div>
+      <div class="stat-label">Months You've Waited</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number gold">7–30</div>
+      <div class="stat-label">Days to Reinstatement</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number green">$0</div>
+      <div class="stat-label">Risk With Our Guarantee</div>
+    </div>
+  </div>
+  <p style="font-size:26px; font-weight:800; margin-top:32px; text-align:center;">
+    You've lost 11 months. <span class="gold">Don't lose month 12.</span>
+  </p>
+  <div class="slide-footer">24/7 Profits — Amazon Account Reactivation</div>
+</div>
+
+<!-- NAV -->
+<div class="slide-counter">
+  <span id="current-slide">1</span> / <span id="total-slides">7</span>
+</div>
+
+<div class="nav">
+  <button onclick="prevSlide()">&#8592; Back</button>
+  <button onclick="nextSlide()">Next &#8594;</button>
+</div>
+
+<script>
+  let current = 0;
+  const slides = document.querySelectorAll('.slide');
+  const totalEl = document.getElementById('total-slides');
+  const currentEl = document.getElementById('current-slide');
+  totalEl.textContent = slides.length;
+
+  function showSlide(n) {
+    slides[current].classList.remove('active');
+    current = (n + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    currentEl.textContent = current + 1;
+  }
+
+  function nextSlide() { showSlide(current + 1); }
+  function prevSlide() { showSlide(current - 1); }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+    if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+</script>
+</body>
+</html>

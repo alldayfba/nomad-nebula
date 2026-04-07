@@ -12,7 +12,7 @@ This file is the Closer's status dashboard. It tracks what is currently running,
 ## Current Status
 
 ```
-Last heartbeat: [TIMESTAMP]
+Last heartbeat: 2026-03-26
 Status: IDLE
 Current task: none
 Next scheduled task: 08:00 — Morning signal scan
@@ -128,4 +128,4 @@ Cold Archive:   0  leads
 
 ---
 
-*Last updated: 2026-03-16*
+*Last updated: 2026-03-26*

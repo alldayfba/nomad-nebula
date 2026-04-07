@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>247 Growth — Offer Breakdown (Internal)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #09090b;
+    color: #fafafa;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 32px 100px;
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(79,140,255,0.12);
+    border: 1px solid rgba(79,140,255,0.25);
+    border-radius: 6px;
+    padding: 4px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    color: #4f8cff;
+    margin-bottom: 16px;
+  }
+
+  .badge-red { background: rgba(255,79,79,0.12); border-color: rgba(255,79,79,0.25); color: #ff4f4f; }
+  .badge-green { background: rgba(79,255,140,0.12); border-color: rgba(79,255,140,0.25); color: #4fff8c; }
+  .badge-yellow { background: rgba(255,213,79,0.12); border-color: rgba(255,213,79,0.25); color: #ffd54f; }
+
+  h1 {
+    font-size: 48px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  h2 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-top: 56px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  p, li {
+    font-size: 17px;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.7;
+  }
+
+  .subtitle {
+    font-size: 20px;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 48px;
+  }
+
+  .accent { color: #4f8cff; }
+  .green { color: #4fff8c; }
+  .red { color: #ff4f4f; }
+  .yellow { color: #ffd54f; }
+  .orange { color: #ff8c4f; }
+  .bold { font-weight: 700; color: #fff; }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 24px 0;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 28px;
+  }
+
+  .card h3 { margin-bottom: 12px; }
+
+  .card-full {
+    grid-column: 1 / -1;
+  }
+
+  ul { list-style: none; padding: 0; }
+  ul li { padding: 6px 0; }
+  ul li::before { content: "→ "; color: #4f8cff; font-weight: 600; }
+
+  .script-box {
+    background: rgba(79,140,255,0.06);
+    border: 1px solid rgba(79,140,255,0.2);
+    border-radius: 14px;
+    padding: 28px;
+    margin: 20px 0;
+  }
+
+  .script-box p {
+    font-size: 18px;
+    font-style: italic;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .script-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    color: #4f8cff;
+    margin-bottom: 12px;
+  }
+
+  .warning {
+    background: rgba(255,79,79,0.06);
+    border: 1px solid rgba(255,79,79,0.2);
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin: 20px 0;
+  }
+
+  .warning p { color: rgba(255,255,255,0.8); }
+
+  .success {
+    background: rgba(79,255,140,0.06);
+    border: 1px solid rgba(79,255,140,0.2);
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin: 20px 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+
+  th {
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.35);
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  td {
+    font-size: 16px;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.75);
+  }
+
+  td:first-child { font-weight: 600; color: #fff; }
+
+  .big-stat {
+    display: flex;
+    gap: 40px;
+    margin: 24px 0;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-number {
+    font-size: 52px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 6px;
+  }
+
+  .divider {
+    height: 1px;
+    background: rgba(255,255,255,0.06);
+    margin: 48px 0;
+  }
+
+  .toc {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 28px;
+    margin: 32px 0;
+  }
+
+  .toc a {
+    display: block;
+    color: #4f8cff;
+    text-decoration: none;
+    padding: 6px 0;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .toc a:hover { text-decoration: underline; }
+
+  .objection-item {
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .objection-q {
+    font-size: 17px;
+    font-weight: 700;
+    color: #ff8c4f;
+    margin-bottom: 8px;
+  }
+
+  .objection-a {
+    font-size: 16px;
+    font-style: italic;
+    color: rgba(255,255,255,0.75);
+  }
+
+  @media (max-width: 700px) {
+    .container { padding: 40px 20px 80px; }
+    h1 { font-size: 32px; }
+    h2 { font-size: 22px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .big-stat { gap: 24px; }
+    .stat-number { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="badge">Internal — Setter Training</div>
+  <h1>247 Growth <span class="accent">Offer Breakdown</span></h1>
+  <p class="subtitle">Study this. Know it cold. You don't pitch all of it — but you need to understand what you're setting for.</p>
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <strong style="color:#fff; font-size:14px; text-transform:uppercase; letter-spacing:2px;">Contents</strong>
+    <br><br>
+    <a href="#what-we-sell">1. What We Sell</a>
+    <a href="#who-we-sell-to">2. Who We Sell To (ICP)</a>
+    <a href="#services">3. The Services — What Clients Actually Get</a>
+    <a href="#why-us">4. Why Us vs. Other Agencies</a>
+    <a href="#pricing">5. Pricing & Deal Structure</a>
+    <a href="#pain-points">6. Pain Points You'll Hear</a>
+    <a href="#what-you-say">7. What You Say (And Don't Say)</a>
+    <a href="#objections">8. Common Objections & Responses</a>
+    <a href="#comp">9. Your Compensation</a>
+    <a href="#success-stories">10. Proof & Results</a>
+  </div>
+
+  <!-- SECTION 1: WHAT WE SELL -->
+  <h2 id="what-we-sell">1. What We Sell</h2>
+
+  <p>We sell a <span class="bold">Done-For-You Growth Operating System</span> for founder-led businesses. We don't just run ads or build a website and disappear — we install and operate the entire growth engine.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3 class="accent">The One-Liner</h3>
+      <p style="font-size:20px; font-weight:600; color:#fff;">"We build the growth engine your business runs on — then operate it for you."</p>
+    </div>
+    <div class="card">
+      <h3 class="yellow">The Promise</h3>
+      <p style="font-size:20px; font-weight:600; color:#fff;">Full-stack growth system installed in 30 days. Operated month over month.</p>
+    </div>
+  </div>
+
+  <h3>What "Full-Stack Growth" Actually Means</h3>
+  <p>Most agencies do one thing — run Facebook ads, build a website, or post on social media. We do the <span class="bold">entire system</span>:</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>🌐 Websites</h3>
+      <ul>
+        <li>High-converting websites that actually generate leads</li>
+        <li>Built to capture and convert traffic — not just "look nice"</li>
+        <li>Landing pages, funnels, booking systems wired in</li>
+        <li>Most businesses we call have NO site or a terrible one</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>📈 Paid Advertising</h3>
+      <ul>
+        <li>Meta (Facebook/Instagram), Google, TikTok ads</li>
+        <li>We build, manage, and optimize — not just set up and forget</li>
+        <li>Creative, copy, targeting, retargeting — all handled</li>
+        <li>Most businesses are either not running ads or burning cash</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>🤖 AI Automation</h3>
+      <ul>
+        <li>Automate follow-ups, lead nurture, appointment booking</li>
+        <li>Streamline operations so the founder isn't doing everything</li>
+        <li>CRM setup, email/SMS sequences, chatbots</li>
+        <li>Saves 10-20 hours/week for most businesses</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>⚙️ Full Growth Engine</h3>
+      <ul>
+        <li>Acquisition → Conversion → Retention — the whole loop</li>
+        <li>We don't just get leads — we help close and keep them</li>
+        <li>Monthly reporting, optimization, strategic direction</li>
+        <li>Operated by senior talent, not junior account managers</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SECTION 2: WHO WE SELL TO -->
+  <h2 id="who-we-sell-to">2. Who We Sell To (ICP)</h2>
+
+  <p>Our ideal client is a <span class="bold">founder-led business doing $1M+/year</span> with product-market fit who doesn't have a repeatable way to get customers. They're usually successful from word-of-mouth or hustle — but it's not systematic.</p>
+
+  <div class="card-grid">
+    <div class="card" style="border-color:rgba(79,255,140,0.2);">
+      <h3 class="green">Qualified ✓ (Book These)</h3>
+      <table>
+        <tr><td>Revenue</td><td>$1M+/year (or clear trajectory)</td></tr>
+        <tr><td>Product-Market Fit</td><td>Customers love what they sell</td></tr>
+        <tr><td>Marketing</td><td>Spending money (even poorly)</td></tr>
+        <tr><td>Attitude</td><td>Frustrated — wants to fix growth</td></tr>
+        <tr><td>Decision Maker</td><td>Founder makes the call</td></tr>
+        <tr><td>Budget</td><td>$5K-$25K/mo is realistic</td></tr>
+      </table>
+    </div>
+    <div class="card" style="border-color:rgba(255,79,79,0.2);">
+      <h3 class="red">Disqualified ✗ (Don't Waste Time)</h3>
+      <table>
+        <tr><td>Revenue</td><td>Under $1M or pre-revenue startup</td></tr>
+        <tr><td>Product</td><td>No clear product or market</td></tr>
+        <tr><td>Marketing</td><td>"We don't really do marketing"</td></tr>
+        <tr><td>Attitude</td><td>Wants "cheap help" or free advice</td></tr>
+        <tr><td>Decision</td><td>Needs board approval to even talk</td></tr>
+        <tr><td>Budget</td><td>No budget, unfunded, or broke</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h3>Current Focus: Real Estate</h3>
+  <p>Right now, we're targeting <span class="bold">real estate agents and brokerages</span>. These leads typically:</p>
+  <ul>
+    <li>Have no website or a terrible template one</li>
+    <li>Are posting on Instagram but not converting followers to clients</li>
+    <li>Depend entirely on referrals and cold networking</li>
+    <li>Know they need online presence but don't know where to start</li>
+    <li>Have budget — real estate agents earn commissions on $300K+ deals</li>
+  </ul>
+
+  <!-- SECTION 3: SERVICES -->
+  <h2 id="services">3. The Services — What Clients Get</h2>
+
+  <p>When a client signs, here's what actually happens. <span class="bold">You don't need to explain all of this on a call</span> — but knowing it makes you sound credible if they ask questions.</p>
+
+  <h3>Month 1: Installation (First 30 Days)</h3>
+  <table>
+    <tr><th>Week</th><th>What Happens</th></tr>
+    <tr><td>Week 1</td><td>Deep-dive discovery call. Brand audit. Competitive analysis. Strategy doc delivered.</td></tr>
+    <tr><td>Week 2</td><td>Website build or rebuild. Funnel setup. CRM integration. Booking system wired.</td></tr>
+    <tr><td>Week 3</td><td>Ad creative production. Copy written. Campaigns built. Automation sequences set up.</td></tr>
+    <tr><td>Week 4</td><td>Launch. Ads go live. Tracking verified. First leads start flowing. Optimization begins.</td></tr>
+  </table>
+
+  <h3>Month 2+: Operation (Ongoing)</h3>
+  <table>
+    <tr><th>Service</th><th>What We Do</th></tr>
+    <tr><td>Ads Management</td><td>Daily optimization, creative refresh, A/B testing, scaling winners</td></tr>
+    <tr><td>Website Updates</td><td>Ongoing conversion optimization, new pages as needed</td></tr>
+    <tr><td>Lead Nurture</td><td>Automated email/SMS sequences, follow-up systems</td></tr>
+    <tr><td>Reporting</td><td>Weekly metrics report, monthly strategy call with founder</td></tr>
+    <tr><td>Strategy</td><td>Continuous optimization of the entire growth engine</td></tr>
+  </table>
+
+  <!-- SECTION 4: WHY US -->
+  <h2 id="why-us">4. Why Us vs. Other Agencies</h2>
+
+  <div class="card-grid">
+    <div class="card" style="border-color:rgba(255,79,79,0.2);">
+      <h3 class="red">Most Agencies</h3>
+      <ul>
+        <li style="color:rgba(255,255,255,0.5);">Run ads and disappear</li>
+        <li style="color:rgba(255,255,255,0.5);">Hand you off to a junior after the sale</li>
+        <li style="color:rgba(255,255,255,0.5);">Only do one thing (just ads, or just a website)</li>
+        <li style="color:rgba(255,255,255,0.5);">No system — just tactics and guessing</li>
+        <li style="color:rgba(255,255,255,0.5);">Monthly reports you can't understand</li>
+        <li style="color:rgba(255,255,255,0.5);">6-12 month contracts with no results</li>
+      </ul>
+    </div>
+    <div class="card" style="border-color:rgba(79,255,140,0.2);">
+      <h3 class="green">247 Growth</h3>
+      <ul>
+        <li>Full-stack: website + ads + automation + strategy</li>
+        <li>Senior operators embedded in your business</li>
+        <li>System installed in 30 days — see results fast</li>
+        <li>We operate the engine — you focus on your business</li>
+        <li>Clear reporting you actually understand</li>
+        <li>Performance-based relationship — we earn our keep</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="script-box">
+    <div class="script-label">If They Ask "How Are You Different?"</div>
+    <p>"Most agencies run ads and disappear. We install a full growth system — website, ads, automation, the whole thing — in 30 days, and then we operate it for you month over month. You get a senior operator, not an account manager reading from a dashboard."</p>
+  </div>
+
+  <!-- SECTION 5: PRICING -->
+  <h2 id="pricing">5. Pricing & Deal Structure</h2>
+
+  <div class="warning">
+    <p><strong class="red">DO NOT discuss pricing on cold calls.</strong> If asked, say: "It depends on scope — that's exactly what the strategy call covers. We'll look at what you need and give you a straight answer." Then book the call. The closer handles pricing.</p>
+  </div>
+
+  <p>For your own understanding (so you know what you're setting for):</p>
+
+  <table>
+    <tr><th>Package</th><th>Price</th><th>What's Included</th></tr>
+    <tr><td>Website Only</td><td>$3K - $5K one-time</td><td>High-converting website, funnel, booking system</td></tr>
+    <tr><td>Ads + Management</td><td>$3K - $5K/mo</td><td>Ad creative, campaign management, optimization</td></tr>
+    <tr><td>Full Growth OS</td><td>$5K - $15K/mo</td><td>Website + Ads + Automation + Strategy — the whole system</td></tr>
+    <tr><td>Enterprise</td><td>$15K - $25K/mo</td><td>Multi-channel, dedicated team, weekly strategy calls</td></tr>
+  </table>
+
+  <p><strong>Most deals will be in the $3K-$10K range</strong> — website builds and ad management packages for the real estate agents you're calling.</p>
+
+  <!-- SECTION 6: PAIN POINTS -->
+  <h2 id="pain-points">6. Pain Points You'll Hear</h2>
+
+  <p>When you talk to real estate agents and business owners, they'll describe their problems in their own words. Here's what to listen for:</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3 class="orange">Website Problems</h3>
+      <ul>
+        <li>"I don't have a website" — they know they need one</li>
+        <li>"My website is outdated" — built it 5 years ago, never updated</li>
+        <li>"I get no leads from my site" — it's a brochure, not a funnel</li>
+        <li>"I paid someone and it didn't work" — burned by a cheap freelancer</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 class="orange">Marketing Problems</h3>
+      <ul>
+        <li>"I post on social but nothing happens" — content without strategy</li>
+        <li>"I tried ads and wasted money" — no targeting, no funnel, no follow-up</li>
+        <li>"All my business is referrals" — no predictable lead flow</li>
+        <li>"I don't have time for marketing" — too busy working IN the business</li>
+      </ul>
+    </div>
+    <div class="card card-full">
+      <h3 class="orange">The Deeper Pain (What They Really Feel)</h3>
+      <ul>
+        <li>"I'm doing everything myself" — no team, no systems, burning out</li>
+        <li>"Growth is random — some months great, some dead" — no predictability</li>
+        <li>"I know I'm leaving money on the table" — they see competitors growing</li>
+        <li>"I've hired agencies before and got burned" — trust issues (our opportunity to be different)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SECTION 7: WHAT YOU SAY -->
+  <h2 id="what-you-say">7. What You Say (And Don't Say)</h2>
+
+  <div class="card-grid">
+    <div class="card" style="border-color:rgba(79,255,140,0.2);">
+      <h3 class="green">SAY This</h3>
+      <ul>
+        <li>"Strategy session" or "strategy call"</li>
+        <li>"Growth system" or "growth engine"</li>
+        <li>"We install and operate"</li>
+        <li>"Founder-led businesses like yours"</li>
+        <li>"We'll look at your specific situation"</li>
+        <li>"No pressure — just a conversation"</li>
+      </ul>
+    </div>
+    <div class="card" style="border-color:rgba(255,79,79,0.2);">
+      <h3 class="red">NEVER Say This</h3>
+      <ul>
+        <li>"Sales call" or "pitch" or "demo"</li>
+        <li>"We run Facebook ads" (reductive — we do the full system)</li>
+        <li>Specific pricing (leave that to the closer)</li>
+        <li>"Our company is called..." (means nothing to them)</li>
+        <li>"We're the best" (prove it, don't claim it)</li>
+        <li>"Trust me" (builds zero trust)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="script-box">
+    <div class="script-label">If They Ask "What Do You Do?"</div>
+    <p>"Short version — we install a full growth operating system into founder-led businesses. Websites, ads, automation, the whole system — and we operate it for you. But honestly, the call is where we'd dig into whether it makes sense for your specific situation."</p>
+  </div>
+
+  <div class="script-box">
+    <div class="script-label">If They Ask "How Much?"</div>
+    <p>"It really depends on what you need — that's exactly what the strategy call covers. We'll take a look at your situation, where the gaps are, and give you a straight answer. No pressure either way."</p>
+  </div>
+
+  <!-- SECTION 8: OBJECTIONS -->
+  <h2 id="objections">8. Common Objections & Responses</h2>
+
+  <p>Handle and redirect. Don't argue. Don't debate. Acknowledge → redirect → move forward.</p>
+
+  <div class="objection-item">
+    <div class="objection-q">"I'm not interested."</div>
+    <div class="objection-a">"Totally respect that. Out of curiosity — is that because growth is already dialed in, or is it more of a timing thing?"</div>
+    <p style="font-size:14px; color:rgba(255,255,255,0.3); margin-top:6px;">If timing → "When's better to revisit?" If dialed in → "Best of luck — keep me in mind."</p>
+  </div>
+
+  <div class="objection-item">
+    <div class="objection-q">"Just send me an email."</div>
+    <div class="objection-a">"Happy to — what's the best email? And just so I send something relevant, what's the biggest marketing challenge you're dealing with right now?"</div>
+    <p style="font-size:14px; color:rgba(255,255,255,0.3); margin-top:6px;">If they answer the question → you're back in conversation.</p>
+  </div>
+
+  <div class="objection-item">
+    <div class="objection-q">"We already have an agency / someone handling this."</div>
+    <div class="objection-a">"Nice — are you happy with the results? I only ask because a lot of founders I talk to have a team but still feel like growth is unpredictable."</div>
+    <p style="font-size:14px; color:rgba(255,255,255,0.3); margin-top:6px;">If unhappy → "What's not working?" If happy → "Not trying to fix what's not broken."</p>
+  </div>
+
+  <div class="objection-item">
+    <div class="objection-q">"I don't have time for a call."</div>
+    <div class="objection-a">"Totally get it — you're busy, that's exactly why this might be worth it. The call is 30 minutes and it's specifically about getting your time back from marketing."</div>
+    <p style="font-size:14px; color:rgba(255,255,255,0.3); margin-top:6px;">Offer a specific time: "What about [Day] at [early/lunch/end of day]?"</p>
+  </div>
+
+  <div class="objection-item">
+    <div class="objection-q">"Is this a sales call?"</div>
+    <div class="objection-a">"It's a strategy session — we look at what you're doing now and give honest feedback on where the gaps are. If there's a fit, great. If not, you walk away with clarity. No pressure either way."</div>
+  </div>
+
+  <div class="objection-item">
+    <div class="objection-q">"How'd you get my number?"</div>
+    <div class="objection-a">"Your business came up when I was researching [industry] in [area]. I'm not trying to waste your time — genuinely had a question about how you're handling growth. 30 seconds?"</div>
+  </div>
+
+  <div class="objection-item">
+    <div class="objection-q">"I've been burned by agencies before."</div>
+    <div class="objection-a">"I hear that a lot, honestly. That's usually because the agency only did one piece — ran ads with no system behind it. What we do is different — we install the full engine. But the strategy call is where you'd see exactly how. No commitment, just a conversation."</div>
+  </div>
+
+  <div class="objection-item">
+    <div class="objection-q">"I can't afford it right now."</div>
+    <div class="objection-a">"Totally understand. Out of curiosity — what's the cost of NOT fixing this? Like, how many clients are you missing out on every month because your online presence isn't working for you?"</div>
+  </div>
+
+  <!-- SECTION 9: COMP -->
+  <h2 id="comp">9. Your Compensation</h2>
+
+  <p>You get paid on <span class="bold">cash collected</span> — when the client actually pays, you eat.</p>
+
+  <div class="big-stat">
+    <div class="stat">
+      <div class="stat-number green">$20</div>
+      <div class="stat-label">Per Shown Call</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number accent">7%</div>
+      <div class="stat-label">Cash Collected</div>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Metric</th><th>How It Works</th></tr>
+    <tr><td>$20 per show</td><td>Every qualified lead that SHOWS UP to the strategy call = $20. Not bookings — shows. This is why your show rate system matters.</td></tr>
+    <tr><td>7% of cash collected</td><td>When your lead closes and the client pays, you get 7% of every dollar. $5K website = $350. $10K/mo retainer = $700. It compounds.</td></tr>
+  </table>
+
+  <div class="success">
+    <p><strong>Example week:</strong> You book 2 calls/day × 5 days = 10 bookings. 80% show rate = 8 shows = <strong class="green">$160 in show bonuses</strong>. If 2 close at $5K avg = <strong class="accent">$700 in commission</strong>. <strong class="yellow">Total: $860/week.</strong></p>
+    <p style="margin-top:8px;"><strong>Scale it:</strong> 3 bookings/day with good closing = <strong>$1,200-$1,500/week</strong>. Top setters who get promoted to Senior make even more.</p>
+  </div>
+
+  <h3>Growth Path</h3>
+  <table>
+    <tr><th>Level</th><th>What It Takes</th></tr>
+    <tr><td>Setter</td><td>Where you start. Hit KPIs consistently.</td></tr>
+    <tr><td>Senior Setter</td><td>2+ months, 80%+ show rate, consistently booking 3+/day. Higher per-show rate.</td></tr>
+    <tr><td>Team Lead</td><td>Proven leadership. Base salary + override on your team's production.</td></tr>
+    <tr><td>Closer</td><td>If you earn it. Higher base + commission on closed deals. The top of the food chain.</td></tr>
+  </table>
+
+  <!-- SECTION 10: PROOF -->
+  <h2 id="success-stories">10. Proof & Results</h2>
+
+  <p>When you need confidence on a call, remember what this system produces:</p>
+
+  <div class="card-grid">
+    <div class="card" style="border-color:rgba(79,255,140,0.2);">
+      <h3 class="green">What We Deliver</h3>
+      <ul>
+        <li>Full growth system installed in 30 days</li>
+        <li>Websites that convert at 5-15% (vs. industry avg 2%)</li>
+        <li>Ad campaigns generating leads from day one</li>
+        <li>Automated follow-up so no lead falls through the cracks</li>
+        <li>Founders get their time back from marketing</li>
+      </ul>
+    </div>
+    <div class="card" style="border-color:rgba(79,140,255,0.2);">
+      <h3 class="accent">Why Clients Stay</h3>
+      <ul>
+        <li>They see results fast (30-day installation)</li>
+        <li>They work with senior operators, not juniors</li>
+        <li>The system is predictable — no guessing</li>
+        <li>We're embedded in their business, not outsiders</li>
+        <li>Everything is transparent — they see exactly what's happening</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="text-align:center; padding:20px 0;">
+    <div class="badge-green badge">Study Complete</div>
+    <h2 style="border:none; margin-top:12px;">Know the Offer. Trust the Script. Book the Calls.</h2>
+    <p style="font-size:18px; color:rgba(255,255,255,0.4);">You don't need to be an expert. You need to find pain, confirm fit, and get them in the room. The closer handles the rest.</p>
+  </div>
+
+</div>
+
+</body>
+</html>

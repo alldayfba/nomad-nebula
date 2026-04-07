@@ -1,18 +1,344 @@
-# Automation Registry — Master list of all Zapier + GHL automations
-# Updated by AutomationBuilder agent
-# Format: one entry per automation
+# Automation Registry — Zapier Audit + Migration Map
+# Exported: 2026-03-29 from zapfile.json
+# Total: 35 Zaps (14 active, 21 off)
+# Connected Apps: Anthropic, Calendly, ConvertKit, Discord, Facebook Leads, FanBasis, GHL, Google Drive, Google Forms, Google Sheets, Schedule, Typeform, Webhook, Whop, YouTube
+#
+# Migration targets:
+#   GHL_WORKFLOW  = GHL native workflow (triggers + actions built-in)
+#   MODAL_WEBHOOK = Modal serverless webhook (execution/modal_webhook.py)
+#   CRON          = Local cron / scheduled skill
+#   DISCORD_BOT   = Nova Discord bot (execution/discord_bot/)
+#   KILL          = Delete — not needed or duplicate
+#   ALREADY_DONE  = Already handled by existing nomad-nebula system
 
-automations: []
-# Example entry:
-# - id: "AUT-001"
-#   name: "New Lead → Slack + Google Sheet"
-#   platform: "zapier"
-#   business: "agency"
-#   status: "active"
-#   trigger_summary: "GHL webhook on new contact"
-#   action_summary: "Post to #leads Slack channel + append to Leads Google Sheet"
-#   created: "2026-03-14"
-#   last_tested: "2026-03-14"
-#   monthly_runs: 150
-#   zapier_folder: "Agency/"
-#   notes: ""
+# ============================================================
+#  ACTIVE ZAPS (14) — These need migration before killing Zapier
+# ============================================================
+automations:
+
+  # --- AMAZON OS (24/7 Profits) ---
+
+  - id: "ZAP-001"
+    name: "IC TypeForm"
+    platform: "zapier"
+    business: "amazon"
+    status: "active"
+    trigger: "Typeform → AllDayFBA LLC Inner Circle Application"
+    actions: "GHL (Create Contact) → Discord (notification)"
+    migration_target: "GHL_WORKFLOW"
+    migration_notes: "GHL can natively receive Typeform webhooks via inbound webhook trigger. Discord notification via GHL workflow action or Nova bot."
+    priority: "high"
+
+  - id: "ZAP-002"
+    name: "Free Training Opt-In"
+    platform: "zapier"
+    business: "amazon"
+    status: "active"
+    trigger: "Typeform → Free Training OPT-IN"
+    actions: "GHL (Create Contact) → Discord (notification)"
+    migration_target: "GHL_WORKFLOW"
+    migration_notes: "Typeform webhook → GHL inbound webhook → create contact + Discord notify via workflow."
+    priority: "high"
+
+  - id: "ZAP-003"
+    name: "EOC Report"
+    platform: "zapier"
+    business: "amazon"
+    status: "active"
+    trigger: "Google Forms → Closer EOC Form"
+    actions: "Discord (post report)"
+    migration_target: "MODAL_WEBHOOK"
+    migration_notes: "Google Forms can POST to a Modal webhook. Webhook formats and sends to Discord via bot. Already have discord webhook infra."
+    priority: "medium"
+
+  - id: "ZAP-004"
+    name: "FanBasis Payment"
+    platform: "zapier"
+    business: "amazon"
+    status: "active"
+    trigger: "FanBasis (payment event)"
+    actions: "Filter → GHL (Create Contact) → Formatter → Formatter → Discord (notification)"
+    migration_target: "MODAL_WEBHOOK"
+    migration_notes: "FanBasis webhook → Modal endpoint → filter logic in Python → GHL API + Discord. Filter/Formatter logic is trivial in Python."
+    priority: "medium"
+
+  - id: "ZAP-005"
+    name: "IC Product Lead Sender"
+    platform: "zapier"
+    business: "amazon"
+    status: "active"
+    trigger: "Google Sheets (new row)"
+    actions: "Discord (post lead)"
+    migration_target: "CRON"
+    migration_notes: "Cron polls Google Sheet for new rows → Discord webhook. Already have Google Sheets API wired up."
+    priority: "low"
+
+  - id: "ZAP-006"
+    name: "Discord Server Call Recording"
+    platform: "zapier"
+    business: "amazon"
+    status: "active"
+    trigger: "Discord (message in channel)"
+    actions: "Discord (post to another channel)"
+    migration_target: "DISCORD_BOT"
+    migration_notes: "Nova bot can listen for messages in one channel and repost to another. Trivial cog."
+    priority: "low"
+
+  - id: "ZAP-007"
+    name: "Sales Call Booked"
+    platform: "zapier"
+    business: "amazon"
+    status: "active"
+    trigger: "Webhook (GHL fires on booking)"
+    actions: "Discord (notification)"
+    migration_target: "GHL_WORKFLOW"
+    migration_notes: "GHL workflow trigger on appointment booked → Discord webhook action (native). Zero external tooling needed."
+    priority: "high"
+
+  - id: "ZAP-008"
+    name: "New Student Fills Onboarding"
+    platform: "zapier"
+    business: "amazon"
+    status: "active"
+    trigger: "Typeform → 24/7 Profits Onboarding"
+    actions: "Discord (notification)"
+    migration_target: "GHL_WORKFLOW"
+    migration_notes: "Typeform webhook → GHL inbound webhook → Discord notification. Or use existing student_onboarding.py + Nova bot."
+    priority: "high"
+
+  - id: "ZAP-009"
+    name: "Webby OPT-IN"
+    platform: "zapier"
+    business: "amazon"
+    status: "active"
+    trigger: "Typeform → Live Class OPT-IN"
+    actions: "GHL (Contact) → Discord (notification) → ConvertKit (Add Subscriber)"
+    migration_target: "GHL_WORKFLOW"
+    migration_notes: "Multi-step: Typeform webhook → GHL workflow → create contact + Discord webhook + ConvertKit API call. ConvertKit has a native GHL integration OR use Modal webhook for the ConvertKit step."
+    priority: "high"
+
+  - id: "ZAP-010"
+    name: "SDR End Of Day Form Response"
+    platform: "zapier"
+    business: "amazon"
+    status: "active"
+    trigger: "Google Forms → Setter EOD Form"
+    actions: "Discord (post report)"
+    migration_target: "MODAL_WEBHOOK"
+    migration_notes: "Same pattern as EOC Report. Google Form → Modal webhook → Discord."
+    priority: "medium"
+
+  - id: "ZAP-011"
+    name: "24/7 Profits Whop Payment Successful"
+    platform: "zapier"
+    business: "amazon"
+    status: "active"
+    trigger: "Whop (payment success)"
+    actions: "Filter → GHL (Create Contact) → Discord (notification)"
+    migration_target: "MODAL_WEBHOOK"
+    migration_notes: "Whop webhook → Modal endpoint → filter + GHL API + Discord. Already have Whop webhook handler in app.py."
+    priority: "high"
+
+  - id: "ZAP-012"
+    name: "24/7 Profits Whop Payment Failed"
+    platform: "zapier"
+    business: "amazon"
+    status: "active"
+    trigger: "Whop (payment failed)"
+    actions: "Filter → Discord (alert)"
+    migration_target: "MODAL_WEBHOOK"
+    migration_notes: "Whop webhook → Modal → Discord alert. Critical for churn prevention — CSM agent should also be notified."
+    priority: "high"
+
+  # --- AGENCY ---
+
+  - id: "ZAP-013"
+    name: "Raw Footage to Discord (EDITOR)"
+    platform: "zapier"
+    business: "agency"
+    status: "active"
+    trigger: "Google Drive (new file in folder)"
+    actions: "Discord (notification)"
+    migration_target: "CRON"
+    migration_notes: "Cron polls Google Drive folder for new files → Discord webhook. Already have Google Drive API."
+    priority: "low"
+
+  - id: "ZAP-014"
+    name: "Agency SDR Rep Application"
+    platform: "zapier"
+    business: "agency"
+    status: "active"
+    trigger: "Typeform → SDR Application"
+    actions: "Discord (notification)"
+    migration_target: "GHL_WORKFLOW"
+    migration_notes: "Typeform webhook → GHL inbound webhook → Discord notify."
+    priority: "medium"
+
+# ============================================================
+#  INACTIVE ZAPS (21) — Review before deleting
+# ============================================================
+
+  # --- DUPLICATES / COPIES (safe to kill) ---
+  - id: "ZAP-OFF-01"
+    name: "(Copy) Agency Sales Call Booked"
+    status: "off"
+    migration_target: "KILL"
+    notes: "Duplicate of ZAP-007 pattern"
+
+  - id: "ZAP-OFF-02"
+    name: "(Copy) GHL | 24/7 Profits Call Cancelled"
+    status: "off"
+    migration_target: "KILL"
+    notes: "Duplicate"
+
+  - id: "ZAP-OFF-03"
+    name: "(Copy) 24/7 Profits Whop Payment Failed"
+    status: "off"
+    migration_target: "KILL"
+    notes: "Duplicate of ZAP-012"
+
+  - id: "ZAP-OFF-04"
+    name: "Untitled Zap"
+    status: "off"
+    migration_target: "KILL"
+    notes: "YouTube → Discord, never finished"
+
+  - id: "ZAP-OFF-05"
+    name: "None"
+    status: "off"
+    migration_target: "KILL"
+    notes: "Schedule → Anthropic, test zap"
+
+  # --- AGENCY (old client zaps) ---
+  - id: "ZAP-OFF-06"
+    name: "Capital Junk AD OPT-IN"
+    status: "off"
+    business: "agency-client"
+    migration_target: "KILL"
+    notes: "Old client — Facebook Leads → Discord"
+
+  - id: "ZAP-OFF-07"
+    name: "Crystal Renovations AD Opt-IN"
+    status: "off"
+    business: "agency-client"
+    migration_target: "KILL"
+    notes: "Old client — Facebook Leads → Discord"
+
+  - id: "ZAP-OFF-08"
+    name: "MBC AD OPT-IN"
+    status: "off"
+    business: "agency-client"
+    migration_target: "KILL"
+    notes: "Old client — GHL → Discord"
+
+  - id: "ZAP-OFF-09"
+    name: "Mahmoud Wafy AD OPT-IN"
+    status: "off"
+    business: "agency-client"
+    migration_target: "KILL"
+    notes: "Old client — Webhook → Discord"
+
+  # --- AGENCY (internal, may reactivate) ---
+  - id: "ZAP-OFF-10"
+    name: "Agency -Setter EOD"
+    status: "off"
+    business: "agency"
+    migration_target: "GHL_WORKFLOW"
+    notes: "Same pattern as ZAP-010. Migrate when agency ramps back up."
+
+  - id: "ZAP-OFF-11"
+    name: "Agency -Closer EOC"
+    status: "off"
+    business: "agency"
+    migration_target: "GHL_WORKFLOW"
+    notes: "Same pattern as ZAP-003. Migrate when agency ramps back up."
+
+  - id: "ZAP-OFF-12"
+    name: "Agency FanBasis Payment"
+    status: "off"
+    business: "agency"
+    migration_target: "MODAL_WEBHOOK"
+    notes: "Same pattern as ZAP-004. Reactivate when agency billing moves to FanBasis."
+
+  - id: "ZAP-OFF-13"
+    name: "Agency Whop Payment"
+    status: "off"
+    business: "agency"
+    migration_target: "MODAL_WEBHOOK"
+    notes: "Whop → Discord. Migrate if agency uses Whop."
+
+  - id: "ZAP-OFF-14"
+    name: "Agency Payment Failed"
+    status: "off"
+    business: "agency"
+    migration_target: "MODAL_WEBHOOK"
+    notes: "Whop → Discord churn alert."
+
+  # --- AMAZON OS (turned off) ---
+  - id: "ZAP-OFF-15"
+    name: "FREE DISCORD Product Lead Sender"
+    status: "off"
+    business: "amazon"
+    migration_target: "ALREADY_DONE"
+    notes: "Google Sheets → Discord. Replaced by IC-only version (ZAP-005)."
+
+  - id: "ZAP-OFF-16"
+    name: "New VA Worker APP"
+    status: "off"
+    business: "amazon"
+    migration_target: "KILL"
+    notes: "Typeform → Discord. VA portal discontinued."
+
+  - id: "ZAP-OFF-17"
+    name: "IC Member VA Portal Form Fill"
+    status: "off"
+    business: "amazon"
+    migration_target: "KILL"
+    notes: "Typeform → GHL + Discord. VA portal discontinued."
+
+  - id: "ZAP-OFF-18"
+    name: "GHL | 24/7 Profits Call Booked"
+    status: "off"
+    business: "amazon"
+    migration_target: "ALREADY_DONE"
+    notes: "Replaced by ZAP-007 (Sales Call Booked via webhook)."
+
+  - id: "ZAP-OFF-19"
+    name: "GHL | 24/7 Profits Call Cancelled"
+    status: "off"
+    business: "amazon"
+    migration_target: "GHL_WORKFLOW"
+    notes: "Webhook → Discord. Worth migrating to GHL native workflow for cancellation alerts."
+
+  - id: "ZAP-OFF-20"
+    name: "4/7 Profits Zelle Payment Successful"
+    status: "off"
+    business: "amazon"
+    migration_target: "KILL"
+    notes: "Whop → GHL + Discord. Zelle payment tracking — likely replaced by Whop-only flow."
+
+  - id: "ZAP-OFF-21"
+    name: "VSL VIdeo Play"
+    status: "off"
+    business: "amazon"
+    migration_target: "KILL"
+    notes: "Webhook → Google Sheets + Discord. Tracking experiment, not in use."
+
+# ============================================================
+#  MIGRATION SUMMARY
+# ============================================================
+#
+#  GHL_WORKFLOW:    7 zaps  (ZAP-001,002,007,008,009,014 + OFF-10,11,19)
+#  MODAL_WEBHOOK:   5 zaps  (ZAP-003,004,010,011,012 + OFF-12,13,14)
+#  CRON:            2 zaps  (ZAP-005,013)
+#  DISCORD_BOT:     1 zap   (ZAP-006)
+#  KILL:           12 zaps  (all copies, old clients, discontinued)
+#  ALREADY_DONE:    2 zaps  (OFF-15,18)
+#
+#  APPS TO DECOMMISSION AFTER MIGRATION:
+#  - Typeform → Replace with GHL forms (saves $29/mo) OR keep + webhook to GHL
+#  - ConvertKit → Only used in Webby OPT-IN. Evaluate if GHL email replaces it.
+#  - FanBasis → Webhook to Modal, no Zapier needed
+#  - Whop → Webhook to Modal, no Zapier needed
+#
+#  ESTIMATED SAVINGS: Zapier plan cost → $0/mo after migration

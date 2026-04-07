@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>24/7 Profits — Program Overview</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #050509;
+  --bg-card: #0c0c14;
+  --bg-card-hover: #111120;
+  --purple: #8B5CF6;
+  --purple-dark: #6D28D9;
+  --purple-glow: rgba(139, 92, 246, 0.12);
+  --cyan: #38BDF8;
+  --green: #10B981;
+  --gold: #D4A843;
+  --gold-light: #F0D78C;
+  --gold-dark: #8B6914;
+  --gold-glow: rgba(212, 168, 67, 0.12);
+  --silver: #A0AEC0;
+  --silver-light: #CBD5E0;
+  --silver-dark: #718096;
+  --silver-glow: rgba(160, 174, 192, 0.10);
+  --bronze: #C08B5C;
+  --bronze-light: #D4A574;
+  --bronze-dark: #8B6239;
+  --bronze-glow: rgba(192, 139, 92, 0.10);
+  --white: #ffffff;
+  --text: #e2e4f0;
+  --muted: #8891ab;
+  --muted2: #5a6278;
+  --border: rgba(139, 92, 246, 0.10);
+  --radius: 20px;
+  --radius-sm: 12px;
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Background ──────────────────────────────── */
+.bg-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.orb { position: absolute; border-radius: 50%; filter: blur(140px); opacity: 0.3; animation: float 25s ease-in-out infinite; }
+.orb-1 { width: 700px; height: 700px; background: rgba(139,92,246,0.10); top: -15%; left: -15%; }
+.orb-2 { width: 500px; height: 500px; background: rgba(56,189,248,0.06); bottom: -10%; right: -10%; animation-delay: -12s; }
+.orb-3 { width: 350px; height: 350px; background: rgba(212,168,67,0.04); top: 40%; left: 60%; animation-delay: -6s; }
+@keyframes float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-30px) scale(1.03); } }
+
+/* ── Layout ──────────────────────────────────── */
+.container { max-width: 860px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+/* ── Hero ─────────────────────────────────────── */
+.hero { text-align: center; padding: 80px 0 56px; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--purple-glow); border: 1px solid rgba(139,92,246,0.18);
+  padding: 8px 22px; border-radius: 999px; font-size: 11px; font-weight: 700;
+  color: var(--purple); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 32px;
+}
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+.hero h1 {
+  font-family: var(--font-serif); font-size: clamp(34px, 5.5vw, 52px);
+  font-weight: 700; line-height: 1.12; color: var(--white); margin-bottom: 20px;
+  letter-spacing: -0.5px;
+}
+.hero h1 .gradient {
+  background: linear-gradient(135deg, var(--purple), var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero .subtitle { font-size: 17px; color: var(--muted); max-width: 560px; margin: 0 auto 40px; line-height: 1.75; }
+.hero-stats { display: flex; justify-content: center; gap: 56px; flex-wrap: wrap; }
+.hero-stat { text-align: center; }
+.hero-stat .num {
+  font-size: 26px; font-weight: 800; letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--purple), var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero-stat .label { font-size: 12px; color: var(--muted); margin-top: 4px; letter-spacing: 0.5px; }
+
+/* ── Divider ─────────────────────────────────── */
+.divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(139,92,246,0.08), transparent); margin: 52px 0; }
+
+/* ── Section Headers ─────────────────────────── */
+.section-label { font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--purple); margin-bottom: 12px; }
+.section-title { font-family: var(--font-serif); font-size: clamp(26px, 3.5vw, 36px); font-weight: 700; color: var(--white); margin-bottom: 14px; line-height: 1.2; letter-spacing: -0.3px; }
+.section-subtitle { font-size: 15px; color: var(--muted); max-width: 560px; margin-bottom: 40px; line-height: 1.75; }
+
+/* ── Cards ───────────────────────────────────── */
+.card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card:hover { border-color: rgba(139,92,246,0.2); background: var(--bg-card-hover); }
+
+/* ═══════════ TIER PRICING ═══════════ */
+.tier-stack { display: flex; flex-direction: column; gap: 28px; margin-bottom: 48px; }
+
+.tier-card {
+  position: relative; border-radius: var(--radius); padding: 40px 36px; overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tier-card::before {
+  content: ''; position: absolute; inset: 0; border-radius: var(--radius);
+  pointer-events: none; z-index: 0;
+}
+.tier-card > * { position: relative; z-index: 1; }
+.tier-card:hover { transform: translateY(-3px); }
+
+/* Gold Tier */
+.tier-gold {
+  background: linear-gradient(135deg, #0f0d08 0%, #1a1508 40%, #0f0d08 100%);
+  border: 1px solid rgba(212,168,67,0.25);
+  box-shadow: 0 0 80px rgba(212,168,67,0.06), 0 20px 60px rgba(0,0,0,0.4);
+}
+.tier-gold::before { background: linear-gradient(135deg, rgba(212,168,67,0.04), transparent 60%); }
+.tier-gold:hover { border-color: rgba(212,168,67,0.4); box-shadow: 0 0 100px rgba(212,168,67,0.1), 0 24px 80px rgba(0,0,0,0.5); }
+.tier-gold .tier-accent { color: var(--gold); }
+.tier-gold .tier-badge-bg { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #1a1508; }
+.tier-gold .tier-cta { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: #fff; box-shadow: 0 6px 24px rgba(212,168,67,0.25); }
+.tier-gold .tier-cta:hover { box-shadow: 0 10px 36px rgba(212,168,67,0.4); }
+.tier-gold .tier-check { color: var(--gold); }
+
+/* Silver Tier */
+.tier-silver {
+  background: linear-gradient(135deg, #0a0b10 0%, #11131c 40%, #0a0b10 100%);
+  border: 1px solid rgba(160,174,192,0.18);
+  box-shadow: 0 0 60px rgba(160,174,192,0.04), 0 16px 48px rgba(0,0,0,0.35);
+}
+.tier-silver::before { background: linear-gradient(135deg, rgba(160,174,192,0.03), transparent 60%); }
+.tier-silver:hover { border-color: rgba(160,174,192,0.3); box-shadow: 0 0 80px rgba(160,174,192,0.06), 0 20px 60px rgba(0,0,0,0.4); }
+.tier-silver .tier-accent { color: var(--silver); }
+.tier-silver .tier-badge-bg { background: linear-gradient(135deg, var(--silver), var(--silver-light)); color: #0a0b10; }
+.tier-silver .tier-cta { background: linear-gradient(135deg, var(--silver), var(--silver-dark)); color: #fff; box-shadow: 0 6px 24px rgba(160,174,192,0.15); }
+.tier-silver .tier-cta:hover { box-shadow: 0 10px 36px rgba(160,174,192,0.3); }
+.tier-silver .tier-check { color: var(--silver); }
+
+/* Bronze Tier */
+.tier-bronze {
+  background: linear-gradient(135deg, #0b0907 0%, #15110c 40%, #0b0907 100%);
+  border: 1px solid rgba(192,139,92,0.15);
+  box-shadow: 0 0 40px rgba(192,139,92,0.03), 0 12px 36px rgba(0,0,0,0.3);
+}
+.tier-bronze::before { background: linear-gradient(135deg, rgba(192,139,92,0.03), transparent 60%); }
+.tier-bronze:hover { border-color: rgba(192,139,92,0.25); box-shadow: 0 0 60px rgba(192,139,92,0.05), 0 16px 48px rgba(0,0,0,0.35); }
+.tier-bronze .tier-accent { color: var(--bronze); }
+.tier-bronze .tier-badge-bg { background: linear-gradient(135deg, var(--bronze), var(--bronze-light)); color: #0b0907; }
+.tier-bronze .tier-cta { background: linear-gradient(135deg, var(--bronze), var(--bronze-dark)); color: #fff; box-shadow: 0 6px 24px rgba(192,139,92,0.12); }
+.tier-bronze .tier-cta:hover { box-shadow: 0 10px 36px rgba(192,139,92,0.25); }
+.tier-bronze .tier-check { color: var(--bronze); }
+
+/* Tier card inner layout */
+.tier-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
+.tier-badge {
+  display: inline-flex; align-items: center; gap: 6px; padding: 5px 16px;
+  border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+}
+.tier-name { font-family: var(--font-serif); font-size: 28px; font-weight: 700; color: var(--white); margin-bottom: 6px; letter-spacing: -0.3px; }
+.tier-tagline { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 480px; }
+.tier-price-block { text-align: right; flex-shrink: 0; }
+.tier-price { font-size: 44px; font-weight: 800; color: var(--white); line-height: 1; letter-spacing: -1px; }
+.tier-was { font-size: 16px; color: var(--muted); text-decoration: line-through; margin-bottom: 4px; }
+.tier-plan { font-size: 12px; color: var(--muted2); margin-top: 6px; }
+.tier-duration {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
+  background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.15);
+  padding: 4px 14px; border-radius: 999px; font-size: 12px; font-weight: 600; color: var(--green);
+}
+
+.tier-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent); margin: 24px 0; }
+
+.tier-features {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; list-style: none; margin-bottom: 28px;
+}
+@media (max-width: 640px) { .tier-features { grid-template-columns: 1fr; } }
+.tier-features li {
+  display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--text); padding: 6px 0;
+}
+.tier-features .dimmed { color: var(--muted2); opacity: 0.5; }
+.tier-features .x-mark { color: var(--muted2); opacity: 0.3; font-weight: 700; flex-shrink: 0; }
+
+.tier-cta {
+  display: inline-flex; align-items: center; gap: 8px; padding: 14px 36px;
+  border-radius: var(--radius-sm); font-size: 15px; font-weight: 700;
+  text-decoration: none; transition: all 0.3s ease; border: none; cursor: pointer;
+}
+.tier-cta:hover { transform: translateY(-1px); }
+
+/* ── Pillars ─────────────────────────────────── */
+.pillars-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 48px; }
+@media (max-width: 700px) { .pillars-grid { grid-template-columns: 1fr; } }
+.pillar-card { padding: 28px; }
+.pillar-icon {
+  width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center;
+  justify-content: center; font-size: 20px; margin-bottom: 16px;
+  background: var(--purple-glow); border: 1px solid rgba(139,92,246,0.12);
+}
+.pillar-title { font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+.pillar-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+/* ── System Phases ───────────────────────────── */
+.phases { margin-bottom: 48px; }
+.phase { display: flex; gap: 24px; padding: 24px 0; border-bottom: 1px solid rgba(139,92,246,0.05); }
+.phase:last-child { border-bottom: none; }
+.phase-number {
+  width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 800; color: var(--white);
+  background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+  box-shadow: 0 4px 16px rgba(139,92,246,0.2);
+}
+.phase-content { flex: 1; }
+.phase-title { font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+.phase-time { font-size: 12px; color: var(--purple); font-weight: 600; margin-bottom: 6px; }
+.phase-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+/* ── Platform Mockup Panels ──────────────────── */
+.platform-panels {
+  display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 16px; margin-bottom: 20px;
+}
+@media (max-width: 800px) { .platform-panels { grid-template-columns: 1fr; } }
+
+.mock-card {
+  background: #fff; border-radius: 16px; padding: 18px; color: #1a1a2e;
+  box-shadow: 0 16px 48px rgba(0,0,0,.3); border: 1px solid rgba(0,0,0,.05);
+}
+.mock-card.mock-dark {
+  background: #0e0e1a; color: var(--text); border: 1px solid rgba(139,92,246,.12);
+}
+.mock-header {
+  font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #6b7194;
+  margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+}
+.dot-green { width: 7px; height: 7px; border-radius: 50%; background: var(--green); display: inline-block; }
+
+.mock-product {
+  display: flex; align-items: center; gap: 10px; padding: 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,.05);
+}
+.mock-product:last-child { border-bottom: none; }
+.mock-product-info { flex: 1; min-width: 0; }
+.mock-product-name { font-size: 13px; font-weight: 600; color: #1a1a2e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mock-product-prices { font-size: 11px; color: #6b7194; }
+.mock-product-right { text-align: right; flex-shrink: 0; }
+.mock-profit { font-size: 13px; font-weight: 700; color: var(--green); }
+.mock-roi { font-size: 10px; color: #6b7194; }
+.mock-badge {
+  display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px;
+  font-weight: 700; flex-shrink: 0;
+}
+.mock-badge.buy { background: #dcfce7; color: #166534; }
+.mock-badge.maybe { background: #fef3c7; color: #92400e; }
+
+.mock-browser-bar {
+  display: flex; align-items: center; gap: 5px; margin-bottom: 14px; padding-bottom: 10px;
+  border-bottom: 1px solid rgba(139,92,246,.08);
+}
+.browser-dot { width: 9px; height: 9px; border-radius: 50%; }
+.browser-dot.red { background: #ef4444; }
+.browser-dot.yellow { background: #eab308; }
+.browser-dot.green { background: #22c55e; }
+.browser-url { font-size: 11px; color: var(--muted2); margin-left: 6px; }
+
+.mock-stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 14px; }
+.mock-stat-item { text-align: center; }
+.mock-stat-label { font-size: 9px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.5px; }
+.mock-stat-value { font-size: 16px; font-weight: 800; color: var(--white); }
+
+.mock-dash-product {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0; border-bottom: 1px solid rgba(139,92,246,.06);
+  font-size: 12px; color: var(--text);
+}
+.mock-dash-product:last-child { border-bottom: none; }
+
+.mock-pipeline { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 20px 0; }
+.mock-pipeline-step { text-align: center; }
+.mock-pipeline-icon {
+  width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center;
+  justify-content: center; font-size: 22px; margin: 0 auto 6px;
+  background: rgba(139,92,246,.06); border: 1px solid rgba(139,92,246,.1);
+}
+.mock-pipeline-label { font-size: 11px; font-weight: 600; color: #6b7194; }
+.mock-pipeline-arrow { font-size: 12px; color: var(--purple); opacity: 0.6; }
+
+.platform-labels {
+  display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 16px; margin-bottom: 48px;
+}
+@media (max-width: 800px) { .platform-labels { grid-template-columns: 1fr; } }
+.platform-label-item { text-align: center; }
+.platform-label-item strong { font-size: 14px; color: var(--white); }
+.platform-label-item span { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+/* ── Testimonials Grid ───────────────────────── */
+.testimonials-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px; margin-bottom: 48px;
+}
+@media (max-width: 640px) { .testimonials-grid { grid-template-columns: 1fr; } }
+
+.t-card {
+  margin: 0; background: linear-gradient(135deg, rgba(139,92,246,.04), rgba(109,40,217,.04));
+  border: 1px solid rgba(139,92,246,.12); border-radius: var(--radius); overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,.25); transition: all .35s ease;
+}
+.t-card:hover { transform: translateY(-3px); box-shadow: 0 16px 48px rgba(139,92,246,.15); border-color: rgba(139,92,246,.25); }
+.t-card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; object-position: center 15%; display: block; filter: saturate(1.05) contrast(1.02); }
+.t-card figcaption { padding: 12px 14px; color: #d0d2e0; font-size: 13px; line-height: 1.5; }
+.t-card figcaption strong { color: #f0f0ff; font-weight: 700; }
+
+/* ── Results Grid ────────────────────────────── */
+.results-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 48px; }
+@media (max-width: 700px) { .results-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .results-grid { grid-template-columns: 1fr; } }
+.result-card { padding: 20px; text-align: center; }
+.result-name { font-size: 13px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+.result-number {
+  font-size: 20px; font-weight: 800;
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px;
+}
+.result-context { font-size: 11px; color: var(--muted); }
+
+/* ── Guarantee ───────────────────────────────── */
+.guarantee-box {
+  background: linear-gradient(135deg, rgba(16,185,129,0.05), rgba(16,185,129,0.02));
+  border: 1px solid rgba(16,185,129,0.15); border-radius: var(--radius);
+  padding: 36px; text-align: center; margin-bottom: 48px;
+}
+.guarantee-icon { font-size: 36px; margin-bottom: 14px; }
+.guarantee-title { font-size: 20px; font-weight: 700; color: var(--white); margin-bottom: 12px; }
+.guarantee-text { font-size: 14px; color: var(--muted); max-width: 520px; margin: 0 auto; line-height: 1.8; }
+
+/* ── ROI Table ───────────────────────────────── */
+.roi-table {
+  width: 100%; border-collapse: separate; border-spacing: 0;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; margin-bottom: 48px;
+}
+.roi-table th {
+  font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--purple); padding: 14px 18px; text-align: left;
+  background: rgba(139,92,246,0.04); border-bottom: 1px solid var(--border);
+}
+.roi-table td { font-size: 13px; padding: 12px 18px; border-bottom: 1px solid rgba(139,92,246,0.04); color: var(--text); }
+.roi-table tr:last-child td { border-bottom: none; }
+.roi-table .highlight { color: var(--green); font-weight: 700; }
+
+/* ── Comparison Table ────────────────────────── */
+.compare-table {
+  width: 100%; border-collapse: separate; border-spacing: 0;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; margin-bottom: 48px;
+}
+.compare-table th { font-size: 12px; font-weight: 700; padding: 14px 18px; text-align: left; border-bottom: 1px solid var(--border); }
+.compare-table th:first-child { color: var(--muted); background: rgba(239,68,68,0.03); }
+.compare-table th:last-child { color: var(--green); background: rgba(16,185,129,0.03); }
+.compare-table td { font-size: 13px; padding: 11px 18px; border-bottom: 1px solid rgba(139,92,246,0.04); vertical-align: top; }
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table td:first-child { color: var(--muted); }
+
+/* ── Founder ─────────────────────────────────── */
+.founder { display: flex; gap: 28px; align-items: center; margin-bottom: 48px; }
+@media (max-width: 600px) { .founder { flex-direction: column; text-align: center; } }
+.founder-img {
+  width: 120px; height: 120px; border-radius: 18px; object-fit: cover;
+  border: 2px solid rgba(139,92,246,0.15); flex-shrink: 0; box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+}
+.founder-name { font-size: 20px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+.founder-role { font-size: 13px; color: var(--purple); font-weight: 600; margin-bottom: 10px; }
+.founder-bio { font-size: 14px; color: var(--muted); line-height: 1.8; }
+.founder-bio strong { color: var(--text); }
+
+/* ── CTA Footer ──────────────────────────────── */
+.cta-section { text-align: center; padding: 56px 0 72px; }
+.cta-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+  color: var(--white); font-size: 16px; font-weight: 700;
+  padding: 16px 40px; border-radius: var(--radius-sm); text-decoration: none;
+  box-shadow: 0 8px 30px rgba(139,92,246,0.3); transition: all 0.3s ease; border: none; cursor: pointer;
+}
+.cta-btn:hover { box-shadow: 0 12px 40px rgba(139,92,246,0.45); transform: translateY(-2px); }
+.cta-note { font-size: 12px; color: var(--muted2); margin-top: 14px; }
+
+footer { text-align: center; padding: 28px 0; border-top: 1px solid rgba(139,92,246,0.06); font-size: 12px; color: var(--muted2); }
+.text-center { text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<div class="container">
+
+  <!-- ═══════════ HERO ═══════════ -->
+  <section class="hero">
+    <div class="hero-badge"><span class="dot"></span> Now Enrolling</div>
+    <h1>Build a <span class="gradient">$10K/Month</span> Amazon Business<br>in 90 Days</h1>
+    <p class="subtitle">Not a course. Not a community. A coaching system with an operator beside you the whole way — powered by AI sourcing that finds products others can't see.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">$50M+</div><div class="label">Student Sales</div></div>
+      <div class="hero-stat"><div class="num">700+</div><div class="label">Active Sellers</div></div>
+      <div class="hero-stat"><div class="num">5x</div><div class="label">Live Calls / Week</div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════ FOUNDER ═══════════ -->
+  <section>
+    <div class="founder">
+      <img src="/sabbo-photo.jpg" alt="Sabbo" class="founder-img">
+      <div>
+        <div class="founder-name">Sabbo Jean-Baptiste</div>
+        <div class="founder-role">Founder — 24/7 Profits</div>
+        <p class="founder-bio">
+          <strong>$2.8M+ in personal Amazon sales.</strong> College dropout from Miami who built a 7-figure Amazon business by 21 — and now coaches 700+ sellers to do the same. Every strategy I teach, I'm running in my own stores right now. I'm not an educator who used to sell — I'm an operator who also teaches.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════ 3 PILLARS ═══════════ -->
+  <section>
+    <p class="section-label">What You Get</p>
+    <h2 class="section-title">Three Pillars, One System</h2>
+    <p class="section-subtitle">Everything is designed to get you from zero (or stuck) to profitable as fast as possible.</p>
+    <div class="pillars-grid">
+      <div class="card pillar-card">
+        <div class="pillar-icon">🎯</div>
+        <div class="pillar-title">Live Coaching</div>
+        <p class="pillar-desc">Up to 5 live calls per week with Sabbo and specialist coaches — all active Amazon sellers doing $20K-$50K/mo themselves.</p>
+      </div>
+      <div class="card pillar-card">
+        <div class="pillar-icon">⚡</div>
+        <div class="pillar-title">Done-For-You Systems</div>
+        <p class="pillar-desc">Daily product leads, custom AI sourcing tool, ungating scripts, prep center access, and $10K-$70K+ funding systems.</p>
+      </div>
+      <div class="card pillar-card">
+        <div class="pillar-icon">👥</div>
+        <div class="pillar-title">Community & Support</div>
+        <p class="pillar-desc">700+ active sellers in private Discord. 10-30 minute response times. Real answers from real operators, not moderators.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════ AI PLATFORM PREVIEW ═══════════ -->
+  <section>
+    <p class="section-label">Custom AI Tool</p>
+    <h2 class="section-title">Built-In AI Sourcing Platform</h2>
+    <p class="section-subtitle">Our proprietary AI tool finds winning products in minutes — not hours. Built by our team, exclusively for Inner Circle members.</p>
+
+    <div class="platform-panels">
+      <!-- Panel 1: Profitable Finds -->
+      <div class="mock-card">
+        <div class="mock-header"><span class="dot-green"></span> PROFITABLE FINDS</div>
+        <div class="mock-product">
+          <div class="mock-product-info">
+            <div class="mock-product-name">Jellycat Bashful Bunny 12in</div>
+            <div class="mock-product-prices">$14.99 → $34.97</div>
+          </div>
+          <div class="mock-product-right">
+            <div class="mock-profit">+$12.48</div>
+            <div class="mock-roi">133% ROI</div>
+          </div>
+          <span class="mock-badge buy">BUY</span>
+        </div>
+        <div class="mock-product">
+          <div class="mock-product-info">
+            <div class="mock-product-name">CeraVe Moisturizing Cream 19oz</div>
+            <div class="mock-product-prices">$11.47 → $22.99</div>
+          </div>
+          <div class="mock-product-right">
+            <div class="mock-profit">+$6.52</div>
+            <div class="mock-roi">100% ROI</div>
+          </div>
+          <span class="mock-badge buy">BUY</span>
+        </div>
+        <div class="mock-product">
+          <div class="mock-product-info">
+            <div class="mock-product-name">Stanley Quencher 40oz Tumbler</div>
+            <div class="mock-product-prices">$24.99 → $39.95</div>
+          </div>
+          <div class="mock-product-right">
+            <div class="mock-profit">+$8.96</div>
+            <div class="mock-roi">60% ROI</div>
+          </div>
+          <span class="mock-badge maybe">MAYBE</span>
+        </div>
+      </div>
+
+      <!-- Panel 2: Dashboard Preview -->
+      <div class="mock-card mock-dark">
+        <div class="mock-browser-bar">
+          <span class="browser-dot red"></span><span class="browser-dot yellow"></span><span class="browser-dot green"></span>
+          <span class="browser-url">247profits.org/tools/sourcing</span>
+        </div>
+        <div class="mock-stats-row">
+          <div class="mock-stat-item"><div class="mock-stat-label">Products</div><div class="mock-stat-value">2,847</div></div>
+          <div class="mock-stat-item"><div class="mock-stat-label">Profitable</div><div class="mock-stat-value" style="color:var(--green)">312</div></div>
+          <div class="mock-stat-item"><div class="mock-stat-label">Avg ROI</div><div class="mock-stat-value">68%</div></div>
+          <div class="mock-stat-item"><div class="mock-stat-label">Revenue P...</div><div class="mock-stat-value" style="color:var(--green)">$142K</div></div>
+        </div>
+        <div class="mock-dash-product">
+          <span>Jellycat Bashful Bunny</span><span class="mock-badge buy" style="font-size:10px;padding:2px 8px;">BUY</span>
+        </div>
+        <div class="mock-dash-product">
+          <span>CeraVe Moisturizing Cream</span><span class="mock-badge buy" style="font-size:10px;padding:2px 8px;">BUY</span>
+        </div>
+        <div class="mock-dash-product">
+          <span>Stanley Quencher 40oz</span><span class="mock-badge maybe" style="font-size:10px;padding:2px 8px;">MAYBE</span>
+        </div>
+      </div>
+
+      <!-- Panel 3: Amazon Pipeline -->
+      <div class="mock-card">
+        <div class="mock-header"><span class="dot-green"></span> AMAZON PIPELINE</div>
+        <div class="mock-pipeline">
+          <div class="mock-pipeline-step">
+            <div class="mock-pipeline-icon">🏪</div>
+            <div class="mock-pipeline-label">Retailers</div>
+          </div>
+          <div class="mock-pipeline-arrow">▶</div>
+          <div class="mock-pipeline-step">
+            <div class="mock-pipeline-icon">🤖</div>
+            <div class="mock-pipeline-label">AI Verification</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="platform-labels">
+      <div class="platform-label-item"><strong>Profitable Product Cards</strong><br><span>Instantly see buy price, sell price, ROI, and profit on every product our system surfaces.</span></div>
+      <div class="platform-label-item"><strong>Dashboard Preview</strong><br><span>Real-time metrics across thousands of scanned products with intelligent profit scoring.</span></div>
+      <div class="platform-label-item"><strong>Amazon Pipeline</strong><br><span>End-to-end flow from 300+ retailers through AI verification to pure profit extraction.</span></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════ PRICING — TIER STACK ═══════════ -->
+  <section>
+    <p class="section-label text-center">Investment</p>
+    <h2 class="section-title text-center">Choose Your Level</h2>
+    <p class="section-subtitle text-center" style="margin-left:auto;">One system, three levels of access. All get results — the difference is speed and hands-on support.</p>
+
+    <div class="tier-stack">
+
+      <!-- ── GOLD — $5K ── -->
+      <div class="tier-card tier-gold">
+        <div class="tier-top">
+          <div>
+            <span class="tier-badge tier-badge-bg">★ GOLD</span>
+            <div class="tier-name" style="margin-top:12px;">The Inner Circle</div>
+            <div class="tier-tagline">Full access. Maximum speed. Hands-on coaching from day one.</div>
+          </div>
+          <div class="tier-price-block">
+            <div class="tier-was">$10,000</div>
+            <div class="tier-price tier-accent">$5,000</div>
+            <div class="tier-plan">Payment plan available</div>
+            <div class="tier-duration">✓ 12 months access</div>
+          </div>
+        </div>
+        <div class="tier-divider"></div>
+        <ul class="tier-features">
+          <li><span class="tier-check">✓</span> 2x/week group sessions with Sabbo (10-15 max)</li>
+          <li><span class="tier-check">✓</span> 3x/week specialist coaching (sourcing, listings, strategy)</li>
+          <li><span class="tier-check">✓</span> Daily profitable product leads from our team</li>
+          <li><span class="tier-check">✓</span> Custom AI sourcing tool access</li>
+          <li><span class="tier-check">✓</span> 2 private support channels (Sabbo + coaches)</li>
+          <li><span class="tier-check">✓</span> Ungating scripts & templates</li>
+          <li><span class="tier-check">✓</span> Prep center access</li>
+          <li><span class="tier-check">✓</span> Funding systems ($10K-$70K+ credit)</li>
+          <li><span class="tier-check">✓</span> Full A-Z course library + all recordings</li>
+          <li><span class="tier-check">✓</span> 700+ member private Discord</li>
+          <li><span class="tier-check">✓</span> Brand-Direct income stream (bonus module)</li>
+          <li><span class="tier-check">✓</span> Results guarantee — work until you win</li>
+        </ul>
+        <a href="#cta" class="tier-cta">Get Started →</a>
+      </div>
+
+      <!-- ── SILVER — $2K ── -->
+      <div class="tier-card tier-silver">
+        <div class="tier-top">
+          <div>
+            <span class="tier-badge tier-badge-bg">◆ SILVER</span>
+            <div class="tier-name" style="margin-top:12px;">The Semi Circle</div>
+            <div class="tier-tagline">Full system access on a tighter budget. Same course, same community.</div>
+          </div>
+          <div class="tier-price-block">
+            <div class="tier-price tier-accent">$2,000</div>
+            <div class="tier-plan">Payment plan available</div>
+            <div class="tier-duration">✓ 6 months access</div>
+          </div>
+        </div>
+        <div class="tier-divider"></div>
+        <ul class="tier-features">
+          <li><span class="tier-check">✓</span> 2x/week group coaching calls</li>
+          <li><span class="tier-check">✓</span> Limited 1-on-1 access with Sabbo</li>
+          <li><span class="tier-check">✓</span> Weekly curated product lead drops</li>
+          <li><span class="tier-check">✓</span> Community support channel</li>
+          <li><span class="tier-check">✓</span> Ungating scripts & templates</li>
+          <li><span class="tier-check">✓</span> Full A-Z course library + all recordings</li>
+          <li><span class="tier-check">✓</span> 700+ member private Discord</li>
+          <li><span class="tier-check">✓</span> 90-day results guarantee</li>
+          <li class="dimmed"><span class="x-mark">—</span> No custom AI sourcing tool</li>
+          <li class="dimmed"><span class="x-mark">—</span> No daily product leads (weekly instead)</li>
+          <li class="dimmed"><span class="x-mark">—</span> No private support channels</li>
+          <li class="dimmed"><span class="x-mark">—</span> No prep center or funding setup</li>
+        </ul>
+        <a href="#cta" class="tier-cta">Get Started →</a>
+      </div>
+
+      <!-- ── BRONZE — $500 ── -->
+      <div class="tier-card tier-bronze">
+        <div class="tier-top">
+          <div>
+            <span class="tier-badge tier-badge-bg">● BRONZE</span>
+            <div class="tier-name" style="margin-top:12px;">The Course</div>
+            <div class="tier-tagline">Learn the system at your own pace. Course + community access.</div>
+          </div>
+          <div class="tier-price-block">
+            <div class="tier-price tier-accent">$500</div>
+            <div class="tier-plan">Or 2 payments of $300</div>
+            <div class="tier-duration">✓ Course access</div>
+          </div>
+        </div>
+        <div class="tier-divider"></div>
+        <ul class="tier-features">
+          <li><span class="tier-check">✓</span> Full A-Z Amazon FBA course</li>
+          <li><span class="tier-check">✓</span> Basic Discord community access</li>
+          <li><span class="tier-check">✓</span> Monthly group coaching calls</li>
+          <li><span class="tier-check">✓</span> All course recordings</li>
+          <li class="dimmed"><span class="x-mark">—</span> No 1-on-1 access</li>
+          <li class="dimmed"><span class="x-mark">—</span> No weekly coaching calls</li>
+          <li class="dimmed"><span class="x-mark">—</span> No product leads</li>
+          <li class="dimmed"><span class="x-mark">—</span> No AI sourcing tool</li>
+          <li class="dimmed"><span class="x-mark">—</span> No ungating scripts</li>
+          <li class="dimmed"><span class="x-mark">—</span> No prep center or funding</li>
+          <li class="dimmed"><span class="x-mark">—</span> No private support channels</li>
+          <li class="dimmed"><span class="x-mark">—</span> No results guarantee</li>
+        </ul>
+        <a href="#cta" class="tier-cta">Get Started →</a>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════ 4-PHASE SYSTEM ═══════════ -->
+  <section>
+    <p class="section-label">The System</p>
+    <h2 class="section-title">Zero to Profitable in 90 Days</h2>
+    <p class="section-subtitle">The 24/7 Amazon Operating System — 4 phases, coach-led, data-driven.</p>
+
+    <div class="phases">
+      <div class="phase">
+        <div class="phase-number">1</div>
+        <div class="phase-content">
+          <div class="phase-title">Foundation</div>
+          <div class="phase-time">Week 1–2</div>
+          <p class="phase-desc">Amazon account setup, business entity, tool stack installed, funding systems activated. You don't touch inventory yet — we build the infrastructure first.</p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-number">2</div>
+        <div class="phase-content">
+          <div class="phase-title">Product Research</div>
+          <div class="phase-time">Week 2–4</div>
+          <p class="phase-desc">AI-powered product selection using proprietary filters. Data-driven decisions — not guesswork. Keepa charts, profit margins, competition analysis. Live research sessions on calls.</p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-number">3</div>
+        <div class="phase-content">
+          <div class="phase-title">Sourcing & Launch</div>
+          <div class="phase-time">Week 4–8</div>
+          <p class="phase-desc">Retail + online arbitrage systems. Brand partnerships and supplier relationships. Listing optimization for conversion. Your first products go live on Amazon.</p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-number">4</div>
+        <div class="phase-content">
+          <div class="phase-title">Scaling & Growth</div>
+          <div class="phase-time">Month 3–12</div>
+          <p class="phase-desc">Expand your product catalog. Wholesale and bundling opportunities. Brand Registry. Brand-direct partnerships. The business becomes a real asset — not a side project.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════ RESULTS ═══════════ -->
+  <section>
+    <p class="section-label text-center">Proof</p>
+    <h2 class="section-title text-center">Real Students, Real Numbers</h2>
+    <p class="section-subtitle text-center" style="margin-left:auto;">Every student who followed the system saw results. Here's what that looks like.</p>
+
+    <div class="results-grid">
+      <div class="card result-card">
+        <div class="result-name">Xavier</div>
+        <div class="result-number">$10,900</div>
+        <div class="result-context">First week · 14 years old · Complete beginner</div>
+      </div>
+      <div class="card result-card">
+        <div class="result-name">Brandon</div>
+        <div class="result-number">$48K/mo</div>
+        <div class="result-context">Scaling consistently</div>
+      </div>
+      <div class="card result-card">
+        <div class="result-name">Diaz</div>
+        <div class="result-number">$52K</div>
+        <div class="result-context">In 9 days</div>
+      </div>
+      <div class="card result-card">
+        <div class="result-name">Jeff</div>
+        <div class="result-number">$188K/yr</div>
+        <div class="result-context">Annual Amazon revenue</div>
+      </div>
+      <div class="card result-card">
+        <div class="result-name">Grace</div>
+        <div class="result-number">$70 → $40K</div>
+        <div class="result-context">2 years stuck · First sale day 1 with us</div>
+      </div>
+      <div class="card result-card">
+        <div class="result-name">700+</div>
+        <div class="result-number">Active Sellers</div>
+        <div class="result-context">In the community right now</div>
+      </div>
+    </div>
+
+    <!-- Testimonial Cards -->
+    <div class="testimonials-grid">
+      <figure class="t-card">
+        <img loading="lazy" src="/testimonials/brandon.png" alt="Brandon results">
+        <figcaption><strong>Brandon:</strong> $234K in 12 months. December at $48K. 2025 target: $500K+.</figcaption>
+      </figure>
+      <figure class="t-card">
+        <img loading="lazy" src="/testimonials/jeff.png" alt="Jeff results">
+        <figcaption><strong>Jeff:</strong> $188K in under 12 months — all FBM, no VA, no warehouse.</figcaption>
+      </figure>
+      <figure class="t-card">
+        <img loading="lazy" src="/testimonials/winston.png" alt="Winston results">
+        <figcaption><strong>Winston:</strong> $54K month after a few months on the system.</figcaption>
+      </figure>
+      <figure class="t-card">
+        <img loading="lazy" src="/testimonials/diaz.png" alt="Diaz results">
+        <figcaption><strong>Diaz:</strong> $52K in 9 days, with $28K+ clean profit.</figcaption>
+      </figure>
+      <figure class="t-card">
+        <img loading="lazy" src="/testimonials/nico.png" alt="Nico results">
+        <figcaption><strong>Nico:</strong> $50K month with $10K+ profit — no ads.</figcaption>
+      </figure>
+      <figure class="t-card">
+        <img loading="lazy" src="/testimonials/isaac.png" alt="Isaac results">
+        <figcaption><strong>Isaac:</strong> $44K day using fast-turn criteria + supplier plays.</figcaption>
+      </figure>
+    </div>
+
+    <p style="text-align:center;font-size:10px;color:var(--muted2);margin-top:8px;max-width:560px;margin-left:auto;margin-right:auto;">
+      Results are not typical or guaranteed. Individual results vary based on effort and market conditions.
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════ ROI ═══════════ -->
+  <section>
+    <p class="section-label">The Math</p>
+    <h2 class="section-title">One Product Covers the Investment</h2>
+    <p class="section-subtitle">You have 12 months (or 6) to find one winning product — with a team behind you the whole time.</p>
+    <table class="roi-table">
+      <thead><tr><th>Scenario</th><th>Monthly Revenue</th><th>Profit (25%)</th><th>Pays Back In</th></tr></thead>
+      <tbody>
+        <tr><td>Conservative</td><td>$5,000/mo</td><td>$1,250/mo</td><td class="highlight">4 months</td></tr>
+        <tr><td>Expected</td><td>$10,000/mo</td><td>$2,500/mo</td><td class="highlight">2 months</td></tr>
+        <tr><td>Students like Xavier</td><td>$10K+ first week</td><td>—</td><td class="highlight">Immediately</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════ COMPARISON ═══════════ -->
+  <section>
+    <p class="section-label">Why This Is Different</p>
+    <h2 class="section-title">Not Another Amazon Course</h2>
+    <table class="compare-table">
+      <thead><tr><th>YouTube / $500 Course</th><th>24/7 Profits</th></tr></thead>
+      <tbody>
+        <tr><td>Watch alone, figure it out</td><td>5 live coaching calls/week with operators</td></tr>
+        <tr><td>Generic 2020 strategies</td><td>AI-powered, updated for 2026 Amazon</td></tr>
+        <tr><td>No accountability</td><td>Weekly check-ins + milestone tracking</td></tr>
+        <tr><td>One size fits all</td><td>Customized to your capital + experience</td></tr>
+        <tr><td>No product leads</td><td>Daily product leads sent to you</td></tr>
+        <tr><td>Post in a Facebook group</td><td>700+ sellers, 10-30 min response time</td></tr>
+        <tr><td>Hope for the best</td><td>Results guarantee — we work until you win</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════ GUARANTEE ═══════════ -->
+  <section>
+    <div class="guarantee-box">
+      <div class="guarantee-icon">🛡️</div>
+      <div class="guarantee-title">The 24/7 Profits Guarantee</div>
+      <p class="guarantee-text">
+        If you follow the system and don't generate $10,000 in revenue within 6 months, I extend your access and keep working with you — at no additional cost — until you do.
+        <br><br>
+        <strong style="color:var(--white);">We succeed when you succeed. Period.</strong>
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══════════ CTA ═══════════ -->
+  <section class="cta-section" id="cta">
+    <p class="section-label">Ready?</p>
+    <h2 class="section-title">Let's Build Your Amazon Business</h2>
+    <p class="section-subtitle" style="margin-left:auto;margin-right:auto;">DM me "READY" on Instagram and I'll get you set up same day.</p>
+    <a href="https://instagram.com/allday.fba" target="_blank" class="cta-btn">DM Me on Instagram →</a>
+    <p class="cta-note">No pressure. No gimmicks. Just a real conversation about where you're at and where you want to be.</p>
+  </section>
+
+  <footer>
+    <p>© 2026 24/7 Profits — AllDayFBA LLC. All rights reserved.</p>
+  </footer>
+
+</div>
+
+</body>
+</html>

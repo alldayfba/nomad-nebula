@@ -1,5 +1,5 @@
 # Creator Social Handles — Master Index
-> Last Updated: 2026-03-15
+> Last Updated: 2026-04-01
 > Used by Creator Intelligence Freshness Protocol (CLAUDE.md §7)
 
 ---
@@ -18,7 +18,7 @@
 | **Sabbo (AllDayFBA)** | [@alldayfba](https://youtube.com/@alldayfba) (2K) | [@allday.fba](https://instagram.com/allday.fba) | — | [alldayfba.com](https://alldayfba.com) · TikTok @allday.fba |
 | **Jace England** | [@jaceengland](https://youtube.com/@jaceengland) | [@jaceengland.ig](https://instagram.com/jaceengland.ig) · [@jace.england](https://instagram.com/jace.england) | [@JaceEngland1](https://x.com/JaceEngland1) | AGARDE Media LLC · [Substack](https://jaceengland.substack.com) · [Spotify: CLASS OF ONE](https://open.spotify.com/show/52O0LSnjTbn7iFMMWqyrA2) · [LinkedIn](https://linkedin.com/in/jace-england-45a574230/) |
 | **Ben Bader** | TBD | TBD | TBD | TBD |
-| **Kabrin Johal** | TBD | TBD | TBD | AI Drivers community |
+| **Kabrin Johal** | (none found) | [@kabrinj](https://instagram.com/kabrinj) (779) | — | [Skool: AI Automation A-Z](https://skool.com/@kabrin-johal-3151) (107K members) |
 
 ---
 
@@ -31,7 +31,7 @@
 | Pierre Khoury | `bots/creators/pierre-khoury-brain.md` | 2026-03-13 |
 | Jeremy Haynes | `bots/creators/jeremy-haynes-brain.md` | 2026-03-13 |
 | SooWei Goh | `bots/creators/soowei-goh-brain.md` | 2026-03-13 |
-| Alex Hormozi | `bots/creators/alex-hormozi-brain.md` | 2026-03-13 |
+| Alex Hormozi | `bots/creators/alex-hormozi-brain.md` | 2026-04-01 |
 | Johnny Mau | `bots/creators/johnny-mau-brain.md` | 2026-03-15 |
 | Sabbo (AllDayFBA) | `bots/creators/sabbo-alldayfba-brain.md` | 2026-03-15 |
 | Ben Bader | `bots/creators/ben-bader-brain.md` | 2026-02-28 |

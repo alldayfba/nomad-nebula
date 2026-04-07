@@ -3,7 +3,7 @@
 > **CRM:** GoHighLevel (GHL)
 > **Merge Fields:** {{first_name}}, {{webinar_link}}, {{replay_link}}, {{application_link}}
 > **Brand:** 24/7 Profits — AI Amazon Scaling
-> **Last Updated:** 2026-03-23
+> **Last Updated:** 2026-04-05
 
 ---
 
@@ -28,7 +28,7 @@
 **Trigger:** Registration confirmed, fires 24 hours before event start
 
 ```
-{{first_name}}! Quick reminder — AI Amazon training TOMORROW 8PM EST. Save your spot: {{webinar_link}}
+{{first_name}}! Quick reminder — AI Amazon training TOMORROW 7PM EST. Save your spot: {{webinar_link}}
 ```
 _Characters: ~105_
 

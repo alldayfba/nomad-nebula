@@ -12,7 +12,7 @@ This file is your status dashboard. It tracks what you're doing, what's queued, 
 ## Current Status
 
 ```
-Last heartbeat: [TIMESTAMP]
+Last heartbeat: 2026-03-26
 Status: IDLE
 Current task: none
 Next scheduled task: 07:30 — Morning standup
@@ -86,4 +86,4 @@ Run on every heartbeat:
 
 ---
 
-*Last updated: 2026-03-16*
+*Last updated: 2026-03-26*

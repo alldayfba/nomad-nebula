@@ -150,4 +150,81 @@ SOP: `directives/codesec-sop.md`
 
 ---
 
-*Last updated: 2026-02-22*
+## Claude Code Security — AI-Specific Vulnerabilities
+
+These vulnerabilities are specific to AI agent workflows and apply on top of all rules above. Source: Nick Saraev Advanced Course (2026-04).
+
+### VULN-1: API Key Chat History Exposure
+
+**Risk:** Every conversation in Claude Code is logged as JSON in `~/.claude/`. Any API key pasted in chat is permanently stored in plain text across potentially hundreds of session files. An attacker who accesses `~/.claude/` gets every key ever mentioned.
+
+**Rules:**
+- Store ALL API keys in `.env` files exclusively — never paste them in chat
+- Reference keys by variable name only: "use the KEEPA_API_KEY from .env" not the actual value
+- Never `cat .env`, `echo $KEY`, or display key values in conversation
+- Add to CLAUDE.md: "Never read, display, or output .env file contents"
+- Periodically audit: `grep -r "sk-" ~/.claude/` to check for leaks
+
+### VULN-2: Supply Chain / Package Hallucination
+
+**Risk:** LLMs hallucinate legitimate-sounding package names due to token encoding. Attackers register typosquatted packages (e.g., "acorns" instead of "acorn") that exfiltrate API keys and conversation logs on install.
+
+**Rules:**
+- Before any `npm install` or `pip install`, audit the package list for unfamiliar names
+- Prompt Claude: "Verify all packages are legitimate with verified histories. Flag suspicious names."
+- Never enable unlimited API billing — always set spending limits
+- Regularly audit `package.json` / `requirements.txt` for unexpected additions
+- Pin dependency versions to prevent supply chain attacks via updates
+
+### VULN-3: Database Row-Level Security (RLS)
+
+**Risk:** Supabase does NOT enable RLS by default. Without it, anyone with the public anon key can READ, WRITE, and DELETE all rows in all tables. Real-world example: Molt (AI agent platform) had zero RLS — attacker read all agents in 2 seconds, created 100K fake profiles.
+
+**Rules:**
+- Enable RLS on ALL Supabase tables immediately (2-second toggle in dashboard)
+- Restrict access so users only see their own data (`auth.uid() = user_id`)
+- Verify RLS is enabled on every new table as part of deployment checklist
+- Test with `supabase.from('table').select('*')` using anon key — should return empty or user-scoped data only
+
+### VULN-4: Public-Facing Agent Endpoints
+
+**Risk:** Running unauthenticated Claude/agent instances on public URLs. Bot farms scan all cloud providers (VPS, Hostinger, etc.) constantly testing thousands of requests/second for known vulnerabilities.
+
+**Rules:**
+- Never expose agent endpoints without authentication
+- Implement firewall rules on all public-facing services
+- Never share SSN, passport, credit card data with public Claude instances
+- Use local instances authenticated through trusted channels (Telegram bot, Discord bot)
+- Modal webhooks: always include API key validation (`X-API-Key` header check)
+
+### VULN-5: Credit Card Data in AI Context
+
+**Risk:** If an agent reads a credit card number, it gets permanently logged in conversation history. Attackers search logs for 16-20 digit patterns matching Visa/MC formats. Creates PCI compliance liability.
+
+**Rules:**
+- NEVER pass raw credit card numbers to any AI agent
+- Use Stripe or certified payment processors exclusively
+- Never store, display, or process raw CC data in any script or conversation
+- If a user accidentally pastes CC data: flag immediately, do not store, advise rotation
+
+### Security Audit Template
+
+Run this audit using a **fresh agent conversation** (no existing context bias) to get an unbiased assessment. Use a **separate agent** to implement any fixes (avoids confirmation bias from the audit agent).
+
+**Audit prompt for fresh agent:**
+```
+Perform a comprehensive security audit of this codebase:
+1. Architecture summary — what services are exposed, what databases exist
+2. API token search — grep for: sk-live, sk-test, sk-bearer, sk-ant, Bearer, Authorization headers
+3. Secrets in git — check .gitignore covers: .env, credentials.json, token.json, *.pem, *.key
+4. Supply chain — audit package.json/requirements.txt for suspicious or unfamiliar packages
+5. Database security — check all Supabase tables have RLS enabled
+6. Public endpoints — list all routes, verify authentication on each
+7. ML-specific — check for exposed model weights, training data, or inference endpoints
+8. Compliance — PCI (no raw CC data), data privacy (no PII in logs)
+Document all findings with severity (CRITICAL/HIGH/MEDIUM/LOW) and remediation steps.
+```
+
+---
+
+*Last updated: 2026-04-03*

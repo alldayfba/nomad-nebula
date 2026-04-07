@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDR Onboarding Call — Agenda</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #09090b;
+    color: #fafafa;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 48px 32px 100px;
+  }
+  .badge {
+    display: inline-block;
+    background: rgba(79,140,255,0.12);
+    border: 1px solid rgba(79,140,255,0.25);
+    border-radius: 6px;
+    padding: 4px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    color: #4f8cff;
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-size: 40px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    font-size: 18px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 40px;
+  }
+  .total-time {
+    background: rgba(79,140,255,0.08);
+    border: 1px solid rgba(79,140,255,0.2);
+    border-radius: 12px;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+  }
+  .total-time span { font-size: 16px; color: rgba(255,255,255,0.6); }
+  .total-time strong { font-size: 24px; color: #4f8cff; }
+
+  .section {
+    margin-bottom: 8px;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+  .section:hover { border-color: rgba(255,255,255,0.12); }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .section-header:hover { background: rgba(255,255,255,0.02); }
+
+  .section-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .section-info { flex: 1; }
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .section-desc {
+    font-size: 14px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 2px;
+  }
+  .section-time {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.35);
+    white-space: nowrap;
+  }
+
+  .section-body {
+    padding: 0 24px 24px 76px;
+    display: none;
+  }
+  .section.open .section-body { display: block; }
+
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px 0;
+    font-size: 16px;
+    color: rgba(255,255,255,0.75);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    cursor: pointer;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li:hover { color: #fff; }
+
+  .check {
+    width: 22px;
+    height: 22px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    font-size: 13px;
+  }
+  .checklist li.done .check {
+    background: #4fff8c;
+    border-color: #4fff8c;
+    color: #000;
+  }
+  .checklist li.done {
+    color: rgba(255,255,255,0.3);
+    text-decoration: line-through;
+  }
+
+  .talk-track {
+    background: rgba(79,140,255,0.06);
+    border: 1px solid rgba(79,140,255,0.15);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    font-size: 15px;
+    font-style: italic;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.6;
+  }
+  .talk-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #4f8cff;
+    font-style: normal;
+    margin-bottom: 8px;
+  }
+
+  .note {
+    background: rgba(255,213,79,0.06);
+    border: 1px solid rgba(255,213,79,0.15);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 10px 0;
+    font-size: 14px;
+    color: rgba(255,213,79,0.8);
+  }
+
+  .c1 { background: rgba(79,140,255,0.12); color: #4f8cff; }
+  .c2 { background: rgba(79,255,140,0.12); color: #4fff8c; }
+  .c3 { background: rgba(255,213,79,0.12); color: #ffd54f; }
+  .c4 { background: rgba(255,140,79,0.12); color: #ff8c4f; }
+  .c5 { background: rgba(168,85,247,0.12); color: #a855f7; }
+  .c6 { background: rgba(255,79,79,0.12); color: #ff4f4f; }
+  .c7 { background: rgba(79,200,255,0.12); color: #4fc8ff; }
+  .c8 { background: rgba(79,255,200,0.12); color: #4fffc8; }
+
+  .expand-all {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.5);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    float: right;
+    margin-bottom: 20px;
+  }
+  .expand-all:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+  .progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    margin-bottom: 32px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4f8cff, #4fff8c);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.3s;
+  }
+
+  .links-box {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-top: 40px;
+  }
+  .links-box h3 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 12px;
+  }
+  .links-box a {
+    display: block;
+    color: #4f8cff;
+    text-decoration: none;
+    font-size: 15px;
+    padding: 4px 0;
+  }
+  .links-box a:hover { text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    .container { padding: 32px 16px 80px; }
+    h1 { font-size: 28px; }
+    .section-body { padding-left: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="badge">Today's Call</div>
+  <h1>SDR Onboarding Call Agenda</h1>
+  <p class="subtitle">March 26, 2026 — Follow this checklist during the call. Click sections to expand.</p>
+
+  <div class="total-time">
+    <span>Total call time</span>
+    <strong>45–60 min</strong>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+  <button class="expand-all" onclick="toggleAll()">Expand All</button>
+  <div style="clear:both;"></div>
+
+  <!-- ====== SECTION 1: WELCOME ====== -->
+  <div class="section open">
+    <div class="section-header" onclick="toggle(this)">
+      <div class="section-number c1">1</div>
+      <div class="section-info">
+        <div class="section-title">Welcome & Set the Tone</div>
+        <div class="section-desc">Energy, expectations, what this is</div>
+      </div>
+      <div class="section-time">3 min</div>
+    </div>
+    <div class="section-body">
+      <ul class="checklist">
+        <li onclick="check(this)"><div class="check"></div>Welcome everyone — names, where they're from</li>
+        <li onclick="check(this)"><div class="check"></div>Set the tone: "This is a performance environment. If you execute, you'll make great money. If you don't, we'll part ways fast. No hard feelings."</li>
+        <li onclick="check(this)"><div class="check"></div>Explain the call structure: "I'm going to walk you through everything — who we are, what we sell, the script, how you get paid, and then you're dialing today."</li>
+      </ul>
+      <div class="talk-track">
+        <div class="talk-label">Talk Track</div>
+        "Welcome to 247 Growth. I'm Sabbo. Here's the deal — I brought you on because I think you can produce. Today I'm going to give you everything you need to start booking calls. By end of day, I expect dials and bookings. Let's get into it."
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SECTION 2: WHO WE ARE ====== -->
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <div class="section-number c2">2</div>
+      <div class="section-info">
+        <div class="section-title">Who We Are & What We Do</div>
+        <div class="section-desc">The company, the offer, why clients pay us</div>
+      </div>
+      <div class="section-time">5 min</div>
+    </div>
+    <div class="section-body">
+      <ul class="checklist">
+        <li onclick="check(this)"><div class="check"></div>"We're a growth agency. We build and operate full-stack growth systems for businesses."</li>
+        <li onclick="check(this)"><div class="check"></div>Explain the 3 services: <strong>Websites</strong> (high-converting, not template garbage), <strong>Ads</strong> (Meta/Google, managed), <strong>AI Automation</strong> (follow-ups, CRM, booking)</li>
+        <li onclick="check(this)"><div class="check"></div>"We're not like other agencies — we're operators, not account managers. Senior people embedded in the business."</li>
+        <li onclick="check(this)"><div class="check"></div>"Clients pay $5K–$25K/month. Most deals you'll set will be in the $3K–$10K range."</li>
+        <li onclick="check(this)"><div class="check"></div>Share screen → walk through Slides 2–3 of the onboarding slideshow</li>
+      </ul>
+      <div class="note">Don't go deep here. They don't need to be experts on the offer — just enough to sound credible and find pain.</div>
+    </div>
+  </div>
+
+  <!-- ====== SECTION 3: WHAT WE'RE SELLING NOW ====== -->
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <div class="section-number c3">3</div>
+      <div class="section-info">
+        <div class="section-title">What We're Selling Right Now</div>
+        <div class="section-desc">Websites + Ads — the current pitch angles</div>
+      </div>
+      <div class="section-time">5 min</div>
+    </div>
+    <div class="section-body">
+      <ul class="checklist">
+        <li onclick="check(this)"><div class="check"></div>"Right now we're going after <strong>real estate agents</strong>."</li>
+        <li onclick="check(this)"><div class="check"></div>"Most of these people have no website, or a trash template one. They're posting on Instagram but not converting."</li>
+        <li onclick="check(this)"><div class="check"></div>Explain the <strong>Website angle</strong>: "Hey, I tried to find your listings online but couldn't. You're losing customers because they can't find you."</li>
+        <li onclick="check(this)"><div class="check"></div>Explain the <strong>Ads angle</strong>: "You're relying on referrals. What if you had a system bringing in new leads every single day?"</li>
+        <li onclick="check(this)"><div class="check"></div>"You don't need to be an expert. Find the pain, book the call. The closer handles the rest."</li>
+        <li onclick="check(this)"><div class="check"></div>Share screen → Slide 3 (What You're Pitching Right Now)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ====== SECTION 4: YOUR ROLE ====== -->
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <div class="section-number c4">4</div>
+      <div class="section-info">
+        <div class="section-title">Your Role — What You Do and Don't Do</div>
+        <div class="section-desc">Filter, not pitcher. Book, don't close.</div>
+      </div>
+      <div class="section-time">3 min</div>
+    </div>
+    <div class="section-body">
+      <ul class="checklist">
+        <li onclick="check(this)"><div class="check"></div>"Your ONLY job: get qualified founders on a strategy call."</li>
+        <li onclick="check(this)"><div class="check"></div>"You do NOT pitch the offer. You do NOT talk pricing. You do NOT try to close."</li>
+        <li onclick="check(this)"><div class="check"></div>"You find pain, confirm fit, and book the call. That's it."</li>
+        <li onclick="check(this)"><div class="check"></div>"Say 'strategy session' — NEVER 'sales call' or 'pitch.'"</li>
+        <li onclick="check(this)"><div class="check"></div>"3 qualified bookings beats 8 unqualified. Close rate on bad leads is 0%."</li>
+        <li onclick="check(this)"><div class="check"></div>Share screen → Slide 4 (Your Role) + Slide 5 (ICP — Who to Book vs Drop)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ====== SECTION 5: THE SCRIPT ====== -->
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <div class="section-number c5">5</div>
+      <div class="section-info">
+        <div class="section-title">The Script — 4 Openers + 6-Phase Flow</div>
+        <div class="section-desc">Walk through each phase with examples</div>
+      </div>
+      <div class="section-time">12 min</div>
+    </div>
+    <div class="section-body">
+      <ul class="checklist">
+        <li onclick="check(this)"><div class="check"></div>Explain: "You have 4 opener styles. Pick the one that fits the lead."</li>
+        <li onclick="check(this)"><div class="check"></div><strong>Style 1 — Customer Approach:</strong> "I was trying to find a listing but couldn't on your site..." (walk through the full script)</li>
+        <li onclick="check(this)"><div class="check"></div><strong>Style 2 — Familiarity Play:</strong> "[Name]? What's up! We spoke a while back about getting you more clients..." (walk through response handling)</li>
+        <li onclick="check(this)"><div class="check"></div><strong>Style 3 — Website Gap:</strong> "I tried to schedule with you but there was no website..." (walk through)</li>
+        <li onclick="check(this)"><div class="check"></div><strong>Style 4 — Direct Cold Open:</strong> Classic "do you have 30 seconds?" (walk through)</li>
+        <li onclick="check(this)"><div class="check"></div>Walk through Phase 2: The Hook — "Is your growth systematic or figuring it out?"</li>
+        <li onclick="check(this)"><div class="check"></div>Walk through Phase 3: Dig Into Pain — the 5 questions, then recap</li>
+        <li onclick="check(this)"><div class="check"></div>Walk through Phase 4: The Bridge — connect pain to the strategy call</li>
+        <li onclick="check(this)"><div class="check"></div>Walk through Phase 5: Book the Call — either/or times + tie-downs (decision maker + financial)</li>
+        <li onclick="check(this)"><div class="check"></div>Walk through Phase 6: Show Rate System — 6 touchpoints</li>
+        <li onclick="check(this)"><div class="check"></div>Share screen → Slides 7–11 (full script walkthrough)</li>
+      </ul>
+      <div class="note">This is the longest section. Go slow. Read the scripts out loud. Make them repeat key lines back to you. "What do you say when they ask what you do?" — drill it.</div>
+      <div class="talk-track">
+        <div class="talk-label">Key Point to Hammer</div>
+        "Follow the script. Don't freelance. Don't 'make it your own' in week 1. Earn that right. The script works — trust it."
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SECTION 6: OBJECTIONS ====== -->
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <div class="section-number c6">6</div>
+      <div class="section-info">
+        <div class="section-title">Objection Handling</div>
+        <div class="section-desc">Top 5 pushbacks and exactly what to say</div>
+      </div>
+      <div class="section-time">5 min</div>
+    </div>
+    <div class="section-body">
+      <ul class="checklist">
+        <li onclick="check(this)"><div class="check"></div>"I'm not interested" → "Is that because growth is dialed in, or timing?"</li>
+        <li onclick="check(this)"><div class="check"></div>"Just send me an email" → "What's best email? And what's the biggest challenge right now?"</li>
+        <li onclick="check(this)"><div class="check"></div>"We already have an agency" → "Are you happy with the results?"</li>
+        <li onclick="check(this)"><div class="check"></div>"What do you guys do?" → Short answer + bridge back to booking</li>
+        <li onclick="check(this)"><div class="check"></div>"I don't have time" → "That's exactly why — 30 min to get your time back"</li>
+        <li onclick="check(this)"><div class="check"></div>Share screen → Slide 13 (Objection Handling)</li>
+      </ul>
+      <div class="talk-track">
+        <div class="talk-label">Principle</div>
+        "Handle and redirect. Don't argue. Don't debate. Acknowledge what they said, redirect to the pain, move forward. If they say no twice — respect it, move on. Next dial."
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SECTION 7: COMP ====== -->
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <div class="section-number c7">7</div>
+      <div class="section-info">
+        <div class="section-title">How You Get Paid</div>
+        <div class="section-desc">$20/show + 7% cash collected</div>
+      </div>
+      <div class="section-time">3 min</div>
+    </div>
+    <div class="section-body">
+      <ul class="checklist">
+        <li onclick="check(this)"><div class="check"></div><strong>$20 per shown call.</strong> "Not per booking — per SHOW. This is why the 6-touchpoint system matters."</li>
+        <li onclick="check(this)"><div class="check"></div><strong>7% of cash collected.</strong> "When your lead closes and pays, you get 7% of every dollar. $5K deal = $350."</li>
+        <li onclick="check(this)"><div class="check"></div>Walk through the math: "2 bookings/day × 80% show = 8 shows/week = $160. Plus 2 closes at $5K = $700. That's $860/week."</li>
+        <li onclick="check(this)"><div class="check"></div>Growth path: Setter → Senior Setter → Team Lead → Closer</li>
+        <li onclick="check(this)"><div class="check"></div>Share screen → Slide 19 (Compensation)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ====== SECTION 8: KPIs & EXPECTATIONS ====== -->
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <div class="section-number c6">8</div>
+      <div class="section-info">
+        <div class="section-title">KPIs, Schedule & Expectations</div>
+        <div class="section-desc">The standard. Perform or we part ways.</div>
+      </div>
+      <div class="section-time">5 min</div>
+    </div>
+    <div class="section-body">
+      <ul class="checklist">
+        <li onclick="check(this)"><div class="check"></div><strong>100+ dials per day.</strong> Not 50. One hundred. Minimum.</li>
+        <li onclick="check(this)"><div class="check"></div><strong>2-4 bookings per day.</strong> Quality > quantity.</li>
+        <li onclick="check(this)"><div class="check"></div><strong>80%+ show rate.</strong> If they don't show, that's on YOU — follow up harder.</li>
+        <li onclick="check(this)"><div class="check"></div><strong>EOD report every day.</strong> Dials, connects, bookings, shows. Miss one = conversation with me.</li>
+        <li onclick="check(this)"><div class="check"></div>Walk through the daily schedule: 9 AM pipeline → 10 AM dial block 1 → 12 PM lunch → 1 PM dial block 2 → 4 PM log + report</li>
+        <li onclick="check(this)"><div class="check"></div><strong>"If you can't get through your list today, this isn't the right fit."</strong></li>
+        <li onclick="check(this)"><div class="check"></div><strong>"Follow the script. Don't freelance. Earn that right."</strong></li>
+        <li onclick="check(this)"><div class="check"></div>Share screen → Slides 15–18 (Schedule, KPIs, Math, Expectations)</li>
+      </ul>
+      <div class="talk-track">
+        <div class="talk-label">Close This Section With</div>
+        "I'm not saying this to scare you. I'm saying this because the people who take this seriously make real money here. The people who treat it like a side gig don't last. I want you to last."
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SECTION 9: TODAY'S SETUP ====== -->
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <div class="section-number c8">9</div>
+      <div class="section-info">
+        <div class="section-title">Today's Setup — Get Them Dialing</div>
+        <div class="section-desc">Hand out leads, set up tools, start calling</div>
+      </div>
+      <div class="section-time">5 min</div>
+    </div>
+    <div class="section-body">
+      <ul class="checklist">
+        <li onclick="check(this)"><div class="check"></div>Send each setter their personal lead CSV (setter-1 through setter-5)</li>
+        <li onclick="check(this)"><div class="check"></div>"Open it in Google Sheets. Each row is a lead — name, phone, website, address, Google Maps link."</li>
+        <li onclick="check(this)"><div class="check"></div>"Add columns for: Call Outcome, Notes, Follow-Up Date, Booked Y/N"</li>
+        <li onclick="check(this)"><div class="check"></div>"GHL is down right now — so log everything in the sheet. When CRM is back, we migrate."</li>
+        <li onclick="check(this)"><div class="check"></div>Send links: Offer Breakdown (study guide) + Onboarding Slideshow (reference)</li>
+        <li onclick="check(this)"><div class="check"></div>"You have ~65 leads. Do 60-second research on each one before you dial. If you can't get through them all today, we have a problem."</li>
+        <li onclick="check(this)"><div class="check"></div>Set up voice chat (Discord/Zoom) — "Everyone dials in the same room. I'll be listening."</li>
+        <li onclick="check(this)"><div class="check"></div>"Questions? Then let's start dialing."</li>
+      </ul>
+      <div class="note"><strong>Links to share in chat:</strong><br>
+        Offer Study Guide: 247growth.org/offer-breakdown.html<br>
+        Onboarding Slides: 247growth.org/setter-onboarding.html<br>
+        Leads: 247growth.org/setter-1-leads.csv (through setter-5)</div>
+    </div>
+  </div>
+
+  <!-- ====== SECTION 10: Q&A ====== -->
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <div class="section-number c1">10</div>
+      <div class="section-info">
+        <div class="section-title">Q&A + Close</div>
+        <div class="section-desc">Answer questions, set expectations, go</div>
+      </div>
+      <div class="section-time">5 min</div>
+    </div>
+    <div class="section-body">
+      <ul class="checklist">
+        <li onclick="check(this)"><div class="check"></div>"Any questions before we start?"</li>
+        <li onclick="check(this)"><div class="check"></div>Answer questions — keep it tight, don't let it spiral</li>
+        <li onclick="check(this)"><div class="check"></div>"Alright. You have your leads, you have the script, you know the expectations. Let's go book some calls."</li>
+        <li onclick="check(this)"><div class="check"></div>"EOD report to me by 4:30 PM. Dials, connects, bookings. No exceptions."</li>
+        <li onclick="check(this)"><div class="check"></div>"Let's make money."</li>
+      </ul>
+      <div class="talk-track">
+        <div class="talk-label">Final Energy Check</div>
+        "I believe in each of you — that's why you're here. Now prove me right. First person to book a call drops it in the group chat. Let's go."
+      </div>
+    </div>
+  </div>
+
+  <!-- LINKS BOX -->
+  <div class="links-box">
+    <h3>Quick Links — Drop in Chat</h3>
+    <a href="https://247growth.org/offer-breakdown.html" target="_blank">247growth.org/offer-breakdown.html — Offer Study Guide</a>
+    <a href="https://247growth.org/setter-onboarding.html" target="_blank">247growth.org/setter-onboarding.html — Onboarding Slideshow</a>
+    <a href="https://247growth.org/setter-1-leads.csv">setter-1-leads.csv</a>
+    <a href="https://247growth.org/setter-2-leads.csv">setter-2-leads.csv</a>
+    <a href="https://247growth.org/setter-3-leads.csv">setter-3-leads.csv</a>
+    <a href="https://247growth.org/setter-4-leads.csv">setter-4-leads.csv</a>
+    <a href="https://247growth.org/setter-5-leads.csv">setter-5-leads.csv</a>
+  </div>
+
+</div>
+
+<script>
+  function toggle(header) {
+    header.closest('.section').classList.toggle('open');
+  }
+
+  function toggleAll() {
+    const sections = document.querySelectorAll('.section');
+    const allOpen = [...sections].every(s => s.classList.contains('open'));
+    sections.forEach(s => {
+      if (allOpen) s.classList.remove('open');
+      else s.classList.add('open');
+    });
+  }
+
+  function check(li) {
+    li.classList.toggle('done');
+    const checkEl = li.querySelector('.check');
+    checkEl.textContent = li.classList.contains('done') ? '✓' : '';
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const total = document.querySelectorAll('.checklist li').length;
+    const done = document.querySelectorAll('.checklist li.done').length;
+    document.getElementById('progress').style.width = ((done / total) * 100) + '%';
+  }
+</script>
+
+</body>
+</html>

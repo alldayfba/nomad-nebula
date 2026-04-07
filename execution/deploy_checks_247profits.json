@@ -1,0 +1,5 @@
+[
+    {"path": "/", "status": 200},
+    {"path": "/login", "status": 200, "auth_expected": true},
+    {"path": "/api/health", "status": 200}
+]

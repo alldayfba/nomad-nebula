@@ -49,27 +49,102 @@ Total call time: 2-3 minutes. That's it.
 
 ---
 
-## PHASE 1: PATTERN INTERRUPT
+## PHASE 1: PATTERN INTERRUPT — 6 OPENER STYLES
 **Goal:** Get 30 seconds of their time. That's all.
 **Time:** 10 seconds
 **Tone:** Calm. Direct. Slightly curious. NOT hyped up.
+**Key Rule:** Pick the opener that fits the lead and what you found in your 60-second research.
 
-### Primary Opener
+---
+
+### STYLE 1: The Customer Approach
+**Best for:** Leads with a bad or missing website. You sound like a real customer.
+
+> "Hey, I was actually trying to look for a [listing / appointment / service] but I wasn't able to find one on your site. I ended up going with someone else — but I think we could actually help you fix that so you don't lose future customers. That's actually how I found you."
+
+**Why it works:** You experienced their problem firsthand. It's not a pitch — it's feedback from a potential customer. Disarming and credible.
+
+---
+
+### STYLE 2: The Familiarity Play
+**Best for:** Any lead. Creates instant rapport by acting like you've spoken before.
+
+> "[Name]? [Name], what's up! This is [Your Name]. We spoke a while back about getting you more clients for your business — does that sound familiar?"
+
+**They'll say:** "Uh... who is this?" or "I don't remember..."
+
+> "Yeah no worries — we spoke a little while back about potentially getting you more clients. Is that something you're still looking into by any chance?"
+
+**Why it works:** People don't want to be rude to someone they might have talked to. Even when they realize they haven't, the door is already open. Gets a quick yes/no.
+
+---
+
+### STYLE 3: The Website Gap
+**Best for:** Leads with NO website or a clearly broken/outdated one.
+
+> "Hey man, I was trying to see where I could schedule [a consultation / an appointment / a service] with you guys, but there was no website — or at least I couldn't find one. I'm all good now, but do you still need a website? Because that's actually what we do."
+
+**Why it works:** You're pointing out a real problem they already know they have. Not pushy — helpful. Direct and to the point.
+
+---
+
+### STYLE 4: The Direct Cold Open
+**Best for:** When you have strong research to follow up with. Honest, no games.
 
 > "Hey [Name], this is [Your Name] — I know this is out of the blue, do you have 30 seconds?"
 
-### If They Push Back
+**Why it works:** Respectful of their time. Sets you apart from every other caller who launches into a pitch. Simple and professional.
+
+---
+
+### STYLE 5: The Social Media Observer
+**Best for:** Leads who are active on Instagram/Facebook but have no funnel or website behind it.
+
+> "Hey [Name], I was actually scrolling through your Instagram — your content is really solid. But I noticed you don't really have anywhere to send people when they want to work with you. Is that something you've been meaning to fix, or are you getting enough business from DMs?"
+
+**Why it works:** Compliment + observation. Shows you've done research. Opens the door to the website/funnel pitch without being pushy.
+
+---
+
+### STYLE 6: The Referral Frame
+**Best for:** Any lead. Creates trust by implying a connection.
+
+> "Hey [Name], your name came up when I was talking to someone in [their industry] in [their city] — they mentioned you were doing great work. Quick question: are you guys actively looking to grow right now, or are you at capacity?"
+
+**Why it works:** Referral framing immediately builds trust. "At capacity" is an either/or that gets them talking.
+
+---
+
+### Push-Back Responses (Works With Any Opener)
 
 | They Say | You Say |
 |---|---|
-| **"Who is this?"** / **"What's this about?"** | "Totally fair — I work with growth systems for founder-led businesses. I was looking at [their company] and had a quick question. Literally 30 seconds." |
-| **"I'm busy"** | "Totally get it. When's a better 2 minutes? I'll call you back then." |
+| **"Who is this?"** / **"What's this about?"** | "Totally fair — I work with growth systems for [their industry] businesses. I was looking at [their company] and had a quick question. Literally 30 seconds." |
+| **"I'm busy"** | "Totally get it. When's a better 2 minutes? I'll call you back then." (Then ACTUALLY call back.) |
 | **"How'd you get my number?"** | "Your business came up when I was researching [their industry] in [their area]. I'm not trying to waste your time — genuinely had a question about how you're handling growth. 30 seconds?" |
+| **"Not interested"** | "Totally respect that. Out of curiosity — is that because growth is already dialed in, or is it more of a timing thing?" |
+| **"Send me an email"** | "Happy to — what's the best email? And just so I send something relevant, what's the biggest marketing challenge you're dealing with right now?" |
+
+### Which Opener to Use — Quick Decision Tree
+
+```
+    Did you find their Instagram/social?
+    ├── YES + No website ──► STYLE 5 (Social Media Observer)
+    ├── YES + Has website ──► STYLE 1 (Customer Approach) or STYLE 4 (Direct)
+    └── NO
+        ├── No website at all ──► STYLE 3 (Website Gap)
+        ├── Has website but it's trash ──► STYLE 1 (Customer Approach)
+        ├── Can't find much info ──► STYLE 2 (Familiarity Play)
+        └── Found good info/reviews ──► STYLE 6 (Referral Frame)
+
+    Not sure? ──► Default to STYLE 4 (Direct Cold Open)
+```
 
 ### Rules
 - Do NOT say your company name — it means nothing to them yet
-- Do NOT pitch in the opener — you're asking for time, not selling
+- Do NOT pitch in the opener — you're buying time, not selling
 - Match their energy — relaxed person = relaxed tone, direct person = direct tone
+- If one style isn't working today, switch to another. Test and rotate.
 
 ---
 
@@ -273,13 +348,13 @@ Handle and redirect. Don't argue. Don't get stuck debating. Acknowledge, redirec
 
 # SECTION 4: YOUR NUMBERS
 
-## Daily Targets (50/50/50)
+## Daily Targets (100/50/50)
 
 ```
     ┌──────────────────────────────────┬─────────────┐
     │ Activity                         │ Daily Target │
     ├──────────────────────────────────┼─────────────┤
-    │ New cold dials                   │ 50           │
+    │ New cold dials                   │ 100          │
     │ Warm follow-ups                  │ 50           │
     │ Old lead re-engagement           │ 50           │
     │ Qualified conversations          │ 5-10         │
@@ -300,7 +375,7 @@ Handle and redirect. Don't argue. Don't get stuck debating. Acknowledge, redirec
                 Batch prep your dial list (60 sec per lead)
 
     10:00 AM ── DIAL BLOCK 1
-    ░░░░░░░░░░ New cold outreach — aim for 25+ dials
+    ░░░░░░░░░░ New cold outreach — aim for 50+ dials
     12:00 PM ──
 
     12:00 PM ── Lunch + follow-up texts/emails to warm leads
@@ -434,7 +509,7 @@ Do this for every lead. Not optional. Leads with context convert 3-4x higher.
     Protect their calendar like it's your own commission.
 
 6.  The math is simple.
-    50 dials → 10 conversations → 3 qualified → 2 booked → 1.5 show
+    100 dials → 20 conversations → 6 qualified → 4 booked → 3 show
     Do this every day and the numbers take care of themselves.
 
 7.  Energy is everything.

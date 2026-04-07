@@ -1,0 +1,49 @@
+{
+  "id": 236,
+  "hypothesis": "If we recategorize 1 memories from 'general', recall precision should improve",
+  "challenger": {
+    "hypothesis": "If we recategorize 1 memories from 'general', recall precision should improve",
+    "actions": [
+      [
+        "recategorize",
+        [
+          {
+            "id": 620,
+            "title": "2026-04-01: Massive build day \u2014 39 modified files, 353 new files, 9 new scripts",
+            "from": "general",
+            "to": "agency",
+            "score": 4
+          }
+        ]
+      ]
+    ],
+    "diagnostics": {
+      "general_count": 3,
+      "recategorize_candidates": [
+        {
+          "id": 620,
+          "title": "2026-04-01: Massive build day \u2014 39 modified files, 353 new files, 9 new scripts",
+          "from": "general",
+          "to": "agency",
+          "score": 4
+        }
+      ],
+      "duplicate_groups": {},
+      "dead_weight": [],
+      "no_tags_count": 0
+    }
+  },
+  "baseline_metric": 99.87,
+  "challenger_metric": 99.91,
+  "status": "keep",
+  "details": {
+    "ref": "{\"applied\": [\"Recategorized #620 '2026-04-01: Massive build day \\u2014 39 modif' \\u2192 agency\"], \"errors\": []}",
+    "metric": 99.91,
+    "applied_count": 1,
+    "error_count": 0,
+    "applied": [
+      "Recategorized #620 '2026-04-01: Massive build day \u2014 39 modif' \u2192 agency"
+    ]
+  },
+  "created_at": "2026-04-01T17:42:41.928394"
+}

@@ -1,0 +1,139 @@
+{
+  "id": 173,
+  "hypothesis": "Fix 45 skill system issues to improve execution quality",
+  "challenger": {
+    "hypothesis": "Fix 45 skill system issues to improve execution quality",
+    "issues": [
+      {
+        "type": "missing_directive",
+        "skill": "pipeline.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "jh-venus-fly-trap-ad-strategy.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "jh-scattered-to-scalable.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "build-site.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "jh-vsl-that-converts.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "memory.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "jh-upsell-ascension-path.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "jh-stabilize-cac-scaling.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "agent-training-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "agent-communication-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "api-cost-management-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "training-officer-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "multi-agent-mcp-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "context-management-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "bidirectional-sync-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "prompt-contracts-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "asset-generation-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "automation-builder-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "whisper-flow-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "testimonial-engine-sop.md",
+        "fix": "Create a skill that references this directive"
+      }
+    ],
+    "total_issues": 45
+  },
+  "baseline_metric": 82.14,
+  "challenger_metric": 82.14,
+  "status": "discard",
+  "details": {
+    "ref": "{\"fixed\": [], \"queued\": [\"Skill 'jh-venus-fly-trap-ad-strategy.md' needs a directive \\u2014 no auto-match found\", \"Skill 'jh-scattered-to-scalable.md' needs a directive \\u2014 no auto-match found\", \"Skill 'jh-vsl-that-converts.md' needs a directive \\u2014 no auto-match found\", \"Skill 'jh-upsell-ascension-path.md' needs a directive \\u2014 no auto-match found\", \"Skill 'jh-stabilize-cac-scaling.md' needs a directive \\u2014 no auto-match found\", \"Directive 'agent-training-sop.md' has no linked skill\", \"Directive 'agent-communication-sop.md' has no linked skill\", \"Directive 'api-cost-management-sop.md' has no linked skill\", \"Directive 'training-officer-sop.md' has no linked skill\", \"Directive 'multi-agent-mcp-sop.md' has no linked skill\", \"Directive 'context-management-sop.md' has no linked skill\", \"Directive 'bidirectional-sync-sop.md' has no linked skill\", \"Directive 'prompt-contracts-sop.md' has no linked skill\", \"Directive 'asset-generation-sop.md' has no linked skill\", \"Directive 'automation-builder-sop.md' has no linked skill\", \"Directive 'whisper-flow-sop.md' has no linked skill\", \"Directive 'testimonial-engine-sop.md' has no linked skill\"], \"skipped\": [\"Skill 'pipeline.md' already has ## Directive section\", \"Skill 'build-site.md' intentionally has no directive\", \"Skill 'memory.md' intentionally has no directive\"]}",
+    "metric": 82.14,
+    "fixed_count": 0,
+    "queued_count": 17,
+    "queued": [
+      "Skill 'jh-venus-fly-trap-ad-strategy.md' needs a directive \u2014 no auto-match found",
+      "Skill 'jh-scattered-to-scalable.md' needs a directive \u2014 no auto-match found",
+      "Skill 'jh-vsl-that-converts.md' needs a directive \u2014 no auto-match found",
+      "Skill 'jh-upsell-ascension-path.md' needs a directive \u2014 no auto-match found",
+      "Skill 'jh-stabilize-cac-scaling.md' needs a directive \u2014 no auto-match found",
+      "Directive 'agent-training-sop.md' has no linked skill",
+      "Directive 'agent-communication-sop.md' has no linked skill",
+      "Directive 'api-cost-management-sop.md' has no linked skill",
+      "Directive 'training-officer-sop.md' has no linked skill",
+      "Directive 'multi-agent-mcp-sop.md' has no linked skill",
+      "Directive 'context-management-sop.md' has no linked skill",
+      "Directive 'bidirectional-sync-sop.md' has no linked skill",
+      "Directive 'prompt-contracts-sop.md' has no linked skill",
+      "Directive 'asset-generation-sop.md' has no linked skill",
+      "Directive 'automation-builder-sop.md' has no linked skill",
+      "Directive 'whisper-flow-sop.md' has no linked skill",
+      "Directive 'testimonial-engine-sop.md' has no linked skill"
+    ]
+  },
+  "created_at": "2026-04-01T17:42:42.010858"
+}

@@ -186,6 +186,23 @@ Training Officer manages proposal lifecycle: detect → review → approve/rejec
 
 Skills reference directives at runtime (never duplicate content). Spec: `.claude/skills/_skillspec.md`.
 
+## Built-in Claude Code Commands
+
+These are native Claude Code features (not custom skills). Use them directly:
+
+| Command | Purpose |
+|---|---|
+| `/init` | Auto-generate optimized CLAUDE.md by scanning entire workspace — creates knowledge-compressed summary |
+| `/insights` | Analyze all conversation history for global patterns, generates HTML report with high-ROI learnings |
+| `/context` | Show current context window usage breakdown (system prompt %, tools %, available space) |
+| Agent Teams | Native multi-agent orchestration — team lead + specialist agents with direct inter-agent communication. Use for complex tasks requiring parallel specialized work. |
+
+**When to use:**
+- `/init` — when setting up a new project or after major restructuring
+- `/insights` — every 4-5 projects to extract cross-project patterns for global CLAUDE.md
+- `/context` — when debugging token usage or optimizing system prompt size
+- Agent Teams — for tasks needing 3+ specialized agents working together (e.g., research + build + review)
+
 ## Memory System v3.0 — SQLite + FTS5 (MANDATORY)
 
 Source of truth is **`/Users/Shared/antigravity/memory/ceo/memory.db`** (SQLite with FTS5 BM25 search). brain.md is now a generated export.
@@ -335,3 +352,5 @@ If Sabbo says "just do it", "skip the questions", or "don't verify" → bypass a
 9. [DATA] All student-related data (churn alerts, testimonials, Discord engagement, student profiles) syncs to 247profits.org. Only sales/pipeline data, ad metrics, and team performance go to 247growth.org.
 10. [FRONTEND] Always use getTodayEST() from @/lib/utils instead of new Date().toISOString().slice(0,10) for any date field default in forms or API fallbacks in saas-dashboard. All dates in this system are EST. new Date().toISOString() returns UTC which rolls to tomorrow after 8pm EDT.
 11. [TOOLING] All sourcing results pass through execution/verify_sourcing_results.py before output. Results with missing/invalid buy links, unknown retailer domains, failed product identity checks, or buy price >= Amazon price are automatically rejected or downgraded to RESEARCH. Finder/OOS modes output as RESEARCH (no retail source). A2A warehouse uses Amazon Warehouse URL as source_url.
+12. [COPY] NEVER include PPC, ACoS, advertising setup, or ad optimization as part of the Amazon OS / 24/7 Profits offer. The program teaches sourcing and selling — not PPC management. No PPC phase, module, or deliverable in any offer doc, course outline, landing page, or sales material.
+13. [SECURITY] NEVER write Discord bot code that dynamically searches for channels by keyword pattern (e.g. "team", "alert", "ops") to post to. This pattern leaks data into unrelated servers/channels. All Discord channel IDs must be explicitly configured and approved by Sabbo. Auto-posting tasks in discord.py cogs must have their code fully removed, not just disabled — disabled code can be re-enabled by bugs or restarts.

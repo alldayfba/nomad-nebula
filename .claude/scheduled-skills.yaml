@@ -131,50 +131,51 @@ schedules:
     description: Bidirectional student progress sync with 247profits.org SaaS
 
   # CSM — Coaching Cadence (accountability prompts)
+  # DISABLED 2026-04-07: All Discord sends require Sabbo's explicit approval (Learned Rule #6)
   - skill: student-health
     cron: "0 8 * * 1"            # 8 AM Mondays
     script: execution/coaching_cadence.py
     args: "send-accountability --day monday --channel-id 1250966307021656115"
-    auto_run: true
-    description: Monday focus accountability prompt in IC groupchat
+    auto_run: false
+    description: Monday focus accountability prompt in IC groupchat (DISABLED — requires approval)
 
   - skill: student-health
     cron: "0 8 * * 3"            # 8 AM Wednesdays
     script: execution/coaching_cadence.py
     args: "send-accountability --day wednesday --channel-id 1250966307021656115"
-    auto_run: true
-    description: Wednesday midweek check-in prompt
+    auto_run: false
+    description: Wednesday midweek check-in prompt (DISABLED — requires approval)
 
   - skill: student-health
     cron: "0 8 * * 5"            # 8 AM Fridays
     script: execution/coaching_cadence.py
     args: "send-accountability --day friday --channel-id 1250966307021656115"
-    auto_run: true
-    description: Friday win collection prompt
+    auto_run: false
+    description: Friday win collection prompt (DISABLED — requires approval)
 
   # CSM — Daily Challenges
   - skill: student-health
     cron: "0 9 * * *"            # 9 AM daily
     script: execution/coaching_cadence.py
     args: "send-challenge --channel-id 1250966307021656115"
-    auto_run: true
-    description: Daily group challenge post
+    auto_run: false
+    description: Daily group challenge post (DISABLED — requires approval)
 
   # CSM — Testimonial auto-requests
   - skill: student-health
     cron: "0 10 * * *"           # 10 AM daily
     script: execution/testimonial_engine.py
     args: "auto-request"
-    auto_run: true
-    description: Auto-request testimonials for qualifying milestone students
+    auto_run: false
+    description: Auto-request testimonials for qualifying milestone students (DISABLED — requires approval)
 
   # CSM — Graduation pipeline
   - skill: student-health
     cron: "0 8 * * 1"            # 8 AM Mondays (after graduation-check)
     script: execution/graduation_flow.py
     args: "send-next"
-    auto_run: true
-    description: Send next graduation sequence touchpoints
+    auto_run: false
+    description: Send next graduation sequence touchpoints (DISABLED — requires approval)
 
   # CSM — Auto-DM Outreach Engine (process queued touchpoints)
   - skill: student-health
@@ -219,28 +220,30 @@ schedules:
     description: Weekly churn root cause analysis
 
   # CSM — Milestone Rewards (scan for ungiven rewards)
+  # DISABLED 2026-04-07: Posts celebrations to Discord — requires Sabbo approval (Learned Rule #6)
   - skill: student-health
     cron: "0 8 * * *"            # 8 AM daily
     script: execution/milestone_rewards.py
     args: "scan"
-    auto_run: true
-    description: Check for milestone completions and grant rewards + celebrations
+    auto_run: false
+    description: Check for milestone completions and grant rewards + celebrations (DISABLED — requires approval)
 
   # CSM — Accountability Pods (weekly check-in)
+  # DISABLED 2026-04-07: Sends DMs to students — requires Sabbo approval (Learned Rule #6)
   - skill: student-health
     cron: "0 9 * * 0"            # 9 AM Sundays
     script: execution/accountability_pods.py
     args: "send-checkin"
-    auto_run: true
-    description: Weekly accountability pod check-in prompts
+    auto_run: false
+    description: Weekly accountability pod check-in prompts (DISABLED — requires approval)
 
   # CSM — Pod Rotation (monthly)
   - skill: student-health
     cron: "0 8 1 * *"            # 8 AM 1st of each month
     script: execution/accountability_pods.py
     args: "rotate"
-    auto_run: true
-    description: Monthly pod rotation for fresh accountability groups
+    auto_run: false
+    description: Monthly pod rotation for fresh accountability groups (DISABLED — requires approval)
 
   # ── Sync Orchestrator — Cross-System Data Bridges ──────────────────────
 

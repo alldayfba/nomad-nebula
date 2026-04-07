@@ -1,0 +1,49 @@
+{
+  "id": 216,
+  "hypothesis": "If we recategorize 1 memories from 'general', recall precision should improve",
+  "challenger": {
+    "hypothesis": "If we recategorize 1 memories from 'general', recall precision should improve",
+    "actions": [
+      [
+        "recategorize",
+        [
+          {
+            "id": 611,
+            "title": "John Mark Stevenson \u2014 info product mentor",
+            "from": "general",
+            "to": "content",
+            "score": 3
+          }
+        ]
+      ]
+    ],
+    "diagnostics": {
+      "general_count": 3,
+      "recategorize_candidates": [
+        {
+          "id": 611,
+          "title": "John Mark Stevenson \u2014 info product mentor",
+          "from": "general",
+          "to": "content",
+          "score": 3
+        }
+      ],
+      "duplicate_groups": {},
+      "dead_weight": [],
+      "no_tags_count": 0
+    }
+  },
+  "baseline_metric": 99.87,
+  "challenger_metric": 99.91,
+  "status": "keep",
+  "details": {
+    "ref": "{\"applied\": [\"Recategorized #611 'John Mark Stevenson \\u2014 info product mento' \\u2192 content\"], \"errors\": []}",
+    "metric": 99.91,
+    "applied_count": 1,
+    "error_count": 0,
+    "applied": [
+      "Recategorized #611 'John Mark Stevenson \u2014 info product mento' \u2192 content"
+    ]
+  },
+  "created_at": "2026-03-31T12:00:47.486102"
+}

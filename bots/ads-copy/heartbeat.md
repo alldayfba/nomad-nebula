@@ -12,9 +12,9 @@ You read this file every 60 minutes. It tells you your current state, what's pen
 ## Current Status
 
 ```
-Last heartbeat: [TIMESTAMP]
-Status: IDLE | RUNNING | WAITING_FOR_APPROVAL
-Current task: [description or "none"]
+Last heartbeat: 2026-03-26
+Status: IDLE
+Current task: none
 Next scheduled task: Morning briefing at 08:00
 ```
 
@@ -90,4 +90,4 @@ If any check fails, log to Flags section and message Sabbo.
 
 ---
 
-*Last updated: [TIMESTAMP]*
+*Last updated: 2026-03-26*

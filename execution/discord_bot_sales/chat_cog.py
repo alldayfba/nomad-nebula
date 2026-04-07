@@ -207,10 +207,18 @@ def _fetch_live_data() -> dict:
     return data
 
 
+_sync_lock = threading.Lock()
+_sync_running = False
+
+
 def _sync_outcomes_background():
     """Background thread: sync EOC reports into learning engine on boot + every 15min."""
+    global _sync_running
     if not _dashboard or not _learning:
         return
+    if not _sync_lock.acquire(blocking=False):
+        return  # Previous sync still running, skip this cycle
+    _sync_running = True
     try:
         # Get team member map for name resolution
         roster = _dashboard.get_team_roster() or []
@@ -230,6 +238,9 @@ def _sync_outcomes_background():
             print(f"[nova-sales] Learning engine synced {len(eoc)} EOC reports", file=sys.stderr)
     except Exception as e:
         print(f"[nova-sales] Learning sync error: {e}", file=sys.stderr)
+    finally:
+        _sync_running = False
+        _sync_lock.release()
 
 
 class ChatCog(commands.Cog):

@@ -1,3 +1,4 @@
+
 <!--
   ====================================
   GHL OPTIMIZED EXPIRED REPLAY PAGE
@@ -67,35 +68,8 @@
   }
 
   /* === FALLING AMAZON BOXES === */
-  #ghl-expired-wrapper .ghl-boxes-bg {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-  }
-
-  #ghl-expired-wrapper .ghl-box {
-    position: absolute;
-    font-size: 32px;
-    opacity: 0.04;
-    animation: ghl-fall linear infinite;
-    top: -60px;
-  }
-
-  @keyframes ghl-fall {
-    0% { transform: translateY(-60px) rotate(0deg); }
     100% { transform: translateY(110vh) rotate(360deg); }
   }
-
-  #ghl-expired-wrapper .ghl-box:nth-child(1) { left: 5%; animation-duration: 18s; animation-delay: 0s; font-size: 28px; }
-  #ghl-expired-wrapper .ghl-box:nth-child(2) { left: 15%; animation-duration: 22s; animation-delay: 3s; font-size: 36px; }
-  #ghl-expired-wrapper .ghl-box:nth-child(3) { left: 25%; animation-duration: 16s; animation-delay: 6s; font-size: 24px; }
-  #ghl-expired-wrapper .ghl-box:nth-child(4) { left: 38%; animation-duration: 20s; animation-delay: 1s; font-size: 30px; }
-  #ghl-expired-wrapper .ghl-box:nth-child(5) { left: 50%; animation-duration: 24s; animation-delay: 4s; font-size: 40px; }
-  #ghl-expired-wrapper .ghl-box:nth-child(6) { left: 62%; animation-duration: 17s; animation-delay: 7s; font-size: 26px; }
-  #ghl-expired-wrapper .ghl-box:nth-child(7) { left: 75%; animation-duration: 21s; animation-delay: 2s; font-size: 34px; }
-  #ghl-expired-wrapper .ghl-box:nth-child(8) { left: 88%; animation-duration: 19s; animation-delay: 5s; font-size: 28px; }
 
   /* Content Container */
   #ghl-expired-wrapper .ghl-wrap {
@@ -220,7 +194,7 @@
     font-size: 15px;
     line-height: 1.55;
     color: var(--text);
-    transition: all .2s ease;
+    transition: transform .2s ease, box-shadow .2s ease;
   }
 
   #ghl-expired-wrapper .ghl-missed-item:hover {
@@ -256,7 +230,7 @@
     text-decoration: none;
     text-align: center;
     box-shadow: 0 16px 48px rgba(139,92,246,.35), 0 0 30px rgba(139,92,246,.2);
-    transition: all .3s ease;
+    transition: transform .3s ease, box-shadow .3s ease;
     position: relative;
     overflow: hidden;
     cursor: pointer;
@@ -306,11 +280,7 @@
   #ghl-expired-wrapper .ghl-btn-arrow {
     display: inline-block;
     font-size: 18px;
-    animation: ghl-bounce-arrow 2s ease-in-out infinite;
   }
-
-  @keyframes ghl-bounce-arrow {
-    0%, 100% { transform: translateX(0); }
     50% { transform: translateX(5px); }
   }
 
@@ -389,7 +359,7 @@
     border-radius: 16px;
     padding: 28px 24px;
     text-align: center;
-    transition: all .3s ease;
+    transition: transform .3s ease, box-shadow .3s ease;
   }
 
   #ghl-expired-wrapper .ghl-result-card:hover {
@@ -489,10 +459,6 @@
 </style>
 
 <div id="ghl-expired-wrapper">
-
-  <!-- Falling Amazon Boxes Background -->
-  <div class="ghl-boxes-bg">
-    <div class="ghl-box">📦</div>
     <div class="ghl-box">📦</div>
     <div class="ghl-box">📦</div>
     <div class="ghl-box">📦</div>

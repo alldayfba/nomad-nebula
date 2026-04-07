@@ -46,10 +46,18 @@ STATE_FILE = TMP_DIR / "scan-state.json"
 CREATORS_DIR = PROJECT_ROOT / "bots" / "creators"
 AUDIO_DIR = TMP_DIR / "audio"
 
-# Use .venv314 yt-dlp binary if available (2026.3.13 — handles YouTube SABR enforcement)
+# Use .venv314 yt-dlp binary if available (2026.3.17 — handles YouTube SABR + JS challenges)
 # The .venv (Python 3.9) yt-dlp 2025.10.14 gets 403'd on downloads
 YTDLP_314 = PROJECT_ROOT / ".venv314" / "bin" / "yt-dlp"
 YTDLP_BIN = str(YTDLP_314) if YTDLP_314.exists() else "yt-dlp"
+
+# Ensure deno is in PATH for yt-dlp JS challenge solving
+DENO_PATH = "/opt/homebrew/bin"
+if DENO_PATH not in os.environ.get("PATH", ""):
+    os.environ["PATH"] = DENO_PATH + ":" + os.environ.get("PATH", "")
+
+# Common yt-dlp options for YouTube authentication
+YTDLP_COOKIE_ARGS = ["--cookies-from-browser", "chrome", "--remote-components", "ejs:github"]
 
 # Load .env
 try:
@@ -83,16 +91,12 @@ CREATORS = {
     },
     "jeremy-haynes": {
         "name": "Jeremy Haynes",
-        "youtube": "https://youtube.com/@JeremyHaynesDMM",
+        "youtube": "https://youtube.com/@JeremyHaynesTraining",
         "brain_file": "jeremy-haynes-brain.md",
         "focus": "paid ads, VSLs, direct response marketing, agency scaling",
     },
-    "johnny-mau": {
-        "name": "Johnny Mau",
-        "youtube": "https://youtube.com/@johnnymauu",
-        "brain_file": "johnny-mau-brain.md",
-        "focus": "high ticket sales, closing, B2B coaching",
-    },
+    # Johnny Mau — removed from YT scanner (no YouTube channel, TikTok/IG only)
+    # Ben Bader — removed from YT scanner (channel inactive)
     "tim-luong": {
         "name": "Tim Luong",
         "youtube": "https://youtube.com/@TimothyLuong_",
@@ -115,13 +119,25 @@ CREATORS = {
         "name": "Caleb Canales",
         "youtube": "https://youtube.com/@calebcanales",
         "brain_file": "caleb-canales-brain.md",
-        "focus": "agency building, client acquisition",
+        "focus": "agency building, client acquisition, Google Ads, AI media buying",
     },
-    "ben-bader": {
-        "name": "Ben Bader",
-        "youtube": "https://youtube.com/@benbader",
-        "brain_file": "ben-bader-brain.md",
-        "focus": "Amazon FBA, YouTube for coaches, AI positioning, traffic",
+    "brez-scales": {
+        "name": "Brez Scales",
+        "youtube": "https://youtube.com/@brezscales",
+        "brain_file": "brez-scales-brain.md",
+        "focus": "TikTok-first media buying, native content ads, ecommerce scaling",
+    },
+    "jason-wojo": {
+        "name": "Jason Wojo",
+        "youtube": "https://youtube.com/@jasonwojoofficial",
+        "brain_file": "jason-wojo-brain.md",
+        "focus": "paid ads for info products, SLO funnels, GoHighLevel, agency scaling",
+    },
+    "scott-kelly": {
+        "name": "Scott Kelly",
+        "youtube": "https://youtube.com/@scottkellybiz",
+        "brain_file": "scott-kelly-brain.md",
+        "focus": "webinar funnels, high-ticket sales, info product operations",
     },
 }
 
@@ -165,6 +181,8 @@ def list_youtube_videos(channel_url: str, max_videos: int = 20) -> list[dict]:
         "extract_flat": True,
         "skip_download": True,
         "ignoreerrors": True,
+        "cookiesfrombrowser": ("chrome",),
+        "extractor_args": {"youtubetab": {"skip": ["authcheck"]}},
     }
     if max_videos > 0:
         ydl_opts["playlistend"] = max_videos
@@ -196,7 +214,7 @@ def fetch_video_metadata(video_id: str) -> dict:
     """Fetch full metadata for a single video (title, date, description)."""
     try:
         import yt_dlp
-        ydl_opts = {"quiet": True, "no_warnings": True, "skip_download": True}
+        ydl_opts = {"quiet": True, "no_warnings": True, "skip_download": True, "cookiesfrombrowser": ("chrome",)}
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=False)
             if info:
@@ -242,6 +260,7 @@ def fetch_transcript_api(video_id: str) -> Optional[str]:
             "subtitleslangs": ["en"],
             "subtitlesformat": "vtt",
             "outtmpl": out_path,
+            "cookiesfrombrowser": ("chrome",),
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([f"https://www.youtube.com/watch?v={video_id}"])
@@ -280,17 +299,18 @@ def fetch_transcript_whisper(video_id: str) -> Optional[str]:
     audio_path = AUDIO_DIR / f"{video_id}.wav"
     mp4_path = AUDIO_DIR / f"{video_id}.mp4"
 
-    # Download audio using the newer yt-dlp binary (handles SABR/403)
+    # Download audio using the newer yt-dlp binary (handles SABR/403/JS challenges)
     try:
         url = f"https://www.youtube.com/watch?v={video_id}"
+        base_args = [YTDLP_BIN] + YTDLP_COOKIE_ARGS
         result = subprocess.run(
-            [YTDLP_BIN, "-f", "18", "-o", str(mp4_path), url],
+            base_args + ["-f", "18", "-o", str(mp4_path), url],
             capture_output=True, text=True, timeout=180,
         )
         if not mp4_path.exists():
             # Try without format constraint
             subprocess.run(
-                [YTDLP_BIN, "-f", "worstaudio", "-o", str(mp4_path), url],
+                base_args + ["-f", "worstaudio", "-o", str(mp4_path), url],
                 capture_output=True, text=True, timeout=180,
             )
 
@@ -349,26 +369,9 @@ def get_transcript(video_id: str) -> tuple[Optional[str], str]:
 # ---------------------------------------------------------------------------
 # Brain file update — append new video findings
 # ---------------------------------------------------------------------------
-def summarize_transcript(creator_name: str, title: str, transcript: str, focus: str) -> Optional[str]:
-    """Use Claude to extract key insights from a video transcript."""
-    try:
-        import anthropic
-    except ImportError:
-        log("ERROR: pip install anthropic")
-        return None
-
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        log("ERROR: ANTHROPIC_API_KEY not set")
-        return None
-
-    # Truncate transcript if too long (keep ~15K chars for Haiku)
-    max_chars = 40000
-    if len(transcript) > max_chars:
-        transcript = transcript[:max_chars] + "\n\n[TRANSCRIPT TRUNCATED]"
-
-    client = anthropic.Anthropic(api_key=api_key)
-    prompt = f"""Analyze this YouTube video transcript from {creator_name} and extract the key insights.
+def _build_summary_prompt(creator_name: str, title: str, transcript: str, focus: str) -> str:
+    """Build the analysis prompt for a video transcript."""
+    return f"""Analyze this YouTube video transcript from {creator_name} and extract the key insights.
 
 **Video Title:** {title}
 **Creator Focus Areas:** {focus}
@@ -394,16 +397,68 @@ Extract and return a structured summary in this EXACT markdown format (no other 
 
 Keep it concise but capture everything actionable. Skip sections if nothing relevant was discussed."""
 
+
+def _summarize_via_cli(prompt: str) -> Optional[str]:
+    """Summarize using claude CLI (Max plan — no API credits needed)."""
     try:
+        result = subprocess.run(
+            ["claude", "--print", "--model", "haiku"],
+            input=prompt, capture_output=True, text=True, timeout=120,
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            log("  Summarized via claude CLI (Max plan)")
+            return result.stdout.strip()
+        log(f"  claude CLI failed (rc={result.returncode}): {result.stderr[:200]}")
+    except FileNotFoundError:
+        log("  claude CLI not found")
+    except subprocess.TimeoutExpired:
+        log("  claude CLI timed out")
+    except Exception as e:
+        log(f"  claude CLI error: {e}")
+    return None
+
+
+def _summarize_via_api(prompt: str) -> Optional[str]:
+    """Summarize using Anthropic API (requires ANTHROPIC_API_KEY with credits)."""
+    try:
+        import anthropic
+    except ImportError:
+        return None
+
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        return None
+
+    try:
+        client = anthropic.Anthropic(api_key=api_key)
         response = client.messages.create(
             model="claude-haiku-4-5-20251001",
             max_tokens=2000,
             messages=[{"role": "user", "content": prompt}],
         )
+        log("  Summarized via API")
         return response.content[0].text
     except Exception as e:
-        log(f"  Claude API error: {e}")
+        log(f"  API fallback error: {e}")
         return None
+
+
+def summarize_transcript(creator_name: str, title: str, transcript: str, focus: str) -> Optional[str]:
+    """Summarize transcript — tries claude CLI (Max plan) first, then API fallback."""
+    # Truncate if too long
+    max_chars = 40000
+    if len(transcript) > max_chars:
+        transcript = transcript[:max_chars] + "\n\n[TRANSCRIPT TRUNCATED]"
+
+    prompt = _build_summary_prompt(creator_name, title, transcript, focus)
+
+    # Try claude CLI first (Max plan — no credits needed)
+    result = _summarize_via_cli(prompt)
+    if result:
+        return result
+
+    # Fallback to API
+    return _summarize_via_api(prompt)
 
 
 def append_to_brain_file(creator_slug: str, video_id: str, title: str,

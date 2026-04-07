@@ -1014,7 +1014,7 @@ class ChatCog(commands.Cog):
             await interaction.followup.send("Answering in this channel.", ephemeral=True)
 
             async def respond(text):
-                return await channel.send(text)
+                return await channel.send(text, silent=True)
 
             # Fetch recent channel context so Nova knows the conversation
             channel_context = await self._fetch_channel_context(channel)
@@ -1044,7 +1044,7 @@ class ChatCog(commands.Cog):
 
         # Respond in the private channel
         async def respond(text):
-            return await channel.send(text)
+            return await channel.send(text, silent=True)
 
         async with channel.typing():
             await self._handle_question(
@@ -1098,7 +1098,7 @@ class ChatCog(commands.Cog):
         channel_context = await self._fetch_channel_context(message.channel)
 
         async def respond(text):
-            return await message.channel.send(text)
+            return await message.channel.send(text, silent=True)
 
         # Extract image URLs from attachments + embeds + replied-to message
         image_urls = []

@@ -1,0 +1,139 @@
+{
+  "id": 212,
+  "hypothesis": "Fix 55 skill system issues to improve execution quality",
+  "challenger": {
+    "hypothesis": "Fix 55 skill system issues to improve execution quality",
+    "issues": [
+      {
+        "type": "missing_directive",
+        "skill": "jh-fix-your-call-funnel.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "pipeline.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "jh-operator-mindset.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "jh-venus-fly-trap-ad-strategy.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "jh-partner-webinar-system.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "jh-scattered-to-scalable.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "build-site.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "jh-planning-offsite.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "jh-ai-first-visibility.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "jh-recruit-top-closers.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "jh-vsl-that-converts.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "memory.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "blitz.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "jh-upsell-ascension-path.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "jh-stabilize-cac-scaling.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "jh-meta-ad-restrictions-prep.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "missing_directive",
+        "skill": "jh-pipeline-triage-desk.md",
+        "fix": "Link skill to appropriate directive or create one"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "agent-training-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "agent-communication-sop.md",
+        "fix": "Create a skill that references this directive"
+      },
+      {
+        "type": "orphan_directive",
+        "directive": "api-cost-management-sop.md",
+        "fix": "Create a skill that references this directive"
+      }
+    ],
+    "total_issues": 55
+  },
+  "baseline_metric": 73.85,
+  "challenger_metric": 73.85,
+  "status": "discard",
+  "details": {
+    "ref": "{\"fixed\": [], \"queued\": [\"Skill 'jh-fix-your-call-funnel.md' needs a directive \\u2014 no auto-match found\", \"Skill 'jh-operator-mindset.md' needs a directive \\u2014 no auto-match found\", \"Skill 'jh-venus-fly-trap-ad-strategy.md' needs a directive \\u2014 no auto-match found\", \"Skill 'jh-partner-webinar-system.md' needs a directive \\u2014 no auto-match found\", \"Skill 'jh-scattered-to-scalable.md' needs a directive \\u2014 no auto-match found\", \"Skill 'jh-planning-offsite.md' needs a directive \\u2014 no auto-match found\", \"Skill 'jh-ai-first-visibility.md' needs a directive \\u2014 no auto-match found\", \"Skill 'jh-recruit-top-closers.md' needs a directive \\u2014 no auto-match found\", \"Skill 'jh-vsl-that-converts.md' needs a directive \\u2014 no auto-match found\", \"Skill 'blitz.md' needs a directive \\u2014 no auto-match found\", \"Skill 'jh-upsell-ascension-path.md' needs a directive \\u2014 no auto-match found\", \"Skill 'jh-stabilize-cac-scaling.md' needs a directive \\u2014 no auto-match found\", \"Skill 'jh-meta-ad-restrictions-prep.md' needs a directive \\u2014 no auto-match found\", \"Skill 'jh-pipeline-triage-desk.md' needs a directive \\u2014 no auto-match found\", \"Directive 'agent-training-sop.md' has no linked skill\", \"Directive 'agent-communication-sop.md' has no linked skill\", \"Directive 'api-cost-management-sop.md' has no linked skill\"], \"skipped\": [\"Skill 'pipeline.md' already has ## Directive section\", \"Skill 'build-site.md' intentionally has no directive\", \"Skill 'memory.md' intentionally has no directive\"]}",
+    "metric": 73.85,
+    "fixed_count": 0,
+    "queued_count": 17,
+    "queued": [
+      "Skill 'jh-fix-your-call-funnel.md' needs a directive \u2014 no auto-match found",
+      "Skill 'jh-operator-mindset.md' needs a directive \u2014 no auto-match found",
+      "Skill 'jh-venus-fly-trap-ad-strategy.md' needs a directive \u2014 no auto-match found",
+      "Skill 'jh-partner-webinar-system.md' needs a directive \u2014 no auto-match found",
+      "Skill 'jh-scattered-to-scalable.md' needs a directive \u2014 no auto-match found",
+      "Skill 'jh-planning-offsite.md' needs a directive \u2014 no auto-match found",
+      "Skill 'jh-ai-first-visibility.md' needs a directive \u2014 no auto-match found",
+      "Skill 'jh-recruit-top-closers.md' needs a directive \u2014 no auto-match found",
+      "Skill 'jh-vsl-that-converts.md' needs a directive \u2014 no auto-match found",
+      "Skill 'blitz.md' needs a directive \u2014 no auto-match found",
+      "Skill 'jh-upsell-ascension-path.md' needs a directive \u2014 no auto-match found",
+      "Skill 'jh-stabilize-cac-scaling.md' needs a directive \u2014 no auto-match found",
+      "Skill 'jh-meta-ad-restrictions-prep.md' needs a directive \u2014 no auto-match found",
+      "Skill 'jh-pipeline-triage-desk.md' needs a directive \u2014 no auto-match found",
+      "Directive 'agent-training-sop.md' has no linked skill",
+      "Directive 'agent-communication-sop.md' has no linked skill",
+      "Directive 'api-cost-management-sop.md' has no linked skill"
+    ]
+  },
+  "created_at": "2026-04-06T08:00:40.254640"
+}
