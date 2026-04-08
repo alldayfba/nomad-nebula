@@ -64,6 +64,16 @@ CSV_NEW_OFFER_COUNT = 11   # Total new offers (FBA + FBM) — NOT reliable alone
 CSV_BUY_BOX_PRICE = 18
 CSV_USED_OFFER_COUNT = 27
 CSV_REVIEW_COUNT = 31
+CSV_COLLECTIBLE_PRICE = 5
+CSV_REFURBISHED_PRICE = 6
+CSV_NEW_FBM_SHIPPING = 7
+CSV_LIGHTNING_DEAL = 8
+CSV_WAREHOUSE_PRICE = 9
+CSV_REFURBISHED_OFFER_COUNT = 13
+CSV_COLLECTIBLE_OFFER_COUNT = 14
+CSV_RATING = 16
+CSV_BUY_BOX_USED = 32
+CSV_PRIME_EXCL = 33
 CSV_FBA_SELLER_COUNT = 34  # FBA-only seller count (Buy Box eligible)
 CSV_FBM_SELLER_COUNT = 35  # FBM-only seller count
 
@@ -143,20 +153,66 @@ def _csv_at(csv_data, index):
 class TokenBudget:
     """Allocates Keepa tokens across pipeline stages to prevent exhaustion.
 
+    Correct token costs (as of 2026):
+      - search_product():      1 token per ASIN
+      - get_product():         1 token per ASIN (no offers)
+      - get_product(offers=N): 1 + 6*ceil(N/10) tokens  (offers=20 = 13 tokens)
+      - get_product(buybox=1): +2 tokens per request
+      - get_bestsellers():     50 tokens per category
+      - get_deals():           5 tokens per page (150 results/page)
+      - product_finder():      5 tokens per request (up to 150 results)
+      - get_products_batch():  1 per ASIN + offers cost if requested
+
     Default allocation:
-      40% search — finding products
-      30% product — fetching details
-      30% offers  — seller verification (pro tier only)
+      35% search — finding products (search_product: 1 tok/ea)
+      25% product — fetching details (get_product: 1 tok/ea)
+      25% offers  — seller verification (get_product+offers: 13 tok/ea)
+      15% bulk    — bestsellers (50 tok), deals (5 tok/page), finder (5 tok)
     """
 
-    def __init__(self, total_tokens, search_pct=0.40, product_pct=0.30, offers_pct=0.30):
+    # ── Exact cost constants ────────────────────────────────────────────────
+    COST_SEARCH = 1             # search_product() per ASIN
+    COST_PRODUCT = 1            # get_product() per ASIN, no offers
+    COST_BUYBOX = 2             # +2 if buybox=1 is added to product request
+    COST_BESTSELLERS = 50       # get_bestsellers() per category
+    COST_DEALS_PER_PAGE = 5     # get_deals() per page (150 results/page)
+    COST_FINDER = 5             # product_finder() per request
+
+    @staticmethod
+    def offers_cost(num_offers):
+        """Calculate token cost for offers parameter.
+
+        Cost = 6 * ceil(num_offers / 10).
+        offers=20 -> 12 tokens.  offers=100 -> 60 tokens.
+        Total product+offers = 1 + offers_cost.
+        """
+        if not num_offers or num_offers <= 0:
+            return 0
+        import math
+        return 6 * math.ceil(num_offers / 10)
+
+    @staticmethod
+    def product_with_offers_cost(num_offers, buybox=False):
+        """Total cost for get_product() with offers and optional buybox.
+
+        get_product(offers=20)          -> 1 + 12 = 13 tokens
+        get_product(offers=20, buybox=1) -> 1 + 12 + 2 = 15 tokens
+        """
+        cost = TokenBudget.COST_PRODUCT + TokenBudget.offers_cost(num_offers)
+        if buybox:
+            cost += TokenBudget.COST_BUYBOX
+        return cost
+
+    def __init__(self, total_tokens, search_pct=0.35, product_pct=0.25,
+                 offers_pct=0.25, bulk_pct=0.15):
         self.total = total_tokens
         self.budgets = {
             "search": int(total_tokens * search_pct),
             "product": int(total_tokens * product_pct),
             "offers": int(total_tokens * offers_pct),
+            "bulk": int(total_tokens * bulk_pct),
         }
-        self.spent = {"search": 0, "product": 0, "offers": 0}
+        self.spent = {"search": 0, "product": 0, "offers": 0, "bulk": 0}
 
     def can_spend(self, stage, cost=1):
         """Check if we have budget for this stage."""
@@ -300,7 +356,7 @@ class KeepaClient:
         parsed["amazon_oos_pct"] = self.get_amazon_oos_pct(raw)
         return parsed
 
-    def get_products_batch(self, asins, domain=1, offers=0, stats=1):
+    def get_products_batch(self, asins, domain=1, offers=0, stats=180):
         """Fetch product data for multiple ASINs (max 100 per call).
 
         Token cost: 1 per ASIN + additional for offers.
@@ -335,7 +391,10 @@ class KeepaClient:
         return results
 
     def get_bestsellers(self, category_id, domain=1):
-        """Get bestseller ASINs for a Keepa category ID."""
+        """Get bestseller ASINs for a Keepa category ID.
+
+        Token cost: 50 tokens per request (NOT 1).
+        """
         data = self._request("bestsellers", {
             "domain": domain,
             "category": category_id,
@@ -344,63 +403,159 @@ class KeepaClient:
             return []
         return data.get("bestSellersList", {}).get("asinList", [])
 
+    # ── Deals API priceTypes mapping ────────────────────────────────────────
+    DEAL_PRICE_TYPES = {
+        "amazon": 0,
+        "new": 1,
+        "used": 2,
+        "sales": 3,       # Sales Rank
+        "fba": 10,
+        "buybox": 18,
+        "warehouse": 31,
+        "lightning": 8,
+        "prime_excl": 29,
+    }
+
+    # ── Deals API sortType mapping ──────────────────────────────────────────
+    DEAL_SORT_TYPES = {
+        "newest": 1,       # By date added
+        "delta": 2,        # By absolute price change
+        "rank": 3,         # By sales rank
+        "percent": 4,      # By percentage change
+    }
+
     def get_deals(self, category=0, domain=1, price_range=(500, 5000),
-                  sort_by=3, count=150):
+                  sort_by=3, count=150, page=0,
+                  # Full queryJSON support
+                  delta_range=None, delta_percent_range=None,
+                  sales_rank_range=None, price_types=None,
+                  title_search="", brand=None,
+                  is_lowest=False, is_lowest_90=False,
+                  is_out_of_stock=False, is_back_in_stock=False,
+                  must_have_amazon_offer=False, must_not_have_amazon_offer=False,
+                  has_reviews=True, is_prime_exclusive=False,
+                  single_variation=False, min_rating=None,
+                  warehouse_conditions=None, date_range=0,
+                  sort_desc=False, max_pages=1):
         """Fetch current Keepa deals (products with recent price changes).
 
-        Uses POST endpoint. Returns products sorted by price volatility.
+        Uses POST endpoint. Full queryJSON support.
 
         Args:
             category: Keepa category ID (0 = all categories)
             domain: 1 = Amazon.com
             price_range: (min_cents, max_cents) — e.g. (500, 5000) = $5-$50
-            sort_by: 3 = by delta percentage
-            count: max results (up to 150 per request)
+            sort_by: sortType 1-4 (newest, delta, rank, percent)
+            count: max results total (paginated at 150/page)
+            page: starting page (0-indexed)
+            delta_range: (min_cents, max_cents) absolute price change range
+            delta_percent_range: (min_pct, max_pct) percentage change range
+            sales_rank_range: (min_bsr, max_bsr)
+            price_types: list of priceType ints (default [0] = Amazon)
+            title_search: filter by title keyword
+            brand: list of brand names to filter
+            is_lowest: only products at lowest ever price
+            is_lowest_90: only products at lowest 90-day price
+            is_out_of_stock: only OOS products
+            is_back_in_stock: only recently back-in-stock products
+            must_have_amazon_offer: Amazon must be a seller
+            must_not_have_amazon_offer: Amazon must NOT be a seller
+            has_reviews: must have reviews
+            is_prime_exclusive: Prime Exclusive deals only
+            single_variation: only single-variation listings
+            min_rating: minimum rating * 10 (e.g. 40 = 4.0 stars)
+            warehouse_conditions: list of warehouse condition ints [1,2,3,4,5]
+            date_range: 0=24h, 1=3d, 2=7d, 3=14d, 4=30d, 5=90d
+            sort_desc: negate sortType for descending
+            max_pages: max pages to fetch (up to 67 for 10,000 results)
 
-        Cost: 5 tokens per request.
+        Cost: 5 tokens per page (150 results/page).
         Returns: list of deal dicts with ASIN, title, prices, delta.
         """
-        self._rate_limit()
+        if price_types is None:
+            price_types = [0]
+        if sales_rank_range is None:
+            sales_rank_range = [1, 500000]
+
+        effective_sort = sort_by if not sort_desc else -sort_by
+
         selection = {
-            "page": 0,
+            "page": page,
             "domainId": domain,
             "excludeCategories": [],
             "includeCategories": [category] if category else [],
-            "priceTypes": [0],  # 0 = Amazon price
-            "salesRankRange": [1, 500000],
+            "priceTypes": price_types,
+            "salesRankRange": list(sales_rank_range),
             "currentRange": list(price_range),
-            "isLowest": False,
-            "isLowestOffer": False,
-            "isOutOfStock": False,
-            "titleSearch": "",
+            "isLowest": is_lowest,
+            "isLowestOffer": is_lowest_90,
+            "isOutOfStock": is_out_of_stock,
+            "titleSearch": title_search or "",
             "isRangeEnabled": True,
             "isFilterEnabled": True,
-            "hasReviews": True,
-            "isPrimeExclusive": False,
-            "mustHaveAmazonOffer": False,
-            "mustNotHaveAmazonOffer": False,
-            "sortType": sort_by,
-            "dateRange": 0,  # 0 = last 24h
+            "hasReviews": has_reviews,
+            "isPrimeExclusive": is_prime_exclusive,
+            "mustHaveAmazonOffer": must_have_amazon_offer,
+            "mustNotHaveAmazonOffer": must_not_have_amazon_offer,
+            "sortType": effective_sort,
+            "dateRange": date_range,
         }
 
-        try:
-            r = requests.post(
-                f"{self.BASE_URL}/deal",
-                params={"key": self.api_key, "domain": domain},
-                json=selection,
-                timeout=30,
-            )
-            if r.status_code != 200:
-                print(f"[keepa] Deals HTTP {r.status_code}: {r.text[:200]}",
-                      file=sys.stderr)
-                return []
-            data = r.json()
-            self.tokens_left = data.get("tokensLeft")
-        except Exception as e:
-            print(f"[keepa] Deals request error: {e}", file=sys.stderr)
-            return []
+        # Optional filters
+        if delta_range:
+            selection["deltaRange"] = list(delta_range)
+        if delta_percent_range:
+            selection["deltaPercentRange"] = list(delta_percent_range)
+        if brand:
+            selection["brand"] = brand if isinstance(brand, list) else [brand]
+        if single_variation:
+            selection["singleVariation"] = True
+        if min_rating is not None:
+            selection["minRating"] = min_rating
+        if warehouse_conditions:
+            selection["warehouseConditions"] = warehouse_conditions
+        if is_back_in_stock:
+            selection["isBackInStock"] = True
 
-        deal_items = data.get("deals", {}).get("dr", [])
+        all_deals_raw = []
+        pages_to_fetch = min(max_pages, 67)  # Max 67 pages = ~10,000 results
+        current_page = page
+
+        for pg in range(pages_to_fetch):
+            selection["page"] = current_page
+
+            self._rate_limit()
+            try:
+                r = requests.post(
+                    f"{self.BASE_URL}/deal",
+                    params={"key": self.api_key, "domain": domain},
+                    json=selection,
+                    timeout=30,
+                )
+                if r.status_code != 200:
+                    print(f"[keepa] Deals HTTP {r.status_code}: {r.text[:200]}",
+                          file=sys.stderr)
+                    break
+                data = r.json()
+                self.tokens_left = data.get("tokensLeft")
+            except Exception as e:
+                print(f"[keepa] Deals request error: {e}", file=sys.stderr)
+                break
+
+            page_items = data.get("deals", {}).get("dr", [])
+            if not page_items:
+                break
+
+            all_deals_raw.extend(page_items)
+            print(f"  [keepa] Deals page {current_page}: {len(page_items)} items "
+                  f"(total: {len(all_deals_raw)}, tokens left: {self.tokens_left})",
+                  file=sys.stderr)
+
+            if len(all_deals_raw) >= count:
+                break
+            current_page += 1
+
+        deal_items = all_deals_raw[:count]
 
         deals = []
         for d in deal_items[:count]:
@@ -565,6 +720,77 @@ class KeepaClient:
             offers_data=None,  # filled later if offers param was used
         )
 
+        # ── Additional Prices (CSV) ──────────────────────────────────────
+        collectible_price = _last_valid_price(_csv_at(csv_data, CSV_COLLECTIBLE_PRICE))
+        refurbished_price = _last_valid_price(_csv_at(csv_data, CSV_REFURBISHED_PRICE))
+        new_fbm_shipping = _last_valid_price(_csv_at(csv_data, CSV_NEW_FBM_SHIPPING))
+        lightning_deal = _last_valid_price(_csv_at(csv_data, CSV_LIGHTNING_DEAL))
+        warehouse_price = _last_valid_price(_csv_at(csv_data, CSV_WAREHOUSE_PRICE))
+        buy_box_used = _last_valid_price(_csv_at(csv_data, CSV_BUY_BOX_USED))
+        prime_excl = _last_valid_price(_csv_at(csv_data, CSV_PRIME_EXCL))
+
+        # ── Additional Offer Counts (CSV) ────────────────────────────────
+        refurbished_offer_count = _last_valid_raw(_csv_at(csv_data, CSV_REFURBISHED_OFFER_COUNT))
+        collectible_offer_count = _last_valid_raw(_csv_at(csv_data, CSV_COLLECTIBLE_OFFER_COUNT))
+        csv_rating = _last_valid_raw(_csv_at(csv_data, CSV_RATING))
+        if csv_rating is not None:
+            csv_rating = csv_rating / 10.0  # Keepa stores rating * 10
+
+        # ── Sales Velocity (FREE — already in product response) ──────────
+        monthly_sold = raw.get('monthlySold')
+        monthly_sold_history = raw.get('monthlySoldHistory')
+
+        # ── Exact Fees (FREE — already in product response) ──────────────
+        fba_fees = raw.get('fbaFees')
+        referral_fee_percentage = raw.get('referralFeePercentage')
+
+        # ── Coupons & Promotions (FREE) ──────────────────────────────────
+        coupon = raw.get('coupon')
+        coupon_history = raw.get('couponHistory')
+        promotions = raw.get('promotions')
+        is_sns = raw.get('isSNS', False)
+
+        # ── Availability (FREE) ──────────────────────────────────────────
+        availability_amazon = raw.get('availabilityAmazon')
+        availability_amazon_delay = raw.get('availabilityAmazonDelay')
+        return_rate = raw.get('returnRate')
+
+        # ── Buy Box Details (FREE with stats) ────────────────────────────
+        buy_box_seller_id_history = raw.get('buyBoxSellerIdHistory')
+        buy_box_used_history = raw.get('buyBoxUsedHistory')
+        buy_box_eligible_offer_counts = raw.get('buyBoxEligibleOfferCounts')
+
+        # ── Deals (FREE) ─────────────────────────────────────────────────
+        deals = raw.get('deals')
+        is_adult_product = raw.get('isAdultProduct', False)
+        is_heat_sensitive = raw.get('isHeatSensitive', False)
+
+        # ── Sales Rank Reference ─────────────────────────────────────────
+        sales_rank_reference = raw.get('salesRankReference')
+        sales_ranks = raw.get('salesRanks')
+
+        # ── Stats Object Parsing ─────────────────────────────────────────
+        stats_parsed = {}
+        if stats:
+            stats_parsed['sales_rank_drops_30'] = stats.get('salesRankDrops30')
+            stats_parsed['sales_rank_drops_90'] = stats.get('salesRankDrops90')
+            stats_parsed['sales_rank_drops_180'] = stats.get('salesRankDrops180')
+            stats_parsed['out_of_stock_count_amazon_30'] = stats.get('outOfStockCountAmazon30')
+            stats_parsed['out_of_stock_count_amazon_90'] = stats.get('outOfStockCountAmazon90')
+            stats_parsed['out_of_stock_percentage_30'] = stats.get('outOfStockPercentage30')
+            stats_parsed['out_of_stock_percentage_90'] = stats.get('outOfStockPercentage90')
+            stats_parsed['buy_box_stats'] = stats.get('buyBoxStats')
+            stats_parsed['buy_box_used_stats'] = stats.get('buyBoxUsedStats')
+            stats_parsed['buy_box_is_amazon'] = stats.get('buyBoxIsAmazon')
+            stats_parsed['buy_box_is_fba'] = stats.get('buyBoxIsFBA')
+            stats_parsed['buy_box_seller_id'] = stats.get('buyBoxSellerId')
+            stats_parsed['buy_box_availability_message'] = stats.get('buyBoxAvailabilityMessage')
+            stats_parsed['offer_count_fba'] = stats.get('offerCountFBA')
+            stats_parsed['offer_count_fbm'] = stats.get('offerCountFBM')
+            stats_parsed['stock_amazon'] = stats.get('stockAmazon')
+            stats_parsed['is_addon_item'] = stats.get('isAddonItem')
+            stats_parsed['lightning_deal_info'] = stats.get('lightningDealInfo')
+
         return {
             "asin": raw.get("asin", ""),
             "title": raw.get("title", ""),
@@ -577,15 +803,54 @@ class KeepaClient:
             "fba_price": fba_price,
             "buy_box_price": buy_box_price,
             "sell_price": sell_price,
+            # Additional prices
+            "collectible_price": collectible_price,
+            "refurbished_price": refurbished_price,
+            "new_fbm_shipping": new_fbm_shipping,
+            "lightning_deal": lightning_deal,
+            "warehouse_price": warehouse_price,
+            "buy_box_used": buy_box_used,
+            "prime_exclusive": prime_excl,
             # Rankings
             "bsr": int(bsr) if bsr else None,
             "review_count": review_count,
             "rating": rating,
+            "csv_rating": csv_rating,
             # Seller counts (CORRECT — index 34/35)
             "fba_seller_count": fba_seller_count,
             "fbm_seller_count": fbm_seller_count,
             "total_offer_count": total_offer_count,
+            "refurbished_offer_count": int(refurbished_offer_count) if refurbished_offer_count is not None else None,
+            "collectible_offer_count": int(collectible_offer_count) if collectible_offer_count is not None else None,
             "amazon_on_listing": amazon_on_listing,
+            # Sales Velocity
+            "monthly_sold": monthly_sold,
+            "monthly_sold_history": monthly_sold_history,
+            # Exact Fees
+            "fba_fees": fba_fees,
+            "referral_fee_percentage": referral_fee_percentage,
+            # Coupons & Promotions
+            "coupon": coupon,
+            "coupon_history": coupon_history,
+            "promotions": promotions,
+            "is_sns": is_sns,
+            # Availability
+            "availability_amazon": availability_amazon,
+            "availability_amazon_delay": availability_amazon_delay,
+            "return_rate": return_rate,
+            # Buy Box Details
+            "buy_box_seller_id_history": buy_box_seller_id_history,
+            "buy_box_used_history": buy_box_used_history,
+            "buy_box_eligible_offer_counts": buy_box_eligible_offer_counts,
+            # Deals
+            "deals": deals,
+            "is_adult_product": is_adult_product,
+            "is_heat_sensitive": is_heat_sensitive,
+            # Sales Rank Reference
+            "sales_rank_reference": sales_rank_reference,
+            "sales_ranks": sales_ranks,
+            # Stats (parsed from stats object)
+            "stats_data": stats_parsed,
             # Analysis
             "price_trends": price_trends,
             "private_label": pl_result,
@@ -1406,6 +1671,287 @@ class KeepaClient:
         except Exception as e:
             print(f"[keepa] get_brand_catalog error: {e}", file=sys.stderr)
             return []
+
+
+    # ── Seller API Methods ────────────────────────────────────────────────
+
+    def get_seller_info(self, seller_id, domain=1, storefront=False):
+        """Fetch seller data via the /seller endpoint.
+
+        Args:
+            seller_id: Amazon seller ID (e.g. 'A1B2C3D4E5')
+            domain: 1 = Amazon.com
+            storefront: If True, include full storefront ASIN list (costs 10 tokens
+                        instead of 1 token per seller).
+
+        Returns: Raw seller dict from Keepa, or None.
+        Cost: 1 token per seller (without storefront), 10 tokens per seller (with storefront).
+        """
+        params = {'domain': domain, 'seller': seller_id}
+        if storefront:
+            params['storefront'] = 1
+        data = self._request('seller', params)
+        if not data or not data.get('sellers'):
+            return None
+        sellers = data['sellers']
+        if isinstance(sellers, dict):
+            return sellers.get(seller_id)
+        return None
+
+    def get_sellers_batch(self, seller_ids, domain=1, storefront=False):
+        """Fetch seller data for multiple seller IDs in one call (up to 100).
+
+        Args:
+            seller_ids: List of Amazon seller IDs
+            domain: 1 = Amazon.com
+            storefront: If True, include storefront ASIN lists (10 tokens each)
+
+        Returns: Dict mapping seller_id -> raw seller data dict.
+        Cost: 1 token per seller (without storefront), 10 tokens per seller (with storefront).
+        """
+        if not seller_ids:
+            return {}
+        batch = seller_ids[:100]
+        params = {
+            'domain': domain,
+            'seller': ','.join(batch),
+        }
+        if storefront:
+            params['storefront'] = 1
+        data = self._request('seller', params)
+        if not data or not data.get('sellers'):
+            return {}
+        sellers = data['sellers']
+        if isinstance(sellers, dict):
+            return sellers
+        return {}
+
+    def parse_seller(self, seller_data):
+        """Parse a raw Keepa seller object into a structured dict with analytics.
+
+        Args:
+            seller_data: Raw seller dict from Keepa /seller endpoint.
+
+        Returns: Structured dict with seller analytics, or empty dict if no data.
+        """
+        if not seller_data:
+            return {}
+
+        return {
+            'seller_id': seller_data.get('sellerId', ''),
+            'seller_name': seller_data.get('sellerName', ''),
+            'has_fba': seller_data.get('hasFBA', False),
+            'ships_from_china': seller_data.get('shipsFromChina', False),
+            'buy_box_new_ownership_rate': seller_data.get('buyBoxNewOwnershipRate'),
+            'buy_box_used_ownership_rate': seller_data.get('buyBoxUsedOwnershipRate'),
+            'avg_buy_box_competitors': seller_data.get('avgBuyBoxCompetitors'),
+            'total_storefront_asins': seller_data.get('totalStorefrontAsins'),
+            'business_name': seller_data.get('businessName', ''),
+            'business_type': seller_data.get('businessType', ''),
+            'address': seller_data.get('address', ''),
+            'rating_count': seller_data.get('ratingCount'),       # [30d, 90d, 365d, lifetime]
+            'positive_rating': seller_data.get('positiveRating'),  # [30d, 90d, 365d, lifetime]
+            'negative_rating': seller_data.get('negativeRating'),  # [30d, 90d, 365d, lifetime]
+            'recent_feedback': seller_data.get('recentFeedback'),
+            'category_stats': seller_data.get('sellerCategoryStatistics'),
+            'brand_stats': seller_data.get('sellerBrandStatistics'),
+            'competitors': seller_data.get('competitors'),         # Top 5 competing sellers
+            'asin_list': seller_data.get('asinList', []),
+            'asin_list_last_seen': seller_data.get('asinListLastSeen', []),
+        }
+
+    def get_top_sellers(self, domain=1):
+        """Get up to 100,000 most rated seller IDs.
+
+        Token cost: 50 tokens per request.
+        """
+        params = {'domain': domain}
+        resp = self._request('topseller', params)
+        if not resp:
+            return []
+        return resp.get('sellerIdList', [])
+
+    # ── Category Lookup Methods ──────────────────────────────────────────
+
+    def category_lookup(self, category_id, domain=1, parents=False):
+        """Get category details. category_id=0 for all root categories.
+
+        Token cost: 1 per request.
+        """
+        params = {'key': self.api_key, 'domain': domain, 'category': category_id}
+        if parents:
+            params['parents'] = 1
+        resp = self._request('category', params)
+        if not resp:
+            return {}
+        return resp.get('categories', {})
+
+    def category_search(self, term, domain=1):
+        """Search categories by name. Returns up to 50 matches.
+
+        Token cost: 1 per request.
+        """
+        params = {'key': self.api_key, 'domain': domain, 'type': 'category', 'term': term}
+        resp = self._request('search', params)
+        if not resp:
+            return {}
+        return resp.get('categories', {})
+
+    # ── Enhanced Deals Method ────────────────────────────────────────────
+
+    def get_deals_advanced(self, domain=1, price_types=None, include_categories=None,
+                           exclude_categories=None, title_search="", brand=None,
+                           current_range=None, delta_range=None, delta_percent_range=None,
+                           sales_rank_range=None, is_lowest=False, is_lowest_offer=False,
+                           is_out_of_stock=False, is_back_in_stock=False,
+                           must_not_have_amazon_offer=False, must_have_amazon_offer=False,
+                           is_lowest_90=False, warehouse_conditions=None,
+                           has_reviews=True, is_prime_exclusive=False,
+                           sort_type=3, date_range=0, page=0, count=150):
+        """Full-spec Keepa Deals API query supporting ALL queryJSON parameters.
+
+        Args:
+            price_types: list of price type indices (0-33). Default [0] (Amazon).
+            include_categories: list of category IDs to include
+            exclude_categories: list of category IDs to exclude
+            title_search: filter by title substring
+            brand: filter by brand name
+            current_range: [min_cents, max_cents] current price filter
+            delta_range: [min_cents, max_cents] absolute price change filter
+            delta_percent_range: [min_pct, max_pct] percentage change filter
+            sales_rank_range: [min_bsr, max_bsr] sales rank filter
+            is_lowest: at historical lowest
+            is_lowest_offer: at lowest offer price
+            is_out_of_stock: currently OOS
+            is_back_in_stock: recently back in stock
+            must_not_have_amazon_offer: Amazon not selling
+            must_have_amazon_offer: Amazon must be selling
+            is_lowest_90: at 90-day lowest
+            warehouse_conditions: list of warehouse condition ints (1-5)
+            has_reviews: must have reviews
+            is_prime_exclusive: Prime exclusive deals
+            sort_type: 1=current, 2=delta, 3=deltaPercent, 4=salesRank (negative=inverted)
+            date_range: 0=24h, 1=7d, 2=30d, 3=90d
+            page: page number (0-indexed)
+            count: max results (up to 150)
+
+        Token cost: 5 per request.
+        Returns: list of deal dicts.
+        """
+        self._rate_limit()
+        selection = {
+            "page": page,
+            "domainId": domain,
+            "excludeCategories": exclude_categories or [],
+            "includeCategories": include_categories or [],
+            "priceTypes": price_types if price_types is not None else [0],
+            "salesRankRange": sales_rank_range or [1, 500000],
+            "currentRange": current_range or [0, -1],
+            "isLowest": is_lowest,
+            "isLowestOffer": is_lowest_offer,
+            "isOutOfStock": is_out_of_stock,
+            "titleSearch": title_search,
+            "isRangeEnabled": True,
+            "isFilterEnabled": True,
+            "hasReviews": has_reviews,
+            "isPrimeExclusive": is_prime_exclusive,
+            "mustHaveAmazonOffer": must_have_amazon_offer,
+            "mustNotHaveAmazonOffer": must_not_have_amazon_offer,
+            "sortType": sort_type,
+            "dateRange": date_range,
+        }
+
+        # Optional filters
+        if delta_range:
+            selection["deltaRange"] = delta_range
+        if delta_percent_range:
+            selection["deltaPercentRange"] = delta_percent_range
+        if is_back_in_stock:
+            selection["isBackInStock"] = True
+        if is_lowest_90:
+            selection["isLowest90"] = True
+        if warehouse_conditions:
+            selection["warehouseConditions"] = warehouse_conditions
+        if brand:
+            selection["brand"] = brand
+
+        try:
+            r = requests.post(
+                f"{self.BASE_URL}/deal",
+                params={"key": self.api_key, "domain": domain},
+                json=selection,
+                timeout=30,
+            )
+            if r.status_code != 200:
+                print(f"[keepa] Advanced Deals HTTP {r.status_code}: {r.text[:200]}",
+                      file=sys.stderr)
+                return []
+            data = r.json()
+            self.tokens_left = data.get("tokensLeft")
+        except Exception as e:
+            print(f"[keepa] Advanced Deals request error: {e}", file=sys.stderr)
+            return []
+
+        deal_items = data.get("deals", {}).get("dr", [])
+
+        deals = []
+        for d in deal_items[:count]:
+            asin = d.get("asin", "")
+            title = d.get("title", "")
+            current = d.get("current", [])
+            delta = d.get("delta", [])
+            delta_pct = d.get("deltaPercent", [])
+
+            # Best available price from current array
+            best_price = 0
+            for idx in [18, 0, 1, 10]:  # Buy Box, Amazon, New 3P, FBA
+                if isinstance(current, list) and len(current) > idx:
+                    val = current[idx]
+                    if isinstance(val, (int, float)) and val > 0:
+                        best_price = val / 100.0
+                        break
+
+            if best_price <= 0:
+                continue
+
+            # Price delta from first price type
+            price_delta = 0
+            pct_delta = 0
+            if delta and isinstance(delta, list) and len(delta) > 0:
+                row = delta[0]
+                if isinstance(row, list) and len(row) > 0:
+                    val = row[0]
+                    if isinstance(val, (int, float)):
+                        price_delta = val / 100.0
+            if delta_pct and isinstance(delta_pct, list) and len(delta_pct) > 0:
+                row = delta_pct[0]
+                if isinstance(row, list) and len(row) > 0:
+                    val = row[0]
+                    if isinstance(val, (int, float)):
+                        pct_delta = val
+
+            cat_name = ""
+            cat_tree = d.get("categoryTree")
+            if cat_tree and isinstance(cat_tree, list):
+                cat_name = cat_tree[-1].get("name", "") if cat_tree else ""
+
+            deals.append({
+                "asin": asin,
+                "title": title,
+                "current_price": round(best_price, 2),
+                "previous_price": round(best_price - price_delta, 2),
+                "delta_percent": round(pct_delta, 1),
+                "category": cat_name,
+                "bsr": d.get("salesRank") or 0,
+                "image": d.get("image", ""),
+                "current_raw": current,
+                "delta_raw": delta,
+                "delta_percent_raw": delta_pct,
+            })
+
+        print(f"[keepa] Advanced Deals API returned {len(deals)} items (cost: 5 tokens)",
+              file=sys.stderr)
+        return deals
 
 
 def _fuzzy_brand_match(brand, seller_name):

@@ -31,6 +31,87 @@ PROJECT_ROOT = Path(__file__).parent.parent
 TMP_DIR = PROJECT_ROOT / ".tmp" / "sourcing"
 TMP_DIR.mkdir(parents=True, exist_ok=True)
 
+USE_KEEPA_SELLER = os.environ.get("SELLER_SCAN_USE_KEEPA", "1").lower() in ("1", "true", "yes")
+
+
+# ── Seller Quality Scoring ──────────────────────────────────────────────────
+
+def score_seller(seller_data):
+    """Score seller quality 0-100 based on Keepa seller data.
+
+    Higher score = better candidate for storefront scanning.
+    Uses parsed seller analytics (from KeepaClient.parse_seller).
+    """
+    if not seller_data:
+        return 50  # baseline if no data
+
+    score = 50  # baseline
+
+    # Positive signals
+    if seller_data.get("has_fba"):
+        score += 10
+
+    positive_rating = seller_data.get("positive_rating")
+    if positive_rating and isinstance(positive_rating, list) and len(positive_rating) > 0:
+        if positive_rating[0] and positive_rating[0] > 95:  # 30-day positive >95%
+            score += 10
+
+    bb_rate = seller_data.get("buy_box_new_ownership_rate")
+    if bb_rate is not None and bb_rate > 30:
+        score += 10
+
+    total_asins = seller_data.get("total_storefront_asins")
+    if total_asins is not None:
+        if 20 <= total_asins <= 500:
+            score += 5  # Good size storefront
+        elif total_asins > 5000:
+            score -= 5  # Likely wholesale/bulk
+
+    # Negative signals
+    if seller_data.get("ships_from_china"):
+        score -= 20
+
+    negative_rating = seller_data.get("negative_rating")
+    if negative_rating and isinstance(negative_rating, list) and len(negative_rating) > 0:
+        if negative_rating[0] and negative_rating[0] > 5:  # 30-day negative >5%
+            score -= 15
+
+    rating_count = seller_data.get("rating_count")
+    if rating_count and isinstance(rating_count, list) and len(rating_count) > 3:
+        if rating_count[3] is not None and rating_count[3] < 100:  # lifetime < 100 ratings
+            score -= 10
+
+    return max(0, min(100, score))
+
+
+def get_sellers_via_keepa(seller_ids, storefront=False):
+    """Batch fetch seller data from Keepa /seller endpoint.
+
+    Args:
+        seller_ids: List of seller ID strings (up to 100).
+        storefront: If True, include storefront ASINs (10 tokens each vs 1 token).
+
+    Returns: Dict mapping seller_id -> parsed seller analytics dict.
+    Cost: 1 token per seller (without storefront), 10 tokens per seller (with storefront).
+    """
+    from keepa_client import KeepaClient
+    keepa = KeepaClient()
+
+    print(f"\n[keepa] Batch fetching {len(seller_ids)} sellers "
+          f"({'storefront' if storefront else 'info only'})...", file=sys.stderr)
+
+    raw_sellers = keepa.get_sellers_batch(seller_ids, storefront=storefront)
+
+    results = {}
+    for sid, raw in raw_sellers.items():
+        parsed = keepa.parse_seller(raw)
+        parsed["quality_score"] = score_seller(parsed)
+        results[sid] = parsed
+
+    print(f"  [keepa] Got data for {len(results)}/{len(seller_ids)} sellers", file=sys.stderr)
+    return results
+
+
 # ── Playwright context (reused) ──────────────────────────────────────────────
 
 _pw_context = None
@@ -50,11 +131,19 @@ def _get_pw_context():
     return _pw_context
 
 
-def get_sellers_from_keepa(asin, max_reviews=100):
-    """Get all sellers on a listing via Keepa offers data.
+def get_sellers_from_keepa(asin, max_reviews=100, enrich_with_seller_api=True):
+    """Get all sellers on a listing via Keepa offers data, optionally enriched
+    with the /seller endpoint for quality scoring and analytics.
 
-    Returns list of seller dicts with seller_id, seller_name, is_fba, price.
-    Costs 21 tokens (1 product + 20 offers).
+    Args:
+        asin: Amazon ASIN to pull sellers from.
+        max_reviews: Max review count filter (used downstream).
+        enrich_with_seller_api: If True, batch-fetch seller data via /seller
+            endpoint (1 token per seller) for quality scoring.
+
+    Returns: (sellers_list, product_dict).
+    Base cost: 21 tokens (1 product + 20 offers).
+    Enrichment cost: +1 token per seller.
     """
     from keepa_client import KeepaClient
     keepa = KeepaClient()
@@ -74,6 +163,29 @@ def get_sellers_from_keepa(asin, max_reviews=100):
               f"{'[AMZ]' if s['is_amazon'] else '     '} "
               f"${s['price']:.2f} — {s['seller_name']} ({s['seller_id']})",
               file=sys.stderr)
+
+    # Enrich with Keepa /seller endpoint for quality scoring + analytics
+    if enrich_with_seller_api and USE_KEEPA_SELLER and offers:
+        third_party_ids = [
+            s["seller_id"] for s in offers
+            if not s.get("is_amazon") and s.get("seller_id")
+        ]
+        if third_party_ids:
+            seller_analytics = get_sellers_via_keepa(third_party_ids, storefront=False)
+            for s in offers:
+                sid = s.get("seller_id", "")
+                if sid in seller_analytics:
+                    s["keepa_seller"] = seller_analytics[sid]
+                    s["quality_score"] = seller_analytics[sid].get("quality_score", 50)
+                    # Use Keepa rating count instead of scraping the feedback page
+                    rc = seller_analytics[sid].get("rating_count")
+                    if rc and isinstance(rc, list) and len(rc) > 3 and rc[3] is not None:
+                        s["keepa_review_count"] = rc[3]  # lifetime rating count
+                    print(f"    [enriched] {s['seller_name']} — "
+                          f"score:{s['quality_score']} "
+                          f"fba:{seller_analytics[sid].get('has_fba')} "
+                          f"china:{seller_analytics[sid].get('ships_from_china')}",
+                          file=sys.stderr)
 
     return offers, product
 
@@ -674,11 +786,19 @@ def main():
     parser.add_argument("--output-asins", type=str, default="",
                        help="Discovery mode: output ASINs to this file (skip Keepa verify). "
                             "Pipe into source.py batch for retail matching.")
+    parser.add_argument("--no-keepa-seller", action="store_true",
+                       help="Skip Keepa /seller enrichment — use Playwright for review counts")
+    parser.add_argument("--min-seller-score", type=int, default=0,
+                       help="Min seller quality score (0-100) to include (default: 0, no filter)")
 
     args = parser.parse_args()
 
-    # Step 1: Get sellers from Keepa
-    sellers, product = get_sellers_from_keepa(args.asin)
+    global USE_KEEPA_SELLER
+    if args.no_keepa_seller:
+        USE_KEEPA_SELLER = False
+
+    # Step 1: Get sellers from Keepa (offers data + optional seller enrichment)
+    sellers, product = get_sellers_from_keepa(args.asin, enrich_with_seller_api=USE_KEEPA_SELLER)
     if not sellers:
         print("No sellers found on listing.", file=sys.stderr)
         return
@@ -688,17 +808,38 @@ def main():
     print(f"\n[scan] {len(third_party)} third-party sellers (excluding Amazon)", file=sys.stderr)
 
     # Step 2: Check review counts and filter
+    # If Keepa seller enrichment is available, use keepa_review_count to skip
+    # the slow Playwright feedback page scrape.
     qualified_sellers = []
     for s in third_party:
         seller_id = s.get("seller_id", "")
         if not seller_id:
             continue
 
-        review_count, display_name, storefront_url = get_seller_review_count(seller_id)
-
-        if review_count is None:
-            print(f"  [skip] Could not check reviews for {seller_id}", file=sys.stderr)
+        # Quality score gate (only when enriched)
+        seller_score = s.get("quality_score", 50)
+        if args.min_seller_score > 0 and seller_score < args.min_seller_score:
+            keepa_seller = s.get("keepa_seller", {})
+            china_flag = " [CHINA]" if keepa_seller.get("ships_from_china") else ""
+            print(f"  [skip] {s.get('seller_name', seller_id)}: "
+                  f"quality score {seller_score} < {args.min_seller_score}{china_flag}",
+                  file=sys.stderr)
             continue
+
+        # Try Keepa review count first (free — already fetched), else Playwright
+        keepa_rc = s.get("keepa_review_count")
+        if keepa_rc is not None:
+            review_count = keepa_rc
+            display_name = s.get("seller_name", "")
+            storefront_url = f"https://www.amazon.com/s?me={seller_id}"
+            print(f"  [keepa] {display_name or seller_id}: {review_count} lifetime ratings "
+                  f"(score: {seller_score})", file=sys.stderr)
+        else:
+            review_count, display_name, storefront_url = get_seller_review_count(seller_id)
+            if review_count is None:
+                print(f"  [skip] Could not check reviews for {seller_id}", file=sys.stderr)
+                continue
+            time.sleep(2)
 
         if review_count <= args.max_reviews:
             qualified_sellers.append({
@@ -706,34 +847,58 @@ def main():
                 "review_count": review_count,
                 "display_name": display_name or s.get("seller_name", ""),
                 "storefront_url": storefront_url,
+                "quality_score": seller_score,
             })
-            print(f"  ✓ {display_name or seller_id}: {review_count} reviews — QUALIFIED", file=sys.stderr)
+            print(f"  QUALIFIED: {display_name or seller_id}: {review_count} reviews "
+                  f"(score: {seller_score})", file=sys.stderr)
         else:
-            print(f"  ✗ {display_name or seller_id}: {review_count} reviews — too many", file=sys.stderr)
-
-        time.sleep(2)
+            print(f"  TOO MANY: {display_name or seller_id}: {review_count} reviews", file=sys.stderr)
 
     if not qualified_sellers:
         print(f"\nNo sellers with <{args.max_reviews} reviews found.", file=sys.stderr)
         return
 
+    # Sort by quality score (best first) so we scan highest-quality sellers first
+    qualified_sellers.sort(key=lambda x: x.get("quality_score", 50), reverse=True)
     print(f"\n[scan] {len(qualified_sellers)} sellers qualify (<{args.max_reviews} reviews)", file=sys.stderr)
 
     # Step 3: Scrape each seller's storefront
+    # If Keepa seller data includes storefront ASINs, use those instead of Playwright
     all_storefront_products = []
     for seller in qualified_sellers:
-        print(f"\n[storefront] Scanning: {seller['display_name']} ({seller['review_count']} reviews)...",
-              file=sys.stderr)
-        products = scrape_storefront(
-            seller["seller_id"],
-            seller["display_name"],
-            max_pages=args.max_pages,
-        )
+        keepa_seller = seller.get("keepa_seller", {})
+        keepa_asins = keepa_seller.get("asin_list", [])
+
+        if USE_KEEPA_SELLER and keepa_asins:
+            # Use Keepa storefront data (already fetched, no extra tokens)
+            print(f"\n[storefront] {seller['display_name']} — "
+                  f"{len(keepa_asins)} ASINs from Keepa seller data", file=sys.stderr)
+            products = [
+                {
+                    "asin": asin,
+                    "title": "",
+                    "price": None,
+                    "url": f"https://www.amazon.com/dp/{asin}",
+                }
+                for asin in keepa_asins
+                if isinstance(asin, str) and len(asin) == 10
+            ]
+        else:
+            # Fall back to Playwright storefront scrape
+            print(f"\n[storefront] Scanning: {seller['display_name']} "
+                  f"({seller['review_count']} reviews)...", file=sys.stderr)
+            products = scrape_storefront(
+                seller["seller_id"],
+                seller["display_name"],
+                max_pages=args.max_pages,
+            )
+            time.sleep(2)
+
         for p in products:
             p["source_seller"] = seller["display_name"]
             p["source_seller_id"] = seller["seller_id"]
+            p["source_seller_score"] = seller.get("quality_score", 50)
         all_storefront_products.extend(products)
-        time.sleep(2)
 
     # Deduplicate across sellers
     seen_asins = set()

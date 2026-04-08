@@ -15,7 +15,15 @@ Modes:
 Zero-token-first principle:
   1. FREE: Scrape retailers via Playwright (0 Keepa tokens)
   2. CHEAP: Verify top candidates on Amazon via Keepa search (1 token/ea)
-  3. EXPENSIVE: Deep verify top hits with offers data (21 tokens/ea) — optional
+  3. EXPENSIVE: Deep verify top hits with offers data (13 tokens/ea for offers=20) — optional
+
+Token costs (correct as of 2026):
+  - search_product: 1 token/ASIN
+  - get_product (no offers): 1 token/ASIN
+  - get_product (offers=20): 1 + 6*ceil(20/10) = 13 tokens/ASIN
+  - get_bestsellers: 50 tokens/category
+  - buybox=1 parameter: +2 tokens/request
+  - get_deals: 5 tokens/page (150 results/page)
 
 Usage:
   python execution/source.py brand "Jellycat" --retailers target,walgreens,walmart
@@ -1025,7 +1033,18 @@ def verify_on_amazon(candidates, max_verify=20, deep_verify=5, min_profit=2.0):
         }
 
         try:
-            prof = calculate_product_profitability(product_data, auto_cashback=True)
+            prof = calculate_product_profitability(
+                product_data, auto_cashback=True,
+                keepa_referral_fee_pct=product.get('referral_fee_percentage'),
+                keepa_fba_fees=product.get('fba_fees'),
+                keepa_monthly_sold=product.get('monthly_sold'),
+                keepa_sales_rank_drops_30=product.get('stats_data', {}).get('sales_rank_drops_30') if product.get('stats_data') else None,
+                availability_amazon=product.get('availability_amazon'),
+                return_rate=product.get('return_rate'),
+                is_sns=product.get('is_sns'),
+                coupon=product.get('coupon'),
+                buy_box_is_amazon=product.get('stats_data', {}).get('buy_box_is_amazon') if product.get('stats_data') else None,
+            )
         except Exception as e:
             print(f"    → Profitability calc error: {e}", file=sys.stderr)
             continue
@@ -1052,6 +1071,36 @@ def verify_on_amazon(candidates, max_verify=20, deep_verify=5, min_profit=2.0):
         # Also factor in retail→amazon title match
         combined_conf = min(cand_conf, retail_amazon_confidence)
 
+        # Build risk flags
+        risk_flags = []
+        if amazon_on:
+            risk_flags.append("amazon_on_listing")
+        if product.get("is_sns"):
+            risk_flags.append("subscribe_and_save")
+        if product.get("return_rate") and product["return_rate"] > 10:
+            risk_flags.append(f"high_return_rate_{product['return_rate']}%")
+        if product.get("is_adult_product"):
+            risk_flags.append("adult_product")
+        if product.get("is_heat_sensitive"):
+            risk_flags.append("heat_sensitive")
+        if isinstance(pl, dict) and pl.get("is_private_label"):
+            risk_flags.append("possible_private_label")
+
+        # Availability status
+        avail_amazon = product.get("availability_amazon")
+        if avail_amazon is not None:
+            # Keepa codes: 0=in stock, -1=OOS, -2=no offer
+            if avail_amazon == 0:
+                avail_status = "in_stock"
+            elif avail_amazon == -1:
+                avail_status = "out_of_stock"
+            elif avail_amazon == -2:
+                avail_status = "no_offer"
+            else:
+                avail_status = f"delayed_{avail_amazon}d"
+        else:
+            avail_status = "unknown"
+
         verified.append({
             # Standardized output fields (Sabbo's requested format)
             "asin": product.get("asin", ""),
@@ -1077,6 +1126,16 @@ def verify_on_amazon(candidates, max_verify=20, deep_verify=5, min_profit=2.0):
             "brand": brand,
             "auto_ungated": ungated,
             "profitability": prof,
+            # New enriched fields
+            "monthly_sold": product.get("monthly_sold"),
+            "risk_flags": risk_flags,
+            "referral_fee_pct": product.get("referral_fee_percentage"),
+            "fba_fee_exact": product.get("fba_fees"),
+            "availability_amazon": avail_status,
+            "is_sns": product.get("is_sns", False),
+            "coupon": product.get("coupon"),
+            "return_rate": product.get("return_rate"),
+            "buy_box_is_amazon": product.get("stats_data", {}).get("buy_box_is_amazon") if product.get("stats_data") else None,
             "pack_info": {
                 "retail_title": name,
                 "amazon_title": amazon_title,
@@ -1109,10 +1168,11 @@ def verify_on_amazon(candidates, max_verify=20, deep_verify=5, min_profit=2.0):
 
 
 def _deep_verify_results(results, keepa):
-    """Phase C: Deep verify with offers data (21 tokens each).
+    """Phase C: Deep verify with offers data (13 tokens each for offers=20).
+    Cost: 1 (product) + 6*ceil(20/10) (offers) = 13 tokens per ASIN.
     Updates results in-place with definitive seller/PL info."""
     print(f"\n[verify] Phase C: Deep-verifying top {len(results)} hits "
-          f"(21 tokens each)...", file=sys.stderr)
+          f"(13 tokens each)...", file=sys.stderr)
 
     for r in results:
         asin = r.get("asin")
@@ -1824,9 +1884,10 @@ def format_results(results, mode_name=""):
     lines.append(f"{'='*70}\n")
 
     # Summary table
-    lines.append(f"{'#':>2} {'ASIN':<12} {'Amazon Title':<30} {'AMZ$':>6} "
-                 f"{'Source':>8} {'Buy$':>6} {'Profit':>7} {'ROI':>5} {'Match':>10}")
-    lines.append("─" * 100)
+    lines.append(f"{'#':>2} {'ASIN':<12} {'Amazon Title':<28} {'AMZ$':>6} "
+                 f"{'Source':>8} {'Buy$':>6} {'Profit':>7} {'ROI':>5} "
+                 f"{'Mo.Sold':>7} {'Avail':>8} {'Match':>10}")
+    lines.append("─" * 120)
 
     for i, r in enumerate(results, 1):
         verdict = r.get("verdict") or r.get("profitability", {}).get("verdict") or "?"
@@ -1844,9 +1905,18 @@ def format_results(results, mode_name=""):
             conf_str = "Unverified"
         match_str = f"{'UPC' if method == 'upc' else 'Title'} {conf_str}"
 
-        lines.append(f"{i:>2} {r.get('asin',''):<12} {title[:28]:<30} ${amz_price:>5.2f} "
+        # New columns
+        mo_sold = r.get("monthly_sold")
+        mo_sold_str = str(mo_sold) if mo_sold is not None else "-"
+        avail = r.get("availability_amazon", "")
+        avail_str = avail[:8] if avail else "-"
+        flags = r.get("risk_flags", [])
+        flag_marker = " !" if flags else ""
+
+        lines.append(f"{i:>2} {r.get('asin',''):<12} {title[:26]:<28} ${amz_price:>5.2f} "
                      f"{retailer:>8} ${buy_cost:>5.2f} ${profit:>5.2f} {roi:>4.0f}% "
-                     f"{match_str:>10} [{verdict}]")
+                     f"{mo_sold_str:>7} {avail_str:>8} "
+                     f"{match_str:>10} [{verdict}]{flag_marker}")
 
     # Detail section with links
     lines.append(f"\n{'─'*70}")
@@ -1864,6 +1934,39 @@ def format_results(results, mode_name=""):
         if r.get("brand"):
             ungated_tag = " [AUTO-UNGATED]" if r.get("auto_ungated") else ""
             lines.append(f"  Brand: {r['brand']}{ungated_tag}")
+
+        # New enriched fields: monthly sold, fees, availability, risk flags
+        monthly_sold = r.get("monthly_sold")
+        if monthly_sold is not None:
+            lines.append(f"  Monthly Sold: {monthly_sold}")
+
+        referral_pct = r.get("referral_fee_pct")
+        fba_fee = r.get("fba_fee_exact")
+        if referral_pct is not None or fba_fee is not None:
+            fee_parts = []
+            if referral_pct is not None:
+                fee_parts.append(f"Referral: {referral_pct}%")
+            if fba_fee is not None:
+                if isinstance(fba_fee, dict):
+                    pick_pack = fba_fee.get("pickAndPackFee", 0)
+                    fee_parts.append(f"FBA: ${pick_pack / 100:.2f}" if pick_pack else f"FBA: {fba_fee}")
+                else:
+                    fee_parts.append(f"FBA: ${fba_fee / 100:.2f}" if isinstance(fba_fee, (int, float)) and fba_fee > 10 else f"FBA: {fba_fee}")
+            lines.append(f"  Exact Fees: {' | '.join(fee_parts)}")
+
+        avail = r.get("availability_amazon")
+        if avail and avail != "unknown":
+            lines.append(f"  Amazon Availability: {avail}")
+
+        risk_flags = r.get("risk_flags", [])
+        if risk_flags:
+            lines.append(f"  Risk Flags: {', '.join(risk_flags)}")
+
+        if r.get("is_sns"):
+            lines.append(f"  Subscribe & Save: YES")
+
+        if r.get("coupon"):
+            lines.append(f"  Coupon: {r['coupon']}")
 
         # Pack info
         if pack.get("retail_pack") or pack.get("amazon_pack"):

@@ -43,6 +43,7 @@ CONVERGENCE_THRESHOLD = 3  # sellers adding same ASIN within window -> HOT DEAL
 CONVERGENCE_WINDOW_HOURS = 24
 RETIREMENT_DAYS = 30  # seller flagged quiet after this many days of inactivity
 DISCORD_WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL", "")
+USE_KEEPA_API = os.environ.get("STOREFRONT_USE_KEEPA", "1").lower() in ("1", "true", "yes")
 
 
 def _get_db():
@@ -176,7 +177,105 @@ def _build_stage2_embed(
     }
 
 
-# ── Amazon scraper ───────────────────────────────────────────────────────────
+# ── Keepa API storefront fetch ───────────────────────────────────────────────
+
+def _fetch_storefront_keepa(seller_id: str) -> list:
+    """Fetch seller storefront via Keepa API /seller?storefront=1 endpoint.
+
+    Returns a list of dicts: [{'asin': str, 'last_seen': int|None}, ...]
+    Cost: 10 tokens per seller.
+    """
+    try:
+        from keepa_client import KeepaClient
+        client = KeepaClient()
+        seller_data = client.get_seller_info(seller_id, storefront=True)
+        if not seller_data:
+            logger.warning("[monitor] Keepa seller API returned no data for %s", seller_id)
+            return []
+
+        asins = seller_data.get("asinList", [])
+        last_seen = seller_data.get("asinListLastSeen", [])
+
+        products = []
+        for i, asin in enumerate(asins):
+            if asin and isinstance(asin, str) and len(asin) == 10:
+                products.append({
+                    "asin": asin,
+                    "last_seen": last_seen[i] if i < len(last_seen) else None,
+                })
+        logger.info("[monitor] Keepa storefront for %s: %d ASINs", seller_id, len(products))
+        return products
+    except Exception as exc:
+        logger.error("[monitor] Keepa storefront fetch failed for %s: %s", seller_id, exc)
+        return []
+
+
+def _parse_seller_analytics(seller_data: dict) -> dict:
+    """Extract rich analytics from a raw Keepa seller object."""
+    if not seller_data:
+        return {}
+    try:
+        from keepa_client import KeepaClient
+        client = KeepaClient()
+        return client.parse_seller(seller_data)
+    except Exception as exc:
+        logger.error("[monitor] Failed to parse seller analytics: %s", exc)
+        return {}
+
+
+def _discover_competitors(seller_id: str) -> list:
+    """Discover competing sellers from a seller's Keepa data.
+
+    Returns list of dicts: [{'seller_id': str, 'seller_name': str}, ...]
+    Cost: 1 token (uses the seller endpoint without storefront).
+    """
+    try:
+        from keepa_client import KeepaClient
+        client = KeepaClient()
+        seller_data = client.get_seller_info(seller_id, storefront=False)
+        if not seller_data:
+            return []
+        competitors = seller_data.get("competitors", [])
+        if not competitors:
+            return []
+        results = []
+        for comp in competitors:
+            if isinstance(comp, dict):
+                comp_id = comp.get("sellerId", "")
+                comp_name = comp.get("sellerName", "")
+            elif isinstance(comp, str):
+                comp_id = comp
+                comp_name = ""
+            else:
+                continue
+            if comp_id:
+                results.append({"seller_id": comp_id, "seller_name": comp_name})
+        logger.info("[monitor] Discovered %d competitors for seller %s", len(results), seller_id)
+        return results
+    except Exception as exc:
+        logger.error("[monitor] Competitor discovery failed for %s: %s", seller_id, exc)
+        return []
+
+
+def fetch_storefront_asins(seller_id: str, use_keepa: bool = True) -> list:
+    """Fetch storefront ASINs using Keepa API (preferred) or HTTP scrape (fallback).
+
+    Args:
+        seller_id: Amazon seller ID
+        use_keepa: If True, use Keepa /seller?storefront=1 (10 tokens).
+                   If False or Keepa fails, fall back to HTTP scrape.
+
+    Returns: List of ASIN strings.
+    """
+    if use_keepa and USE_KEEPA_API:
+        products = _fetch_storefront_keepa(seller_id)
+        if products:
+            return [p["asin"] for p in products]
+        logger.info("[monitor] Keepa storefront empty/failed for %s, falling back to scrape", seller_id)
+    return scrape_storefront_asins(seller_id)
+
+
+# ── Amazon scraper (fallback) ────────────────────────────────────────────────
 
 def scrape_storefront_asins(seller_id: str) -> list:
     """Lightweight HTTP scrape of a seller storefront sorted by newest arrivals.
@@ -437,9 +536,9 @@ def run_monitor_cycle() -> None:
         known_asins = set(json.loads(sf.get("known_asins_json") or "[]"))
 
         try:
-            current_asins = scrape_storefront_asins(seller_id)
+            current_asins = fetch_storefront_asins(seller_id, use_keepa=USE_KEEPA_API)
         except Exception as exc:
-            logger.error("[monitor] Failed to scrape %s: %s", seller_id, exc)
+            logger.error("[monitor] Failed to fetch storefront %s: %s", seller_id, exc)
             continue
 
         if not current_asins:
@@ -453,6 +552,21 @@ def run_monitor_cycle() -> None:
         # Always update the known ASIN set
         updated_known = list(known_asins | set(current_asins))
         db.update_storefront_known_asins(seller_id, updated_known)
+
+        # Competitor auto-discovery: suggest new sellers to watch
+        if USE_KEEPA_API and new_asins:
+            try:
+                competitors = _discover_competitors(seller_id)
+                tracked_ids = {s["seller_id"] for s in storefronts}
+                for comp in competitors:
+                    if comp["seller_id"] not in tracked_ids:
+                        logger.info(
+                            "[monitor] Suggested new seller to watch: %s (%s) — "
+                            "competitor of %s",
+                            comp.get("seller_name", "?"), comp["seller_id"], seller_name,
+                        )
+            except Exception as exc:
+                logger.debug("[monitor] Competitor discovery skipped for %s: %s", seller_id, exc)
 
         for asin in new_asins:
             logger.info("[monitor] New ASIN %s from seller %s", asin, seller_name)
@@ -520,11 +634,15 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Storefront Monitor -- watches seller storefronts")
     sub = parser.add_subparsers(dest="cmd")
 
-    sub.add_parser("run", help="Run one monitor cycle now")
+    run_p = sub.add_parser("run", help="Run one monitor cycle now")
+    run_p.add_argument("--no-keepa", action="store_true",
+                       help="Force HTTP scrape instead of Keepa API")
 
     watch_p = sub.add_parser("watch", help="Poll continuously on an interval")
     watch_p.add_argument("--interval", type=int, default=POLL_INTERVAL_MINUTES,
                          help="Poll interval in minutes (default: 15)")
+    watch_p.add_argument("--no-keepa", action="store_true",
+                         help="Force HTTP scrape instead of Keepa API")
 
     add_p = sub.add_parser("add", help="Add a seller storefront to watch")
     add_p.add_argument("--seller-id", required=True, help="Amazon seller ID")
@@ -539,12 +657,16 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.cmd == "run":
+        if getattr(args, "no_keepa", False):
+            USE_KEEPA_API = False
         run_monitor_cycle()
 
     elif args.cmd == "watch":
+        if getattr(args, "no_keepa", False):
+            USE_KEEPA_API = False
         logger.info(
-            "[monitor] Starting watch loop -- %d min interval (+/-%ds jitter)",
-            args.interval, JITTER_SECONDS,
+            "[monitor] Starting watch loop -- %d min interval (+/-%ds jitter) [keepa=%s]",
+            args.interval, JITTER_SECONDS, USE_KEEPA_API,
         )
         while True:
             run_monitor_cycle()

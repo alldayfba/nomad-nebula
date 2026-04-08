@@ -493,7 +493,7 @@ def fetch_keepa_reverse(categories=None, count=20, keepa_tier="pro"):
     Uses Keepa to get top-selling ASINs with UPCs, then checks prices at
     Walmart/Target. Returns products where retail is cheaper than Amazon.
 
-    Token cost: ~1 (bestsellers) + ~10-20 (batch product details) = ~11-21 tokens.
+    Token cost: ~50 (bestsellers) + ~10-20 (batch product details) = ~60-70 tokens.
 
     Returns:
         List of deal dicts with _pre_matched=True (skip Keepa search in pipeline).
@@ -515,9 +515,9 @@ def fetch_keepa_reverse(categories=None, count=20, keepa_tier="pro"):
     if categories is None:
         categories = ["grocery"]
 
-    # Wait for enough tokens before starting (bestsellers=1 + batch=20 = ~21 tokens)
-    print(f"  [keepa-reverse] Waiting for tokens (need ~25)...", file=sys.stderr)
-    client.wait_for_tokens(min_tokens=25)
+    # Wait for enough tokens before starting (bestsellers=50 + batch=20 = ~70 tokens)
+    print(f"  [keepa-reverse] Waiting for tokens (need ~75)...", file=sys.stderr)
+    client.wait_for_tokens(min_tokens=75)
 
     all_deals = []
     session = requests.Session()
@@ -531,7 +531,7 @@ def fetch_keepa_reverse(categories=None, count=20, keepa_tier="pro"):
         print(f"  [keepa-reverse] Bestsellers for '{cat}' (ID: {cat_id})...",
               file=sys.stderr)
 
-        # 1 token: get bestseller ASINs
+        # 50 tokens: get bestseller ASINs
         asins = client.get_bestsellers(cat_id)
         if not asins:
             print(f"  [keepa-reverse] No bestsellers found for {cat}", file=sys.stderr)
@@ -829,6 +829,63 @@ def main():
     parser.add_argument("--keepa-tier", default="pro",
                         choices=["basic", "pro"],
                         help="Keepa subscription tier (affects rate limiting)")
+
+    # ── Keepa Deals API filters (v4.1) ──────────────────────────────────────
+    deals_group = parser.add_argument_group("Keepa Deals API filters",
+        "Advanced filters for Keepa deal searches (used with --source keepa-deals)")
+    deals_group.add_argument("--keepa-deals", action="store_true",
+                             help="Use Keepa Deals API directly (5 tokens/page)")
+    # Boolean filters
+    deals_group.add_argument("--back-in-stock", action="store_true",
+                             help="Only show products recently back in stock")
+    deals_group.add_argument("--no-amazon-offer", action="store_true",
+                             help="Exclude products where Amazon is a seller")
+    deals_group.add_argument("--lowest-90", action="store_true",
+                             help="Only products at their lowest 90-day price")
+    deals_group.add_argument("--lowest-ever", action="store_true",
+                             help="Only products at their lowest ever price")
+    deals_group.add_argument("--single-variation", action="store_true",
+                             help="Only single-variation listings (no parent/child)")
+    # Value filters
+    deals_group.add_argument("--warehouse-conditions", type=str, default=None,
+                             help="Comma-separated warehouse conditions (1-5)")
+    deals_group.add_argument("--brand", type=str, default=None,
+                             help="Filter by brand name(s), comma-separated")
+    deals_group.add_argument("--title-search", type=str, default="",
+                             help="Filter deals by title keyword")
+    deals_group.add_argument("--min-rating", type=int, default=None,
+                             help="Minimum rating * 10 (e.g. 40 = 4.0 stars)")
+    # Range filters
+    deals_group.add_argument("--delta-min", type=float, default=None,
+                             help="Min absolute price change in dollars")
+    deals_group.add_argument("--delta-max", type=float, default=None,
+                             help="Max absolute price change in dollars")
+    deals_group.add_argument("--delta-pct-min", type=float, default=None,
+                             help="Min percentage price change")
+    deals_group.add_argument("--delta-pct-max", type=float, default=None,
+                             help="Max percentage price change")
+    deals_group.add_argument("--bsr-min", type=int, default=None,
+                             help="Min sales rank (BSR)")
+    deals_group.add_argument("--bsr-max", type=int, default=None,
+                             help="Max sales rank (BSR)")
+    # Sort
+    deals_group.add_argument("--sort", default="percent",
+                             choices=["newest", "delta", "rank", "percent"],
+                             help="Sort deals by (default: percent)")
+    deals_group.add_argument("--sort-desc", action="store_true",
+                             help="Sort in descending order")
+    # Price type
+    deals_group.add_argument("--price-type", default="amazon",
+                             choices=["amazon", "new", "used", "sales", "fba",
+                                      "buybox", "warehouse", "lightning", "prime_excl"],
+                             help="Price type to track (default: amazon)")
+    # Paging
+    deals_group.add_argument("--max-pages", type=int, default=1,
+                             help="Max pages to fetch (150 deals/page, max 67 pages = 10,000 deals)")
+    deals_group.add_argument("--date-range", type=int, default=0,
+                             choices=[0, 1, 2, 3, 4, 5],
+                             help="Date range: 0=24h, 1=3d, 2=7d, 3=14d, 4=30d, 5=90d")
+
     args = parser.parse_args()
 
     # Handle private label flag logic
@@ -849,7 +906,7 @@ def main():
         retailers = DEFAULT_CLEARANCE_RETAILERS
 
     print(f"\n{'='*60}", file=sys.stderr)
-    print(f"[deal-scanner v4] Online Arbitrage Sourcing", file=sys.stderr)
+    print(f"[deal-scanner v4.1] Online Arbitrage Sourcing", file=sys.stderr)
     print(f"  Source:     {args.source}", file=sys.stderr)
     print(f"  Categories: {', '.join(categories)}", file=sys.stderr)
     print(f"  Count:      {args.count}", file=sys.stderr)
@@ -863,6 +920,23 @@ def main():
         print(f"  No PL:      {args.no_private_label}", file=sys.stderr)
         print(f"  Check stock: {args.check_stock}", file=sys.stderr)
         print(f"  Keepa tier:  {args.keepa_tier}", file=sys.stderr)
+    if getattr(args, "keepa_deals", False):
+        print(f"  Keepa Deals: YES (5 tokens/page)", file=sys.stderr)
+        print(f"  Price type:  {getattr(args, 'price_type', 'amazon')}", file=sys.stderr)
+        print(f"  Sort:        {getattr(args, 'sort', 'percent')} {'(desc)' if getattr(args, 'sort_desc', False) else ''}", file=sys.stderr)
+        print(f"  Max pages:   {getattr(args, 'max_pages', 1)}", file=sys.stderr)
+        if getattr(args, "title_search", ""):
+            print(f"  Title search: {args.title_search}", file=sys.stderr)
+        if getattr(args, "brand", None):
+            print(f"  Brand:       {args.brand}", file=sys.stderr)
+        if getattr(args, "lowest_ever", False):
+            print(f"  Lowest ever: YES", file=sys.stderr)
+        if getattr(args, "lowest_90", False):
+            print(f"  Lowest 90d:  YES", file=sys.stderr)
+        if getattr(args, "no_amazon_offer", False):
+            print(f"  No Amazon:   YES", file=sys.stderr)
+        if getattr(args, "back_in_stock", False):
+            print(f"  Back in stock: YES", file=sys.stderr)
     print(f"{'='*60}\n", file=sys.stderr)
 
     all_deals = []
@@ -905,6 +979,95 @@ def main():
         if args.sale_only:
             target_deals = [d for d in target_deals if d.get("on_sale")]
         all_deals.extend(target_deals)
+
+    # ── Fetch from Keepa Deals API (full queryJSON) ──
+    if getattr(args, "keepa_deals", False):
+        print("\n[deal-scanner] Fetching from Keepa Deals API...", file=sys.stderr)
+        client = _get_keepa_client(args.keepa_tier)
+        if client:
+            from keepa_client import KeepaClient as _KC
+
+            # Map CLI args to get_deals params
+            price_type_map = getattr(_KC, "DEAL_PRICE_TYPES", {})
+            sort_map = getattr(_KC, "DEAL_SORT_TYPES", {})
+
+            price_type_int = price_type_map.get(
+                getattr(args, "price_type", "amazon"), 0)
+            sort_int = sort_map.get(getattr(args, "sort", "percent"), 4)
+
+            # Build range params
+            deals_price_range = (
+                int(args.min_price * 100), int(args.max_price * 100))
+
+            delta_range = None
+            if getattr(args, "delta_min", None) is not None or getattr(args, "delta_max", None) is not None:
+                d_min = int((args.delta_min or 0) * 100)
+                d_max = int((args.delta_max or 99999) * 100)
+                delta_range = (d_min, d_max)
+
+            delta_pct_range = None
+            if getattr(args, "delta_pct_min", None) is not None or getattr(args, "delta_pct_max", None) is not None:
+                dp_min = int(args.delta_pct_min or 0)
+                dp_max = int(args.delta_pct_max or 100)
+                delta_pct_range = (dp_min, dp_max)
+
+            bsr_range = None
+            if getattr(args, "bsr_min", None) is not None or getattr(args, "bsr_max", None) is not None:
+                bsr_range = (args.bsr_min or 1, args.bsr_max or 500000)
+
+            brand_list = None
+            if getattr(args, "brand", None):
+                brand_list = [b.strip() for b in args.brand.split(",")]
+
+            wh_conditions = None
+            if getattr(args, "warehouse_conditions", None):
+                wh_conditions = [int(c.strip()) for c in args.warehouse_conditions.split(",")]
+
+            keepa_deals = client.get_deals(
+                category=int(args.category) if args.category and args.category.isdigit() else 0,
+                price_range=deals_price_range,
+                sort_by=sort_int,
+                count=args.count,
+                delta_range=delta_range,
+                delta_percent_range=delta_pct_range,
+                sales_rank_range=bsr_range,
+                price_types=[price_type_int],
+                title_search=getattr(args, "title_search", ""),
+                brand=brand_list,
+                is_lowest=getattr(args, "lowest_ever", False),
+                is_lowest_90=getattr(args, "lowest_90", False),
+                is_back_in_stock=getattr(args, "back_in_stock", False),
+                must_not_have_amazon_offer=getattr(args, "no_amazon_offer", False),
+                single_variation=getattr(args, "single_variation", False),
+                min_rating=getattr(args, "min_rating", None),
+                warehouse_conditions=wh_conditions,
+                date_range=getattr(args, "date_range", 0),
+                sort_desc=getattr(args, "sort_desc", False),
+                max_pages=getattr(args, "max_pages", 1),
+            )
+            print(f"  Total Keepa deals: {len(keepa_deals)}", file=sys.stderr)
+
+            # Convert Keepa deal format to deal_scanner format
+            for kd in keepa_deals:
+                kd_price = kd.get("current_price", 0)
+                if not kd_price or kd_price <= 0:
+                    continue
+                all_deals.append({
+                    "name": kd.get("title", ""),
+                    "price": kd_price,
+                    "store": "Amazon",
+                    "link": f"https://www.amazon.com/dp/{kd.get('asin', '')}",
+                    "asin": kd.get("asin", ""),
+                    "categories": [kd.get("category", "")] if kd.get("category") else [],
+                    "source": "keepa_deals",
+                    "amazon_price": kd_price,
+                    "previous_price": kd.get("previous_price"),
+                    "delta_percent": kd.get("delta_percent", 0),
+                    "bsr": kd.get("bsr", 0),
+                    "_pre_matched": True,  # Already from Amazon, skip Keepa search
+                })
+        else:
+            print("  [keepa-deals] No KeepaClient available", file=sys.stderr)
 
     # ── Filter ──
     print(f"\n[deal-scanner] Filtering {len(all_deals)} total deals...", file=sys.stderr)

@@ -319,8 +319,19 @@ INBOUND_PLACEMENT_FEE = {
 MAX_BSR_THRESHOLD = 500000  # Skip products above this BSR (practically dead)
 
 
-def get_referral_fee_rate(category):
-    """Get referral fee rate for a category. Defaults to 15%."""
+def get_referral_fee_rate(category, keepa_referral_fee_pct=None):
+    """Get referral fee rate for a category. Defaults to 15%.
+
+    Args:
+        category: Amazon category string.
+        keepa_referral_fee_pct: Exact referral fee from Keepa's referralFeePercentage
+            field (float, e.g. 0.15 for 15%). If provided and not None, used directly
+            instead of category lookup.
+    """
+    # Prefer Keepa's exact referral fee when available
+    if keepa_referral_fee_pct is not None:
+        return float(keepa_referral_fee_pct)
+
     if not category:
         return REFERRAL_FEE_RATES["default"]
     # Try exact match first
@@ -334,9 +345,17 @@ def get_referral_fee_rate(category):
     return REFERRAL_FEE_RATES["default"]
 
 
-def estimate_fba_fee(sell_price, weight_lbs=None):
+def estimate_fba_fee(sell_price, weight_lbs=None, keepa_fba_fees=None):
     """Estimate FBA fulfillment fee based on price bracket and weight.
 
+    Args:
+        sell_price: Amazon sell price.
+        weight_lbs: Product weight in pounds (optional).
+        keepa_fba_fees: Dict from Keepa's fbaFees object with keys:
+            pickAndPackFee, storageFee, storageFeeTax, pickAndPackFeeTax
+            (all values in cents). If provided, pickAndPackFee is used directly.
+
+    If Keepa fbaFees are available, uses pickAndPackFee / 100.0 directly.
     If weight is available (from Keepa), uses weight-based tiers for accuracy.
     Otherwise falls back to price-based estimate.
 
@@ -351,6 +370,11 @@ def estimate_fba_fee(sell_price, weight_lbs=None):
     - 2.5-3 lb: $5.75
     - Each additional lb: +$0.40
     """
+    # Prefer Keepa's exact FBA fees when available
+    if keepa_fba_fees is not None and isinstance(keepa_fba_fees, dict):
+        pick_and_pack = keepa_fba_fees.get('pickAndPackFee')
+        if pick_and_pack is not None and pick_and_pack > 0:
+            return round(pick_and_pack / 100.0, 2)
     if weight_lbs and weight_lbs > 0:
         # Weight-based (more accurate when Keepa provides weight)
         oz = weight_lbs * 16
@@ -421,9 +445,30 @@ def _resolve_coupon_code(product):
     return None
 
 
-def estimate_monthly_sales(sales_rank, category=None):
+def estimate_monthly_sales(sales_rank, category=None, keepa_monthly_sold=None,
+                           keepa_sales_rank_drops_30=None):
     """Estimate monthly sales from BSR with category-specific multiplier.
-    Returns None if no rank."""
+
+    Args:
+        sales_rank: Amazon Best Sellers Rank.
+        category: Amazon category string.
+        keepa_monthly_sold: Amazon's "bought in past month" count from Keepa's
+            monthlySold field. If provided and not None, used directly.
+        keepa_sales_rank_drops_30: Number of BSR drops in last 30 days from Keepa.
+            Used as secondary velocity signal when monthlySold is unavailable.
+
+    Returns:
+        Estimated monthly units sold, or None if no data.
+    """
+    # Prefer Keepa's exact monthlySold when available
+    if keepa_monthly_sold is not None and keepa_monthly_sold > 0:
+        return int(keepa_monthly_sold)
+
+    # Secondary: use salesRankDrops30 as approximate monthly sales
+    if keepa_sales_rank_drops_30 is not None and keepa_sales_rank_drops_30 > 0:
+        return int(keepa_sales_rank_drops_30)
+
+    # Fallback: BSR-based estimation
     if not sales_rank or sales_rank <= 0:
         return None
     base_sales = 1
@@ -809,10 +854,21 @@ def calculate_product_profitability(product, shipping_to_fba=1.00,
                                     gift_card_discount=0.0, auto_giftcard=False,
                                     prep_cost=None, tax_state="none",
                                     include_storage=True, fbm_mode=False,
-                                    auto_coupon=False):
+                                    auto_coupon=False,
+                                    keepa_referral_fee_pct=None,
+                                    keepa_fba_fees=None,
+                                    keepa_monthly_sold=None,
+                                    keepa_sales_rank_drops_30=None,
+                                    availability_amazon=None,
+                                    return_rate=None,
+                                    is_sns=False,
+                                    coupon=None,
+                                    buy_box_is_amazon=None):
     """Calculate full profitability for a single matched product.
 
     New in v3.0: prep costs, sales tax, storage fees, BSR auto-filter, deal scoring.
+    New in v4.1: Keepa exact fees (referral, FBA, monthly sold), competition
+    intelligence fields, and risk flags.
     """
     amazon_data = product.get("amazon", {})
     asin = amazon_data.get("asin")
@@ -910,13 +966,28 @@ def calculate_product_profitability(product, shipping_to_fba=1.00,
             "total_fees": None,
             "profit_per_unit": None,
             "roi_percent": None,
-            "estimated_monthly_sales": estimate_monthly_sales(sales_rank, category),
+            "estimated_monthly_sales": estimate_monthly_sales(
+                sales_rank, category,
+                keepa_monthly_sold=keepa_monthly_sold,
+                keepa_sales_rank_drops_30=keepa_sales_rank_drops_30,
+            ),
             "estimated_monthly_profit": None,
             "deal_score": 0,
             "verdict": "SKIP",
             "skip_reason": "Missing buy cost or sell price",
             "competition_score": competition_score,
             "competition_warnings": competition_warnings,
+            "keepa_monthly_sold": keepa_monthly_sold,
+            "keepa_sales_rank_drops_30": keepa_sales_rank_drops_30,
+            "keepa_referral_fee_pct": keepa_referral_fee_pct,
+            "keepa_fba_pick_and_pack": (keepa_fba_fees or {}).get('pickAndPackFee'),
+            "keepa_storage_fee": (keepa_fba_fees or {}).get('storageFee'),
+            "availability_amazon": availability_amazon,
+            "return_rate": return_rate,
+            "is_sns": is_sns,
+            "has_coupon": coupon is not None and any(c != 0 for c in (coupon or [])),
+            "buy_box_is_amazon": buy_box_is_amazon,
+            "risk_flags": [],
             **restrictions,
             **multipack,
         }
@@ -932,7 +1003,7 @@ def calculate_product_profitability(product, shipping_to_fba=1.00,
     sales_tax = estimate_sales_tax(buy_cost, tax_state) if buy_cost else 0.0
 
     # Calculate fees — FBA vs FBM branch
-    referral_fee_rate = get_referral_fee_rate(category)
+    referral_fee_rate = get_referral_fee_rate(category, keepa_referral_fee_pct=keepa_referral_fee_pct)
     referral_fee = round(sell_price * referral_fee_rate, 2)
     if fbm_mode:
         # FBM: no FBA fulfillment fee; you pay your own shipping to buyer
@@ -941,7 +1012,7 @@ def calculate_product_profitability(product, shipping_to_fba=1.00,
         inbound_placement_fee = 0.0  # FBM ships direct — no inbound placement fee
         total_amazon_fees = round(referral_fee + fbm_shipping + effective_prep_cost, 2)
     else:
-        fba_fee = estimate_fba_fee(sell_price)
+        fba_fee = estimate_fba_fee(sell_price, keepa_fba_fees=keepa_fba_fees)
         fbm_shipping = 0.0
         # Inbound Placement Fee — large_standard rate if sell_price suggests heavier item (>$30 proxy)
         weight_proxy = amazon_data.get("weight_lbs") or 0
@@ -953,14 +1024,24 @@ def calculate_product_profitability(product, shipping_to_fba=1.00,
             referral_fee + fba_fee + shipping_to_fba + effective_prep_cost + inbound_placement_fee, 2
         )
 
-    # Estimate monthly sales and profit (category-aware)
-    monthly_sales = estimate_monthly_sales(sales_rank, category)
+    # Estimate monthly sales and profit (category-aware, Keepa-enhanced)
+    monthly_sales = estimate_monthly_sales(
+        sales_rank, category,
+        keepa_monthly_sold=keepa_monthly_sold,
+        keepa_sales_rank_drops_30=keepa_sales_rank_drops_30,
+    )
 
     # ─── Storage fee ────────────────────────────────────────────────────
     # FBM: no Amazon storage fees (inventory stays at home/warehouse)
     storage_fee = 0.0
     if include_storage and not fbm_mode:
-        storage_fee = estimate_storage_fee(monthly_sales, sales_rank)
+        # Prefer Keepa's exact monthly storage fee when available
+        if (keepa_fba_fees is not None and isinstance(keepa_fba_fees, dict)
+                and keepa_fba_fees.get('storageFee') is not None
+                and keepa_fba_fees['storageFee'] > 0):
+            storage_fee = round(keepa_fba_fees['storageFee'] / 100.0, 2)
+        else:
+            storage_fee = estimate_storage_fee(monthly_sales, sales_rank)
     total_fees = round(total_amazon_fees + storage_fee, 2)
 
     # Calculate profit and ROI (including tax as a cost)
@@ -1073,6 +1154,21 @@ def calculate_product_profitability(product, shipping_to_fba=1.00,
         if price_trends.get("at_historical_low") is False:
             deal_score = min(100, deal_score + 5)
 
+    # ─── Risk flags (v4.1) ──────────────────────────────────────────────
+    risk_flags = []
+    if return_rate == 2:
+        risk_flags.append("HIGH_RETURN_RATE")
+    if buy_box_is_amazon:
+        risk_flags.append("AMAZON_OWNS_BUYBOX")
+    if is_sns:
+        risk_flags.append("SNS_AVAILABLE")
+    if coupon and any(c != 0 for c in coupon):
+        risk_flags.append("ACTIVE_COUPON")
+    if availability_amazon == 0:
+        risk_flags.append("AMAZON_IN_STOCK")
+    elif availability_amazon == -1:
+        risk_flags.append("NO_AMAZON_OFFER")  # This is actually good for sellers
+
     return {
         "raw_buy_cost": round(raw_buy_cost, 2) if raw_buy_cost else None,
         "gift_card_discount_applied": effective_giftcard,
@@ -1108,6 +1204,18 @@ def calculate_product_profitability(product, shipping_to_fba=1.00,
         "bsr_drops_60d": amazon_data.get("bsr_drops_60d", 0) if isinstance(amazon_data, dict) else 0,
         "bsr_drops_90d": amazon_data.get("bsr_drops_90d", 0) if isinstance(amazon_data, dict) else 0,
         "amazon_bb_pct_90d": amazon_data.get("amazon_oos_pct", 0.0) if isinstance(amazon_data, dict) else 0.0,
+        # ─── Keepa competition intelligence (v4.1) ──────────────────────
+        "keepa_monthly_sold": keepa_monthly_sold,
+        "keepa_sales_rank_drops_30": keepa_sales_rank_drops_30,
+        "keepa_referral_fee_pct": keepa_referral_fee_pct,
+        "keepa_fba_pick_and_pack": (keepa_fba_fees or {}).get('pickAndPackFee'),
+        "keepa_storage_fee": (keepa_fba_fees or {}).get('storageFee'),
+        "availability_amazon": availability_amazon,
+        "return_rate": return_rate,
+        "is_sns": is_sns,
+        "has_coupon": coupon is not None and any(c != 0 for c in (coupon or [])),
+        "buy_box_is_amazon": buy_box_is_amazon,
+        "risk_flags": risk_flags,
         **restrictions,
         **multipack,
     }
