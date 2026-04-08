@@ -932,6 +932,16 @@ class HealthMonitor:
         except Exception:
             return
         if e._current_device_name and new_name != e._current_device_name:
+            # Don't switch to a ghost-blacklisted device
+            if new_name in e._ghost_devices and time.time() < e._ghost_devices[new_name]:
+                return
+            # Verify USB connection before switching to non-built-in device
+            name_lower = new_name.lower()
+            is_builtin = any(k in name_lower for k in ('built-in', 'macbook', 'internal'))
+            if not is_builtin and not e._is_usb_device_connected(new_name):
+                print(f"[HealthMonitor] Default mic {new_name} not on USB bus — ignoring switch")
+                e._ghost_devices[new_name] = time.time() + 60
+                return
             self._heal(f"Mic switched: {e._current_device_name} → {new_name}")
             with e._stream_lock:
                 if e._ring_stream:
@@ -1063,6 +1073,7 @@ class WhisperFlowEngine:
         self._stream_lock = threading.RLock()  # protects ALL stream open/close/restart
         self._current_device_name: str = ""    # track which mic is active
         self._ring_restart_failures: int = 0   # exponential backoff counter
+        self._ghost_devices: dict[str, float] = {}  # name → blacklisted_until timestamp
 
     def start_ring_buffer(self):
         """Start the always-on mic stream. Call once at app startup.
@@ -1202,6 +1213,27 @@ class WhisperFlowEngine:
             pass
         return None
 
+    @staticmethod
+    def _is_usb_device_connected(name: str) -> bool:
+        """Check if a USB audio device is actually present on the USB bus.
+
+        macOS caches audio devices even after USB disconnect. This checks
+        ioreg to verify the device is physically connected, preventing
+        ghost device loops (silence → fallback → switch back → silence).
+        """
+        try:
+            result = subprocess.run(
+                ['ioreg', '-p', 'IOUSB', '-w0'],
+                capture_output=True, text=True, timeout=3,
+            )
+            # Match against the device name (case-insensitive)
+            # USB audio devices register with their product name
+            search_terms = name.lower().split()
+            output_lower = result.stdout.lower()
+            return any(term in output_lower for term in search_terms if len(term) > 3)
+        except Exception:
+            return True  # if ioreg fails, assume connected (don't block)
+
     def _open_mic(self):
         """Open mic stream at native rate, resample later. Falls back on error.
 
@@ -1256,6 +1288,20 @@ class WhisperFlowEngine:
             native_rate = int(dev_info['default_samplerate'])
             max_ch = dev_info['max_input_channels']
 
+            # Skip ghost devices (blacklisted after repeated silence)
+            blacklisted_until = self._ghost_devices.get(name, 0)
+            if time.time() < blacklisted_until:
+                print(f"[WhisperFlow] Mic: {name} — ghost-blacklisted for {blacklisted_until - time.time():.0f}s, skipping")
+                continue
+
+            # For non-built-in devices, verify USB connection before wasting time
+            name_lower = name.lower()
+            is_builtin = any(k in name_lower for k in ('built-in', 'macbook', 'internal'))
+            if not is_builtin and not self._is_usb_device_connected(name):
+                print(f"[WhisperFlow] Mic: {name} — NOT on USB bus (ghost device), skipping")
+                self._ghost_devices[name] = time.time() + 60  # blacklist 60s
+                continue
+
             configs = [
                 (SAMPLE_RATE, 1),
                 (native_rate, 1),
@@ -1281,6 +1327,8 @@ class WhisperFlowEngine:
                         print(f"[WhisperFlow] Mic {name} {rate}Hz/{ch}ch — silence (peak={peak:.6f}), skipping")
                         stream.close()
                         continue
+                    # Device is alive — clear any ghost blacklist
+                    self._ghost_devices.pop(name, None)
                     print(f"[WhisperFlow] Mic: {name} — verified at {rate}Hz/{ch}ch (peak={peak:.4f})")
                     self._current_device_name = name
                     return stream, rate
