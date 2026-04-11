@@ -485,10 +485,17 @@ class IGBrowser:
             await self.page.keyboard.press("Home")
             await self._human_delay(0.5, 1.0)
 
+        # Use multiple selectors for message containers — Instagram's DOM changes frequently
         msg_elements = await self.page.query_selector_all(
-            'div[role="row"], div[class*="message"]'
+            'div[role="row"]'
         )
+        # Fallback if role="row" yields nothing
+        if not msg_elements:
+            msg_elements = await self.page.query_selector_all(
+                'div[class*="message"], div[data-testid*="message"]'
+            )
 
+        debug_count = 0
         for el in msg_elements[-max_messages:]:
             try:
                 msg = {"message_type": "text"}
@@ -496,18 +503,114 @@ class IGBrowser:
                 if text_el:
                     msg["content"] = (await text_el.inner_text()).strip()
 
-                # Determine direction based on alignment/styling
-                # Instagram typically right-aligns sent messages
-                style = await el.get_attribute("style") or ""
-                classes = await el.get_attribute("class") or ""
-                parent = await el.evaluate_handle("el => el.parentElement")
-                parent_style = await parent.evaluate("el => el.style.cssText") if parent else ""
+                if not msg.get("content"):
+                    continue
 
-                # Heuristic: our messages are typically in blue/right-aligned containers
-                if "flex-end" in style or "flex-end" in parent_style:
-                    msg["direction"] = "out"
-                else:
-                    msg["direction"] = "in"
+                # ── Direction Detection (multi-strategy) ──
+                # Instagram renders sent messages with blue/purple bubbles
+                # and received messages with grey bubbles. We check:
+                # 1. Computed background color of the message bubble
+                # 2. CSS alignment (flex-end = sent, flex-start = received)
+                # 3. Presence of avatar img next to message (received msgs have avatar)
+                direction = None
+
+                # Strategy 1: Check bubble background color via JS
+                try:
+                    color_info = await el.evaluate("""el => {
+                        // Walk down to find the actual message bubble div
+                        const spans = el.querySelectorAll('span[dir="auto"], div[dir="auto"]');
+                        for (const span of spans) {
+                            let node = span.parentElement;
+                            // Walk up max 5 levels looking for a colored container
+                            for (let i = 0; i < 5 && node && node !== el; i++) {
+                                const bg = window.getComputedStyle(node).backgroundColor;
+                                if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
+                                    return bg;
+                                }
+                                node = node.parentElement;
+                            }
+                        }
+                        return '';
+                    }""")
+                    if color_info:
+                        # Instagram blue/purple for sent: rgb(0, 149, 246), rgb(99, 102, 241),
+                        # rgb(0, 132, 255), or similar bright blue
+                        # Grey for received: rgb(239, 239, 239), rgb(38, 38, 38) dark mode, etc.
+                        import re as _re
+                        rgb = _re.findall(r'\d+', color_info)
+                        if len(rgb) >= 3:
+                            r, g, b = int(rgb[0]), int(rgb[1]), int(rgb[2])
+                            # Blue-ish hues (sent) — high blue channel, low red
+                            if b > 200 and r < 120:
+                                direction = "out"
+                            # Purple-ish (sent) — both r and b elevated
+                            elif b > 200 and r > 80 and g < 120:
+                                direction = "out"
+                            # Grey/white (received) — all channels similar
+                            elif abs(r - g) < 30 and abs(g - b) < 30:
+                                direction = "in"
+                except Exception:
+                    pass
+
+                # Strategy 2: Check alignment via computed styles up the tree
+                if not direction:
+                    try:
+                        alignment = await el.evaluate("""el => {
+                            let node = el;
+                            for (let i = 0; i < 8 && node; i++) {
+                                const s = window.getComputedStyle(node);
+                                const justify = s.justifyContent || '';
+                                const align = s.alignItems || '';
+                                const flexDir = s.flexDirection || '';
+                                const ml = s.marginLeft || '';
+                                if (justify === 'flex-end' || align === 'flex-end') return 'out';
+                                if (justify === 'flex-start' || align === 'flex-start') return 'in';
+                                // Auto margin-left pushes element right (sent message)
+                                if (ml === 'auto') return 'out';
+                                node = node.parentElement;
+                            }
+                            return '';
+                        }""")
+                        if alignment in ("out", "in"):
+                            direction = alignment
+                    except Exception:
+                        pass
+
+                # Strategy 3: Avatar detection — received messages have the other person's avatar
+                if not direction:
+                    try:
+                        has_avatar = await el.evaluate("""el => {
+                            const imgs = el.querySelectorAll('img');
+                            for (const img of imgs) {
+                                const alt = (img.getAttribute('alt') || '').toLowerCase();
+                                const src = img.getAttribute('src') || '';
+                                // Profile pictures are small circular images
+                                if (src.includes('profile') || src.includes('150x150')
+                                    || img.width <= 40 || img.naturalWidth <= 40) {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        }""")
+                        direction = "in" if has_avatar else "out"
+                    except Exception:
+                        pass
+
+                # Final fallback — if we still can't determine, skip this message
+                # rather than guessing wrong (prevents phantom inbound/outbound)
+                if not direction:
+                    logger.debug("Could not determine direction for message: %.40s...", msg.get("content", ""))
+                    continue
+
+                msg["direction"] = direction
+
+                # Debug logging for first 3 messages per thread
+                if debug_count < 3:
+                    logger.info(
+                        "Thread msg direction=%s: %.40s",
+                        direction, msg.get("content", "")
+                    )
+                    debug_count += 1
 
                 # Check for images/links
                 img = await el.query_selector("img:not([alt*='profile'])")
@@ -518,8 +621,7 @@ class IGBrowser:
                 if link:
                     msg["message_type"] = "link"
 
-                if msg.get("content"):
-                    messages.append(msg)
+                messages.append(msg)
 
             except Exception as e:
                 logger.debug("Error reading message: %s", e)

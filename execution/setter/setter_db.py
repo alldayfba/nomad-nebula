@@ -67,6 +67,8 @@ CREATE TABLE IF NOT EXISTS conversations (
     booking_confirmed INTEGER DEFAULT 0,
     opener_type TEXT,
     total_api_cost REAL DEFAULT 0.0,
+    heat_score INTEGER DEFAULT 0,
+    heat_score_updated_at TEXT,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
     FOREIGN KEY (prospect_id) REFERENCES prospects(id)
@@ -224,6 +226,16 @@ CREATE TABLE IF NOT EXISTS system_state (
     value TEXT NOT NULL,
     updated_at TEXT NOT NULL
 );
+
+-- Blocklist: handles that should never receive DMs
+CREATE TABLE IF NOT EXISTS blocklist (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ig_handle TEXT NOT NULL UNIQUE,
+    reason TEXT NOT NULL,
+    source TEXT NOT NULL,
+    added_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_blocklist_handle ON blocklist(ig_handle);
 """
 
 
@@ -254,6 +266,26 @@ def get_db() -> sqlite3.Connection:
     _conn.execute("PRAGMA foreign_keys=ON")
     if not _schema_initialized:
         _conn.executescript(SCHEMA_SQL)
+        # Migration: add heat_score columns if not present (existing DBs)
+        try:
+            _conn.execute("ALTER TABLE conversations ADD COLUMN heat_score INTEGER DEFAULT 0")
+            _conn.execute("ALTER TABLE conversations ADD COLUMN heat_score_updated_at TEXT")
+            _conn.commit()
+        except Exception:
+            pass  # Columns already exist
+        # Migration: create blocklist table (existing DBs)
+        try:
+            _conn.execute("""CREATE TABLE IF NOT EXISTS blocklist (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ig_handle TEXT NOT NULL UNIQUE,
+                reason TEXT NOT NULL,
+                source TEXT NOT NULL,
+                added_at TEXT NOT NULL
+            )""")
+            _conn.execute("CREATE INDEX IF NOT EXISTS idx_blocklist_handle ON blocklist(ig_handle)")
+            _conn.commit()
+        except Exception:
+            pass
         _schema_initialized = True
     return _conn
 
@@ -550,10 +582,13 @@ def get_messages(conversation_id: int, limit: int = 50) -> List[Dict]:
 
 
 def get_pending_approval_messages() -> List[Dict]:
-    """Get messages waiting for human approval."""
+    """Get messages waiting for human approval, with prospect's last inbound message."""
     db = get_db()
     rows = db.execute(
-        """SELECT m.*, c.stage, p.ig_handle, p.full_name
+        """SELECT m.*, c.stage, p.ig_handle, p.full_name,
+           (SELECT m2.content FROM messages m2
+            WHERE m2.conversation_id = m.conversation_id AND m2.direction = 'in'
+            ORDER BY m2.sent_at DESC LIMIT 1) AS prospect_last_message
            FROM messages m
            JOIN conversations c ON m.conversation_id = c.id
            JOIN prospects p ON c.prospect_id = p.id
@@ -578,6 +613,17 @@ def reject_message(message_id: int):
         "UPDATE messages SET approval_status = 'rejected' WHERE id = ?",
         (message_id,),
     )
+    # Flag the conversation for human follow-up so it doesn't sit in limbo
+    row = db.execute(
+        "SELECT conversation_id FROM messages WHERE id = ?", (message_id,)
+    ).fetchone()
+    if row:
+        db.execute(
+            """UPDATE conversations SET requires_human = 1,
+               human_reason = 'AI response rejected — needs manual follow-up',
+               updated_at = ? WHERE id = ?""",
+            (_now(), row["conversation_id"]),
+        )
     db.commit()
 
 
@@ -1078,6 +1124,33 @@ def update_watermark(ig_handle: str, position: int, last_follower: str):
     db.commit()
 
 
+# ── Heat Score ──────────────────────────────────────────────────────────────
+
+def update_heat_score(conversation_id: int, score: int):
+    """Update the heat score for a conversation."""
+    db = get_db()
+    db.execute(
+        "UPDATE conversations SET heat_score = ?, heat_score_updated_at = ? WHERE id = ?",
+        (max(0, min(100, score)), _now(), conversation_id),
+    )
+    db.commit()
+
+
+def get_hottest_leads(limit: int = 20) -> List[Dict]:
+    """Get conversations sorted by heat score (highest first)."""
+    db = get_db()
+    rows = db.execute(
+        """SELECT c.*, p.ig_handle, p.full_name, p.bio
+           FROM conversations c
+           JOIN prospects p ON p.id = c.prospect_id
+           WHERE c.stage NOT IN ('dead', 'disqualified', 'booked', 'show')
+           ORDER BY c.heat_score DESC
+           LIMIT ?""",
+        (limit,),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
 # ── EST Timestamps ──────────────────────────────────────────────────────────
 
 def _now_est() -> str:
@@ -1102,3 +1175,134 @@ def get_audit_summary() -> Dict:
            FROM conversation_audits"""
     ).fetchone()
     return dict(row) if row else {}
+
+
+# ── Blocklist ──────────────────────────────────────────────────────────────────
+
+def is_blocklisted(handle: str) -> bool:
+    """Check if a handle is on the blocklist."""
+    d = get_db()
+    row = d.execute(
+        "SELECT 1 FROM blocklist WHERE ig_handle = ?",
+        (handle.lower().lstrip("@"),),
+    ).fetchone()
+    return row is not None
+
+
+def add_to_blocklist(handle: str, reason: str, source: str):
+    """Add a handle to the blocklist."""
+    d = get_db()
+    try:
+        d.execute(
+            "INSERT OR IGNORE INTO blocklist (ig_handle, reason, source, added_at) VALUES (?, ?, ?, ?)",
+            (handle.lower().lstrip("@"), reason, source, _now()),
+        )
+        d.commit()
+    except Exception:
+        pass
+
+
+def remove_from_blocklist(handle: str):
+    """Remove a handle from the blocklist."""
+    d = get_db()
+    d.execute(
+        "DELETE FROM blocklist WHERE ig_handle = ?",
+        (handle.lower().lstrip("@"),),
+    )
+    d.commit()
+
+
+def get_blocklist_stats() -> Dict:
+    """Get blocklist counts by reason."""
+    d = get_db()
+    rows = d.execute(
+        "SELECT reason, COUNT(*) as cnt FROM blocklist GROUP BY reason"
+    ).fetchall()
+    return {r["reason"]: r["cnt"] for r in rows}
+
+
+def get_blocklist(reason: Optional[str] = None) -> List[Dict]:
+    """Get all blocklist entries, optionally filtered by reason."""
+    d = get_db()
+    if reason:
+        rows = d.execute(
+            "SELECT ig_handle, reason, source, added_at FROM blocklist WHERE reason = ? ORDER BY added_at DESC",
+            (reason,),
+        ).fetchall()
+    else:
+        rows = d.execute(
+            "SELECT ig_handle, reason, source, added_at FROM blocklist ORDER BY added_at DESC"
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+# ── DM Queue ───────────────────────────────────────────────────────────────
+
+DM_QUEUE_SQL = """
+CREATE TABLE IF NOT EXISTS dm_queue (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    prospect_id INTEGER NOT NULL UNIQUE,
+    priority_score INTEGER NOT NULL,
+    queued_at TEXT NOT NULL,
+    status TEXT DEFAULT 'pending',
+    FOREIGN KEY (prospect_id) REFERENCES prospects(id)
+);
+CREATE INDEX IF NOT EXISTS idx_dm_queue_priority ON dm_queue(priority_score DESC);
+CREATE INDEX IF NOT EXISTS idx_dm_queue_status ON dm_queue(status);
+"""
+
+
+def _ensure_dm_queue_table():
+    """Create dm_queue table if it doesn't exist."""
+    d = get_db()
+    d.executescript(DM_QUEUE_SQL)
+
+
+def save_dm_queue(entries: List[Dict]):
+    """Replace the pending queue with new entries.
+
+    Each entry: {prospect_id: int, priority_score: int}
+    """
+    _ensure_dm_queue_table()
+    d = get_db()
+    # Clear old pending entries
+    d.execute("DELETE FROM dm_queue WHERE status = 'pending'")
+    now = _now()
+    for entry in entries:
+        try:
+            d.execute(
+                "INSERT OR REPLACE INTO dm_queue (prospect_id, priority_score, queued_at, status) VALUES (?, ?, ?, 'pending')",
+                (entry["prospect_id"], entry["priority_score"], now),
+            )
+        except Exception:
+            pass
+    d.commit()
+
+
+def get_pending_queue(limit: int = 200) -> List[Dict]:
+    """Get pending queue entries joined with prospect data, ordered by priority."""
+    _ensure_dm_queue_table()
+    d = get_db()
+    rows = d.execute(
+        """SELECT q.id as queue_id, q.priority_score, q.queued_at,
+                  p.id as prospect_id, p.ig_handle, p.bio, p.icp_score,
+                  p.source, p.created_at as prospect_created_at
+           FROM dm_queue q
+           JOIN prospects p ON p.id = q.prospect_id
+           WHERE q.status = 'pending'
+           ORDER BY q.priority_score DESC
+           LIMIT ?""",
+        (limit,),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def mark_queue_sent(prospect_id: int):
+    """Mark a queue entry as sent."""
+    _ensure_dm_queue_table()
+    d = get_db()
+    d.execute(
+        "UPDATE dm_queue SET status = 'sent' WHERE prospect_id = ?",
+        (prospect_id,),
+    )
+    d.commit()

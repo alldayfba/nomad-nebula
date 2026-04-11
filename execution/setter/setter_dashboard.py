@@ -89,12 +89,13 @@ th { color: var(--dim); font-weight: 500; }
 <div class="section">
 <h2>Pending Approvals ({{ pending_approvals|length }})</h2>
 <table>
-<tr><th>Prospect</th><th>Stage</th><th>AI Response</th><th>Actions</th></tr>
+<tr><th>Prospect</th><th>Stage</th><th>They Said</th><th>AI Response</th><th>Actions</th></tr>
 {% for msg in pending_approvals %}
 <tr>
     <td>@{{ msg.ig_handle }}</td>
     <td><span class="badge badge-yellow">{{ msg.stage }}</span></td>
-    <td>{{ msg.content[:80] }}{% if msg.content|length > 80 %}...{% endif %}</td>
+    <td style="color: var(--dim); max-width: 250px;">{{ (msg.prospect_last_message or 'N/A')[:80] }}{% if msg.prospect_last_message and msg.prospect_last_message|length > 80 %}...{% endif %}</td>
+    <td style="max-width: 300px;">{{ msg.content[:100] }}{% if msg.content|length > 100 %}...{% endif %}</td>
     <td>
         <button class="btn btn-approve" onclick="approve({{ msg.id }})">Approve</button>
         <button class="btn btn-reject" onclick="reject({{ msg.id }})">Reject</button>

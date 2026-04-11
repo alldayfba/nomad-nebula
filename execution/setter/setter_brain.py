@@ -49,16 +49,31 @@ def _load_file(path: Path, max_chars: int = 0) -> str:
 
 
 def _load_section(path: Path, section_header: str, max_chars: int = 5000) -> str:
-    """Load a specific section from a markdown file by header."""
+    """Load a specific section from a markdown file by header.
+
+    Captures everything from the matched header until the next header
+    of the SAME level or higher (fewer #), so sub-headers are included.
+    """
     text = _load_file(path)
     if not text:
         return ""
-    pattern = rf"(#{1,3}\s*{re.escape(section_header)}.*?)(?=\n#{1,3}\s|\Z)"
-    match = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
-    if match:
-        content = match.group(1).strip()
-        return content[:max_chars] if max_chars else content
-    return ""
+    # Find the header and determine its level (number of #)
+    header_pattern = rf"(#{{1,6}})\s*{re.escape(section_header)}"
+    header_match = re.search(header_pattern, text, re.IGNORECASE)
+    if not header_match:
+        return ""
+    level = len(header_match.group(1))  # e.g. "##" → 2
+    start = header_match.start()
+    # Stop at the next header of same level or higher (≤ level #s)
+    # e.g. for ##, stop at # or ## but NOT ### or ####
+    end_pattern = rf"\n#{{1,{level}}}\s"
+    end_match = re.search(end_pattern, text[header_match.end():])
+    if end_match:
+        end = header_match.end() + end_match.start()
+    else:
+        end = len(text)
+    content = text[start:end].strip()
+    return content[:max_chars] if max_chars else content
 
 
 # ── Knowledge Paths ──────────────────────────────────────────────────────────
@@ -108,6 +123,30 @@ MENTOR_SECTIONS = {
     "johnny_mau_preframe": (
         PROJECT_ROOT / "bots" / "creators" / "johnny-mau-brain.md",
         "Pre-Frame",
+        5000,
+    ),
+}
+
+# Sales Trainer — stage-specific knowledge files
+SALES_TRAINER_FILES = {
+    "objection_battle_card": (
+        PROJECT_ROOT / ".tmp" / "24-7-profits-sales-optimization.md",
+        "DELIVERABLE 2: OBJECTION HANDLING",
+        6000,
+    ),
+    "five_tones": (
+        PROJECT_ROOT / ".tmp" / "24-7-profits-sales-optimization.md",
+        "The 5 Tones",
+        1500,
+    ),
+    "financial_tiedown": (
+        PROJECT_ROOT / ".tmp" / "creators" / "hormozi-docx-extractions" / "tie-downs-1.md",
+        "Financial Qualifications",
+        3000,
+    ),
+    "dm_setting_breakdown": (
+        PROJECT_ROOT / ".tmp" / "creators" / "hormozi-docx-extractions" / "dm-setting-breakdown.md",
+        None,  # Load whole file
         5000,
     ),
 }
@@ -203,26 +242,53 @@ ICP Reasoning: {prospect.get('icp_reasoning', 'Not scored yet')}
     parts.append(prospect_block)
 
     # ── Block 4: Conversation State (always loaded, ~300 tokens) ─────────
+    heat = conversation.get('heat_score', 0)
     state_block = f"""# CONVERSATION STATE
 
 Stage: {stage}
 Type: {conversation.get('conversation_type', 'cold_outbound')}
 Messages sent: {conversation.get('messages_sent', 0)}
 Messages received: {conversation.get('messages_received', 0)}
+Heat Score: {heat}/100
 Qualification status:
   - Commitment: {'Confirmed' if conversation.get('qual_commitment') else 'Unknown'}
   - Urgency: {'Confirmed' if conversation.get('qual_urgency') else 'Unknown'}
   - Resources: {'Confirmed' if conversation.get('qual_resources') else 'Unknown'}
+
+Heat Score Guide: 0-20 = cold (be casual, low pressure), 21-50 = warming (qualify actively), 51-80 = hot (push toward booking), 81-100 = closing (get them on the calendar NOW).
 """
     parts.append(state_block)
 
-    # ── Block 5: Conversation History (always loaded, variable) ──────────
+    # ── Block 5: Conversation History (always loaded, smart truncation) ──
     if messages:
         history_lines = ["# CONVERSATION HISTORY\n"]
-        for msg in messages[-20:]:  # Last 20 messages
-            direction = "YOU" if msg["direction"] == "out" else "PROSPECT"
-            history_lines.append(f"**{direction}:** {msg['content']}")
+        total = len(messages)
+
+        if total <= 30:
+            # Load everything
+            for msg in messages:
+                direction = "YOU" if msg["direction"] == "out" else "PROSPECT"
+                history_lines.append(f"**{direction}:** {msg['content']}")
+        else:
+            # First 5 + gap + last 25
+            for msg in messages[:5]:
+                direction = "YOU" if msg["direction"] == "out" else "PROSPECT"
+                history_lines.append(f"**{direction}:** {msg['content']}")
+            history_lines.append(f"\n... ({total - 30} earlier messages omitted) ...\n")
+            for msg in messages[-25:]:
+                direction = "YOU" if msg["direction"] == "out" else "PROSPECT"
+                history_lines.append(f"**{direction}:** {msg['content']}")
+
         parts.append("\n".join(history_lines))
+
+        # ── Block 5b: DO NOT REPEAT list ────────────────────────────
+        our_messages = [m['content'] for m in messages if m['direction'] == 'out']
+        if our_messages:
+            repeat_block = "# DO NOT REPEAT (you already sent these exact messages)\n\n"
+            for msg_text in our_messages[-10:]:  # Last 10 outbound
+                repeat_block += f"- \"{msg_text[:100]}\"\n"
+            repeat_block += "\nNEVER send the same message twice. Always write something fresh."
+            parts.append(repeat_block)
 
     # ── Block 6: DM Frameworks (loaded for qualification+, ~3K tokens) ───
     if stage in ("replied", "qualifying", "qualified", "booking", "nurture"):
@@ -255,6 +321,58 @@ Qualification status:
             if section_content:
                 parts.append(f"# SETTING FRAMEWORK: {key}\n\n{section_content}")
 
+    # ── Block 7c: Johnny Mau Pre-Frame (loaded for replied stage) ───────
+    if stage == "replied":
+        path, section, max_chars = MENTOR_SECTIONS["johnny_mau_preframe"]
+        section_content = _load_section(path, section, max_chars)
+        if section_content:
+            parts.append(f"# SALES TRAINER: Pre-Frame Psychology\n\n{section_content}")
+
+    # ── Block 7d: Sales Trainer deep knowledge (qualifying+) ───────────
+    if stage in ("qualifying", "qualified", "booking"):
+        # Objection battle card + 5 tones
+        for key in ("objection_battle_card", "five_tones"):
+            path, section, max_chars = SALES_TRAINER_FILES[key]
+            if section:
+                content = _load_section(path, section, max_chars)
+            else:
+                content = _load_file(path, max_chars)
+            if content:
+                parts.append(f"# SALES TRAINER: {key.replace('_', ' ').title()}\n\n{content}")
+
+    # ── Block 7e: Tie-downs (loaded for qualified/booking) ─────────────
+    if stage in ("qualified", "booking"):
+        path, section, max_chars = SALES_TRAINER_FILES["financial_tiedown"]
+        if section:
+            content = _load_section(path, section, max_chars)
+        else:
+            content = _load_file(path, max_chars)
+        if content:
+            parts.append(f"# SALES TRAINER: Financial Tie-Down\n\n{content}")
+
+    # ── Block 7f: Re-engagement strategies (nurture) ───────────────────
+    if stage == "nurture":
+        nurture_prompt = """# SALES TRAINER: Re-Engagement Strategies
+
+When a lead goes cold, use ONE of these approaches (rotate, don't repeat):
+
+1. **Value Share** — Send a specific, relevant insight with NO ask attached.
+   Example: "saw this and thought of you — [relevant tip about Amazon/their niche]"
+
+2. **Curiosity Hook** — Reference something new or time-sensitive without pitching.
+   Example: "we just had a student hit their first $10K month doing [thing relevant to their situation] — crazy stuff"
+
+3. **Direct Check-In** — Casual, no pressure, acknowledge the gap.
+   Example: "hey been a min — you still looking into the amazon thing or nah?"
+
+Rules:
+- NEVER re-pitch or re-qualify. They already know what you do.
+- NEVER guilt trip ("I noticed you didn't respond...")
+- Keep it to ONE sentence max. Less is more for re-engagement.
+- If they reply → go back to qualification flow from where you left off.
+- If no reply after 2 re-engagements → mark dead, revisit in 90 days."""
+        parts.append(nurture_prompt)
+
     # ── Block 8: Winning Patterns (loaded when available, ~500 tokens) ───
     pattern_type_map = {
         "new": "opener",
@@ -272,6 +390,15 @@ Qualification status:
             for p in patterns:
                 pattern_block += f"- (success: {p['success_rate']:.0%}) {p['content']}\n"
             parts.append(pattern_block)
+
+    # ── Block 8b: Sales Trainer Coaching Notes (from audits) ──────────────
+    try:
+        from .sales_auditor import get_improvement_report
+        coaching = get_improvement_report()
+        if coaching and len(coaching) > 50:
+            parts.append(f"# SALES TRAINER COACHING NOTES (from recent conversation audits)\n\n{coaching}")
+    except Exception:
+        pass  # Auditor not available, skip
 
     # ── Block 9: Safety Rules (always loaded, ~300 tokens) ───────────────
     safety_block = f"""# SAFETY RULES
@@ -341,6 +468,8 @@ Generate the next DM message. Current stage: {stage}
 - If the prospect says "on my own" or "basic info" → use the reclose script.
 - If unclear what stage we're at → use the clarify script.
 - NEVER pitch, explain the program, or discuss pricing in detail. Redirect to the call.
+- NEVER repeat a message you already sent (check the DO NOT REPEAT list above).
+- If you're at a stage where the script says to send a specific message but you already sent it — acknowledge their response and move to the NEXT stage naturally.
 - EVERY reply MUST end with a question. Acknowledge → answer briefly → ask a follow-up question. If you just answer without asking something back, they'll leave you on seen. You must always lead the conversation.
 - {"Generate a personalized opener based on their profile." if stage == "new" else "Continue the conversation using the script flow."}
 
@@ -583,8 +712,9 @@ def _analyze_stage_progression(
         if any(s in msg_lower for s in urgency_signals) and not conversation.get("qual_urgency"):
             qual_updates["qual_urgency"] = True
 
-        # Check for resource signals
-        resource_signals = ["budget", "saved", "have the money", "set aside", "ready to invest", "capital"]
+        # Check for resource signals — aggressive detection for capital mentions
+        resource_signals = ["budget", "saved", "have the money", "set aside", "ready to invest",
+                          "capital", "$", "k", "thousand", "credit", "savings", "loan"]
         if any(s in msg_lower for s in resource_signals) and not conversation.get("qual_resources"):
             qual_updates["qual_resources"] = True
 
@@ -604,8 +734,15 @@ def _analyze_stage_progression(
 
     elif current_stage == "booking":
         # Check if they confirmed booking
-        booking_signals = ["booked", "scheduled", "confirmed", "yes", "done", "see you"]
+        booking_signals = ["booked", "scheduled", "confirmed", "yes", "done", "see you",
+                          "locked in", "all set", "just booked", "got it"]
         if any(s in msg_lower for s in booking_signals):
+            return "booked", {}
+        # Check if they're sharing contact info (name/email/phone) — booking in progress
+        import re as _re
+        has_email = bool(_re.search(r'[\w.+-]+@[\w-]+\.[\w.-]+', prospect_msg))
+        has_phone = bool(_re.search(r'[\(]?\d{3}[\)]?[-.\s]?\d{3}[-.\s]?\d{4}', prospect_msg))
+        if has_email or has_phone:
             return "booked", {}
 
     return current_stage, qual_updates

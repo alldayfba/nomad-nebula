@@ -116,12 +116,12 @@ def _is_time_for(task: str, last_run: dict) -> bool:
     """Check if it's time to run a periodic task."""
     now = time.time()
     intervals = {
-        "inbox": 60,           # Every 1 minute — near-instant DM response
+        "inbox": 45,           # Every 45 seconds — sub-2-min response time
         "inbox_night": 900,    # Every 15 minutes at night
         "prospect": 300,       # Every 5 minutes — catch new followers fast
         "followup": 300,       # Every 5 minutes
         "show_rate": 300,      # Every 5 minutes
-        "story_viewers": 1800, # Every 30 minutes
+        "story_viewers": 900,  # Every 15 minutes — catch story engagement fast
         "comment_scan": 300,   # Every 5 minutes — keyword comment triggers
         "grading": 3600,       # Every hour — batch re-grade all convos
         "audit": 14400,        # Every 4 hours — Sales Manager audit

@@ -24,6 +24,7 @@ from . import setter_db as db
 from .setter_brain import generate_response, generate_opener
 from .ig_browser import IGBrowserSync
 from .followup_engine import schedule_follow_ups, cancel_follow_ups_for_conversation
+from .heat_scorer import calculate_heat_score
 
 logger = logging.getLogger("setter.conversation")
 
@@ -48,7 +49,7 @@ def _create_ghl_contact(prospect: Dict, offer_key: str) -> Optional[str]:
             contact_data["website"] = prospect["website"]
 
         result = create_or_update_contact(**contact_data)
-        contact_id = result.get("contact", {}).get("id") if result else None
+        contact_id = result.get("contact_id") if result else None
         if contact_id:
             add_tags(contact_id, offer.get("tags", []))
             logger.info("GHL contact created: %s for @%s", contact_id, prospect.get("ig_handle"))
@@ -299,6 +300,15 @@ def process_inbox(browser: IGBrowserSync) -> Dict:
     threads = browser.read_inbox(max_threads=30)
     unread = [t for t in threads if t.get("unread")]
 
+    # Sort unread: inbound-first (no existing conversation) get priority
+    def _inbound_priority(thread):
+        thread_id = thread.get("thread_id")
+        conv = db.get_conversation_by_thread(thread_id) if thread_id else None
+        # No existing conversation = they messaged us first = highest priority
+        return 0 if conv is None else 1
+
+    unread = sorted(unread, key=_inbound_priority)
+
     for thread in unread:
         try:
             thread_id = thread.get("thread_id")
@@ -318,6 +328,12 @@ def process_inbox(browser: IGBrowserSync) -> Dict:
             if not conv:
                 # Try to match by handle from thread name
                 handle = thread.get("name", "").lstrip("@")
+
+                # Blocklist check for inbound too — don't auto-respond to blocklisted
+                if handle and db.is_blocklisted(handle):
+                    logger.debug("Skipping inbox thread from @%s — blocklisted", handle)
+                    continue
+
                 prospect = db.get_prospect_by_handle(handle) if handle else None
 
                 if not prospect and handle:
@@ -341,6 +357,13 @@ def process_inbox(browser: IGBrowserSync) -> Dict:
                     conv = db.get_conversation(conv_id)
                 else:
                     continue
+            else:
+                # Existing conversation — check blocklist by prospect handle
+                _prospect_check = db.get_prospect(conv["prospect_id"])
+                if _prospect_check and db.is_blocklisted(_prospect_check.get("ig_handle", "")):
+                    logger.debug("Skipping inbox thread from @%s — blocklisted",
+                                 _prospect_check.get("ig_handle", ""))
+                    continue
 
             prospect = db.get_prospect(conv["prospect_id"])
             if not prospect:
@@ -350,19 +373,25 @@ def process_inbox(browser: IGBrowserSync) -> Dict:
             existing_msgs = db.get_messages(conv["id"])
             existing_count = len(existing_msgs)
 
-            # Find messages we haven't stored yet (compare content)
-            existing_contents = {m["content"] for m in existing_msgs}
+            # Find messages we haven't stored yet
+            # Use (content, direction) tuple for dedup — content-only misses direction flips
+            existing_keys = {(m["content"], m["direction"]) for m in existing_msgs}
             new_inbound = []
             for msg in thread_messages:
-                if msg["direction"] == "in" and msg.get("content") not in existing_contents:
+                if msg["direction"] == "in" and (msg.get("content"), "in") not in existing_keys:
                     new_inbound.append(msg)
 
-            for msg in new_inbound:
+            for idx, msg in enumerate(new_inbound):
+                import hashlib
+                msg_hash = hashlib.md5(
+                    f"{msg['content']}:{conv['id']}:{idx}".encode()
+                ).hexdigest()[:16]
                 db.add_message(
                     conversation_id=conv["id"],
                     direction="in",
                     content=msg["content"],
                     message_type=msg.get("message_type", "text"),
+                    ig_message_id=f"in_{msg_hash}",
                 )
 
             if not new_inbound:
@@ -376,6 +405,7 @@ def process_inbox(browser: IGBrowserSync) -> Dict:
                 db.update_conversation(conv["id"], stage="replied")
                 conv["stage"] = "replied"
                 db.increment_metric("replies_received")
+                calculate_heat_score(conv["id"])
 
             # Check message cap
             if conv["messages_sent"] >= SAFETY["max_messages_before_flag"]:
@@ -402,6 +432,7 @@ def process_inbox(browser: IGBrowserSync) -> Dict:
             # Check max unanswered — don't spam if they're not replying
             if _too_many_unanswered(conv["id"]):
                 db.update_conversation(conv["id"], stage="nurture")
+                calculate_heat_score(conv["id"])
                 logger.info("@%s moved to nurture — %d unanswered messages",
                             prospect["ig_handle"], SAFETY["max_unanswered_messages"])
                 continue
@@ -445,9 +476,13 @@ def process_inbox(browser: IGBrowserSync) -> Dict:
                 )
                 continue
 
-            # Human-like reply delay (15-90s so we don't look like a bot)
+            # Human-like reply delay — faster for inbound (they DM'd us first, they're hot)
             import random as _rnd
-            delay = _rnd.uniform(REPLY_DELAY["min_seconds"], REPLY_DELAY["max_seconds"])
+            if conv.get("conversation_type") == "inbound":
+                from .setter_config import REPLY_DELAY_INBOUND
+                delay = _rnd.uniform(REPLY_DELAY_INBOUND["min_seconds"], REPLY_DELAY_INBOUND["max_seconds"])
+            else:
+                delay = _rnd.uniform(REPLY_DELAY["min_seconds"], REPLY_DELAY["max_seconds"])
             logger.info("Waiting %.0fs before replying to @%s...", delay, prospect["ig_handle"])
             time.sleep(delay)
 
@@ -489,10 +524,17 @@ def process_inbox(browser: IGBrowserSync) -> Dict:
                         db.update_conversation(conv["id"], ghl_contact_id=ghl_id)
 
                 # Detect booking info (name + email + phone in recent messages)
-                _check_booking_info(conv, prospect, new_inbound)
+                # Only check once we're past initial qualifying — prevents false
+                # triggers from random email/phone patterns in early openers
+                updated_conv = db.get_conversation(conv["id"]) or conv
+                if updated_conv["stage"] in ("qualifying", "qualified", "booking"):
+                    _check_booking_info(updated_conv, prospect, new_inbound)
 
                 # NOTE: We book manually — no calendar link auto-send.
                 # When booking info is detected, Discord alert fires.
+
+                # Recalculate heat score after all updates
+                calculate_heat_score(conv["id"])
 
                 stats["sent"] += 1
 
@@ -518,9 +560,20 @@ def process_inbox(browser: IGBrowserSync) -> Dict:
                 logger.error("Failed to send DM to %s: %s",
                              prospect["ig_handle"], send_result.get("error"))
 
-        except Exception as e:
+        except (TimeoutError, Exception) as e:
             stats["errors"] += 1
             logger.error("Error processing thread: %s", e, exc_info=True)
+            # On timeout or crash, check if IG action-blocked us
+            if isinstance(e, TimeoutError) or "timeout" in str(e).lower():
+                try:
+                    if browser.check_action_block():
+                        _send_discord_alert("ACTION BLOCK DETECTED (timeout). Setter paused for 24h.")
+                        Path(SAFETY["pause_file"]).parent.mkdir(parents=True, exist_ok=True)
+                        Path(SAFETY["pause_file"]).touch()
+                        db.increment_metric("action_blocks")
+                        break
+                except Exception:
+                    pass
 
     return stats
 
@@ -602,9 +655,18 @@ def send_approved_messages(browser: IGBrowserSync) -> Dict:
                     Path(SAFETY["pause_file"]).touch()
                     break
 
-        except Exception as e:
+        except (TimeoutError, Exception) as e:
             stats["errors"] += 1
             logger.error("Error sending approved message: %s", e)
+            if isinstance(e, TimeoutError) or "timeout" in str(e).lower():
+                try:
+                    if browser.check_action_block():
+                        _send_discord_alert("ACTION BLOCK (timeout) during approved send. Paused 24h.")
+                        Path(SAFETY["pause_file"]).parent.mkdir(parents=True, exist_ok=True)
+                        Path(SAFETY["pause_file"]).touch()
+                        break
+                except Exception:
+                    pass
 
     return stats
 
@@ -630,6 +692,12 @@ def send_cold_outbound_batch(browser: IGBrowserSync, max_count: int = 50) -> Dic
             break
 
         try:
+            # Blocklist check
+            if db.is_blocklisted(prospect.get("ig_handle", "")):
+                logger.debug("Skipping @%s — blocklisted", prospect.get("ig_handle"))
+                stats["skipped"] += 1
+                continue
+
             # Skip if already has active conversation
             existing = db.get_conversation_by_prospect(prospect["id"])
             if existing:
@@ -731,6 +799,9 @@ def send_cold_outbound_batch(browser: IGBrowserSync, max_count: int = 50) -> Dic
                 # Record pattern
                 db.record_pattern("opener", opener["content"], offer_key)
 
+                # Calculate initial heat score
+                calculate_heat_score(conv_id)
+
                 stats["sent"] += 1
                 logger.info("Cold opener sent to @%s", prospect["ig_handle"])
             else:
@@ -741,10 +812,19 @@ def send_cold_outbound_batch(browser: IGBrowserSync, max_count: int = 50) -> Dic
                     Path(SAFETY["pause_file"]).touch()
                     break
 
-        except Exception as e:
+        except (TimeoutError, Exception) as e:
             stats["errors"] += 1
             logger.error("Error in cold outbound for @%s: %s",
                          prospect.get("ig_handle"), e, exc_info=True)
+            if isinstance(e, TimeoutError) or "timeout" in str(e).lower():
+                try:
+                    if browser.check_action_block():
+                        _send_discord_alert("ACTION BLOCK (timeout) during cold outbound. Paused 24h.")
+                        Path(SAFETY["pause_file"]).parent.mkdir(parents=True, exist_ok=True)
+                        Path(SAFETY["pause_file"]).touch()
+                        break
+                except Exception:
+                    pass
 
     return stats
 
@@ -773,6 +853,12 @@ def send_warm_outbound_batch(browser: IGBrowserSync, max_count: int = 50) -> Dic
             continue
 
         try:
+            # Blocklist check
+            if db.is_blocklisted(handle):
+                logger.debug("Skipping @%s — blocklisted", handle)
+                stats["skipped"] += 1
+                continue
+
             # Check if already a prospect
             prospect = db.get_prospect_by_handle(handle)
             if prospect:
@@ -867,6 +953,7 @@ def send_warm_outbound_batch(browser: IGBrowserSync, max_count: int = 50) -> Dic
                 db.increment_send_count("dm_total")
                 db.increment_metric("warm_dms_sent")
                 schedule_follow_ups(conv_id)
+                calculate_heat_score(conv_id)
                 stats["sent"] += 1
             else:
                 stats["errors"] += 1
@@ -875,8 +962,17 @@ def send_warm_outbound_batch(browser: IGBrowserSync, max_count: int = 50) -> Dic
                     Path(SAFETY["pause_file"]).touch()
                     break
 
-        except Exception as e:
+        except (TimeoutError, Exception) as e:
             stats["errors"] += 1
             logger.error("Warm outbound error for @%s: %s", handle, e)
+            if isinstance(e, TimeoutError) or "timeout" in str(e).lower():
+                try:
+                    if browser.check_action_block():
+                        _send_discord_alert("ACTION BLOCK (timeout) during warm outbound. Paused 24h.")
+                        Path(SAFETY["pause_file"]).parent.mkdir(parents=True, exist_ok=True)
+                        Path(SAFETY["pause_file"]).touch()
+                        break
+                except Exception:
+                    pass
 
     return stats

@@ -275,6 +275,11 @@ REPLY_DELAY = {
     "max_seconds": 90,   # Max wait (always under 2 min total with processing time)
 }
 
+REPLY_DELAY_INBOUND = {
+    "min_seconds": 10,   # Faster for inbound — they're hot
+    "max_seconds": 30,   # Still under 30s (Hormozi: 60s response time target)
+}
+
 # ── Comment Keywords (trigger auto-DM when someone comments these) ──────────
 
 COMMENT_KEYWORDS = {
@@ -362,11 +367,10 @@ OWN_IG_HANDLE = os.getenv("SETTER_IG_HANDLE", "allday.fba")
 
 COMPETITOR_ACCOUNTS = {
     "amazon_os": [
-        # Add competitor IG handles here
+        # Add competitor FBA coaching IG handles here
+        # Example: "competitor_fba_coach_1",
     ],
-    "agency_os": [
-        # Add competitor IG handles here
-    ],
+    "agency_os": [],
 }
 
 # ── Hashtags to Monitor ──────────────────────────────────────────────────────

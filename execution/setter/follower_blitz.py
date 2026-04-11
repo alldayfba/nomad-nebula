@@ -97,7 +97,7 @@ def run_blitz(limit: int = 20, dry_run: bool = False, cooldown: tuple = None,
 
     stats = {"sent": 0, "skipped_contacted": 0, "skipped_no_msg": 0,
              "skipped_error": 0, "total_checked": 0, "collected": 0,
-             "new_followers": 0}
+             "new_followers": 0, "skipped_blocklist": 0, "skipped_icp": 0}
 
     try:
         _run_blitz_loop(browser, limit, dry_run, cooldown, stats, mode,
@@ -113,6 +113,8 @@ def run_blitz(limit: int = 20, dry_run: bool = False, cooldown: tuple = None,
     logger.info("  Followers collected: %d (%d new)", stats["collected"], stats["new_followers"])
     logger.info("  DMs sent: %d", stats["sent"])
     logger.info("  Skipped (already contacted): %d", stats["skipped_contacted"])
+    logger.info("  Skipped (blocklisted): %d", stats.get("skipped_blocklist", 0))
+    logger.info("  Skipped (ICP mismatch): %d", stats.get("skipped_icp", 0))
     logger.info("  Skipped (not found/error): %d", stats["skipped_no_msg"])
     logger.info("  Total checked for DM: %d", stats["total_checked"])
 
@@ -333,19 +335,33 @@ Return ONLY the message text, nothing else."""
 
     async def _dm_from_db():
         """Pick uncontacted followers from DB, open DM thread, send if fresh."""
-        # Query DB for followers we haven't contacted yet
-        d = db.get_db()
-        rows = d.execute(
-            """SELECT p.ig_handle FROM prospects p
-               LEFT JOIN conversations c ON c.prospect_id = p.id
-               WHERE c.id IS NULL
-               AND p.source IN ('follower_scroll', 'new_follower')
-               ORDER BY p.created_at DESC
-               LIMIT ?""",
-            (limit * 3,)  # Fetch extra in case many have existing threads
-        ).fetchall()
-        candidates = [r["ig_handle"] for r in rows]
+        # Try priority queue first (smarter ordering by ICP + heat + recency)
+        use_priority_queue = False
+        try:
+            from execution.setter.priority_queue import get_queue_for_blitz
+            pq = get_queue_for_blitz(limit=limit * 3)
+            if pq:
+                candidates = [entry["ig_handle"] for entry in pq]
+                use_priority_queue = True
+                logger.info("Phase 2: Using priority queue (%d leads)", len(candidates))
+        except Exception as pq_err:
+            logger.debug("Priority queue unavailable: %s", pq_err)
 
+        if not use_priority_queue:
+            # Fallback to sequential order
+            d = db.get_db()
+            rows = d.execute(
+                """SELECT p.ig_handle FROM prospects p
+                   LEFT JOIN conversations c ON c.prospect_id = p.id
+                   WHERE c.id IS NULL
+                   AND p.source IN ('follower_scroll', 'new_follower')
+                   ORDER BY p.created_at DESC
+                   LIMIT ?""",
+                (limit * 3,)  # Fetch extra in case many have existing threads
+            ).fetchall()
+            candidates = [r["ig_handle"] for r in rows]
+
+        d = db.get_db()
         total_in_db = d.execute(
             "SELECT COUNT(*) FROM prospects WHERE source IN ('follower_scroll', 'new_follower')"
         ).fetchone()[0]
@@ -355,8 +371,9 @@ Return ONLY the message text, nothing else."""
                WHERE p.source IN ('follower_scroll', 'new_follower')"""
         ).fetchone()[0]
 
-        logger.info("Phase 2: DB has %d followers total, %d contacted, %d uncontacted candidates",
-                    total_in_db, contacted_count, len(candidates))
+        logger.info("Phase 2: DB has %d followers total, %d contacted, %d uncontacted candidates%s",
+                    total_in_db, contacted_count, len(candidates),
+                    " (priority-ordered)" if use_priority_queue else "")
 
         if not candidates:
             logger.info("No uncontacted followers in DB — run with scroll first")
@@ -366,6 +383,22 @@ Return ONLY the message text, nothing else."""
         for handle in candidates:
             if stats["sent"] >= limit:
                 break
+
+            # Blocklist check — never DM friends, students, creators
+            if db.is_blocklisted(handle):
+                logger.debug("Skipping @%s — blocklisted", handle)
+                stats["skipped_blocklist"] = stats.get("skipped_blocklist", 0) + 1
+                continue
+
+            # ICP filter — skip prospects scored 0 with a real bio (not ICP)
+            prospect_data = db.get_prospect_by_handle(handle)
+            if prospect_data and prospect_data.get("icp_score", 0) == 0:
+                # If they have a bio and scored 0, they're not ICP — skip
+                if prospect_data.get("bio") and prospect_data["bio"] not in ("", "No bio", None):
+                    logger.debug("Skipping @%s — ICP score 0 (not a match)", handle)
+                    stats["skipped_icp"] = stats.get("skipped_icp", 0) + 1
+                    continue
+                # If no bio, we can't determine ICP yet — let them through
 
             stats["total_checked"] += 1
             logger.info("@%s — checking DM thread... (%d/%d sent)",
@@ -424,6 +457,8 @@ Return ONLY the message text, nothing else."""
                 db.update_prospect_status(prospect["id"], "contacted")
                 db.increment_send_count("dm_followup")
                 db.increment_send_count("dm_total")
+                if use_priority_queue:
+                    db.mark_queue_sent(prospect["id"])
                 stats["sent"] += 1
                 logger.info("  FOLLOW-UP (%d/%d)", stats["sent"], limit)
 
@@ -439,6 +474,8 @@ Return ONLY the message text, nothing else."""
                 db.update_prospect_status(prospect["id"], "contacted")
                 db.increment_send_count("dm_cold")
                 db.increment_send_count("dm_total")
+                if use_priority_queue:
+                    db.mark_queue_sent(prospect["id"])
                 stats["sent"] += 1
                 logger.info("  SENT (%d/%d)", stats["sent"], limit)
 
@@ -538,27 +575,14 @@ Return ONLY the message text, nothing else."""
             logger.info("  @%s: thread didn't open (no input found)", handle)
             return False
 
-        # ── STEP 3: Check if we've already messaged this person ──────
-        # Simple check: look for ANY of our known openers in the thread text
-        # If found → this is a follow-up situation, not a fresh thread
+        # ── STEP 3: Check thread state — fresh vs has messages ──────
+        # Instead of matching specific opener text, detect ANY messages in thread.
+        # If thread has messages → "still with me??" follow-up.
+        # If truly empty → cold opener.
         try:
             thread_state = await page.evaluate("""() => {
                 const body = document.body.innerText.toLowerCase();
-                // Check for our known openers (any variation)
-                const ourOpeners = [
-                    'u looking into amazon',
-                    'you selling on amazon',
-                    'u into amazon',
-                    'looking into starting on amazon',
-                    'welcome, you into amazon',
-                    'still with me',
-                    'making sure this didn',
-                    'checking in',
-                ];
-                for (const opener of ourOpeners) {
-                    if (body.includes(opener)) return 'we_sent';
-                }
-                // Check for "send a message" empty state
+                // Check for "send a message" empty state → fresh thread
                 const emptyIndicators = [
                     'send a message to start a chat',
                     'say something nice',
@@ -570,21 +594,13 @@ Return ONLY the message text, nothing else."""
                 }
                 // If we're still on /direct/new/ URL, it's fresh
                 if (window.location.href.includes('/direct/new/')) return 'fresh';
-                // Thread exists but none of our openers found — could be their inbound or old convo
-                return 'unknown';
-            }""")
-        except Exception as e:
-            logger.warning("  @%s: thread check error: %s", handle, e)
-            thread_state = "unknown"
-
-        if thread_state == "we_sent":
-            # We already messaged them — check if they replied
-            has_their_reply = await page.evaluate("""() => {
+                // Thread exists with messages — check for outbound (ours) vs inbound
                 const main = document.querySelector('main') || document.querySelector('section');
-                if (!main) return false;
+                if (!main) return 'fresh';
                 const allDivs = main.querySelectorAll('div[dir="auto"]');
                 const skip = new Set(['', 'message...', 'active now', 'active today',
-                    'send a message to start a chat.']);
+                    'send a message to start a chat.', 'message', 'audio', 'video']);
+                let hasOurs = false, hasTheirs = false;
                 for (const el of allDivs) {
                     const t = el.textContent.trim();
                     if (!t || t.length < 2 || skip.has(t.toLowerCase())) continue;
@@ -598,17 +614,26 @@ Return ONLY the message text, nothing else."""
                             isOurs = true; break;
                         }
                     }
-                    if (!isOurs) return true;
+                    if (isOurs) hasOurs = true;
+                    else hasTheirs = true;
                 }
-                return false;
+                if (hasOurs && hasTheirs) return 'they_replied';
+                if (hasOurs) return 'we_sent_no_reply';
+                if (hasTheirs) return 'they_messaged_us';
+                return 'has_thread';
             }""")
+        except Exception as e:
+            logger.warning("  @%s: thread check error: %s", handle, e)
+            thread_state = "has_thread"
 
-            if has_their_reply:
-                logger.info("  @%s: they replied — skipping", handle)
-                return ("skip", None)
+        if thread_state == "they_replied":
+            # Active convo — they replied, skip
+            logger.info("  @%s: they replied — skipping", handle)
+            return ("skip", None)
 
-            # We sent, they never replied → "still with me??"
-            logger.info("  @%s: already messaged, no reply — follow-up", handle)
+        if thread_state in ("we_sent_no_reply", "has_thread", "they_messaged_us"):
+            # Existing thread, no recent reply from them → "still with me??"
+            logger.info("  @%s: existing thread (%s) — sending follow-up", handle, thread_state)
             message_to_send = "still with me??"
             await msg_input.click()
             await asyncio.sleep(0.3)
@@ -629,11 +654,6 @@ Return ONLY the message text, nothing else."""
                 except Exception: pass
                 return ("followup", message_to_send)
             return False
-
-        if thread_state == "unknown":
-            # Thread exists but we can't tell what's in it — skip to be safe
-            logger.info("  @%s: existing thread (unknown state) — skipping", handle)
-            return ("skip", None)
 
         # ── STEP 4: Fresh thread — send personalized cold opener ──
         # Use bio from search result or DB
@@ -751,7 +771,7 @@ def run_full_cycle(limit: int = 200, fast: bool = False):
         logger.info("═══ PHASE 1: Scroll & Collect ═══")
         stats_collect = {"sent": 0, "skipped_contacted": 0, "skipped_no_msg": 0,
                          "skipped_error": 0, "total_checked": 0, "collected": 0,
-                         "new_followers": 0}
+                         "new_followers": 0, "skipped_blocklist": 0, "skipped_icp": 0}
         _run_blitz_loop(browser, limit, False, cooldown or (30, 90), stats_collect,
                         mode="cold", collect_only=True, dm_only=False)
         logger.info("  Collected %d followers (%d new)",
@@ -775,7 +795,7 @@ def run_full_cycle(limit: int = 200, fast: bool = False):
         logger.info("═══ PHASE 4: New Openers ═══")
         stats_dm = {"sent": 0, "skipped_contacted": 0, "skipped_no_msg": 0,
                     "skipped_error": 0, "total_checked": 0, "collected": 0,
-                    "new_followers": 0}
+                    "new_followers": 0, "skipped_blocklist": 0, "skipped_icp": 0}
         _run_blitz_loop(browser, limit, False, cooldown or (30, 90), stats_dm,
                         mode="cold", collect_only=False, dm_only=True)
         logger.info("  Sent: %d new openers", stats_dm["sent"])
