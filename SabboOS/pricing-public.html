@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>24/7 Profits — Full Pricing & Offers</title>
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --surface: #121218;
+    --surface-2: #1a1a22;
+    --border: rgba(255,255,255,0.08);
+    --text: #f4f4f6;
+    --muted: rgba(244,244,246,0.55);
+    --dim: rgba(244,244,246,0.35);
+    --brand: #bf5af2;
+    --brand-dim: rgba(191,90,242,0.15);
+    --gold: #d4a017;
+    --success: #30d158;
+    --danger: #ff453a;
+  }
+  *,*::before,*::after { box-sizing: border-box; }
+  html,body { margin:0; padding:0; background: var(--bg); color: var(--text); font: 15px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; }
+  body { background:
+    radial-gradient(900px 500px at 10% -10%, rgba(191,90,242,0.18), transparent 60%),
+    radial-gradient(700px 500px at 100% 10%, rgba(212,160,23,0.08), transparent 60%),
+    var(--bg);
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 48px 32px 120px; }
+  .hero { text-align:center; padding: 48px 16px 32px; }
+  .hero h1 { font-size: clamp(32px, 5vw, 56px); margin: 0 0 12px; letter-spacing:-0.02em; font-weight: 800; }
+  .hero h1 span { background: linear-gradient(135deg, var(--brand), var(--gold)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p { color: var(--muted); max-width: 640px; margin: 8px auto 0; font-size: 16px; }
+  .section { margin: 48px 0 0; }
+  .section-head { display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom: 20px; }
+  .section-head h2 { margin:0; font-size: 24px; letter-spacing:-0.01em; }
+  .section-head p { color: var(--muted); margin:0; font-size: 14px; }
+  .grid { display:grid; gap: 16px; }
+  .grid.coaching { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .grid.saas { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .card { background: linear-gradient(180deg, var(--surface), var(--surface-2)); border:1px solid var(--border); border-radius: 18px; padding: 24px; position: relative; overflow: hidden; }
+  .card.featured { border-color: rgba(191,90,242,0.35); box-shadow: 0 0 0 1px rgba(191,90,242,0.1), 0 20px 60px -20px rgba(191,90,242,0.3); }
+  .card.featured::before { content: "Most Popular"; position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, var(--brand), var(--gold)); color: white; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 999px; }
+  .tier-label { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--brand); margin-bottom: 6px; }
+  .tier-name { font-size: 22px; font-weight: 700; margin: 0 0 4px; letter-spacing:-0.01em; }
+  .tier-desc { font-size: 13px; color: var(--muted); margin: 0 0 16px; min-height: 36px; }
+  .tier-price { font-size: 34px; font-weight: 800; letter-spacing:-0.02em; }
+  .tier-price small { font-size: 13px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+  .tier-sub { font-size: 12px; color: var(--dim); margin-top: 4px; }
+  .feat { list-style: none; padding: 0; margin: 20px 0 0; display: flex; flex-direction: column; gap: 8px; }
+  .feat li { display:flex; gap:8px; align-items:flex-start; font-size: 13px; line-height: 1.5; color: var(--text); }
+  .feat li::before { content: "✓"; color: var(--success); font-weight: 700; flex-shrink: 0; }
+  .feat li.x { color: var(--dim); text-decoration: line-through; }
+  .feat li.x::before { content: "—"; color: var(--dim); }
+  .feat li.inf::before { content: "∞"; color: var(--brand); font-size: 14px; }
+  .cta { display: block; margin-top: 22px; padding: 12px 16px; text-align: center; background: linear-gradient(135deg, var(--brand), var(--gold)); color: #fff; text-decoration: none; font-weight: 600; font-size: 14px; border-radius: 12px; transition: filter 0.15s; }
+  .cta:hover { filter: brightness(1.1); }
+  .cta.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  .cta.ghost:hover { background: rgba(255,255,255,0.04); }
+  .table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--surface); border-radius: 16px; overflow: hidden; border: 1px solid var(--border); }
+  .table th, .table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+  .table th { background: rgba(255,255,255,0.02); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .table tr:last-child td { border-bottom: none; }
+  .table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+  .pill.inf { background: var(--brand-dim); color: var(--brand); }
+  .pill.free { background: rgba(48,209,88,0.15); color: var(--success); }
+  .pill.cap { background: rgba(255,255,255,0.06); color: var(--muted); }
+  .note { background: var(--surface); border-left: 3px solid var(--brand); padding: 14px 16px; border-radius: 8px; font-size: 13px; color: var(--muted); margin-top: 20px; }
+  .note strong { color: var(--text); }
+  .foot { text-align:center; color: var(--dim); font-size: 12px; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border); }
+  @media (max-width: 640px) {
+    .wrap { padding: 24px 16px 80px; }
+    .hero { padding: 24px 8px 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <h1>Profit like it's <span>24/7</span></h1>
+    <p>The complete pricing breakdown for the Amazon OS coaching program and the 24/7 Profits AI software suite. Every tier. Every dollar. Zero surprises.</p>
+  </div>
+
+  <!-- COACHING -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Amazon OS — Coaching Programs</h2>
+      <p>For sellers who want to be taught, not just handed a tool.</p>
+    </div>
+    <div class="grid coaching">
+
+      <div class="card">
+        <div class="tier-label">Tier A · Self-Study</div>
+        <div class="tier-name">Course Only</div>
+        <div class="tier-desc">Full Academy library. DIY, at your own pace.</div>
+        <div class="tier-price">$500 <small>/ one-time</small></div>
+        <div class="tier-sub">or 3 × $197 payment plan</div>
+        <ul class="feat">
+          <li>Full Academy course library</li>
+          <li>All modules &amp; lesson updates, forever</li>
+          <li>Read-only Discord general channels</li>
+          <li class="x">No AI software access</li>
+          <li class="x">No coaching calls</li>
+          <li class="x">No product leads</li>
+        </ul>
+        <a class="cta ghost" href="#">Start with course</a>
+      </div>
+
+      <div class="card">
+        <div class="tier-label">Tier B · Group Program</div>
+        <div class="tier-name">Accelerator</div>
+        <div class="tier-desc">First $1K month in 60 days with limited AI + group coaching.</div>
+        <div class="tier-price">$2,000 <small>PIF</small></div>
+        <div class="tier-sub">or 3 × $797 · 6 × $397 (+15%)</div>
+        <ul class="feat">
+          <li>Everything in Course Only</li>
+          <li>2,000 AI credits / month</li>
+          <li>Nova Chat — 500 messages/month</li>
+          <li>Seller Spy — 5 tracked sellers</li>
+          <li>Deal Scanner — 10 scans/day</li>
+          <li>Product Analyzer — 30/day</li>
+          <li>Group coaching calls 2× / week</li>
+          <li class="x">No 1:1 calls</li>
+          <li class="x">No premium product leads</li>
+        </ul>
+        <a class="cta" href="#">Join Accelerator</a>
+      </div>
+
+      <div class="card featured">
+        <div class="tier-label">Tier C · Flagship</div>
+        <div class="tier-name">Inner Circle</div>
+        <div class="tier-desc">$10K/mo Amazon business in 90 days — or we keep working until you get there.</div>
+        <div class="tier-price">$10,000</div>
+        <div class="tier-sub">$5K upfront + $5K day 30 · or 6 × $1,997 (+20%)</div>
+        <ul class="feat">
+          <li>Everything in Accelerator</li>
+          <li class="inf">Unlimited AI credits (promised forever)</li>
+          <li class="inf">Unlimited Nova Chat</li>
+          <li>Seller Spy — 25 tracked sellers</li>
+          <li>Deal Scanner, Product Analyzer, Gift Card Intel — unlimited</li>
+          <li>Wholesale Research AI — unlimited</li>
+          <li>2× 1:1 calls / month (30 min)</li>
+          <li>Weekly group calls + admin action plan</li>
+          <li>Premium product leads drops in #1on1</li>
+          <li>Quarterly strategy review with Sabbo</li>
+        </ul>
+        <a class="cta" href="#">Apply for Inner Circle</a>
+      </div>
+
+      <div class="card">
+        <div class="tier-label">Tier D · Alumni Plus</div>
+        <div class="tier-name">Inner Circle + AI</div>
+        <div class="tier-desc">Scale beyond $30K/mo with operator-level coaching + lifetime AI.</div>
+        <div class="tier-price">$20,000</div>
+        <div class="tier-sub">$18K if wire PIF · or $10K + $500/mo retainer (12mo min)</div>
+        <ul class="feat">
+          <li>Everything in Inner Circle</li>
+          <li class="inf">Lifetime unlimited credits (not monthly)</li>
+          <li class="inf">Unlimited tracked sellers</li>
+          <li>Nova Chat with custom personas</li>
+          <li>Weekly 1:1 calls with Sabbo</li>
+          <li>Direct DM access (24h response)</li>
+          <li>Early access to new AI tools</li>
+          <li>Revenue-share option (10% of first $100K)</li>
+        </ul>
+        <a class="cta" href="#">Book a call</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAAS -->
+  <div class="section">
+    <div class="section-head">
+      <h2>24/7 Profits AI — Standalone SaaS</h2>
+      <p>For Amazon sellers who just want the software.</p>
+    </div>
+    <div class="grid saas">
+
+      <div class="card">
+        <div class="tier-label">Trial</div>
+        <div class="tier-name">Free</div>
+        <div class="tier-desc">14 days, no credit card burn.</div>
+        <div class="tier-price">$0</div>
+        <div class="tier-sub">Card required · auto-converts to Starter day 15</div>
+        <ul class="feat">
+          <li>100 credits (one-time)</li>
+          <li>3 tracked sellers</li>
+          <li>10 product analyses</li>
+          <li>Nova Chat — 20 messages</li>
+          <li class="x">No wholesale research</li>
+          <li class="x">No deal scanner</li>
+        </ul>
+        <a class="cta ghost" href="#">Start free trial</a>
+      </div>
+
+      <div class="card">
+        <div class="tier-label">Starter</div>
+        <div class="tier-name">$29 <small>/ month</small></div>
+        <div class="tier-desc">Solo sellers, part-time, under $5K/mo revenue.</div>
+        <div class="tier-price">$290 <small>/ year (save 17%)</small></div>
+        <ul class="feat">
+          <li>1,500 credits / month</li>
+          <li>10 tracked sellers</li>
+          <li>Nova Chat — 100 messages/mo</li>
+          <li>Deal Scanner — 20/day</li>
+          <li>Product Analyzer — unlimited</li>
+          <li>Gift Card Intel (read-only)</li>
+          <li class="x">No wholesale research</li>
+        </ul>
+        <a class="cta" href="#">Start Starter</a>
+      </div>
+
+      <div class="card featured">
+        <div class="tier-label">Pro</div>
+        <div class="tier-name">$79 <small>/ month</small></div>
+        <div class="tier-desc">Full-time sellers, $5K–$30K/mo revenue.</div>
+        <div class="tier-price">$790 <small>/ year</small></div>
+        <ul class="feat">
+          <li>5,000 credits / month</li>
+          <li>25 tracked sellers</li>
+          <li>Nova Chat — unlimited</li>
+          <li>Deal Scanner — unlimited</li>
+          <li>Product Analyzer — unlimited</li>
+          <li>Gift Card Intel — full access</li>
+          <li>Wholesale Research — 10/day</li>
+          <li>Basic product leads feed</li>
+        </ul>
+        <a class="cta" href="#">Go Pro</a>
+      </div>
+
+      <div class="card">
+        <div class="tier-label">Scale</div>
+        <div class="tier-name">$199 <small>/ month</small></div>
+        <div class="tier-desc">Established sellers $30K+/mo, multi-brand, small teams.</div>
+        <div class="tier-price">$1,990 <small>/ year</small></div>
+        <ul class="feat">
+          <li>20,000 credits / month</li>
+          <li>100 tracked sellers</li>
+          <li>Everything in Pro — unlimited</li>
+          <li>Wholesale Research — unlimited</li>
+          <li>API access (rate-limited)</li>
+          <li>Priority Discord support</li>
+          <li>Monthly group Q&amp;A</li>
+        </ul>
+        <a class="cta" href="#">Scale up</a>
+      </div>
+
+      <div class="card">
+        <div class="tier-label">Enterprise</div>
+        <div class="tier-name">$499+ <small>/ mo</small></div>
+        <div class="tier-desc">Agencies, $100K+/mo sellers, custom needs.</div>
+        <div class="tier-price">Custom</div>
+        <ul class="feat">
+          <li>Unlimited everything</li>
+          <li>White-label option (+$500/mo)</li>
+          <li>Dedicated success manager</li>
+          <li>Custom integrations</li>
+          <li>SLA: 99.9% uptime, &lt;2h response</li>
+        </ul>
+        <a class="cta ghost" href="#">Book a call</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPARISON TABLE -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Side-by-side comparison</h2>
+      <p>Every tier, every number.</p>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Course $500</th>
+            <th>Accelerator $2K</th>
+            <th>Inner Circle $10K</th>
+            <th>IC + AI $20K</th>
+            <th>SaaS Starter $29</th>
+            <th>SaaS Pro $79</th>
+            <th>SaaS Scale $199</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>AI credits / mo</td><td class="num">0</td><td class="num">2,000</td><td class="num"><span class="pill inf">∞</span></td><td class="num"><span class="pill inf">∞</span></td><td class="num">1,500</td><td class="num">5,000</td><td class="num">20,000</td></tr>
+          <tr><td>Tracked sellers</td><td class="num">0</td><td class="num">5</td><td class="num">25</td><td class="num"><span class="pill inf">∞</span></td><td class="num">10</td><td class="num">25</td><td class="num">100</td></tr>
+          <tr><td>Nova Chat msgs/mo</td><td class="num">—</td><td class="num">500</td><td class="num"><span class="pill inf">∞</span></td><td class="num"><span class="pill inf">∞</span></td><td class="num">100</td><td class="num"><span class="pill inf">∞</span></td><td class="num"><span class="pill inf">∞</span></td></tr>
+          <tr><td>Deal Scanner</td><td>—</td><td>10/day</td><td><span class="pill inf">∞</span></td><td><span class="pill inf">∞</span></td><td>20/day</td><td><span class="pill inf">∞</span></td><td><span class="pill inf">∞</span></td></tr>
+          <tr><td>Product Analyzer</td><td>—</td><td>30/day</td><td><span class="pill inf">∞</span></td><td><span class="pill inf">∞</span></td><td><span class="pill inf">∞</span></td><td><span class="pill inf">∞</span></td><td><span class="pill inf">∞</span></td></tr>
+          <tr><td>Gift Card Intel</td><td>—</td><td><span class="pill free">✓</span></td><td><span class="pill free">✓</span></td><td><span class="pill free">✓</span></td><td>Read-only</td><td><span class="pill free">✓</span></td><td><span class="pill free">✓</span></td></tr>
+          <tr><td>Wholesale Research</td><td>—</td><td>—</td><td><span class="pill inf">∞</span></td><td><span class="pill inf">∞</span></td><td>—</td><td>10/day</td><td><span class="pill inf">∞</span></td></tr>
+          <tr><td>1:1 calls</td><td>—</td><td>—</td><td>2×/mo</td><td>Weekly (Sabbo)</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>Group calls</td><td>—</td><td>2×/week</td><td>Weekly</td><td>Weekly</td><td>—</td><td>—</td><td>Monthly Q&amp;A</td></tr>
+          <tr><td>Product leads drops</td><td>—</td><td>—</td><td>Premium #1on1</td><td>Premium #1on1</td><td>—</td><td>Basic feed</td><td>Basic feed</td></tr>
+          <tr><td>API access</td><td>—</td><td>—</td><td>—</td><td>Early access</td><td>—</td><td>—</td><td>Rate-limited</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note">
+      <strong>Seller cap applies to every tier (yes, even unlimited).</strong> This isn't a limit on you — it protects Keepa API speed for everyone. Need more? Book a call and we'll whitelist you case-by-case.
+    </div>
+  </div>
+
+  <!-- PAYMENT / BILLING -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Billing &amp; Payment</h2>
+      <p>How you pay, when, and what happens if a card fails.</p>
+    </div>
+    <table class="table">
+      <thead>
+        <tr><th>Tier</th><th>Processor</th><th>Payment options</th><th>Refund window</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Course $500</td><td>Whop / Fanbasis</td><td>PIF · 3 × $197</td><td>14 days</td></tr>
+        <tr><td>Accelerator $2K</td><td>Whop / Fanbasis</td><td>PIF · 3 × $797 · 6 × $397 (+15%)</td><td>14 days, must not have onboarded</td></tr>
+        <tr><td>Inner Circle $10K</td><td>Whop / Fanbasis / Wire</td><td>$5K + $5K · 6 × $1,997 (+20%) · $200 off for wire</td><td>14 days, must not have onboarded</td></tr>
+        <tr><td>IC + AI $20K</td><td>Fanbasis / Wire</td><td>$18K wire PIF · $10K + $500/mo (12mo min)</td><td>14 days</td></tr>
+        <tr><td>SaaS (any)</td><td>Whop</td><td>Monthly or annual (17% off)</td><td>7 days self-service</td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <strong>Failed card?</strong> We auto-retry at day 1, 3, 7. On day 10 tools pause until resolved. Coaching payment plans: 7-day grace, 30-day revoke. No stealth charges — you'll get three emails before anything pauses.
+    </div>
+  </div>
+
+  <div class="foot">
+    24/7 Profits · Last updated 2026-04-15 · All prices USD · Processing by Whop &amp; Fanbasis
+  </div>
+
+</div>
+</body>
+</html>

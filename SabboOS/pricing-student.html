@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Your Credits, Plan &amp; Billing — 24/7 Profits</title>
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --surface: #121218;
+    --surface-2: #1a1a22;
+    --border: rgba(255,255,255,0.08);
+    --text: #f4f4f6;
+    --muted: rgba(244,244,246,0.55);
+    --dim: rgba(244,244,246,0.35);
+    --brand: #bf5af2;
+    --brand-dim: rgba(191,90,242,0.15);
+    --gold: #d4a017;
+    --success: #30d158;
+    --warning: #ff9f0a;
+    --danger: #ff453a;
+  }
+  *,*::before,*::after { box-sizing: border-box; }
+  html,body { margin:0; padding:0; background: var(--bg); color: var(--text); font: 15px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; }
+  body { background:
+    radial-gradient(900px 500px at 10% -10%, rgba(191,90,242,0.18), transparent 60%),
+    var(--bg);
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 48px 24px 120px; }
+  h1 { font-size: 34px; letter-spacing:-0.02em; margin: 0 0 8px; font-weight: 800; }
+  h1 span { background: linear-gradient(135deg, var(--brand), var(--gold)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { color: var(--muted); margin: 0 0 40px; max-width: 640px; }
+  h2 { font-size: 20px; margin: 40px 0 12px; letter-spacing: -0.01em; }
+  h3 { font-size: 15px; margin: 20px 0 8px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .card { background: linear-gradient(180deg, var(--surface), var(--surface-2)); border: 1px solid var(--border); border-radius: 18px; padding: 24px; margin-bottom: 16px; }
+  .card.brand { border-color: rgba(191,90,242,0.3); box-shadow: 0 10px 40px -20px rgba(191,90,242,0.4); }
+  .row { display:flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .row:last-child { border-bottom: none; }
+  .row .label { color: var(--muted); font-size: 14px; }
+  .row .val { font-weight: 600; font-size: 15px; text-align: right; }
+  .big { font-size: 44px; font-weight: 800; letter-spacing:-0.02em; line-height: 1; margin: 8px 0; }
+  .big.inf { background: linear-gradient(135deg, var(--brand), var(--gold)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { color: var(--muted); font-size: 13px; }
+  .table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .table th, .table td { padding: 12px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  .table th { color: var(--muted); font-weight: 600; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .table td.credits { color: var(--brand); font-weight: 700; }
+  .table td.free { color: var(--success); font-weight: 700; }
+  .pill { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+  .pill.ok { background: rgba(48,209,88,0.15); color: var(--success); }
+  .pill.warn { background: rgba(255,159,10,0.15); color: var(--warning); }
+  .pill.info { background: var(--brand-dim); color: var(--brand); }
+  .pill.danger { background: rgba(255,69,58,0.12); color: var(--danger); }
+  .note { background: var(--surface); border-left: 3px solid var(--brand); padding: 14px 18px; border-radius: 8px; font-size: 14px; color: var(--muted); margin: 20px 0; }
+  .note strong { color: var(--text); }
+  .faq details { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; margin-bottom: 8px; }
+  .faq summary { cursor: pointer; font-weight: 600; outline: none; list-style: none; }
+  .faq summary::-webkit-details-marker { display:none; }
+  .faq summary::after { content: "+"; float: right; color: var(--muted); font-size: 18px; line-height: 1; transition: transform 0.15s; }
+  .faq details[open] summary::after { content: "−"; }
+  .faq details[open] summary { margin-bottom: 10px; }
+  .faq .ans { color: var(--muted); font-size: 14px; line-height: 1.6; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+  .btn { padding: 10px 18px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; transition: filter 0.15s; }
+  .btn.primary { background: linear-gradient(135deg, var(--brand), var(--gold)); color: #fff; }
+  .btn.primary:hover { filter: brightness(1.1); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  .btn.ghost:hover { background: rgba(255,255,255,0.04); }
+  .foot { text-align:center; color: var(--dim); font-size: 12px; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 560px) { .grid-2 { grid-template-columns: 1fr; } .wrap { padding: 24px 16px 80px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Your <span>credits, plan &amp; billing</span></h1>
+  <p class="lead">Total transparency on what you're paying, what it gets you, and what every tool actually costs to run. No hidden math, no gotchas.</p>
+
+  <!-- CURRENT STATE -->
+  <div class="card brand">
+    <h3 style="margin-top:0">Your Status</h3>
+    <div class="grid-2">
+      <div>
+        <div class="sub">Current plan</div>
+        <div class="big" id="plan-name">Inner Circle</div>
+        <div class="sub">Enrolled 2026-03-10</div>
+      </div>
+      <div>
+        <div class="sub">Credits available</div>
+        <div class="big inf" id="credits">∞</div>
+        <div class="sub">Unlimited — your PIF promise, kept forever</div>
+      </div>
+    </div>
+    <div class="row"><span class="label">Billing status</span><span class="val"><span class="pill ok">Paid in full</span></span></div>
+    <div class="row"><span class="label">Tracked sellers</span><span class="val">12 of 25 <span class="sub">(cap protects Keepa speed for everyone)</span></span></div>
+    <div class="row"><span class="label">Next renewal / action</span><span class="val">None — lifetime access</span></div>
+    <div class="actions">
+      <a class="btn primary" href="#">Upgrade plan</a>
+      <a class="btn ghost" href="#">Billing history</a>
+      <a class="btn ghost" href="#">Payment methods</a>
+    </div>
+  </div>
+
+  <!-- WHAT YOUR PLAN INCLUDES -->
+  <h2>What your plan includes</h2>
+  <div class="card">
+    <div class="row"><span class="label">AI credits per month</span><span class="val"><span class="pill info">∞ Unlimited</span></span></div>
+    <div class="row"><span class="label">Nova Chat messages</span><span class="val"><span class="pill info">∞ Unlimited</span></span></div>
+    <div class="row"><span class="label">Product Analyzer</span><span class="val"><span class="pill info">∞ Unlimited</span></span></div>
+    <div class="row"><span class="label">Deal Scanner</span><span class="val"><span class="pill info">∞ Unlimited</span></span></div>
+    <div class="row"><span class="label">Gift Card Intel</span><span class="val"><span class="pill ok">Full access (free)</span></span></div>
+    <div class="row"><span class="label">Wholesale Research AI</span><span class="val"><span class="pill info">∞ Unlimited</span></span></div>
+    <div class="row"><span class="label">Seller Spy (tracked sellers)</span><span class="val">25 max</span></div>
+    <div class="row"><span class="label">1:1 coaching calls</span><span class="val">2 × 30min / month</span></div>
+    <div class="row"><span class="label">Group coaching calls</span><span class="val">Every week</span></div>
+    <div class="row"><span class="label">Premium product leads</span><span class="val"><span class="pill ok">In #1on1 channel</span></span></div>
+  </div>
+
+  <!-- CREDIT COST BREAKDOWN -->
+  <h2>What each action costs (in credits)</h2>
+  <p class="sub" style="margin:0 0 16px">For students with unlimited plans these are informational only — nothing is deducted from you. Non-unlimited tiers pay the credit cost listed here.</p>
+  <div class="card" style="padding: 0; overflow: hidden;">
+    <table class="table">
+      <thead>
+        <tr><th>Action</th><th style="text-align:right">Credits</th><th>What it actually does</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Nova Chat message</td><td class="num credits">1</td><td class="sub">One AI response from your Nova assistant</td></tr>
+        <tr><td>Product Analyzer (single ASIN)</td><td class="num credits">5</td><td class="sub">Full Keepa history + AI profitability breakdown</td></tr>
+        <tr><td>Deal Scanner (up to 50 products)</td><td class="num credits">5</td><td class="sub">Scans retailer → Amazon for arbitrage opportunities</td></tr>
+        <tr><td>Listing Optimizer</td><td class="num credits">5</td><td class="sub">AI-rewrite your title, bullets &amp; backend keywords</td></tr>
+        <tr><td>Seller scan (per seller tracked)</td><td class="num credits">10</td><td class="sub">Full catalog scan + Keepa enrichment on every listing</td></tr>
+        <tr><td>Wholesale Research query</td><td class="num credits">15</td><td class="sub">AI-powered supplier discovery &amp; contact extraction</td></tr>
+        <tr><td>Gift Card Intel refresh</td><td class="num free">FREE</td><td class="sub">Daily CardBear scrape — never costs you credits</td></tr>
+        <tr><td>Adding a tracked seller</td><td class="num free">FREE</td><td class="sub">The scan is what costs — tracking is free</td></tr>
+        <tr><td>Product Vault browsing</td><td class="num free">FREE</td><td class="sub">Save any product you've analyzed, no recurring cost</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <strong>Why the credit costs look cheap:</strong> your Nova Chat runs on our Claude Max plan — AI inference has zero marginal cost to us, so we pass that on. The real variable expense is Keepa API tokens (that's why Product Analyzer + Seller Scan cost more — they hit Keepa). We pay Keepa, so those actions carry a real cost. Gift Card Intel is scraped, so it's free forever.
+  </div>
+
+  <!-- HOW CREDITS REFILL -->
+  <h2>How credits work</h2>
+  <div class="card">
+    <h3 style="margin-top:0">Two kinds of credits</h3>
+    <div class="row">
+      <span class="label"><strong style="color:var(--text)">Subscription credits</strong><br><span class="sub">Refill on the 1st of every month, don't carry over</span></span>
+      <span class="val">Auto-renew</span>
+    </div>
+    <div class="row">
+      <span class="label"><strong style="color:var(--text)">Top-up credits</strong><br><span class="sub">One-time packs you buy — never expire</span></span>
+      <span class="val">Roll over forever</span>
+    </div>
+    <h3>Order of use</h3>
+    <p class="sub" style="margin: 0 0 8px">When you use a tool, we deduct from <strong style="color:var(--text)">subscription first</strong>, then <strong style="color:var(--text)">top-up</strong> — so your paid packs last as long as possible.</p>
+  </div>
+
+  <!-- BUY MORE CREDITS -->
+  <h2>Top-up packs (non-unlimited plans)</h2>
+  <div class="card" style="padding:0; overflow:hidden;">
+    <table class="table">
+      <thead><tr><th>Pack</th><th>Credits</th><th style="text-align:right">Price</th><th style="text-align:right">$/credit</th></tr></thead>
+      <tbody>
+        <tr><td>Starter pack</td><td class="num credits">500</td><td class="num">$19</td><td class="num sub">$0.038</td></tr>
+        <tr><td>Value pack ⭐</td><td class="num credits">2,000</td><td class="num">$49</td><td class="num sub">$0.025</td></tr>
+        <tr><td>Power pack</td><td class="num credits">5,000</td><td class="num">$99</td><td class="num sub">$0.020</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="sub" style="margin-top:8px">Top-ups never expire. Best value: the $99 pack at 2¢ per credit.</p>
+
+  <!-- BILLING RULES -->
+  <h2>Billing rules (no surprises)</h2>
+  <div class="card">
+    <div class="row"><span class="label">Payment processor</span><span class="val">Whop + Fanbasis</span></div>
+    <div class="row"><span class="label">Refund window — SaaS plans</span><span class="val">7 days, self-service in Settings</span></div>
+    <div class="row"><span class="label">Refund window — Coaching</span><span class="val">14 days, before you've onboarded</span></div>
+    <div class="row"><span class="label">Card fails</span><span class="val">Auto-retry day 1, 3, 7 → pause day 10</span></div>
+    <div class="row"><span class="label">Payment plan grace</span><span class="val">7-day grace, 30-day revoke</span></div>
+    <div class="row"><span class="label">Upgrade mid-cycle</span><span class="val">Prorated, credits bumped immediately</span></div>
+    <div class="row"><span class="label">Annual discount</span><span class="val">17% off if paid annually</span></div>
+    <div class="row"><span class="label">Coaching → SaaS after graduation</span><span class="val">Auto-downgrade to Pro $79 (90-day alumni rate $39)</span></div>
+  </div>
+
+  <!-- FAQ -->
+  <h2>FAQ</h2>
+  <div class="faq">
+    <details>
+      <summary>I'm in Inner Circle. Will my unlimited credits ever go away?</summary>
+      <p class="ans">No. If you PIF'd Inner Circle at any enrollment date, unlimited is yours forever. That was the promise and it stays the promise — we'll never revoke it. The only cap we enforce on you is the 25 tracked-seller limit, which exists so one user can't slow Keepa down for the whole community.</p>
+    </details>
+    <details>
+      <summary>Why is there a tracked-seller cap even on unlimited plans?</summary>
+      <p class="ans">Every tracked seller gets its catalog re-scanned on a schedule. Those scans cost us Keepa API tokens. If one user tracked 500 sellers, they'd burn the shared token pool and every scan everyone else runs would slow down. The 25 cap is generous — no serious arbitrage sourcer actually needs more. If you do, book a call and we'll whitelist you.</p>
+    </details>
+    <details>
+      <summary>I'm on Accelerator. What happens when I run out of credits mid-month?</summary>
+      <p class="ans">Two options. (1) Buy a top-up pack — starts at $19 for 500 credits, they never expire. (2) Wait until the 1st of next month when your 2,000 refill hits. Your existing tool access doesn't disappear — you just can't run new AI actions until credits return.</p>
+    </details>
+    <details>
+      <summary>If I upgrade from Accelerator to Inner Circle, do I get a discount for what I already paid?</summary>
+      <p class="ans">Yes. Whatever you've paid toward Accelerator is credited 100% toward your Inner Circle balance. So $2K PIF → $8K to step up. Talk to your coach to lock the rate before it changes.</p>
+    </details>
+    <details>
+      <summary>My payment plan card is about to expire. What happens?</summary>
+      <p class="ans">Update it in Settings → Payment Methods before the next charge date. If the charge fails, we auto-retry at day 1, 3, 7 with email notifications. On day 10 your tools pause — not your access to content or Discord, just the AI tools — until the card is fixed.</p>
+    </details>
+    <details>
+      <summary>Can I cancel anytime?</summary>
+      <p class="ans">SaaS subscriptions: yes, self-service in Settings, cancels at end of current billing cycle (you keep access through the paid period). Coaching programs: see your enrollment agreement — generally 14-day refund window before onboarding, then the program runs its full term. Payment plans are commitments.</p>
+    </details>
+    <details>
+      <summary>Where does my money actually go?</summary>
+      <p class="ans">Real talk: Keepa API tokens (~$0.10 per seller scan), scraper compute, Whop/Fanbasis processing (~3%), coaching calls (my time), course platform hosting, and the Claude Max plan ($200/mo flat) that powers Nova Chat for the whole community. AI features feel free because the Max plan is a fixed cost, not per-token. That's why we can give you unlimited Nova without going broke.</p>
+    </details>
+  </div>
+
+  <div class="foot">
+    Questions? Email support@247profits.org or ping Sabbo in Discord · Last updated 2026-04-15
+  </div>
+
+</div>
+</body>
+</html>
