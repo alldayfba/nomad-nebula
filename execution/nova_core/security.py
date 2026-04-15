@@ -97,6 +97,13 @@ OUTPUT_LEAK_PATTERNS = [
     re.compile(r"\$\s*10[,.]?000\b.*\bretainer\b|\bretainer\b.*\$\s*10[,.]?000\b", re.I),
     re.compile(r"\$\s*25[,.]?000\b.*\bretainer\b|\bretainer\b.*\$\s*25[,.]?000\b", re.I),
     re.compile(r"\$\s*25K\s*/\s*mo", re.I),
+    # Keepa internals — the API key shouldn't echo back, and raw endpoint
+    # URLs suggest the model copied a system response verbatim (which it
+    # never should — the <keepa_data> block is for reasoning, not quoting).
+    re.compile(r"https?://api\.keepa\.com/[a-zA-Z?=&0-9_%]+", re.I),
+    re.compile(r"keepa[_\s-]*api[_\s-]*key\s*[:=]\s*[a-z0-9]{32,}", re.I),
+    # Supabase service role JWT inadvertently appearing in output
+    re.compile(r"service_role[\"']?\s*:\s*[\"']?eyJ", re.I),
 ]
 
 SYSTEM_PROMPT_FRAGMENTS = [

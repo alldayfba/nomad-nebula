@@ -269,16 +269,20 @@ class ProfileCog(commands.Cog):
             pass
 
         # 2. Delete from nova.db (shared: chat_log, abuse_log, feedback)
+        # Explicit per-table deletes — no dynamic table names in SQL (defense in depth).
         try:
             from nova_core.database import get_conn
             nova_conn = get_conn()
-            for table in ("chat_log", "abuse_log", "feedback"):
+            nova_table_deletes = (
+                ("chat_log", "DELETE FROM chat_log WHERE user_id = ?"),
+                ("abuse_log", "DELETE FROM abuse_log WHERE user_id = ?"),
+                ("feedback", "DELETE FROM feedback WHERE user_id = ?"),
+            )
+            for label, stmt in nova_table_deletes:
                 try:
-                    count = nova_conn.execute(
-                        f"DELETE FROM {table} WHERE user_id = ?", (user_id,)
-                    ).rowcount
+                    count = nova_conn.execute(stmt, (user_id,)).rowcount
                     if count:
-                        deleted_items.append(f"{table}: {count}")
+                        deleted_items.append(f"{label}: {count}")
                 except Exception:
                     pass
             nova_conn.commit()

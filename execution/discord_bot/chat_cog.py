@@ -330,6 +330,103 @@ class ChatCog(commands.Cog):
 
         self.model = os.getenv("DISCORD_CHAT_MODEL", "claude-haiku-4-5-20251001")
 
+    def _run_keepa_pipeline(self, user_id, channel_id, sanitized):
+        """Detect ASINs / product-analysis intent in the message and inject
+        a <keepa_data> block + reasoning-scaffold flags for the LLM.
+
+        Returns:
+            (keepa_block: str, flags: dict)
+            keepa_block is "" when no analysis was produced.
+            flags is a dict like {"keepa_data": True, "gating_question": True}.
+        """
+        keepa_block = ""
+        flags: dict = {}
+        try:
+            # Import lazily — nova_core lives in execution/ not in site-packages.
+            import sys as _sys
+            from pathlib import Path as _Path
+            _execution = _Path(__file__).resolve().parent.parent
+            if str(_execution) not in _sys.path:
+                _sys.path.insert(0, str(_execution))
+
+            from nova_core.asin_extractor import extract_all as _extract_all
+            from nova_core.keepa_analyzer import analyze_asin, format_for_prompt
+            from nova_core.thread_memory import recall, remember, should_recall
+            from nova_core.usage_tracker import check_quota, record
+
+            extracted = _extract_all(sanitized)
+            asins = extracted.get("asins") or []
+            buy_cost = extracted.get("buy_cost")
+            moq = extracted.get("moq")
+
+            # Thread memory: if no ASIN in this message but the student wrote a
+            # follow-up like "recalculate at $7", rehydrate the last ASIN/cost.
+            if not asins and should_recall(sanitized.lower()):
+                remembered = recall("discord", str(channel_id), str(user_id))
+                if remembered and remembered.get("asin"):
+                    asins = [remembered["asin"]]
+                    if buy_cost is None:
+                        buy_cost = remembered.get("buy_cost")
+                    if moq is None:
+                        moq = remembered.get("moq")
+
+            # Gating / buy-box / pricing-discrepancy keyword detection — fires the
+            # diagnostic scaffold regardless of whether Keepa data is present.
+            lowered = sanitized.lower()
+            gating_triggers = (
+                "ungated", "ungate", "ungating", "gated", "get approval",
+                "buy box", "lost the buy box", "won the buy box",
+                "prices are different", "price is different",
+                "why is my price", "why are my prices", "amazon is lower",
+                "amex plum", "why cant i",
+            )
+            if any(t in lowered for t in gating_triggers):
+                flags["gating_question"] = True
+
+            if not asins:
+                return keepa_block, flags
+
+            # Quota gate — cheap check before burning Keepa tokens.
+            quota = check_quota(str(user_id))
+            if not quota["allowed"]:
+                keepa_block = (
+                    "<keepa_data>\n"
+                    f"You've hit your daily Keepa lookup cap "
+                    f"({quota['cap']} on the {quota['tier']} plan). "
+                    "Upgrade at 247profits.org to raise it.\n"
+                    "</keepa_data>"
+                )
+                flags["keepa_data"] = True
+                return keepa_block, flags
+
+            # Analyze first ASIN only for now — multi-ASIN support lives in the
+            # Flask API where we can parallelize without blocking the event loop.
+            primary_asin = asins[0]
+            analysis = analyze_asin(primary_asin, buy_cost=buy_cost, moq=moq)
+            keepa_block = format_for_prompt(analysis)
+            flags["keepa_data"] = True
+
+            # Record usage + save to thread memory for follow-ups.
+            record(
+                user_id=str(user_id),
+                asin=primary_asin,
+                tokens_used=analysis.get("keepa_tokens_used") or 0,
+                tier=quota.get("tier"),
+                cached=bool(analysis.get("cached")),
+            )
+            remember(
+                "discord",
+                str(channel_id),
+                str(user_id),
+                primary_asin,
+                buy_cost=buy_cost,
+                moq=moq,
+            )
+        except Exception as _pipe_err:
+            print(f"[chat-cog] Keepa pipeline error (non-fatal): {_pipe_err}", file=sys.stderr)
+
+        return keepa_block, flags
+
     async def _handle_question(self, user_id, channel_id, question, respond_func,
                                user_name="", channel_context="", image_urls=None):
         """Core logic shared by /ask and DM handler.
@@ -410,6 +507,14 @@ class ChatCog(commands.Cog):
                 intents = _query_router.detect_intent(sanitized)
             except Exception:
                 pass
+
+        # Keepa pipeline — detects ASINs / Amazon URLs / buy cost / MOQ and
+        # returns a <keepa_data> block to prepend to the user message plus
+        # reasoning-scaffold flags (keepa_data, gating_question) for the
+        # system prompt. Fails open: on any error, no block / no flags.
+        keepa_block, _scaffold_flags = self._run_keepa_pipeline(
+            user_id, channel_id, sanitized
+        )
 
         # ── Student/Admin context injection ─────────────────────────────
         # Check if this is the owner/admin (Sabbo)
@@ -528,7 +633,22 @@ class ChatCog(commands.Cog):
                 except Exception as _e:
                     platform_context["programStats"] = f"Error fetching students: {_e}"
 
-            system_prompt = build_prompt("discord", faq_entries=faq_entries, platform_context=platform_context)
+            system_prompt = build_prompt(
+                "discord",
+                faq_entries=faq_entries,
+                platform_context=platform_context,
+                flags=_scaffold_flags or None,
+            )
+        elif _scaffold_flags:
+            # No student / owner context, but a scaffold is needed (e.g., a
+            # student dropped an ASIN or asked a gating question). Build the
+            # full prompt so the scaffold fires — the static base_system_prompt
+            # doesn't support flags.
+            system_prompt = build_prompt(
+                "discord",
+                faq_entries=faq_entries,
+                flags=_scaffold_flags,
+            )
         else:
             system_prompt = self.base_system_prompt
 
@@ -540,6 +660,12 @@ class ChatCog(commands.Cog):
         # Wrap user input in boundary tags (injection defense)
         wrapped_input = wrap_user_input(sanitized)
 
+        # Prepend live Keepa analysis when the pre-processor produced one.
+        # Kept outside the <user_question> wrapper so the LLM treats it as
+        # trusted, structured context (same pattern as <channel_conversation>).
+        if keepa_block:
+            wrapped_input = f"{keepa_block}\n\n{wrapped_input}"
+
         # Build multimodal content if images are attached
         _image_blocks = []
         if image_urls:
@@ -547,9 +673,19 @@ class ChatCog(commands.Cog):
             import httpx
             for img_url in image_urls[:4]:  # Max 4 images per message
                 try:
-                    # Download image and convert to base64 (Discord CDN URLs need direct fetch)
+                    # HEAD first so we can reject oversized images without streaming them.
+                    # Some CDNs don't honor HEAD; GET with stream + size check is the backstop.
+                    MAX_IMAGE_BYTES = 5_000_000
+                    try:
+                        head = httpx.head(img_url, timeout=5.0, follow_redirects=True)
+                        cl = int(head.headers.get("content-length", "0") or 0)
+                        if cl and cl > MAX_IMAGE_BYTES:
+                            print(f"[chat-cog] Skipping oversized image ({cl} bytes)", file=sys.stderr)
+                            continue
+                    except Exception:
+                        pass
                     img_resp = httpx.get(img_url, timeout=10.0, follow_redirects=True)
-                    if img_resp.status_code == 200:
+                    if img_resp.status_code == 200 and len(img_resp.content) <= MAX_IMAGE_BYTES:
                         ct = img_resp.headers.get("content-type", "image/png")
                         # Normalize content type
                         if "jpeg" in ct or "jpg" in ct:

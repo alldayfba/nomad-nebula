@@ -455,8 +455,10 @@ class BotDatabase:
     def update_knowledge_votes(self, entry_id, upvote=True):
         conn = self._get_conn()
         try:
-            col = "upvotes" if upvote else "downvotes"
-            conn.execute(f"UPDATE knowledge_base SET {col} = {col} + 1 WHERE id = ?", (entry_id,))
+            if upvote:
+                conn.execute("UPDATE knowledge_base SET upvotes = upvotes + 1 WHERE id = ?", (entry_id,))
+            else:
+                conn.execute("UPDATE knowledge_base SET downvotes = downvotes + 1 WHERE id = ?", (entry_id,))
             conn.commit()
         finally:
             conn.close()

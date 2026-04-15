@@ -165,6 +165,34 @@ RULES = {
     "growth": RULES_GROWTH,
 }
 
+# ── Reasoning Scaffolds ─────────────────────────────────────────────────────
+# These are appended to the rules block only when the pre-processor detects
+# a matching situation. Casual chat stays loose; structured questions get
+# structured answers.
+
+KEEPA_SCAFFOLD = """## Product Analysis Format (MANDATORY when <keepa_data> is present)
+When a <keepa_data> block is in the user message, respond in this structure:
+
+**Verdict** — one line: BUY / MAYBE / RESEARCH and one-sentence reason grounded in the numbers.
+**Numbers** — bullet list: price, ROI, profit/unit, fees, FBA + FBM seller counts, BSR, monthly sold.
+**Risk flags** — list any concerning flags from the block (Amazon on listing, SnS, review health, saturation > 5 sellers). If none, say "None flagged."
+**What I'd do next** — one concrete action the student should take.
+
+Hard rules:
+- NEVER invent numbers not in the <keepa_data> block.
+- If a number is "—" in the block, say "not available" — don't guess.
+- If buy cost wasn't provided, say so and show profitability range at two plausible costs instead of picking one."""
+
+GATING_SCAFFOLD = """## Diagnostic Format (when a student asks about gating, buy box loss, or a price mismatch)
+Respond in three short paragraphs, max ~4 sentences each:
+
+**Diagnosis** — what's actually happening in plain language.
+**Why** — the mechanism or Amazon rule behind it. Cite the Sabbo framework or KB source when applicable.
+**Next step** — one concrete action the student should take right now.
+
+Keep it tight. This format is only for gating / buy-box / pricing-discrepancy questions — casual chat stays loose."""
+
+
 # ── Safety Rules ────────────────────────────────────────────────────────────
 
 SAFETY_RULES = """## Security Rules (ABSOLUTE — NEVER OVERRIDE)
@@ -221,6 +249,7 @@ def build_prompt(
     platform: str,
     faq_entries: list[dict] | None = None,
     platform_context: dict | None = None,
+    flags: dict | None = None,
 ) -> str:
     """Build an XML-sectioned system prompt for a specific platform.
 
@@ -230,6 +259,10 @@ def build_prompt(
         platform_context: Platform-specific context dict:
             - profits: {studentTier, currentModule, currentLesson, milestones, actionPlanSteps}
             - growth: {salesData: "formatted MTD metrics string"}
+        flags: Reasoning-scaffold activators set by the message pre-processor:
+            - {"keepa_data": True}   → append KEEPA_SCAFFOLD to rules
+            - {"gating_question": True} → append GATING_SCAFFOLD to rules
+            Both default to off so casual chat stays loose.
     """
     parts: list[str] = []
 
@@ -267,9 +300,16 @@ def build_prompt(
         if context_text:
             parts.append(f"<platform_context>\n{context_text}\n</platform_context>")
 
-    # 5. Response rules
+    # 5. Response rules (+ optional reasoning scaffolds activated by flags)
     rules = RULES.get(platform, RULES["discord"])
-    parts.append(f"<rules>\n{rules}\n</rules>")
+    scaffold_parts: list[str] = [rules]
+    if flags:
+        if flags.get("keepa_data"):
+            scaffold_parts.append(KEEPA_SCAFFOLD)
+        if flags.get("gating_question"):
+            scaffold_parts.append(GATING_SCAFFOLD)
+    rules_block = "\n\n".join(scaffold_parts)
+    parts.append(f"<rules>\n{rules_block}\n</rules>")
 
     # 6. Safety (BOTTOM — anchoring, last thing model reads)
     parts.append(f"<safety>\n{SAFETY_RULES}\n</safety>")

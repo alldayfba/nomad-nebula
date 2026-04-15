@@ -2104,7 +2104,15 @@ def nova_prompt():
     if query:
         faq_entries = get_relevant_faq(query, limit=3)
 
-    prompt = build_prompt(platform, faq_entries=faq_entries, platform_context=context)
+    # Optional reasoning-scaffold flags — SaaS / Discord set these when the
+    # pre-processor spotted a Keepa block or a gating/buy-box question.
+    flags = data.get("flags") or None
+    prompt = build_prompt(
+        platform,
+        faq_entries=faq_entries,
+        platform_context=context,
+        flags=flags,
+    )
     return jsonify({"prompt": prompt})
 
 
@@ -2486,6 +2494,132 @@ def nova_students():
 
     except Exception as e:
         return jsonify({"error": str(e), "students": []}), 500
+
+
+# ── Nova Keepa Analyzer API ──────────────────────────────────────────────────
+# Shared between Discord bot and 247profits.org SaaS Nova. Callers pass an
+# ASIN + optional buy_cost/moq + a user identifier; we do the Keepa call,
+# run profitability if possible, meter the usage against the caller's tier,
+# and return the full structured dict (the caller formats it for their UX).
+
+@app.route("/nova/analyze-asin", methods=["POST"])
+def nova_analyze_asin():
+    """Run a full Keepa analysis for one ASIN, with quota enforcement.
+
+    Request body:
+        {
+          "asin": "B0XXXXXXXX",          # required
+          "buy_cost": 9.04,               # optional — triggers profitability
+          "moq": 320,                     # optional — triggers capital math
+          "user_id": "discord:1234...",  # required — quota key
+          "tier": "paid_in_full",         # optional override; else resolved
+          "source": "discord"             # discord | saas
+        }
+
+    Returns:
+        {ok, analysis, quota, error?}
+    """
+    auth_err = _nova_auth()
+    if auth_err:
+        return auth_err
+
+    data = request.get_json() or {}
+    asin = (data.get("asin") or "").strip().upper()
+    if not asin or len(asin) != 10 or not asin.startswith("B"):
+        return jsonify({"ok": False, "error": "invalid asin"}), 400
+
+    user_id = str(data.get("user_id") or "").strip()
+    if not user_id:
+        return jsonify({"ok": False, "error": "user_id required"}), 400
+
+    tier_override = data.get("tier")
+    source = data.get("source") or "discord"
+
+    try:
+        buy_cost = float(data["buy_cost"]) if data.get("buy_cost") is not None else None
+    except (TypeError, ValueError):
+        buy_cost = None
+    try:
+        moq = int(data["moq"]) if data.get("moq") is not None else None
+    except (TypeError, ValueError):
+        moq = None
+
+    # Quota check BEFORE the Keepa call — don't spend tokens for a capped user.
+    from execution.nova_core import usage_tracker as _ut
+    from execution.nova_core import keepa_analyzer as _ka
+
+    quota = _ut.check_quota(user_id, tier=tier_override)
+    if not quota["allowed"]:
+        return jsonify({
+            "ok": False,
+            "error": "quota_exceeded",
+            "quota": quota,
+            "message": (
+                f"You've hit your daily Keepa cap ({quota['cap']} lookups) "
+                "on the current plan. Upgrade at 247profits.org to raise it."
+            ),
+        })
+
+    try:
+        analysis = _ka.analyze_asin(asin, buy_cost=buy_cost, moq=moq)
+    except Exception as e:
+        return jsonify({"ok": False, "error": f"analysis failed: {e}"}), 500
+
+    # Log usage — cached hits don't count against the quota (tokens_used=0,
+    # cached=1) but we still record them so the dashboard shows activity.
+    _ut.record(
+        user_id=user_id,
+        asin=asin,
+        tokens_used=analysis.get("keepa_tokens_used") or 0,
+        tier=tier_override or quota.get("tier"),
+        cached=bool(analysis.get("cached")),
+    )
+
+    # Post-record quota (so the caller can show "X left")
+    refreshed = _ut.check_quota(user_id, tier=tier_override)
+
+    return jsonify({
+        "ok": bool(analysis.get("ok")),
+        "analysis": analysis,
+        "prompt_block": _ka.format_for_prompt(analysis),
+        "quota": refreshed,
+        "source": source,
+    })
+
+
+@app.route("/nova/usage", methods=["GET"])
+def nova_usage():
+    """Return usage + quota for a user — powers the SaaS dashboard widget."""
+    auth_err = _nova_auth_get()
+    if auth_err:
+        return auth_err
+
+    user_id = (request.args.get("user_id") or "").strip()
+    if not user_id:
+        return jsonify({"error": "user_id required"}), 400
+    tier = request.args.get("tier")
+
+    from execution.nova_core import usage_tracker as _ut
+    quota = _ut.check_quota(user_id, tier=tier)
+    summary = _ut.usage_summary(user_id)
+    return jsonify({"quota": quota, "summary": summary})
+
+
+def _nova_auth_get():
+    """Auth helper for GET endpoints — same as _nova_auth minus the JSON CT check."""
+    if not NOVA_API_SECRET and not _NOVA_DEV_MODE:
+        return jsonify({"error": "NOVA_API_SECRET not configured"}), 401
+    if NOVA_API_SECRET:
+        secret = request.headers.get("X-Nova-Secret", "")
+        if secret != NOVA_API_SECRET:
+            return jsonify({"error": "Unauthorized"}), 401
+    ip = request.remote_addr or "unknown"
+    now = _nova_time.time()
+    _nova_rate_windows[ip] = [t for t in _nova_rate_windows[ip] if now - t < _NOVA_RATE_WINDOW]
+    if len(_nova_rate_windows[ip]) >= _NOVA_RATE_LIMIT:
+        return jsonify({"error": "Rate limited"}), 429
+    _nova_rate_windows[ip].append(now)
+    return None
 
 
 # ── Product Review Queue API ─────────────────────────────────────────────────
